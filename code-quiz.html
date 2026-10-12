@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>stencil.me — Code-Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=DM+Sans:wght@400;500;700&family=Courier+Prime&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111111;--paper:#ffffff;--neon:#ff2d95;--kraft:#b89b74;--muted:#4a4a4a;--mono:'Courier Prime','SFMono-Regular',Consolas,monospace;--head:'Oswald','Arial Narrow',sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.01em;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+a{color:var(--ink)}a:hover{color:var(--neon);background:var(--ink)}
+.topbar{display:flex;align-items:center;gap:14px;padding:16px 20px 10px;flex-shrink:0;max-width:760px;width:100%;margin:0 auto}
+.dots{display:flex;gap:8px;flex:1}
+.dot{flex:1;height:10px;border:2px solid var(--ink);background:#fff;overflow:hidden;position:relative}
+.dot .fill{position:absolute;inset:0;background:var(--neon);width:0%;transition:width .35s ease}
+.steplabel{font-family:var(--head);font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap}
+.stage{flex:1;display:flex;justify-content:center;padding:8px 20px 20px}
+.card{width:100%;max-width:720px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-family:var(--head);font-size:.85rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--neon);color:var(--ink);align-self:flex-start;padding:2px 10px}
+h1{font-family:var(--head);font-weight:700;font-size:1.9rem;line-height:1.15;margin:0;text-transform:uppercase;letter-spacing:.04em}
+.lede{font-size:15px;line-height:1.5;margin:0}
+.codepanel{background:var(--ink);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--neon);padding:14px 16px}
+.codepanel pre{margin:0;font-family:var(--mono);font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word;color:#fff}
+.cm{color:#9a9a9a}.kw{color:var(--neon)}.str{color:var(--kraft)}
+.quiz{background:#fff;border:3px solid var(--ink);padding:16px}
+.quiz .q{font-family:var(--head);font-size:1.05rem;font-weight:500;letter-spacing:.04em;margin:0 0 12px}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border:3px solid var(--ink);background:#fff;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14.5px;cursor:pointer;letter-spacing:.01em}
+.choice:hover{background:var(--kraft)}
+.choice .swatch{width:28px;height:28px;flex-shrink:0;border:3px solid var(--ink);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:.85rem;background:#fff}
+.choice.opt-a .swatch:before{content:'A'}.choice.opt-b .swatch:before{content:'B'}
+.choice:active{transform:translate(2px,2px)}
+.choice.correct{background:var(--neon);box-shadow:5px 5px 0 var(--ink)}
+.choice.correct .swatch:before{content:'✓'}
+.choice.wrong{opacity:.55;text-decoration:line-through}
+.choice.wrong .swatch:before{content:'✕'}
+.choice[disabled]{pointer-events:none}
+.feedback{margin-top:14px;padding:12px 14px;font-size:14px;line-height:1.5;display:none;border:2px solid var(--ink)}
+.feedback.show{display:block}
+.feedback.good{background:#fff0f7}.feedback.bad{background:var(--kraft)}
+.pipeline-tag{font-family:var(--mono);font-size:.85rem;border-left:5px solid var(--neon);padding-left:10px}
+.navbar{position:sticky;bottom:0;background:#fff;border-top:3px solid var(--ink);display:flex;gap:10px;padding:14px 20px 18px;flex-shrink:0;max-width:760px;width:100%;margin:0 auto}
+.btn{flex:1;padding:14px;border:3px solid var(--ink);font-family:var(--head);font-size:1rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;background:var(--ink);color:#fff}
+.btn-back{background:#fff;color:var(--ink);flex:0 0 100px}
+.btn-next[disabled]{opacity:.35;pointer-events:none}
+.btn-next.ready{background:var(--neon);color:var(--ink);box-shadow:5px 5px 0 var(--ink)}
+.btn:hover{background:var(--neon);color:var(--ink)}
+#intro,#outro{display:flex;flex-direction:column;flex:1}
+.full{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 30px;gap:16px}
+.full h1{font-size:2.4rem}.full .eyebrow{align-self:center}.full .lede{max-width:480px;font-size:16px}
+.startbtn{margin-top:10px;padding:16px 36px;border:3px solid var(--ink);background:var(--neon);color:var(--ink);font-family:var(--head);font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;box-shadow:6px 6px 0 var(--ink)}
+.startbtn:hover{background:var(--ink);color:#fff;box-shadow:6px 6px 0 var(--neon)}
+.badge-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center}
+.badge{padding:8px 14px;border:3px solid var(--ink);font-family:var(--mono);font-size:.85rem;background:#fff}
+.backlink{font-family:var(--head);font-size:.85rem;text-transform:uppercase;letter-spacing:.12em}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<div id="intro" class="full">
+  <div class="eyebrow">stencil.me · Code-Quiz</div>
+  <h1>Was steckt wirklich im Code?</h1>
+  <p class="lede">Ihr ratet erst, was ein echter Code-Ausschnitt aus stencil.me macht, und seht danach die Auflösung.</p>
+  <button class="startbtn" onclick="start()">Los geht's →</button>
+  <a class="backlink" href="index.html">← Zurück zum Workshop</a>
+</div>
+
+<div id="app" class="hidden" style="display:flex;flex-direction:column;flex:1;">
+  <div class="topbar">
+    <div class="dots" id="dots"></div>
+    <div class="steplabel" id="stepLabel">Schritt 1/5</div>
+  </div>
+  <div class="stage">
+    <div class="card" id="card"></div>
+  </div>
+  <div class="navbar">
+    <button class="btn btn-back" id="backBtn" onclick="prevCard()">Zurück</button>
+    <button class="btn btn-next" id="nextBtn" disabled onclick="nextCard()">Erst raten →</button>
+  </div>
+</div>
+
+<div id="outro" class="full hidden">
+  <div class="eyebrow">Geschafft</div>
+  <h1>Ihr kennt jetzt die ganze Pipeline</h1>
+  <p class="lede">Von der ersten Zeile Foto-Code bis zum fertigen SVG für den Plotter — genau das läuft im Hintergrund, wenn ihr euer eigenes Stencil-Porträt erstellt.</p>
+  <div class="badge-row" id="scoreRow"></div>
+  <button class="startbtn" onclick="restart()" style="margin-top:26px;">Nochmal von vorn</button>
+  <a class="backlink" href="index.html">← Zurück zum Workshop</a>
+</div>
+
+<script>
+const STEPS = ["Foto","Person erkennen","Schwarz-Weiß","Bereinigen","SVG-Export"];
+
+const CARDS = [
+  {
+    step:0,
+    eyebrow:"Schritt 1 · Foto aufnehmen",
+    title:"Was ist ein Foto für den Computer?",
+    lede:"Wenn ihr eine Datei auswählt, passiert erstmal nur das hier:",
+    code:
+`<span class="kw">const</span> reader = <span class="kw">new</span> FileReader();
+reader.onload = (ev) =&gt; loadImageFromSrc(ev.target.result);
+reader.readAsDataURL(f); <span class="cm">// f = eure ausgewählte Datei</span>`,
+    question:"Ein Foto ist für den Computer im Kern eigentlich …",
+    correctText:"eine lange Kette von Bytes (Zahlen)",
+    wrongText:"eine Zeichnung, die das Programm im Kopf hat",
+    explain:"Genau — <b>FileReader</b> liest die Bilddatei nur als Bytes ein und wandelt sie in eine sogenannte „data URL“ um. Erst danach kann sie der Browser als Bild anzeigen.",
+    pipeline:"loadImageFromSrc() speichert dieses Bild als sourceImg — die Basis für alle folgenden Schritte."
+  },
+  {
+    step:1,
+    eyebrow:"Schritt 2 · Person erkennen",
+    title:"Warum „async“?",
+    lede:"So lädt die App das KI-Modell BodyPix, das Personen erkennt:",
+    code:
+`<span class="kw">async function</span> getBodyPixNet(){
+  bodyPixLoading = bodyPix.load({
+    architecture: <span class="str">'MobileNetV1'</span>,
+    multiplier: <span class="str">0.75</span>
+  });
+  bodyPixNet = <span class="kw">await</span> bodyPixLoading;
+  <span class="kw">return</span> bodyPixNet;
+}`,
+    question:"Wofür steht hier async / await?",
+    correctText:"Der Browser darf beim Laden aus dem Internet weiterarbeiten, statt einzufrieren",
+    wrongText:"Es ist nur Deko und hat keine Funktion",
+    explain:"Laden aus dem Internet dauert. <b>async/await</b> lässt die App währenddessen reagieren, statt die ganze Seite zu blockieren.",
+    pipeline:"Dieses Modell entscheidet gleich für jedes Pixel: Person oder Hintergrund?"
+  },
+  {
+    step:1,
+    eyebrow:"Schritt 2 · Person erkennen",
+    title:"Was kommt am Ende raus?",
+    lede:"Nachdem BodyPix ein Foto analysiert hat:",
+    code:
+`<span class="kw">const</span> segmentation = <span class="kw">await</span> net.segmentPerson(img, {
+  segmentationThreshold: <span class="str">0.7</span>
+});
+<span class="cm">// segmentation.data: 1 = Person, 0 = Hintergrund</span>
+<span class="cm">// ... ein Wert pro Pixel</span>`,
+    question:"Was steht am Ende in der „Personen-Maske“?",
+    correctText:"Für jedes Pixel eine einzelne 0 oder 1",
+    wrongText:"Ein fertiges Foto ohne Hintergrund",
+    explain:"Die KI liefert erstmal nur Zahlen — eine riesige Liste aus Nullen und Einsen, eine pro Pixel. Erst der App-Code nutzt diese Liste, um den Hintergrund später zu ignorieren.",
+    pipeline:"Diese Maske sorgt dafür, dass Schritt 3 nur innerhalb der Person nach dem besten Trennwert sucht."
+  },
+  {
+    step:2,
+    eyebrow:"Schritt 3 · Schwarz-Weiß",
+    title:"Warum zählt Grün am meisten?",
+    lede:"Jedes Pixel hat drei Farbanteile: Rot, Grün und Blau, jeweils von 0 bis 255. Für Schwarz-Weiß braucht die App aber nur einen einzigen Helligkeitswert g. Dafür wird jeder Anteil mit einer Zahl multipliziert (dem „Gewicht“) und alles addiert:",
+    code:
+`<span class="kw">let</span> g = <span class="str">0.299</span>*d[i] + <span class="str">0.587</span>*d[i+<span class="str">1</span>] + <span class="str">0.114</span>*d[i+<span class="str">2</span>];
+<span class="cm">// d[i]   = Rot-Anteil des Pixels</span>
+<span class="cm">// d[i+1] = Grün-Anteil</span>
+<span class="cm">// d[i+2] = Blau-Anteil</span>
+<span class="cm">// g = Helligkeit: 0 = schwarz, 255 = weiß</span>`,
+    question:"Warum wird der Grün-Anteil mit 0.587 multipliziert, also am stärksten gewichtet?",
+    correctText:"Wir empfinden Grün als am hellsten, deshalb soll es am stärksten zählen",
+    wrongText:"Grün ist zufällig gewählt, es könnte auch Rot sein",
+    explain:"Ein Gewicht legt fest, wie stark eine Farbe zur Helligkeit beiträgt. Die drei Gewichte ergeben zusammen 1 (0.299 + 0.587 + 0.114). Würden alle gleich zählen, wirkte ein reines Grün zu dunkel und ein reines Blau zu hell. Zum Vergleich: Reines Grün (0, 255, 0) ergibt g ≈ 150, reines Blau (0, 0, 255) nur g ≈ 29. Genau so hell empfinden wir die Farben auch: <b>Grün am hellsten, Blau am dunkelsten.</b> Diese Formel ist ein Standard, den auch Video und JPEG nutzen.",
+    pipeline:"Dieser Grauwert ist die Grundlage für die Schwarz-Weiß-Entscheidung im nächsten Häppchen."
+  },
+  {
+    step:2,
+    eyebrow:"Schritt 3 · Schwarz-Weiß",
+    title:"Wie findet der Computer die beste Trennung?",
+    lede:"Otsu probiert IM KOPF alle möglichen Trennwerte von 0–255 durch:",
+    code:
+`<span class="kw">for</span>(<span class="kw">let</span> t=<span class="str">0</span>; t&lt;<span class="str">256</span>; t++){
+  <span class="cm">// wie unterschiedlich sind "hell" und "dunkel" bei t?</span>
+  <span class="kw">const</span> varBetween = wB*wF*(mB-mF)*(mB-mF);
+  <span class="kw">if</span>(varBetween &gt; varMax){ threshold = t; }
+}`,
+    question:"Was macht die Otsu-Methode im Kern?",
+    correctText:"Probiert alle Trennwerte durch und wählt den, der zwei möglichst unterschiedliche Gruppen erzeugt",
+    wrongText:"Nimmt immer fest die Bildmitte (127) als Trennwert",
+    explain:"Otsu testet <b>jeden</b> möglichen Wert und behält den, bei dem „helle“ und „dunkle“ Pixel-Gruppen sich am stärksten unterscheiden. So passt sich die App automatisch an jedes Foto an — hell oder dunkel aufgenommen.",
+    pipeline:"Dieser eine Wert entscheidet in stencil.me, welches Pixel ins Motiv kommt und welches nicht."
+  },
+  {
+    step:3,
+    eyebrow:"Schritt 4 · Bereinigen",
+    title:"Wie verschwinden Störpixel?",
+    lede:"despeckle() fragt jedes Pixel nach seinen 8 Nachbarn:",
+    code:
+`<span class="kw">let</span> count = <span class="str">0</span>;
+<span class="cm">// zähle, wie viele der 8 Nachbarn "Motiv" sind</span>
+next[y*size+x] = count &gt; total/<span class="str">2</span> ? <span class="str">1</span> : <span class="str">0</span>;
+<span class="cm">// Mehrheit entscheidet</span>`,
+    question:"Wonach entscheidet despeckle(), ob ein Pixel am Ende schwarz oder weiß wird?",
+    correctText:"Mehrheitsentscheid seiner 8 Nachbar-Pixel",
+    wrongText:"Zufallsgenerator",
+    explain:"Jedes Pixel fragt seine Nachbarn: „Seid ihr mehrheitlich Motiv oder Hintergrund?“ und passt sich an. Einzelne Störpixel verlieren diese Abstimmung und verschwinden.",
+    pipeline:"Ohne diesen Schritt würde der Laser winzige, unnötige Krümel mitschneiden."
+  },
+  {
+    step:4,
+    eyebrow:"Schritt 5 · SVG-Export",
+    title:"Wo verläuft der Umriss?",
+    lede:"traceContours() sucht die Übergänge zwischen Motiv und Hintergrund:",
+    code:
+`<span class="kw">if</span>(!isFg(x,y-<span class="str">1</span>)) edges.push([[x,y],[x+<span class="str">1</span>,y]]);
+<span class="cm">// Kante oben: Pixel ist Motiv, Nachbar drüber nicht</span>`,
+    question:"Wann gilt eine Kante als Rand des Motivs?",
+    correctText:"Wenn ein Motiv-Pixel direkt neben einem Nicht-Motiv-Pixel liegt",
+    wrongText:"Wenn ein Pixel genau in der Bildmitte liegt",
+    explain:"Der Code geht jedes Motiv-Pixel durch und schaut bei allen 4 Nachbarn nach: Ist der Nachbar KEIN Motiv? Dann verläuft dort die Außenkante — genau wie mit dem Finger am Rand entlangfahren.",
+    pipeline:"Aus tausenden solcher Mini-Kanten entsteht am Ende eine zusammenhängende Kontur-Linie."
+  },
+  {
+    step:4,
+    eyebrow:"Schritt 5 · SVG-Export",
+    title:"Was macht die Spiegelung?",
+    lede:"Für den Mirror-Haken in der App steht im SVG-Code:",
+    code:
+`<span class="kw">const</span> t = mirror
+  ? <span class="str">\`translate(\${sizeMm},0) scale(-1,1)\`</span>
+  : <span class="str">""</span>;`,
+    question:"Was bewirkt scale(-1,1) hier?",
+    correctText:"Spiegelt die Grafik horizontal (links-rechts vertauscht)",
+    wrongText:"Macht die Grafik doppelt so groß",
+    explain:"<b>scale(-1,1)</b> dreht die X-Achse um — die Grafik wird horizontal gespiegelt. <b>translate()</b> schiebt sie danach zurück ins Sichtbare. Genau das braucht ein Stempel, damit sein Abdruck seitenrichtig wird.",
+    pipeline:"Erinnert euch an Folie 7: Ein Stempel druckt immer sein Spiegelbild."
+  },
+  {
+    step:4,
+    eyebrow:"Schritt 5 · SVG-Export",
+    title:"Wie entsteht ein „Loch“ im Motiv?",
+    lede:"Beim Positiv-Modus wird die Umgebung graviert, nicht das Motiv:",
+    code:
+`<span class="kw">const</span> d = <span class="str">\`\${fullRectD} \${motifPathD}\`</span>;
+<span class="cm">// eine volle Fläche + die Motiv-Kontur zusammen,</span>
+<span class="cm">// mit fill-rule="evenodd"</span>`,
+    question:"Was bewirkt fill-rule=\"evenodd\" im Positiv-Modus?",
+    correctText:"Schneidet das Motiv als „Loch“ aus einer voll eingefärbten Fläche heraus",
+    wrongText:"Färbt das Motiv einfach doppelt so kräftig ein",
+    explain:"Eine volle Rechteck-Fläche plus die Motiv-Kontur zusammen — mit evenodd wird alles, was von einer <b>ungeraden</b> Anzahl Konturen umschlossen ist, zum Loch. So bleibt das Motiv unbearbeitet, während ringsherum graviert wird.",
+    pipeline:"Das ist derselbe Trick, mit dem auch Buchstaben wie „O“ ihr Loch in der Mitte bekommen."
+  },
+];
+
+// Pro Card einmalig festlegen, ob die richtige Antwort oben oder unten steht
+const shuffleMap = CARDS.map(() => Math.random() < 0.5);
+
+let idx = 0;
+let answered = new Array(CARDS.length).fill(null);
+
+function getChoices(i){
+  const c = CARDS[i];
+  if(shuffleMap[i]){
+    // vertauscht: falsche Antwort oben, richtige unten
+    return { topText: c.wrongText, bottomText: c.correctText, correctSlot: 'b' };
+  }
+  // normal: richtige oben, falsche unten
+  return { topText: c.correctText, bottomText: c.wrongText, correctSlot: 'a' };
+}
+
+function start(){
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');window.scrollTo(0,0);
+  idx = 0;
+  render();
+}
+
+function restart(){
+  answered = new Array(CARDS.length).fill(null);
+  document.getElementById('outro').classList.add('hidden');
+  document.getElementById('intro').classList.remove('hidden');
+}
+
+function buildDots(){
+  const wrap = document.getElementById('dots');
+  wrap.innerHTML = '';
+  STEPS.forEach(() => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    const f = document.createElement('div');
+    f.className = 'fill';
+    d.appendChild(f);
+    wrap.appendChild(d);
+  });
+}
+buildDots();
+
+function updateDots(){
+  const currentStep = CARDS[idx].step;
+  const dots = document.querySelectorAll('#dots .dot .fill');
+  dots.forEach((f, i) => {
+    if(i < currentStep) f.style.width = '100%';
+    else if(i === currentStep) f.style.width = '55%';
+    else f.style.width = '0%';
+  });
+  document.getElementById('stepLabel').textContent =
+    `Schritt ${currentStep+1}/5 · ${STEPS[currentStep]}`;
+}
+
+function render(){
+  const c = CARDS[idx];
+  const ch = getChoices(idx);
+  updateDots();
+
+  const wasAnswered = answered[idx];
+
+  document.getElementById('card').innerHTML = `
+    <div class="eyebrow">${c.eyebrow}</div>
+    <h1>${c.title}</h1>
+    <p class="lede">${c.lede}</p>
+    <div class="codepanel"><pre>${c.code}</pre></div>
+    <div class="quiz">
+      <p class="q">${c.question}</p>
+      <div class="choices">
+        <button class="choice opt-a" id="choiceA" onclick="answer('a')"><span class="swatch"></span>${ch.topText}</button>
+        <button class="choice opt-b" id="choiceB" onclick="answer('b')"><span class="swatch"></span>${ch.bottomText}</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+    <div class="pipeline-tag">${c.pipeline}</div>
+  `;
+
+  window.scrollTo(0,0);
+  document.getElementById('backBtn').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  const nextBtn = document.getElementById('nextBtn');
+
+  if(wasAnswered){
+    revealAnswer(c, wasAnswered);
+    nextBtn.disabled = false;
+    nextBtn.classList.add('ready');
+    nextBtn.textContent = (idx === CARDS.length - 1) ? 'Fertig →' : 'Weiter →';
+  } else {
+    nextBtn.disabled = true;
+    nextBtn.classList.remove('ready');
+    nextBtn.textContent = 'Erst raten →';
+  }
+}
+
+function answer(choice){
+  const ch = getChoices(idx);
+  const isCorrect = choice === ch.correctSlot;
+  answered[idx] = isCorrect ? 'correct' : 'wrong';
+  revealAnswer(CARDS[idx], answered[idx]);
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = false;
+  nextBtn.classList.add('ready');
+  nextBtn.textContent = (idx === CARDS.length - 1) ? 'Fertig →' : 'Weiter →';
+}
+
+function revealAnswer(c, result){
+  const ch = getChoices(idx);
+  const aBtn = document.getElementById('choiceA');
+  const bBtn = document.getElementById('choiceB');
+  [aBtn, bBtn].forEach(b => b.disabled = true);
+
+  if(ch.correctSlot === 'a'){
+    aBtn.classList.add('correct');
+    if(result === 'wrong') bBtn.classList.add('wrong');
+  } else {
+    bBtn.classList.add('correct');
+    if(result === 'wrong') aBtn.classList.add('wrong');
+  }
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (result === 'correct' ? 'good' : 'bad');
+  fb.innerHTML = (result === 'correct' ? '✓ Genau richtig. ' : '➜ Nicht ganz, aber jetzt wisst ihr’s: ') + c.explain;
+}
+
+function nextCard(){
+  if(idx < CARDS.length - 1){
+    idx++;
+    render();
+  } else {
+    finish();
+  }
+}
+
+function prevCard(){
+  if(idx > 0){
+    idx--;
+    render();
+  }
+}
+
+function finish(){
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('outro').classList.remove('hidden');
+  const correctCount = answered.filter(a => a === 'correct').length;
+  document.getElementById('scoreRow').innerHTML = `
+    <div class="badge">${correctCount} von ${CARDS.length} richtig geraten</div>
+    <div class="badge">Alle 5 Schritte durch</div>
+  `;
+}
+</script>
+</body>
+</html>
