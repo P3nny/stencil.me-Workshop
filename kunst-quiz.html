@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>stencil.me — Kunst-Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=DM+Sans:wght@400;500;700&family=Courier+Prime&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111111;--paper:#ffffff;--neon:#ff2d95;--kraft:#b89b74;--muted:#4a4a4a;--mono:'Courier Prime','SFMono-Regular',Consolas,monospace;--head:'Oswald','Arial Narrow',sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.01em;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+a{color:var(--ink)}a:hover{color:var(--neon);background:var(--ink)}
+.topbar{display:flex;align-items:center;gap:14px;padding:16px 20px 10px;flex-shrink:0;max-width:760px;width:100%;margin:0 auto}
+.dots{display:flex;gap:8px;flex:1}
+.dot{flex:1;height:10px;border:2px solid var(--ink);background:#fff;overflow:hidden;position:relative}
+.dot .fill{position:absolute;inset:0;background:var(--neon);width:0%;transition:width .35s ease}
+.steplabel{font-family:var(--head);font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;white-space:nowrap}
+.stage{flex:1;display:flex;justify-content:center;padding:8px 20px 20px}
+.card{width:100%;max-width:720px;display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-family:var(--head);font-size:.85rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:var(--neon);color:var(--ink);align-self:flex-start;padding:2px 10px}
+h1{font-family:var(--head);font-weight:700;font-size:1.9rem;line-height:1.15;margin:0;text-transform:uppercase;letter-spacing:.04em}
+.lede{font-size:15px;line-height:1.5;margin:0}
+.cluepanel{background:var(--kraft);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--neon);padding:14px 16px;font-size:16px;line-height:1.5}.cluepanel .cl{font-family:var(--head);font-size:.8rem;text-transform:uppercase;letter-spacing:.14em;margin-bottom:4px}.codepanel{background:var(--ink);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--neon);padding:14px 16px}
+.codepanel pre{margin:0;font-family:var(--mono);font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word;color:#fff}
+.cm{color:#9a9a9a}.kw{color:var(--neon)}.str{color:var(--kraft)}
+.quiz{background:#fff;border:3px solid var(--ink);padding:16px}
+.quiz .q{font-family:var(--head);font-size:1.05rem;font-weight:500;letter-spacing:.04em;margin:0 0 12px}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border:3px solid var(--ink);background:#fff;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14.5px;cursor:pointer;letter-spacing:.01em}
+.choice:hover{background:var(--kraft)}
+.choice .swatch{width:28px;height:28px;flex-shrink:0;border:3px solid var(--ink);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:700;font-size:.85rem;background:#fff}
+.choice.opt-a .swatch:before{content:'A'}.choice.opt-b .swatch:before{content:'B'}
+.choice:active{transform:translate(2px,2px)}
+.choice.correct{background:var(--neon);box-shadow:5px 5px 0 var(--ink)}
+.choice.correct .swatch:before{content:'✓'}
+.choice.wrong{opacity:.55;text-decoration:line-through}
+.choice.wrong .swatch:before{content:'✕'}
+.choice[disabled]{pointer-events:none}
+.feedback{margin-top:14px;padding:12px 14px;font-size:14px;line-height:1.5;display:none;border:2px solid var(--ink)}
+.feedback.show{display:block}
+.feedback.good{background:#fff0f7}.feedback.bad{background:var(--kraft)}
+.pipeline-tag{font-family:var(--mono);font-size:.85rem;border-left:5px solid var(--neon);padding-left:10px}
+.navbar{position:sticky;bottom:0;background:#fff;border-top:3px solid var(--ink);display:flex;gap:10px;padding:14px 20px 18px;flex-shrink:0;max-width:760px;width:100%;margin:0 auto}
+.btn{flex:1;padding:14px;border:3px solid var(--ink);font-family:var(--head);font-size:1rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;background:var(--ink);color:#fff}
+.btn-back{background:#fff;color:var(--ink);flex:0 0 100px}
+.btn-next[disabled]{opacity:.35;pointer-events:none}
+.btn-next.ready{background:var(--neon);color:var(--ink);box-shadow:5px 5px 0 var(--ink)}
+.btn:hover{background:var(--neon);color:var(--ink)}
+#intro,#outro{display:flex;flex-direction:column;flex:1}
+.full{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px 30px;gap:16px}
+.full h1{font-size:2.4rem}.full .eyebrow{align-self:center}.full .lede{max-width:480px;font-size:16px}
+.startbtn{margin-top:10px;padding:16px 36px;border:3px solid var(--ink);background:var(--neon);color:var(--ink);font-family:var(--head);font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;cursor:pointer;box-shadow:6px 6px 0 var(--ink)}
+.startbtn:hover{background:var(--ink);color:#fff;box-shadow:6px 6px 0 var(--neon)}
+.badge-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center}
+.badge{padding:8px 14px;border:3px solid var(--ink);font-family:var(--mono);font-size:.85rem;background:#fff}
+.backlink{font-family:var(--head);font-size:.85rem;text-transform:uppercase;letter-spacing:.12em}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<div id="intro" class="full">
+  <div class="eyebrow">stencil.me · Kunst-Quiz</div>
+  <h1>Wie gut kennst du die Künstler:innen?</h1>
+  <p class="lede">Zu jeder Künstler:in gibt es einen kurzen Hinweis und eine Frage. Ihr ratet erst und seht danach die Auflösung. Alle findet ihr auch als Lernkarten an der Wand.</p>
+  <button class="startbtn" onclick="start()">Los geht's →</button>
+  <a class="backlink" href="index.html">← Zurück zum Workshop</a>
+</div>
+
+<div id="app" class="hidden" style="display:flex;flex-direction:column;flex:1;">
+  <div class="topbar">
+    <div class="dots" id="dots"></div>
+    <div class="steplabel" id="stepLabel">1/4</div>
+  </div>
+  <div class="stage">
+    <div class="card" id="card"></div>
+  </div>
+  <div class="navbar">
+    <button class="btn btn-back" id="backBtn" onclick="prevCard()">Zurück</button>
+    <button class="btn btn-next" id="nextBtn" disabled onclick="nextCard()">Erst raten →</button>
+  </div>
+</div>
+
+<div id="outro" class="full hidden">
+  <div class="eyebrow">Geschafft</div>
+  <h1>Ihr kennt jetzt die Künstler:innen</h1>
+  <p class="lede">Sie alle haben ein Bild vereinfacht, wiederholt oder zugespitzt. Genau das passiert, wenn ihr euer Stencil-Selfie erstellt.</p>
+  <div class="badge-row" id="scoreRow"></div>
+  <button class="startbtn" onclick="restart()" style="margin-top:26px;">Nochmal von vorn</button>
+  <a class="backlink" href="index.html">← Zurück zum Workshop</a>
+</div>
+
+<script>
+const STEPS = ["Klassiker:innen","Stencil-Pioniere","Frauen auf der Straße","Köln"];
+
+const CARDS = [
+ {
+  "step": 0,
+  "eyebrow": "Klassiker:innen · Selbstporträt",
+  "title": "Yayoi Kusama",
+  "clue": "Japan, 1929–2026. Über 70 Jahre lang malte sie, baute Skulpturen und gestaltete Räume.",
+  "question": "Was ist Kusamas typisches Prinzip?",
+  "correctText": "Ein Muster wird immer wieder wiederholt, bis es ganze Flächen, Räume und Körper überzieht",
+  "wrongText": "Jedes Bild zeigt ein neues Motiv, nie zweimal dasselbe",
+  "explain": "Punkte, Kürbisse und die „Infinity Mirror Rooms“ mit scheinbar endlosen Lichtern: Bei Kusama wiederholt sich ein Muster, bis es alles überzieht.",
+  "pipeline": "Dein Stencil-Selfie ist auch ein Selbstporträt, das du mit eigenen Mustern füllen kannst."
+ },
+ {
+  "step": 0,
+  "eyebrow": "Klassiker:innen · Selbstporträt",
+  "title": "Frida Kahlo",
+  "clue": "Mexiko, 1907–1954. Sie lebte und arbeitete im „Blauen Haus“ bei Mexiko-Stadt.",
+  "question": "Warum malte Frida Kahlo so oft sich selbst?",
+  "correctText": "Sie zeigte damit Schmerz, Identität und mexikanische Kultur und erzählte, wer sie ist",
+  "wrongText": "Sie bekam Aufträge von Prominenten, die porträtiert werden wollten",
+  "explain": "Rund ein Drittel ihrer Bilder sind Selbstporträts. Direkter Blick, Symbole aus Natur und Tradition, kräftige Farben: So erfand sie sich selbst.",
+  "pipeline": "Dein Selfie wird bei stencil.me zur Schablone. Was zeigst du von dir?"
+ },
+ {
+  "step": 0,
+  "eyebrow": "Klassiker:innen · Pop-Art",
+  "title": "Andy Warhol",
+  "clue": "USA, 1928–1987. Sein Atelier hieß „The Factory“.",
+  "question": "Wie entstehen Warhols Siebdrucke von Marilyn Monroe?",
+  "correctText": "Farbe geht nur durch offene Stellen einer Schablone, das Motiv wird in Serie und in vielen Farben gedruckt",
+  "wrongText": "Jedes Bild wird einzeln mit dem Pinsel gemalt",
+  "explain": "Siebdruck arbeitet mit Schablonen: Ein Foto wird vereinfacht, in Serie gedruckt und in verschiedenen Farben wiederholt.",
+  "pipeline": "Genau das macht auch dein Stencil: Farbe geht nur durch die offenen Stellen."
+ },
+ {
+  "step": 0,
+  "eyebrow": "Klassiker:innen · Pop-Art",
+  "title": "Roy Lichtenstein",
+  "clue": "USA, 1923–1997. Er machte Comic-Szenen wie „Whaam!“ zu großen Gemälden.",
+  "question": "Woran erkennst du ein Bild von Lichtenstein?",
+  "correctText": "An dicken schwarzen Konturen, Grundfarben und Rasterpunkten wie im Zeitungsdruck",
+  "wrongText": "An weichen Farbverläufen und verschwommenen Pinselstrichen",
+  "explain": "Schwarze Linien, Grundfarben und Rasterpunkte (Ben-Day-Dots), die den Druck von Zeitungen nachahmen.",
+  "pipeline": "Auch dein Selfie wird auf Schwarz und Weiß reduziert und bleibt trotzdem erkennbar."
+ },
+ {
+  "step": 1,
+  "eyebrow": "Stencil-Pioniere",
+  "title": "Blek le Rat",
+  "clue": "Frankreich, geb. 1951. Er sprühte seit den frühen 1980er-Jahren Ratten in Paris.",
+  "question": "Wer gilt als Urvater des Stencil-Graffitis in Europa?",
+  "correctText": "Blek le Rat. Banksy nennt ihn als Vorbild",
+  "wrongText": "Banksy. Er hat als Erster Schablonen gesprüht",
+  "explain": "Xavier Prou aus Paris sprühte figürliche Motive statt Schriftzüge: schnell gesprüht, überall wiederholbar. Banksy nennt ihn als Vorbild.",
+  "pipeline": "Er hat vorgemacht, was du bei stencil.me tust: ein Bild auf Schwarz und Weiß reduzieren, ausschneiden, sprühen."
+ },
+ {
+  "step": 1,
+  "eyebrow": "Stencil-Pioniere",
+  "title": "Banksy",
+  "clue": "Anonym, Bristol (GB). Bekannt für „Girl with Balloon“ und „Flower Thrower“.",
+  "question": "Was ist über Banksy bis heute nicht bestätigt?",
+  "correctText": "Seine Identität",
+  "wrongText": "Dass er Stencils benutzt",
+  "explain": "Politische, humorvolle Stencils mit Botschaft, im Museum und im öffentlichen Raum. Wer dahintersteckt, ist bis heute nicht bestätigt.",
+  "pipeline": "Ein Stencil braucht kein Gesicht, um erkannt zu werden. Mit wenig Schwarz sagst du viel."
+ },
+ {
+  "step": 2,
+  "eyebrow": "Frauen auf der Straße",
+  "title": "Miss Van",
+  "clue": "Frankreich / Spanien, geb. 1973. Sie lebt in Barcelona und malt die „Poupées“.",
+  "question": "Womit entstehen Miss Vans Wandbilder?",
+  "correctText": "Sie werden mit dem Pinsel gemalt",
+  "wrongText": "Sie werden mit der Spraydose gesprüht",
+  "explain": "Vanessa Alice malt selbstbewusste Frauenfiguren, oft mit Tiermasken und langem Haar. Gemalt mit dem Pinsel, nicht gesprüht. Sie gilt als Pionierin der weiblichen Streetart.",
+  "pipeline": "Sie bestimmt, wie Frauen auf der Straße aussehen. Bei deinem Stencil-Selfie bestimmst du, was von dir sichtbar wird."
+ },
+ {
+  "step": 2,
+  "eyebrow": "Frauen auf der Straße",
+  "title": "Fafi",
+  "clue": "Toulouse, Frankreich. Sie gehört zu den Ersten, die weibliche Figuren im Stadtraum etablierten.",
+  "question": "Was zeichnet die „Fafinettes“ aus?",
+  "correctText": "Ein wiederkehrender Figurentyp im Comic-Look, den man sofort erkennt",
+  "wrongText": "Jedes Mal ein anderer Figurentyp in anderem Stil",
+  "explain": "Freche, wilde, manchmal verletzliche Frauenfiguren auf Mauern, Plakaten und in Galerien. Comic-Look, Rosa und ein Figurentyp, der immer wiederkehrt.",
+  "pipeline": "Auch dein Stencil-Selfie kann zu deinem Erkennungszeichen werden."
+ },
+ {
+  "step": 2,
+  "eyebrow": "Frauen auf der Straße",
+  "title": "Hera",
+  "clue": "Frankfurt. Jasmin Siddiqui bildet mit Falk Lehmann das Duo Herakut.",
+  "question": "Was kombiniert Hera in ihren Wandbildern?",
+  "correctText": "Gemalte Figuren und geschriebene Sätze",
+  "wrongText": "Fotografien und Neonröhren",
+  "explain": "Märchenhafte Wandbilder, auf denen Körper mit Tierformen verschmelzen. Bild und Text erzählen zusammen eine Geschichte.",
+  "pipeline": "Zu deinem Stencil-Selfie kannst du einen eigenen Satz schreiben. So erzählt dein Bild eine Geschichte."
+ },
+ {
+  "step": 2,
+  "eyebrow": "Frauen auf der Straße",
+  "title": "Mona Caron",
+  "clue": "Schweiz, lebt seit 1996 in San Francisco.",
+  "question": "Was malt Mona Caron über mehrere Stockwerke?",
+  "correctText": "Unkraut und Wildpflanzen wie Löwenzahn und Distel",
+  "wrongText": "Wolkenkratzer und Brücken",
+  "explain": "Die Riesen-Murals sind mit Pinsel und Acrylfarbe gemalt. Die Pflanzen stehen für Widerstand, Wandel und Hoffnung.",
+  "pipeline": "Ein einfaches Motiv kann eine Botschaft tragen: Unkraut, das nicht aufgibt. Was soll dein Stencil sagen?"
+ },
+ {
+  "step": 3,
+  "eyebrow": "Streetart in Köln",
+  "title": "Invader",
+  "clue": "Frankreich, geb. 1969. Seit 2006 hängen seine Mosaike auch in Köln, etwa an der Friesenstraße und rund um den Dom.",
+  "question": "Woraus besteht Invaders Streetart?",
+  "correctText": "Aus Fliesen-Mosaiken im Pixel-Look mit Figuren aus „Space Invaders“",
+  "wrongText": "Aus Schablonen und Spraydose",
+  "explain": "Meist nur etwa 20 × 20 cm große Mosaike aus kleinen Quadraten, in über 80 Städten.",
+  "pipeline": "Pixel sind Schwarz-Weiß-Entscheidungen im Kleinen. Dein Bild wird auch aus hellen und dunklen Flächen gebaut."
+ },
+ {
+  "step": 3,
+  "eyebrow": "Streetart in Köln",
+  "title": "Thomas Baumgärtel",
+  "clue": "Kölner Künstler, bekannt als „Bananensprayer“.",
+  "question": "Was sprüht Baumgärtel per Schablone an Museen und Galerien?",
+  "correctText": "Eine Banane",
+  "wrongText": "Einen Apfel",
+  "explain": "Die Banane hängt an den Türen von fast 5.000 Kunstorten, darunter Guggenheim New York und Tate Modern. Heute gilt sie als Auszeichnung.",
+  "pipeline": "Ein Stencil lässt sich beliebig oft sprühen. Ein einfaches Motiv wird zum Erkennungszeichen."
+ },
+ {
+  "step": 3,
+  "eyebrow": "Streetart in Köln",
+  "title": "Oni",
+  "clue": "Düsseldorf / Köln. Ihr Name bedeutet auf Kisuaheli „Gib acht!“.",
+  "question": "Wie bringt Oni ihre Porträts an die Wand?",
+  "correctText": "Als Paste-Up: auf Papier gedruckt oder gemalt und mit Kleister geklebt",
+  "wrongText": "Als Mosaik aus Fliesen",
+  "explain": "Porträts von Frauen, einfach zu transportieren und schnell geklebt. In Ehrenfeld gestaltete sie mit Metra Eda ein Frida-Kahlo-Motiv.",
+  "pipeline": "Ein Porträt vorbereiten, später überall anbringen: Dein Stencil-Selfie funktioniert genauso."
+ }
+];
+
+// Pro Card einmalig festlegen, ob die richtige Antwort oben oder unten steht
+const shuffleMap = CARDS.map(() => Math.random() < 0.5);
+
+let idx = 0;
+let answered = new Array(CARDS.length).fill(null);
+
+function getChoices(i){
+  const c = CARDS[i];
+  if(shuffleMap[i]){
+    // vertauscht: falsche Antwort oben, richtige unten
+    return { topText: c.wrongText, bottomText: c.correctText, correctSlot: 'b' };
+  }
+  // normal: richtige oben, falsche unten
+  return { topText: c.correctText, bottomText: c.wrongText, correctSlot: 'a' };
+}
+
+function start(){
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');window.scrollTo(0,0);
+  idx = 0;
+  render();
+}
+
+function restart(){
+  answered = new Array(CARDS.length).fill(null);
+  document.getElementById('outro').classList.add('hidden');
+  document.getElementById('intro').classList.remove('hidden');
+}
+
+function buildDots(){
+  const wrap = document.getElementById('dots');
+  wrap.innerHTML = '';
+  STEPS.forEach(() => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    const f = document.createElement('div');
+    f.className = 'fill';
+    d.appendChild(f);
+    wrap.appendChild(d);
+  });
+}
+buildDots();
+
+function updateDots(){
+  const currentStep = CARDS[idx].step;
+  const dots = document.querySelectorAll('#dots .dot .fill');
+  dots.forEach((f, i) => {
+    if(i < currentStep) f.style.width = '100%';
+    else if(i === currentStep) f.style.width = '55%';
+    else f.style.width = '0%';
+  });
+  document.getElementById('stepLabel').textContent =
+    `${currentStep+1}/${STEPS.length} · ${STEPS[currentStep]}`;
+}
+
+function render(){
+  const c = CARDS[idx];
+  const ch = getChoices(idx);
+  updateDots();
+
+  const wasAnswered = answered[idx];
+
+  document.getElementById('card').innerHTML = `
+    <div class="eyebrow">${c.eyebrow}</div>
+    <h1>${c.title}</h1>
+    <div class="cluepanel"><div class="cl">Hinweis</div>${c.clue}</div>
+    <div class="quiz">
+      <p class="q">${c.question}</p>
+      <div class="choices">
+        <button class="choice opt-a" id="choiceA" onclick="answer('a')"><span class="swatch"></span>${ch.topText}</button>
+        <button class="choice opt-b" id="choiceB" onclick="answer('b')"><span class="swatch"></span>${ch.bottomText}</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  `;
+
+  window.scrollTo(0,0);
+  document.getElementById('backBtn').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  const nextBtn = document.getElementById('nextBtn');
+
+  if(wasAnswered){
+    revealAnswer(c, wasAnswered);
+    nextBtn.disabled = false;
+    nextBtn.classList.add('ready');
+    nextBtn.textContent = (idx === CARDS.length - 1) ? 'Fertig →' : 'Weiter →';
+  } else {
+    nextBtn.disabled = true;
+    nextBtn.classList.remove('ready');
+    nextBtn.textContent = 'Erst raten →';
+  }
+}
+
+function answer(choice){
+  const ch = getChoices(idx);
+  const isCorrect = choice === ch.correctSlot;
+  answered[idx] = isCorrect ? 'correct' : 'wrong';
+  revealAnswer(CARDS[idx], answered[idx]);
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = false;
+  nextBtn.classList.add('ready');
+  nextBtn.textContent = (idx === CARDS.length - 1) ? 'Fertig →' : 'Weiter →';
+}
+
+function revealAnswer(c, result){
+  const ch = getChoices(idx);
+  const aBtn = document.getElementById('choiceA');
+  const bBtn = document.getElementById('choiceB');
+  [aBtn, bBtn].forEach(b => b.disabled = true);
+
+  if(ch.correctSlot === 'a'){
+    aBtn.classList.add('correct');
+    if(result === 'wrong') bBtn.classList.add('wrong');
+  } else {
+    bBtn.classList.add('correct');
+    if(result === 'wrong') aBtn.classList.add('wrong');
+  }
+
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback show ' + (result === 'correct' ? 'good' : 'bad');
+  fb.innerHTML = (result === 'correct' ? '✓ Genau richtig. ' : '➜ Nicht ganz, aber jetzt wisst ihr’s: ') + c.explain;
+}
+
+function nextCard(){
+  if(idx < CARDS.length - 1){
+    idx++;
+    render();
+  } else {
+    finish();
+  }
+}
+
+function prevCard(){
+  if(idx > 0){
+    idx--;
+    render();
+  }
+}
+
+function finish(){
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('outro').classList.remove('hidden');
+  const correctCount = answered.filter(a => a === 'correct').length;
+  document.getElementById('scoreRow').innerHTML = `
+    <div class="badge">${correctCount} von ${CARDS.length} richtig geraten</div>
+    <div class="badge">Alle ${STEPS.length} Runden durch</div>
+  `;
+}
+</script>
+</body>
+</html>
