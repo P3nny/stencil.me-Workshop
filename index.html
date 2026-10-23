@@ -82,7 +82,7 @@
   <header>
     <div>
       <h1>stencil.me</h1>
-      <div class="tag">Workshop Selbstporträt · Mr Beam Lasercutter · Cricut Maker 3</div>
+      <div class="tag">Selbstporträt · Stempel · Mr Beam</div>
     </div>
     <div class="tag">Patricia Ennenbach</div>
   </header>
@@ -95,15 +95,15 @@
       <span class="val" id="fileStatus">— kein Bild geladen —</span>
     </div>
     <div class="note" id="segNote">
-      Personensegmentierung (BodyPix, läuft lokal im Browser) — noch kein Bild geladen.
+      Die KI-Bilderkennung sucht dich auf dem Foto. Sie läuft nur auf diesem iPad.
     </div>
   </section>
 
   <section class="panel">
-    <div class="step-label"><span class="n">2</span>Freistellung + Bildaufbereitung</div>
+    <div class="step-label"><span class="n">2</span>Bild vorbereiten</div>
     <div class="toggle-row" style="margin-top:0;">
       <label class="field" style="margin:0;">
-        <input type="checkbox" id="useSegmentation" checked> Personensegmentierung anwenden (Hintergrund ausblenden)
+        <input type="checkbox" id="useSegmentation" checked> Hintergrund entfernen (KI-Bilderkennung)
       </label>
     </div>
     <div class="controls-grid">
@@ -129,7 +129,7 @@
   </section>
 
   <section class="panel">
-    <div class="step-label"><span class="n">3</span>Drei Sättigungsgrad-Varianten</div>
+    <div class="step-label"><span class="n">3</span>Wähle deinen Stempel</div>
     <div class="thumbs" id="thumbs"></div>
   </section>
 
@@ -222,9 +222,7 @@
     </div>
 
     <div class="note warn" id="thinWarning" style="display:none;">
-      Achtung: Es wurden sehr dünne Strukturen erkannt (&lt; 0,5 mm bei 5 cm Kantenlänge). Diese können beim
-      Lasercutter/Schneideplotter oder beim Andrucken abbrechen. Empfehlung: gröbere Threshold-Variante wählen oder
-      Rauschunterdrückung erhöhen.
+      Achtung: Sehr dünne Linien brechen beim Drucken leicht ab. Wähl eine Variante weiter links.
     </div>
 
     <div class="row" style="margin-top:16px; align-items:center;" hidden>
@@ -253,9 +251,9 @@
       </div>
       <div style="flex:1;min-width:220px;">
         <div class="legend">
-          <div><span class="swatch" style="background:#ffffff;border:1px solid #c6cabf;"></span>Weiß = kein Job (bleibt erhaben, unbehandelt)</div>
-          <div><span class="swatch" style="background:#1e4fd6;"></span>Blau = Gravur-Job (wird abgetragen)</div>
-          <div><span class="swatch" style="background:#d6291e;border-radius:0;width:10px;height:2px;margin-top:4px;"></span>Rot = Schnittkontur (4×4 cm)</div>
+          <div><span class="swatch" style="background:#ffffff;border:1px solid #c6cabf;"></span>Weiß = bleibt stehen und druckt Farbe</div>
+          <div><span class="swatch" style="background:#1e4fd6;"></span>Blau = wird weggelasert</div>
+          <div><span class="swatch" style="background:#d6291e;border-radius:0;width:10px;height:2px;margin-top:4px;"></span>Rot = hier schneidet der Laser den Stempel aus</div>
         </div>
       </div>
     </div>
@@ -543,7 +541,7 @@ let segToken = 0;
 
 async function runSegmentation(img){
   const token = ++segToken;
-  segNote.textContent = "Personensegmentierung läuft (Modell lädt ggf. erstmalig, kurz warten) …";
+  segNote.textContent = "Die KI sucht dich auf dem Foto … (beim ersten Mal dauert es etwas länger)";
   try{
     const mask = await computePersonMaskWork(img);
     if(token !== segToken) return;
@@ -551,16 +549,16 @@ async function runSegmentation(img){
     if(coverage < MIN_PERSON_COVERAGE){
       // Leere Maske würde einen leeren Stempel ergeben -> ganzes Bild verwenden
       personMaskWork = null;
-      segNote.textContent = "Keine Person erkannt. Es wird das ganze Bild verwendet. Tipp: neues Foto machen, Gesicht groß im Bild.";
+      segNote.textContent = "Die KI hat keine Person gefunden. Es wird das ganze Bild verwendet. Tipp: neues Foto machen, Gesicht groß im Bild.";
     } else {
       personMaskWork = mask;
-      segNote.textContent = "Personensegmentierung aktiv — " + Math.round(coverage*100) + "% der Fläche als Person erkannt.";
+      segNote.textContent = "Die KI hat dich erkannt (" + Math.round(coverage*100) + " % des Bildes). Der Hintergrund ist weg.";
     }
   }catch(err){
     if(token !== segToken) return;
     console.error(err);
     personMaskWork = null;
-    segNote.textContent = "Personenerkennung hat nicht geklappt. Es wird das ganze Bild verwendet. Tipp: Foto vor hellem, ruhigem Hintergrund machen.";
+    segNote.textContent = "Die KI-Bilderkennung hat nicht geklappt. Es wird das ganze Bild verwendet. Tipp: Foto vor hellem, ruhigem Hintergrund machen.";
   }
   render();
 }
@@ -607,7 +605,7 @@ function loadImageFromSrc(src, label, onFinished){
     if(useSegmentation.checked){
       runSegmentation(sourceImg);
     } else {
-      segNote.textContent = "Personensegmentierung deaktiviert.";
+      segNote.textContent = "Hintergrund bleibt drin (KI-Bilderkennung ist aus).";
     }
   };
   img.onerror = () => {
@@ -626,7 +624,7 @@ useSegmentation.addEventListener('change', () => {
   } else {
     segToken++; // laufende Segmentierung verwerfen
     personMaskWork = null;
-    segNote.textContent = "Personensegmentierung deaktiviert.";
+    segNote.textContent = "Hintergrund bleibt drin (KI-Bilderkennung ist aus).";
     render();
   }
 });
