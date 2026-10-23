@@ -116,9 +116,16 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 
 Details, Netzplan und Testprotokoll stehen in `docs/entscheidungen.md`. Neue Entscheidungen dort festhalten.
 
-1. Server: **Ubuntu-Rechner** (entschieden).
-2. HTTPS: App im Workshop vom Ubuntu-Server unter **`https://workshop.datenhandlung.de`**, Let's-Encrypt-Zertifikat per INWX-DNS, lokaler DNS im Workshop-WLAN (vorgeschlagen, Test auf iPad ausstehend). Fallback: Foto per `<input capture>` über HTTP. Netlify bleibt für Demo. INWX-Zugangsdaten nie ins Repo.
-3. WLAN: eigener Router ohne Internet, feste Server-IP, Client-Isolation aus. Mr Beam am eigenen Router (Variante A) oder Ubuntu als Brücke ins KOMEZ-WLAN (Variante B), je nach Antwort des KOMEZ (`docs/fragen-medienzentrum.md`).
+Grundsatz: **Jede Ausbaustufe muss den Workshop allein tragen**, die alte Stufe (Karten, Pairdrop) bleibt Rückfallebene. So wenig Technik wie möglich, bedienbar ohne Netzwerkwissen. Notfallplan: `docs/notfallkarte.md`.
+
+1. Server: **Ubuntu-Laptop**, kleiner Python-Server, Startskript mit QR-Code (entschieden).
+2. Netz: **KOMEZ-WLAN, kein eigener Router** (vorgeschlagen, 5-Minuten-Test vor Ort ausstehend).
+   - Plan A: Laptop liefert App über `http://<IP>:8000`, Foto per `<input capture>` (kein HTTPS nötig), Upload an den Laptop.
+   - Plan B: dieselbe App von Netlify, Stempel per „Teilen“.
+   - Plan C: Karten und Pairdrop wie früher.
+3. Laser: **Handarbeit** in der Mr-Beam-Oberfläche, keine automatische Anbindung vor dem nächsten Workshop.
+
+Zurückgestellt (nach dem Workshop, nur bei Bedarf): eigener Router, HTTPS mit `workshop.datenhandlung.de` (`docs/https-einrichten.md`, INWX-Zugangsdaten nie ins Repo), Laser-Queue.
 
 Noch offen:
 4. Wie kommen die Dateien zu den Kindern? ZIP auf USB-Stick an die Lehrkraft ist der aktuelle Plan, Alternativen prüfen.
@@ -143,7 +150,14 @@ Der erste Auftrag vor allen neuen Funktionen:
 
 Patricia möchte durch die Entwicklung geführt werden. Immer nur den aktuellen Schritt bearbeiten, am Ende Ergebnis und nächsten Schritt vorschlagen.
 
-0. **Infrastruktur klären**: Entscheidungen 1–3 oben, Netzplan, Testaufbau (Server, Router, 2 iPads mit Safari als Home-Bildschirm-App), Ergebnis in `docs/entscheidungen.md`.
+**Bis zum nächsten Workshop (< 4 Wochen, Stand 23.10.2026) gilt diese Reihenfolge, der Rest danach:**
+
+- a) 5-Minuten-Test im KOMEZ (`docs/aufbau-checkliste.md`), Fragen ans KOMEZ.
+- b) Schritt 2 **Stabilität**, gezielt in `index.html`, ohne großes Aufteilen.
+- c) **Minimaler Upload**: Server + Startskript mit QR-Code. In der App: „Stempel speichern“, „An Laptop senden“, „Teilen“.
+- d) Testlauf im KOMEZ spätestens eine Woche vorher.
+
+0. **Infrastruktur klären**: erledigt, siehe `docs/entscheidungen.md`.
 1. **`index.html` reviewen, aufräumen, aufteilen** (siehe Ziel ganz oben): Funktionsliste mit Empfehlung, Freigabe, dann in Stationen `lasercut-stempel`, `lasercut-portraet`, `schneideplotter` plus gemeinsamem Kern zerlegen.
 2. **Stabilität auf alten iPads**: Bibliotheken lokal einbinden, Crash bei leerer Maske beheben, Bildgröße begrenzen, Test auf echten Geräten (Safari, danach Chrome als Fallback), Optimierungen aus `archiv/fotobox-karte` prüfen.
 3. **Offline-first-Grundgerüst**: Anmeldung (Paar/Einzelperson), IndexedDB, Outbox, Server-Endpunkte, Synchronisationsanzeige.
