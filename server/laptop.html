@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stencil.me Laptop</title>
+<link href="/vendor/fonts/fonts.css" rel="stylesheet">
+<script src="/vendor/qrcode/qrcode.js"></script>
+<style>
+  :root { --ink:#111; --paper:#fff; --neon:#ff2d95; --kraft:#b89b74; --muted:#4a4a4a; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:'DM Sans',-apple-system,sans-serif; }
+  h1, h2 { font-family:'Oswald','Arial Narrow',sans-serif; text-transform:uppercase; letter-spacing:.06em; margin:0 0 12px; }
+  h1 { font-size:2rem; border-bottom:4px solid var(--ink); padding-bottom:12px; margin-bottom:24px; }
+  .layout { display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start; }
+  .panel { border:3px solid var(--ink); box-shadow:8px 8px 0 var(--neon); padding:20px; background:#fff; }
+  .qr-panel { width:340px; max-width:100%; text-align:center; }
+  #qr img, #qr svg { width:100%; height:auto; image-rendering:pixelated; }
+  .url { font-family:'Courier Prime',monospace; font-size:1.3rem; font-weight:700; word-break:break-all; margin-top:8px; }
+  .hint { color:var(--muted); font-size:.9rem; margin-top:8px; }
+  .list-panel { flex:1; min-width:300px; }
+  .count { font-family:'Oswald',sans-serif; font-size:1.4rem; }
+  .grid { display:flex; flex-wrap:wrap; gap:14px; margin-top:14px; }
+  .stamp { width:160px; border:3px solid var(--ink); padding:8px; text-align:center; font-family:'Courier Prime',monospace; font-size:.85rem; }
+  .stamp img { width:100%; height:140px; object-fit:contain; background:#f4f4f4; }
+  .stamp .name { font-weight:700; font-size:1rem; }
+  .stamp.new { background:var(--neon); }
+  .folder { font-family:'Courier Prime',monospace; background:#f4f4f4; padding:6px 8px; word-break:break-all; }
+  button { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.1em; border:3px solid var(--ink); background:#fff; padding:8px 14px; cursor:pointer; margin-top:16px; }
+  button:hover { background:var(--neon); }
+  .error { background:var(--neon); border:2px solid var(--ink); padding:10px; margin-top:12px; font-weight:700; }
+</style>
+</head>
+<body>
+<h1>stencil.me · Laptop</h1>
+<div class="layout">
+  <div class="panel qr-panel">
+    <h2>iPads: QR-Code scannen</h2>
+    <div id="qr">Adresse wird gesucht …</div>
+    <div class="url" id="url"></div>
+    <div class="hint" id="otherUrls"></div>
+    <div class="hint">Kamera-App des iPads auf den Code richten, dann den Link antippen.</div>
+  </div>
+  <div class="panel list-panel">
+    <h2>Eingegangene Stempel</h2>
+    <div class="count" id="count">–</div>
+    <div class="hint">Ordner für die Mr-Beam-Oberfläche:</div>
+    <div class="folder" id="folder"></div>
+    <div id="listError"></div>
+    <div class="grid" id="grid"></div>
+    <button id="deleteAll" type="button">Alle Stempel löschen (nach dem Workshop)</button>
+  </div>
+</div>
+<script>
+(function () {
+  "use strict";
+  var seen = null; // Pfade der letzten Liste, um neue Stempel hervorzuheben
+
+  function showQr(url) {
+    var qr = qrcode(0, "M");
+    qr.addData(url);
+    qr.make();
+    document.getElementById("qr").innerHTML = qr.createSvgTag(8, 2);
+    document.getElementById("url").textContent = url;
+  }
+
+  function loadInfo() {
+    fetch("/api/info", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (info) {
+        if (!info.adressen.length) {
+          document.getElementById("qr").textContent = "Keine Netzwerk-Adresse gefunden. Ist der Laptop im WLAN?";
+          setTimeout(loadInfo, 5000);
+          return;
+        }
+        showQr(info.adressen[0]);
+        document.getElementById("otherUrls").textContent = info.adressen.length > 1
+          ? "Falls der Code nicht geht: " + info.adressen.slice(1).join(", ")
+          : "";
+      })
+      .catch(function () { setTimeout(loadInfo, 5000); });
+  }
+
+  function renderList(data) {
+    var grid = document.getElementById("grid");
+    var count = data.stempel.length;
+    document.getElementById("count").textContent = count + " Stempel";
+    document.getElementById("folder").textContent = data.ordner;
+    grid.innerHTML = "";
+    data.stempel.forEach(function (s) {
+      var box = document.createElement("div");
+      box.className = "stamp" + (seen && seen.indexOf(s.pfad) < 0 ? " new" : "");
+      var img = document.createElement("img");
+      img.src = "/daten/" + encodeURI(s.pfad);
+      img.alt = "Stempel von " + s.name;
+      var name = document.createElement("div");
+      name.className = "name";
+      name.textContent = s.name;
+      var time = document.createElement("div");
+      time.textContent = s.tag + " " + s.zeit;
+      box.appendChild(img);
+      box.appendChild(name);
+      box.appendChild(time);
+      grid.appendChild(box);
+    });
+    seen = data.stempel.map(function (s) { return s.pfad; });
+  }
+
+  function loadList() {
+    fetch("/api/liste", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        document.getElementById("listError").innerHTML = "";
+        renderList(data);
+      })
+      .catch(function () {
+        document.getElementById("listError").innerHTML = '<div class="error">Server nicht erreichbar. Läuft das Server-Fenster noch?</div>';
+      });
+  }
+
+  document.getElementById("deleteAll").addEventListener("click", function () {
+    if (!confirm("Wirklich ALLE Stempel vom Laptop löschen? Das kann nicht rückgängig gemacht werden.")) return;
+    fetch("/api/alle-loeschen", { method: "POST" }).then(loadList);
+  });
+
+  loadInfo();
+  loadList();
+  setInterval(loadList, 5000);
+})();
+</script>
+</body>
+</html>
