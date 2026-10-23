@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Small HTTPS file server for testing the workshop pages on an iPad.
 
+Deferred: not needed for the next workshop, see docs/entscheidungen.md.
+
 Only the standard library is used. Example:
     python3 docs/https-testserver.py --cert fullchain.pem --key key.pem
 """

@@ -1,5 +1,7 @@
 # HTTPS einrichten: `workshop.datenhandlung.de`
 
+> **Zurückgestellt.** Für den nächsten Workshop nicht nötig (siehe [entscheidungen.md](entscheidungen.md)). Diese Anleitung gilt erst, wenn wir später einen eigenen Router mit HTTPS brauchen.
+
 Diese Anleitung führst du selbst auf dem Ubuntu-Rechner aus. Die INWX-Zugangsdaten bleiben auf dem Rechner und kommen **nie ins Repo**.
 
 Warum: Safari gibt die Kamera im Browser nur über HTTPS frei (siehe [entscheidungen.md](entscheidungen.md), Punkt 2).
