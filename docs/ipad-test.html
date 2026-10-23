@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>iPad-Test stencil.me</title>
+<style>
+  :root { --bg: #fff; --fg: #111; --muted: #666; --line: #ddd; --ok: #1a7f37; --bad: #c62828; --warn: #b26a00; --btn: #111; --btn-fg: #fff; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111; --fg: #eee; --muted: #aaa; --line: #333; --ok: #4cc26a; --bad: #ff6b6b; --warn: #f0a640; --btn: #eee; --btn-fg: #111; }
+  }
+  body { margin: 0; padding: 16px; font: 17px/1.4 -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--fg); }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  p.hint { color: var(--muted); margin: 0 0 16px; }
+  .row { border-top: 1px solid var(--line); padding: 12px 0; }
+  .row h2 { font-size: 17px; margin: 0 0 4px; }
+  .val { word-break: break-word; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .bad { color: var(--bad); font-weight: 600; }
+  .warn { color: var(--warn); font-weight: 600; }
+  button, .filebtn { display: inline-block; margin-top: 8px; padding: 12px 18px; font: inherit; border: 0; border-radius: 10px; background: var(--btn); color: var(--btn-fg); cursor: pointer; }
+  input[type=file] { display: none; }
+  input[type=text] { width: 100%; box-sizing: border-box; padding: 10px; font: inherit; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); margin-top: 8px; }
+  video, img { display: block; max-width: 100%; max-height: 260px; margin-top: 8px; border-radius: 8px; }
+  textarea { width: 100%; box-sizing: border-box; height: 180px; font: 13px/1.4 ui-monospace, monospace; margin-top: 8px; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>iPad-Test</h1>
+  <p class="hint">Prüft, ob das iPad alles kann, was die Workshop-App braucht. Ergebnis unten kopieren und in docs/entscheidungen.md eintragen.</p>
+
+  <div class="row"><h2>Gerät und Browser</h2><div class="val" id="geraet"></div></div>
+  <div class="row"><h2>Als Home-Bildschirm-App geöffnet</h2><div class="val" id="standalone"></div></div>
+  <div class="row"><h2>Sichere Verbindung (HTTPS)</h2><div class="val" id="https"></div></div>
+
+  <div class="row">
+    <h2>Kamera im Browser</h2>
+    <div class="val" id="kamera"></div>
+    <button id="kameraBtn" type="button">Kamera testen</button>
+    <video id="video" playsinline muted hidden></video>
+  </div>
+
+  <div class="row">
+    <h2>Foto über die Kamera-App</h2>
+    <div class="val" id="foto">noch nicht getestet</div>
+    <label class="filebtn">Foto aufnehmen<input id="fotoInput" type="file" accept="image/*" capture="user"></label>
+    <img id="fotoBild" alt="" hidden>
+  </div>
+
+  <div class="row"><h2>Speichern auf dem iPad (IndexedDB)</h2><div class="val" id="idb"></div></div>
+  <div class="row"><h2>Speicherplatz</h2><div class="val" id="speicher"></div></div>
+
+  <div class="row">
+    <h2>Server erreichbar</h2>
+    <div class="val" id="server"></div>
+    <input id="serverUrl" type="text" placeholder="andere Adresse, z. B. http://192.168.8.10:8000/">
+    <button id="serverBtn" type="button">Adresse prüfen</button>
+  </div>
+
+  <div class="row">
+    <h2>Ergebnis</h2>
+    <textarea id="ergebnis" readonly></textarea>
+    <button id="kopierenBtn" type="button">Ergebnis kopieren</button>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var results = {};
+
+  function show(id, cls, text) {
+    var el = document.getElementById(id);
+    el.innerHTML = "";
+    var span = document.createElement("span");
+    if (cls) span.className = cls;
+    span.textContent = text;
+    el.appendChild(span);
+    results[id] = text;
+    updateSummary();
+  }
+
+  function updateSummary() {
+    var lines = ["Datum: " + new Date().toLocaleString("de-DE"), "Adresse: " + location.href];
+    for (var key in results) {
+      if (Object.prototype.hasOwnProperty.call(results, key)) lines.push(key + ": " + results[key]);
+    }
+    document.getElementById("ergebnis").value = lines.join("\n");
+  }
+
+  // Gerät: iPadOS 13+ meldet sich als "Macintosh", erkennbar an Touch
+  function checkDevice() {
+    var ua = navigator.userAgent;
+    var isIpad = /iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+    var os = ua.match(/OS (\d+)[_.](\d+)/);
+    var version = ua.match(/Version\/([\d.]+)/);
+    var browser = /CriOS/.test(ua) ? "Chrome (iOS)" : /FxiOS/.test(ua) ? "Firefox (iOS)" : /Chrome\//.test(ua) ? "Chrome (Desktop)" : /Safari/.test(ua) ? "Safari" : "unbekannt";
+    var text = (isIpad ? "iPad" : "kein iPad erkannt") +
+      ", Browser: " + browser +
+      (version ? ", Safari-Version " + version[1] : "") +
+      (os ? ", iOS " + os[1] + "." + os[2] : "") +
+      " | " + ua;
+    show("geraet", "", text);
+  }
+
+  function checkStandalone() {
+    var standalone = window.navigator.standalone === true ||
+      (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+    show("standalone", standalone ? "ok" : "warn", standalone ? "ja" : "nein (normaler Browser-Tab)");
+  }
+
+  function checkHttps() {
+    var secure = window.isSecureContext === true;
+    var how = location.protocol === "https:" ? "https:" : location.protocol + " auf localhost, zählt als sicher";
+    show("https", secure ? "ok" : "warn", secure ? "ja (" + how + ")" :"nein (" + location.protocol + "), Kamera im Browser geht dann nicht");
+  }
+
+  function checkCameraSupport() {
+    var supported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    show("kamera", supported ? "" : "bad", supported ? "vorhanden, bitte „Kamera testen“ antippen" : "nicht verfügbar (meist: kein HTTPS)");
+    document.getElementById("kameraBtn").disabled = !supported;
+  }
+
+  function testCamera() {
+    var video = document.getElementById("video");
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+      .then(function (stream) {
+        video.srcObject = stream;
+        video.hidden = false;
+        video.play();
+        var track = stream.getVideoTracks()[0];
+        var s = track.getSettings ? track.getSettings() : {};
+        show("kamera", "ok", "funktioniert" + (s.width ? " (" + s.width + "×" + s.height + ")" : ""));
+        setTimeout(function () {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          video.hidden = true;
+        }, 5000);
+      })
+      .catch(function (err) {
+        show("kamera", "bad", "Fehler: " + err.name + " " + err.message);
+      });
+  }
+
+  function testPhoto(evt) {
+    var file = evt.target.files && evt.target.files[0];
+    if (!file) return;
+    var url = URL.createObjectURL(file);
+    var img = document.getElementById("fotoBild");
+    img.onload = function () {
+      show("foto", "ok", "funktioniert: " + img.naturalWidth + "×" + img.naturalHeight + " px, " + Math.round(file.size / 1024) + " KB, " + file.type);
+    };
+    img.onerror = function () {
+      show("foto", "bad", "Foto lässt sich nicht anzeigen (" + file.type + ")");
+    };
+    img.src = url;
+    img.hidden = false;
+  }
+
+  // Schreibt einen Zeitstempel und liest ihn zurück. Der vorige Wert zeigt, ob Daten das Neuladen überleben.
+  function checkIndexedDb() {
+    if (!window.indexedDB) {
+      show("idb", "bad", "nicht verfügbar");
+      return;
+    }
+    var req;
+    try {
+      req = indexedDB.open("ipad-test", 1);
+    } catch (e) {
+      show("idb", "bad", "Fehler beim Öffnen: " + e.message);
+      return;
+    }
+    req.onupgradeneeded = function () { req.result.createObjectStore("werte"); };
+    req.onerror = function () { show("idb", "bad", "Fehler: " + (req.error && req.error.name)); };
+    req.onsuccess = function () {
+      var db = req.result;
+      var tx = db.transaction("werte", "readwrite");
+      var store = tx.objectStore("werte");
+      var getReq = store.get("letzterBesuch");
+      var now = new Date().toLocaleString("de-DE");
+      getReq.onsuccess = function () {
+        var previous = getReq.result;
+        store.put(now, "letzterBesuch");
+        tx.oncomplete = function () {
+          var readTx = db.transaction("werte", "readonly").objectStore("werte").get("letzterBesuch");
+          readTx.onsuccess = function () {
+            var okWrite = readTx.result === now;
+            show("idb", okWrite ? "ok" : "bad",
+              (okWrite ? "speichern und lesen ok" : "gelesener Wert stimmt nicht") +
+              " | voriger Besuch: " + (previous || "keiner gespeichert (Seite einmal neu laden zum Prüfen)"));
+          };
+        };
+      };
+      tx.onerror = function () { show("idb", "bad", "Fehler: " + (tx.error && tx.error.name)); };
+    };
+  }
+
+  function checkStorage() {
+    if (!(navigator.storage && navigator.storage.estimate)) {
+      show("speicher", "warn", "Angabe nicht verfügbar (ältere iPadOS-Version)");
+      return;
+    }
+    navigator.storage.estimate().then(function (est) {
+      var mb = function (n) { return Math.round(n / 1024 / 1024) + " MB"; };
+      var text = "genutzt " + mb(est.usage || 0) + " von " + mb(est.quota || 0);
+      if (navigator.storage.persisted) {
+        navigator.storage.persisted().then(function (p) {
+          show("speicher", "", text + ", dauerhaft: " + (p ? "ja" : "nein"));
+        });
+      } else {
+        show("speicher", "", text);
+      }
+    }).catch(function (e) { show("speicher", "warn", "Fehler: " + e.message); });
+  }
+
+  function checkServer(url) {
+    var target = url || (location.pathname + "?ping=" + Date.now());
+    show("server", "", "prüfe " + target + " …");
+    var done = false;
+    var timer = setTimeout(function () {
+      if (!done) { done = true; show("server", "bad", "keine Antwort nach 5 s: " + target); }
+    }, 5000);
+    fetch(target, { cache: "no-store", mode: url ? "no-cors" : "same-origin" })
+      .then(function (res) {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        show("server", "ok", "erreichbar: " + target + (res.type === "opaque" ? "" : " (Status " + res.status + ")"));
+      })
+      .catch(function (err) {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        var mixed = location.protocol === "https:" && /^http:/i.test(target);
+        show("server", "bad", "nicht erreichbar: " + target + " (" + err.message + ")" + (mixed ? ", HTTPS-Seite darf keine HTTP-Adresse aufrufen" : ""));
+      });
+  }
+
+  function copyResult() {
+    var area = document.getElementById("ergebnis");
+    area.focus();
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.getElementById("kopierenBtn").textContent = ok ? "Kopiert ✓" : "Text markiert, bitte selbst kopieren";
+  }
+
+  document.getElementById("kameraBtn").addEventListener("click", testCamera);
+  document.getElementById("fotoInput").addEventListener("change", testPhoto);
+  document.getElementById("serverBtn").addEventListener("click", function () {
+    var url = document.getElementById("serverUrl").value.trim();
+    if (url) checkServer(url);
+  });
+  document.getElementById("kopierenBtn").addEventListener("click", copyResult);
+
+  window.addEventListener("error", function (e) {
+    show("fehler", "bad", e.message);
+  });
+
+  checkDevice();
+  checkStandalone();
+  checkHttps();
+  checkCameraSupport();
+  checkIndexedDb();
+  checkStorage();
+  checkServer();
+})();
+</script>
+</body>
+</html>
