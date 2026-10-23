@@ -58,6 +58,8 @@
   .swatch{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px;}
   .note{font-size:.88rem;color:var(--ink);line-height:1.5;background:#fff0f7;border:2px solid var(--ink);padding:10px 14px;margin-top:12px;}
   .note.warn{background:var(--neon);}
+  .error-note{position:fixed;left:16px;right:16px;bottom:16px;z-index:10;margin:0;font-weight:700;}
+  .error-note[hidden]{display:none;}
   .toggle-row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap;}
   select{font-family:inherit;font-size:.85rem;padding:7px 10px;border-radius:0;border:3px solid var(--ink);background:#fff;}
   footer{font-family:var(--mono);font-size:.78rem;color:var(--ink);text-align:center;margin-top:28px;padding-top:16px;border-top:4px solid var(--ink);}
@@ -275,7 +277,23 @@
   </footer>
 </div>
 
+<div class="note warn error-note" id="errorNote" role="alert" hidden></div>
 <script>
+// ---- Fehler anzeigen statt abstürzen ----
+// Jeder unerwartete Fehler erscheint als Hinweis unten am Bildschirm. Die App läuft weiter.
+const errorNote = document.getElementById('errorNote');
+let errorNoteTimer = null;
+function showError(message, err){
+  if(err) console.error(err);
+  errorNote.textContent = message;
+  errorNote.hidden = false;
+  clearTimeout(errorNoteTimer);
+  errorNoteTimer = setTimeout(() => { errorNote.hidden = true; }, 10000);
+}
+const GENERIC_ERROR = "Da ist etwas schiefgegangen. Probier es nochmal oder mach ein neues Foto.";
+window.addEventListener('error', (e) => showError(GENERIC_ERROR, e.error || e.message));
+window.addEventListener('unhandledrejection', (e) => showError(GENERIC_ERROR, e.reason));
+
 const fileInput = document.getElementById('fileInput');
 const useDemo = document.getElementById('useDemo');
 const fileStatus = document.getElementById('fileStatus');
@@ -499,31 +517,86 @@ function refinePersonMask(mask, size){
   return m;
 }
 
+// Unter diesem Anteil gilt die Maske als leer (refinePersonMask entfernt Inseln < 2 %).
+const MIN_PERSON_COVERAGE = 0.02;
+// Zählt bei jedem neuen Foto und beim Abschalten hoch. So kann ein spät fertiges
+// Ergebnis kein neueres Foto überschreiben.
+let segToken = 0;
+
 async function runSegmentation(img){
+  const token = ++segToken;
   segNote.textContent = "Personensegmentierung läuft (Modell lädt ggf. erstmalig, kurz warten) …";
   try{
-    personMaskWork = await computePersonMaskWork(img);
-    const coverage = personMaskWork.reduce((a,b)=>a+b,0) / personMaskWork.length;
-    segNote.textContent = "Personensegmentierung aktiv — " + Math.round(coverage*100) + "% der Fläche als Person erkannt.";
+    const mask = await computePersonMaskWork(img);
+    if(token !== segToken) return;
+    const coverage = mask.reduce((a,b)=>a+b,0) / mask.length;
+    if(coverage < MIN_PERSON_COVERAGE){
+      // Leere Maske würde einen leeren Stempel ergeben -> ganzes Bild verwenden
+      personMaskWork = null;
+      segNote.textContent = "Keine Person erkannt. Es wird das ganze Bild verwendet. Tipp: neues Foto machen, Gesicht groß im Bild.";
+    } else {
+      personMaskWork = mask;
+      segNote.textContent = "Personensegmentierung aktiv — " + Math.round(coverage*100) + "% der Fläche als Person erkannt.";
+    }
   }catch(err){
+    if(token !== segToken) return;
+    console.error(err);
     personMaskWork = null;
-    segNote.textContent = "BodyPix konnte nicht geladen werden (vermutlich keine Internetverbindung im Browser). Pipeline läuft ohne Segmentierung weiter — dann bitte Greenscreen-Foto oder manuelles Freistellen nutzen.";
+    segNote.textContent = "Personenerkennung hat nicht geklappt. Es wird das ganze Bild verwendet. Tipp: Foto vor hellem, ruhigem Hintergrund machen.";
   }
   render();
 }
 
-function loadImageFromSrc(src, label){
+// Längere Bildseite in px. iPad-Fotos haben bis zu 12 Megapixel; in voller Größe
+// sprengen sie auf älteren iPads den Speicher (Absturz) und BodyPix braucht ewig.
+const MAX_IMAGE_SIZE = 1024;
+let loadToken = 0;
+
+// Verkleinert das Foto auf höchstens MAX_IMAGE_SIZE px. Ab hier arbeitet die ganze
+// Pipeline (BodyPix, Schwarz-Weiß, SVG) mit dieser kleinen Kopie.
+function downscaleImage(img){
+  const scale = Math.min(1, MAX_IMAGE_SIZE / Math.max(img.naturalWidth, img.naturalHeight));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(img.naturalWidth * scale));
+  c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c;
+}
+
+function loadImageFromSrc(src, label, onFinished){
+  const token = ++loadToken;
+  const previousStatus = fileStatus.textContent;
+  fileStatus.textContent = "Foto wird geladen …";
   const img = new Image();
   img.onload = () => {
-    sourceImg = img;
+    if(onFinished) onFinished();
+    if(token !== loadToken) return;
+    if(!img.naturalWidth || !img.naturalHeight){
+      fileStatus.textContent = previousStatus;
+      showError("Dieses Foto kann nicht geöffnet werden. Bitte ein anderes Foto wählen.");
+      return;
+    }
+    try{
+      sourceImg = downscaleImage(img);
+    }catch(err){
+      showError("Das Foto ist zu groß oder beschädigt. Bitte ein neues Foto machen.", err);
+      return;
+    }
     fileStatus.textContent = label;
     personMaskWork = null;
+    segToken++;
     render();
     if(useSegmentation.checked){
-      runSegmentation(img);
+      runSegmentation(sourceImg);
     } else {
       segNote.textContent = "Personensegmentierung deaktiviert.";
     }
+  };
+  img.onerror = () => {
+    if(onFinished) onFinished();
+    if(token !== loadToken) return;
+    fileStatus.textContent = previousStatus;
+    showError("Dieses Foto kann nicht geöffnet werden. Bitte ein anderes Foto wählen.");
   };
   img.src = src;
 }
@@ -533,6 +606,7 @@ useSegmentation.addEventListener('change', () => {
   if(useSegmentation.checked){
     runSegmentation(sourceImg);
   } else {
+    segToken++; // laufende Segmentierung verwerfen
     personMaskWork = null;
     segNote.textContent = "Personensegmentierung deaktiviert.";
     render();
@@ -546,12 +620,19 @@ useDemo.addEventListener('click', () => {
 fileInput.addEventListener('change', (e) => {
   const f = e.target.files[0];
   if(!f) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => loadImageFromSrc(ev.target.result, f.name);
-  reader.readAsDataURL(f);
+  // Objekt-URL statt Data-URL: spart eine mehrere MB große Text-Kopie des Fotos
+  const url = URL.createObjectURL(f);
+  loadImageFromSrc(url, f.name, () => URL.revokeObjectURL(url));
+  fileInput.value = ''; // dasselbe Foto kann erneut gewählt werden
 });
 
-[contrastSlider, spreadSlider, despeckleSlider].forEach(s => s.addEventListener('input', render));
+// Jede Neuberechnung erzeugt mehrere Bilder im Speicher. Beim Ziehen am Regler
+// erst kurz nach der letzten Bewegung rechnen, damit alte iPads nicht überlaufen.
+let renderDebounce = null;
+[contrastSlider, spreadSlider, despeckleSlider].forEach(s => s.addEventListener('input', () => {
+  clearTimeout(renderDebounce);
+  renderDebounce = setTimeout(render, 150);
+}));
 
 function toSquareGrayscale(img, contrastPct){
   const c = document.createElement('canvas');
