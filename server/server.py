@@ -30,7 +30,7 @@ DATA_DIR = os.path.join(REPO_DIR, "server", "daten", "stempel")
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 
 # Paths the iPads may load. Everything else (archiv/, .git/, server/) stays private.
-PUBLIC_FILES = {"/", "/index.html", "/code-quiz.html", "/kunst-quiz.html", "/docs/ipad-test.html"}
+PUBLIC_FILES = {"/", "/index.html", "/code-quiz.html", "/kunst-quiz.html", "/docs/ipad-test.html", "/docs/test-foto.jpg"}
 PUBLIC_PREFIXES = ("/vendor/",)
 
 ID_RE = re.compile(r"^[a-f0-9]{12}$")
