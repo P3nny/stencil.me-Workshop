@@ -12,6 +12,23 @@ Status-Werte: **entschieden** · **vorgeschlagen** (Test ausstehend) · **zurüc
 
 ---
 
+## Arbeitsannahmen (bis zur Antwort des KOMEZ, frühestens 02.11.2026)
+
+Wir bauen mit diesen Annahmen weiter. Stellt sich eine als falsch heraus, greift der jeweilige Plan B.
+
+| Annahme | Begründung | Falls falsch |
+| --- | --- | --- |
+| iPads im KOMEZ-WLAN können den Laptop erreichen | Laptop durfte ins WLAN, Pairdrop lief zwischen Geräten | Plan B (Netlify + Teilen) |
+| Safari auf den iPads ist nutzbar | Pairdrop lief im Browser | Plan C (Karten) |
+| iPads sind älter, wenig Arbeitsspeicher (2–3 GB) | Abstürze bei der Bildverarbeitung im letzten Workshop | — darum: Bilder klein rechnen, Fehler abfangen |
+| iPadOS-Version unbekannt | — | vorsichtige Syntax (kein `?.`, `??`), keine neuen Web-APIs voraussetzen |
+| „Zum Home-Bildschirm“ evtl. gesperrt | MDM unbekannt | App muss auch im normalen Safari-Tab laufen |
+| Mr Beam ist vom Laptop im KOMEZ-WLAN erreichbar | noch nicht geprüft, beim nächsten Besuch testen | USB-Stick, später lasern |
+
+Tests laufen mit Patricias Ubuntu-Laptop und ihrem eigenen iPad. Das ist eine Annäherung: Die KOMEZ-iPads können älter und langsamer sein.
+
+---
+
 ## 1. Server: Ubuntu-Laptop — entschieden
 
 - Ein kleiner Server (Python) auf dem Ubuntu-Laptop liefert die App aus und nimmt Stempel-Dateien entgegen.
