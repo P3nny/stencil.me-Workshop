@@ -60,6 +60,11 @@
   .note.warn{background:var(--neon);}
   .error-note{position:fixed;left:16px;right:16px;bottom:16px;z-index:10;margin:0;font-weight:700;}
   .error-note[hidden]{display:none;}
+  .send-box{margin-top:14px;border-top:3px solid var(--ink);padding-top:12px;max-width:320px;}
+  .send-box input[type=text]{font-family:inherit;font-size:1rem;padding:10px;border:3px solid var(--ink);border-radius:0;width:100%;box-sizing:border-box;margin:4px 0 10px;}
+  .send-box button{margin:0 8px 8px 0;}
+  .send-box button[hidden]{display:none;}
+  .send-status{font-family:var(--mono);font-size:.85rem;line-height:1.5;margin-top:4px;}
   .toggle-row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap;}
   select{font-family:inherit;font-size:.85rem;padding:7px 10px;border-radius:0;border:3px solid var(--ink);background:#fff;}
   footer{font-family:var(--mono);font-size:.78rem;color:var(--ink);text-align:center;margin-top:28px;padding-top:16px;border-top:4px solid var(--ink);}
@@ -231,6 +236,13 @@
         <div class="val" style="font-weight:bold;margin-bottom:4px;">Negativ</div>
         <div class="svgbox"><div id="svgHolderNeg">— Variante in Schritt 3 auswählen —</div></div>
         <button id="downloadNeg" disabled style="margin-top:8px;">Negativ herunterladen</button>
+        <div class="send-box">
+          <label class="field" for="stampName">Dein Vorname oder Kürzel</label>
+          <input type="text" id="stampName" maxlength="20" autocomplete="off" autocapitalize="words" placeholder="z. B. Lena oder LK">
+          <button id="sendStamp" type="button" disabled>Stempel abschicken</button>
+          <button id="shareStamp" type="button" class="secondary" hidden>Teilen</button>
+          <div class="send-status" id="sendStatus"></div>
+        </div>
       </div>
       <div style="flex:1;min-width:220px;">
         <div class="legend">
@@ -1274,6 +1286,7 @@ function renderOutputs(){
     svgHolderNeg.innerHTML = neg.svg;
     setupDownload(downloadPosBtn, pos.svg, '-positiv');
     setupDownload(downloadNegBtn, neg.svg, '-negativ');
+    setCurrentStamp(neg.svg);
   } else {
     const plot = buildPlotterSvg(variant);
     svgHolderPlot.innerHTML = plot.svg;
@@ -1368,6 +1381,179 @@ hatchSpacingSlider.addEventListener('input', () => {
   clearTimeout(hatchSpacingDebounce);
   hatchSpacingDebounce = setTimeout(renderOutputs, 150);
 });
+
+// ---- Stempel abschicken: erst aufs iPad, dann an den Laptop ----
+// Jeder abgeschickte Stempel wird sofort auf dem iPad gespeichert (IndexedDB) und
+// kommt in eine Warteschlange ("Outbox"). Die App schickt ihn an den Laptop und
+// versucht es alle 15 s erneut, solange der Laptop nicht erreichbar ist.
+// Jeder Stempel hat eine eigene ID, damit er beim Laptop nie doppelt ankommt.
+const stampNameInput = document.getElementById('stampName');
+const sendStampBtn = document.getElementById('sendStamp');
+const shareStampBtn = document.getElementById('shareStamp');
+const sendStatusEl = document.getElementById('sendStatus');
+const RETRY_MS = 15000;
+const SEND_TIMEOUT_MS = 10000;
+let currentStampSvg = null;
+let lastQueuedSvg = null;
+let flushing = false;
+let flushAgain = false; // während eines Laufs neu dazugekommen -> direkt nochmal senden
+let memoryOutbox = []; // Ersatz, falls IndexedDB auf dem Gerät nicht geht
+
+function setCurrentStamp(svg){
+  currentStampSvg = svg;
+  sendStampBtn.disabled = false;
+}
+
+function cleanStampName(name){
+  return (name || '').trim().replace(/\s+/g, '-').replace(/[^A-Za-z0-9äöüÄÖÜß_-]/g, '').slice(0, 20);
+}
+
+function newStampId(){
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  return Array.prototype.map.call(bytes, b => ('0' + b.toString(16)).slice(-2)).join('');
+}
+
+let outboxDbPromise = null;
+function openOutboxDb(){
+  if(outboxDbPromise) return outboxDbPromise;
+  outboxDbPromise = new Promise((resolve) => {
+    let req;
+    try{
+      req = indexedDB.open('stencilme', 1);
+    }catch(err){
+      resolve(null);
+      return;
+    }
+    req.onupgradeneeded = () => req.result.createObjectStore('stempel', { keyPath: 'id' });
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => resolve(null);
+  });
+  return outboxDbPromise;
+}
+
+function outboxPut(entry){
+  return openOutboxDb().then(db => {
+    if(!db){
+      memoryOutbox = memoryOutbox.filter(e => e.id !== entry.id).concat([entry]);
+      return false;
+    }
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('stempel', 'readwrite');
+      tx.objectStore('stempel').put(entry);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => reject(tx.error);
+    });
+  });
+}
+
+function outboxAll(){
+  return openOutboxDb().then(db => {
+    if(!db) return memoryOutbox.slice();
+    return new Promise((resolve, reject) => {
+      const req = db.transaction('stempel', 'readonly').objectStore('stempel').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  });
+}
+
+function postStamp(entry){
+  const url = 'api/stempel?id=' + encodeURIComponent(entry.id) + '&name=' + encodeURIComponent(entry.name);
+  const request = fetch(url, { method: 'POST', headers: { 'Content-Type': 'image/svg+xml' }, body: entry.svg })
+    .then(res => {
+      if(!res.ok) throw new Error('Status ' + res.status);
+      return res.json();
+    });
+  const timeout = new Promise((resolve, reject) => setTimeout(() => reject(new Error('Zeitüberschreitung')), SEND_TIMEOUT_MS));
+  return Promise.race([request, timeout]);
+}
+
+function updateSendStatus(entries, persisted){
+  const pending = entries.filter(e => !e.sent).length;
+  const sent = entries.length - pending;
+  const lines = [];
+  if(entries.length){
+    lines.push(persisted === false
+      ? '⚠ Nur vorübergehend auf dem iPad gespeichert. App bitte nicht schließen.'
+      : '✓ Gesichert auf dem iPad');
+  }
+  if(sent) lines.push('✓ Gesichert auf dem Laptop: ' + sent + ' Stempel');
+  if(pending) lines.push('… Noch nicht beim Laptop: ' + pending + ' Stempel. Neuer Versuch läuft automatisch.');
+  sendStatusEl.textContent = lines.join('\n');
+  sendStatusEl.style.whiteSpace = 'pre-line';
+}
+
+function flushOutbox(){
+  if(flushing){
+    flushAgain = true;
+    return Promise.resolve();
+  }
+  flushing = true;
+  return outboxAll()
+    .then(entries => {
+      const pending = entries.filter(e => !e.sent);
+      // Nacheinander senden, damit alte iPads und der Laptop nicht überlastet werden
+      return pending.reduce((chain, entry) => chain.then(() =>
+        postStamp(entry)
+          .then(() => { entry.sent = true; return outboxPut(entry); })
+          .catch(() => { /* Laptop nicht erreichbar: beim nächsten Versuch erneut */ })
+      ), Promise.resolve());
+    })
+    .then(() => outboxAll())
+    .then(entries => openOutboxDb().then(db => updateSendStatus(entries, !!db)))
+    .catch(err => console.error(err))
+    .then(() => {
+      flushing = false;
+      if(flushAgain){
+        flushAgain = false;
+        flushOutbox();
+      }
+    });
+}
+
+sendStampBtn.addEventListener('click', () => {
+  if(!currentStampSvg) return;
+  const name = cleanStampName(stampNameInput.value);
+  if(!name){
+    showError('Bitte trag zuerst deinen Vornamen oder ein Kürzel ein.');
+    stampNameInput.focus();
+    return;
+  }
+  if(currentStampSvg === lastQueuedSvg){
+    sendStatusEl.textContent = 'Dieser Stempel ist schon abgeschickt. Ändere ihn oder mach ein neues Foto.';
+    return;
+  }
+  const entry = { id: newStampId(), name: name, svg: currentStampSvg, createdAt: new Date().toISOString(), sent: false };
+  lastQueuedSvg = currentStampSvg;
+  sendStatusEl.textContent = 'Wird gespeichert …';
+  outboxPut(entry)
+    .then(() => flushOutbox())
+    .catch(err => showError('Speichern auf dem iPad hat nicht geklappt. Bitte „Negativ herunterladen“ benutzen.', err));
+});
+
+// Teilen (z. B. an Pairdrop oder AirDrop) geht nur über HTTPS, also bei Plan B (Netlify)
+function canShareFiles(){
+  try{
+    return !!(navigator.canShare && navigator.canShare({ files: [new File(['<svg/>'], 'test.svg', { type: 'image/svg+xml' })] }));
+  }catch(err){
+    return false;
+  }
+}
+if(canShareFiles()){
+  shareStampBtn.hidden = false;
+  shareStampBtn.addEventListener('click', () => {
+    if(!currentStampSvg) return;
+    const name = cleanStampName(stampNameInput.value) || 'stempel';
+    const file = new File([currentStampSvg], name + '-negativ.svg', { type: 'image/svg+xml' });
+    navigator.share({ files: [file], title: 'Stempel von ' + name })
+      .catch(err => { if(err && err.name !== 'AbortError') showError('Teilen hat nicht geklappt. Bitte „Negativ herunterladen“ benutzen.', err); });
+  });
+}
+
+// Nach dem Laden (z. B. App wurde neu geöffnet) liegengebliebene Stempel nachsenden
+flushOutbox();
+setInterval(flushOutbox, RETRY_MS);
 </script>
 </body>
 </html>
