@@ -112,13 +112,15 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 - Als mögliches Vorbild für Upload und Queue dient `archiv/00_fotobox-karte` (lokal).
 - Ob der Server auf dem Windows-Rechner (verbunden über find.mrbeam) oder dem Ubuntu-Rechner läuft, ist **offen** (siehe unten).
 
-## Offene Entscheidungen (Stand: Schritt 0)
+## Entscheidungen (Stand: Schritt 0)
 
-Vor dem Bauen mit Patricia klären und in `docs/entscheidungen.md` festhalten:
+Details, Netzplan und Testprotokoll stehen in `docs/entscheidungen.md`. Neue Entscheidungen dort festhalten.
 
-1. Server auf Windows- oder Ubuntu-Rechner? Kriterien: Erreichbarkeit des Mr Beam, Adminrechte, Claude-CLI, Stabilität.
-2. HTTPS im lokalen Netz. iPad-Safari erlaubt die Kamera nur über HTTPS (außer localhost). Ein reines `http://192.168…` reicht nicht, eine Seite von Netlify (HTTPS) darf kein HTTP-Ziel im LAN ansprechen.
-3. Eigener Router/WLAN mit fester Server-Adresse, Client-Isolation aus. Verwaltete iPads: MDM-Einschränkungen klären.
+1. Server: **Ubuntu-Rechner** (entschieden).
+2. HTTPS: App im Workshop vom Ubuntu-Server unter **`https://workshop.datenhandlung.de`**, Let's-Encrypt-Zertifikat per INWX-DNS, lokaler DNS im Workshop-WLAN (vorgeschlagen, Test auf iPad ausstehend). Fallback: Foto per `<input capture>` über HTTP. Netlify bleibt für Demo. INWX-Zugangsdaten nie ins Repo.
+3. WLAN: eigener Router ohne Internet, feste Server-IP, Client-Isolation aus. Mr Beam am eigenen Router (Variante A) oder Ubuntu als Brücke ins KOMEZ-WLAN (Variante B), je nach Antwort des KOMEZ (`docs/fragen-medienzentrum.md`).
+
+Noch offen:
 4. Wie kommen die Dateien zu den Kindern? ZIP auf USB-Stick an die Lehrkraft ist der aktuelle Plan, Alternativen prüfen.
 5. Claude-Station in der App: API-Zugang hinterlegen, Interaktion auf die vorgegebene Aufgabe begrenzen. Eigenes Unterprojekt. Ein API-Schlüssel mit Ausgabenlimit ist etwas anderes als das Claude-Konto der CLI. Nutzungsbedingungen prüfen.
 6. Canva und KI-Selbstporträt: ersetzen, ohne das private Canva-Konto. Hintergrund-Tausch lokal mit BodyPix. Generative Bilder nur mit geprüftem Datenschutz, möglichst ohne Foto der Kinder (nur Prompt aus Baukasten).
