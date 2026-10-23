@@ -23,7 +23,23 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 
 ## 3. Aufbau im Raum
 
-- [ ] Laptop ins KOMEZ-WLAN, Startskript starten (kommt in einem späteren Schritt; bis dahin wie in Teil 1)
-- [ ] QR-Code sichtbar aufstellen
+- [ ] Laptop ins KOMEZ-WLAN, Netzteil anschließen, Laptop **aufgeklappt** lassen
+- [ ] Terminal im Repo-Ordner öffnen: `./server/start.sh`
+  - Der Browser öffnet die Laptop-Seite mit QR-Code und Stempel-Liste.
+  - Der Laptop geht nicht in den Ruhezustand, solange das Terminal-Fenster offen ist.
+- [ ] Laptop-Bildschirm mit dem QR-Code zu den iPads drehen
 - [ ] Pro iPad: QR-Code scannen, Seite öffnen, Teilen → „Zum Home-Bildschirm“, App vom Home-Bildschirm starten, ein Testfoto machen
 - [ ] App offen lassen, nicht neu laden
+
+## 4. Während des Workshops
+
+- [ ] Die Kinder tippen beim Negativ-Stempel ihren Vornamen oder ein Kürzel ein und dann „Stempel abschicken“.
+- [ ] Neue Stempel erscheinen auf der Laptop-Seite (pink markiert).
+- [ ] In der Mr-Beam-Oberfläche die Dateien aus dem angezeigten Ordner hochladen.
+- [ ] Steht auf dem iPad „Noch nicht beim Laptop“: nichts tun, die App versucht es alle 15 Sekunden erneut.
+
+## 5. Nach dem Workshop
+
+- [ ] Stempel auf USB-Stick sichern, falls sie noch gebraucht werden
+- [ ] Laptop-Seite: „Alle Stempel löschen“
+- [ ] Terminal-Fenster schließen (Server aus)
