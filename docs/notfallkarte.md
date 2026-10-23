@@ -17,3 +17,8 @@ Ausdrucken und neben den Laptop legen. Ruhig bleiben: Es gibt immer einen Plan B
 - Plan A (Laptop): `http://__________:8000`
 - Plan B (Netlify): `https://stencilme-workshop.netlify.app`
 - Mr Beam: `http://__________`
+
+## Versteckte Funktionen (für die Leitung)
+
+- `?extras` an die Adresse hängen: Bild (Positiv) und Sticker, nur wenn Zeit bleibt. Beispiel: `http://__________:8000/?extras`
+- `?test`: Knopf „Test-Foto verwenden“ zum Ausprobieren ohne Kamera

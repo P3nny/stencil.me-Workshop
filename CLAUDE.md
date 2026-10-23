@@ -44,7 +44,7 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 
 ## Ist-Zustand des Repos
 
-- `index.html`: stencil.me-Workshop-App (Foto → BodyPix → Schwarz-Weiß → SVG). Eine einzelne, große Datei (ca. 500 KB, Bilddaten eingebettet).
+- `index.html`: stencil.me-Workshop-App (Foto → BodyPix → Schwarz-Weiß → SVG), eine Datei (ca. 100 KB). Startet im Pflichtweg Negativ-Stempel. `?extras` zeigt Bild (Positiv) und Sticker, `?test` den Knopf für `docs/test-foto.jpg`. Code für Schraffur, Raster, Sticker ist noch drin (Löschen in Roadmap 1).
 - `code-quiz.html`, `kunst-quiz.html`: eigenständige Quizseiten.
 - PDFs: Startpräsentation, Stationenkarten, Künstler:innen, Berufe, Abschluss, QR-Code Kunstquiz.
 - `/archiv/` ist in `.gitignore`: dort liegt lokal die `fotobox-karte` (Flask-Queue `fotobox-queue.py`, Plotter-Anbindung) als Vorbild für Foto-Übertragung und Server-Queue. **Nicht ins Repo committen.** Wenn du dort lesen musst, frag nach dem Pfad.
