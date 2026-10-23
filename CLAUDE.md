@@ -101,7 +101,7 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 - **Kein Foto und kein Prompt eines Kindes geht an einen Online-Dienst**, ohne dass es in `Datenschutz.md` steht und Einwilligungen vorliegen. Das gilt auch für KI-Funktionen.
 - Der Workshop-Server ist Patricias Laptop im KOMEZ-WLAN und nimmt nur Stempel-Dateien an. Er gibt nichts an Online-Dienste weiter.
 - Daten werden nach dem Workshop gelöscht. Abgabe der Ergebnisse als ZIP (USB-Stick an die Lehrkraft, Weg noch zu prüfen).
-- `/archiv/Datenschutz.md` ist ein Pflicht-Ergebnis: kindgerecht verständlich, geht vorab an Lehrkräfte und Erziehungsberechtigte, Kinder sollen es selbst lesen, verstehen und hinterfragen können. Es erklärt den Datenweg pro Station und den Unterschied Programm / KI / generative KI. Bei jeder Änderung an Datenflüssen aktualisieren.
+- `/archiv/Datenschutz.md` ist ein Pflicht-Ergebnis: kindgerecht verständlich, geht vorab an Lehrkräfte und Erziehungsberechtigte, Kinder sollen es selbst lesen, verstehen und hinterfragen können. Es erklärt den Datenweg pro Station und den Unterschied Programm / KI / generative KI. Bei jeder Änderung an Datenflüssen aktualisieren. Bis zum eigenen Datenschutz-Schritt (Roadmap 7) werden die Punkte in `docs/datenschutz-notizen.md` gesammelt, `Datenschutz.md` bleibt solange unverändert.
 - Beim Bau neuer Funktionen immer fragen: Wohin gehen die Daten? Wie lange bleiben sie? Wer kann sie sehen?
 
 ## Lokaler Server und Lasercut
