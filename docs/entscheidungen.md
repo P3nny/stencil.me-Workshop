@@ -111,4 +111,4 @@ Eigener API-Schlüssel mit Ausgabenlimit, Nutzungsbedingungen prüfen.
 
 | Datum | Gerät (Modell, iPadOS) | Browser | Adresse | Ergebnis |
 | ----- | ---------------------- | ------- | ------- | -------- |
-|       |                        |         |         |          |
+| 23.10.2026 | Patricias iPad (Modell/iPadOS nachtragen) | Safari | Heim-WLAN, `http://<Laptop-IP>:8000/` (Branch `feature/upload`) | Upload Stempel → Laptop reibungslos |
