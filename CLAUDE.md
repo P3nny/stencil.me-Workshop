@@ -99,7 +99,7 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 
 - Fotos von Jugendlichen werden zuerst nur auf dem Gerät verarbeitet. Zum lokalen Server geht nur, was für Laser und Ergebnis-Mappe nötig ist (Stempel-Datei, vom Kind hochgeladene Ergebnisse).
 - **Kein Foto und kein Prompt eines Kindes geht an einen Online-Dienst**, ohne dass es in `Datenschutz.md` steht und Einwilligungen vorliegen. Das gilt auch für KI-Funktionen.
-- Der Workshop-Server hängt in einem eigenen WLAN ohne Internet (außer es ist ausdrücklich nötig).
+- Der Workshop-Server ist Patricias Laptop im KOMEZ-WLAN und nimmt nur Stempel-Dateien an. Er gibt nichts an Online-Dienste weiter.
 - Daten werden nach dem Workshop gelöscht. Abgabe der Ergebnisse als ZIP (USB-Stick an die Lehrkraft, Weg noch zu prüfen).
 - `/archiv/Datenschutz.md` ist ein Pflicht-Ergebnis: kindgerecht verständlich, geht vorab an Lehrkräfte und Erziehungsberechtigte, Kinder sollen es selbst lesen, verstehen und hinterfragen können. Es erklärt den Datenweg pro Station und den Unterschied Programm / KI / generative KI. Bei jeder Änderung an Datenflüssen aktualisieren.
 - Beim Bau neuer Funktionen immer fragen: Wohin gehen die Daten? Wie lange bleiben sie? Wer kann sie sehen?
@@ -128,6 +128,7 @@ Grundsatz: **Jede Ausbaustufe muss den Workshop allein tragen**, die alte Stufe 
 Zurückgestellt (nach dem Workshop, nur bei Bedarf): eigener Router, HTTPS mit `workshop.datenhandlung.de` (`docs/https-einrichten.md`, INWX-Zugangsdaten nie ins Repo), Laser-Queue.
 
 Noch offen:
+
 4. Wie kommen die Dateien zu den Kindern? ZIP auf USB-Stick an die Lehrkraft ist der aktuelle Plan, Alternativen prüfen.
 5. Claude-Station in der App: API-Zugang hinterlegen, Interaktion auf die vorgegebene Aufgabe begrenzen. Eigenes Unterprojekt. Ein API-Schlüssel mit Ausgabenlimit ist etwas anderes als das Claude-Konto der CLI. Nutzungsbedingungen prüfen.
 6. Canva und KI-Selbstporträt: ersetzen, ohne das private Canva-Konto. Hintergrund-Tausch lokal mit BodyPix. Generative Bilder nur mit geprüftem Datenschutz, möglichst ohne Foto der Kinder (nur Prompt aus Baukasten).
