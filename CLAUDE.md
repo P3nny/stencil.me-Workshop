@@ -48,7 +48,7 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 - `code-quiz.html`, `kunst-quiz.html`: eigenständige Quizseiten.
 - PDFs: Startpräsentation, Stationenkarten, Künstler:innen, Berufe, Abschluss, QR-Code Kunstquiz.
 - `/archiv/` ist in `.gitignore`: dort liegt lokal die `fotobox-karte` (Flask-Queue `fotobox-queue.py`, Plotter-Anbindung) als Vorbild für Foto-Übertragung und Server-Queue. **Nicht ins Repo committen.** Wenn du dort lesen musst, frag nach dem Pfad.
-- Aktuell gibt es Widersprüche zu den Regeln unten: `index.html` lädt TF.js, BodyPix und Schriften von CDNs (jsdelivr, Google Fonts). Das wird in Roadmap-Schritt 2 behoben.
+- TF.js, BodyPix-Modell und Schriften liegen lokal in `vendor/` (Versionen und Lizenzen: `vendor/README.md`). `index.html` lädt nichts mehr aus dem Internet.
 
 ## Repo-Struktur (Zielbild, bei Bedarf anpassen)
 
