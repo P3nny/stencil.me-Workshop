@@ -60,6 +60,8 @@
   .note.warn{background:var(--neon);}
   .error-note{position:fixed;left:16px;right:16px;bottom:16px;z-index:10;margin:0;font-weight:700;}
   [hidden]{display:none !important;}
+  details.fine{margin-top:14px;border-top:1px dashed var(--line);padding-top:10px;}
+  details.fine summary{font-family:var(--head);text-transform:uppercase;letter-spacing:.1em;font-size:.85rem;cursor:pointer;}
   .send-box{margin-top:14px;border-top:3px solid var(--ink);padding-top:12px;max-width:320px;}
   .send-box input[type=text]{font-family:inherit;font-size:1rem;padding:10px;border:3px solid var(--ink);border-radius:0;width:100%;box-sizing:border-box;margin:4px 0 10px;}
   .send-box button{margin:0 8px 8px 0;}
@@ -109,16 +111,21 @@
         <label class="field">Kontrast <span class="val" id="contrastVal">100%</span></label>
         <input type="range" id="contrast" min="50" max="200" value="100">
       </div>
-      <div>
-        <label class="field">Schwellwert-Abstand (Stufen) <span class="val" id="spreadVal">±15</span></label>
-        <input type="range" id="spread" min="5" max="35" value="15">
-      </div>
-      <div>
-        <label class="field">Rauschunterdrückung (Freistellen kleiner Flecken)</label>
-        <input type="range" id="despeckle" min="0" max="6" value="2">
-      </div>
     </div>
-    <div class="val" id="otsuVal" style="margin-top:8px;"></div>
+    <details class="fine">
+      <summary>Feineinstellung</summary>
+      <div class="controls-grid">
+        <div>
+          <label class="field">Schwellwert-Abstand (Stufen) <span class="val" id="spreadVal">±15</span></label>
+          <input type="range" id="spread" min="5" max="35" value="15">
+        </div>
+        <div>
+          <label class="field">Rauschunterdrückung (Freistellen kleiner Flecken)</label>
+          <input type="range" id="despeckle" min="0" max="6" value="2">
+        </div>
+      </div>
+      <div class="val" id="otsuVal" style="margin-top:8px;"></div>
+    </details>
   </section>
 
   <section class="panel">
@@ -126,8 +133,8 @@
     <div class="thumbs" id="thumbs"></div>
   </section>
 
-  <section class="panel">
-    <div class="step-label"><span class="n">4</span>Was willst du machen?</div>
+  <section class="panel" id="extrasPanel" hidden>
+    <div class="step-label"><span class="n">+</span>Extra: Was willst du machen?</div>
     <div class="row" style="align-items:stretch;">
       <button type="button" id="procLaserBtn" class="proc-btn selected" style="flex:1;min-width:200px;text-align:left;padding:14px 16px;">
         Lasercut · Bild<br><span style="font-family:'DM Sans',sans-serif;text-transform:none;letter-spacing:0;font-weight:400;font-size:.8rem;">Positiv, quadratisch</span>
@@ -142,10 +149,11 @@
   </section>
 
   <section class="panel">
-    <div class="step-label"><span class="n">5</span><span id="outputStepTitle">SVG für Lasercutter (4×4 cm, Mr Beam / BeamOS)</span></div>
+    <div class="step-label"><span class="n">4</span><span id="outputStepTitle">Dein Stempel</span></div>
 
     <!-- Lasercutter-spezifische Optionen -->
-    <div id="laserControls">
+    <details class="fine" id="laserControls" style="margin-top:0;border-top:0;padding-top:0;">
+      <summary>Feineinstellung</summary>
       <div class="toggle-row" style="margin-top:0;display:none;">
         <label class="field" style="margin:0;">Ausgabeformat:</label>
         <select id="outputFormat">
@@ -171,7 +179,7 @@
       </div>
 
       <div class="val" id="vectorInfo" style="margin-top:8px;"></div>
-    </div>
+    </details>
 
     <!-- Schneideplotter-spezifische Optionen -->
     <div id="plotterControls" style="display:none;">
@@ -219,7 +227,7 @@
       Rauschunterdrückung erhöhen.
     </div>
 
-    <div class="row" style="margin-top:16px; align-items:center;">
+    <div class="row" style="margin-top:16px; align-items:center;" hidden>
       <input type="text" id="filenameInput" placeholder="dateiname" value="stencil-portrait" style="font-family:inherit;font-size:0.85rem;padding:8px 10px;border:1px solid var(--ink);border-radius:3px;width:180px;">
       <span class="val">.svg</span>
     </div>
@@ -234,13 +242,13 @@
       <div id="negBox">
         <div class="val" style="font-weight:bold;margin-bottom:4px;">Negativ</div>
         <div class="svgbox"><div id="svgHolderNeg">— Variante in Schritt 3 auswählen —</div></div>
-        <button id="downloadNeg" disabled style="margin-top:8px;">Negativ herunterladen</button>
         <div class="send-box">
           <label class="field" for="stampName">Dein Vorname oder Kürzel</label>
           <input type="text" id="stampName" maxlength="20" autocomplete="off" autocapitalize="words" placeholder="z. B. Lena oder LK">
           <button id="sendStamp" type="button" disabled>Stempel abschicken</button>
           <button id="shareStamp" type="button" class="secondary" hidden>Teilen</button>
           <div class="send-status" id="sendStatus"></div>
+          <button id="downloadNeg" class="secondary" disabled style="margin-top:12px;font-size:.75rem;padding:6px 10px;">Datei herunterladen (falls Abschicken nicht geht)</button>
         </div>
       </div>
       <div style="flex:1;min-width:220px;">
@@ -755,6 +763,7 @@ function detectThinStructures(mask, size){
 
 function render(){
   if(!sourceImg) return;
+  if(selectedVariantIdx === null) selectedVariantIdx = 1; // "Ausgewogen" vorauswählen
   const contrast = parseInt(contrastSlider.value);
   const spread = parseInt(spreadSlider.value);
   const despecklePasses = parseInt(despeckleSlider.value);
@@ -1264,7 +1273,7 @@ function setupDownload(btn, svg, suffix){
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = sanitizeFilename(filenameInput.value) + suffix + '.svg';
+    a.download = sanitizeFilename(cleanStampName(stampNameInput.value) || filenameInput.value) + suffix + '.svg';
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -1328,7 +1337,7 @@ function selectMode(mode){
   posBox.style.display = mode === 'image' ? '' : 'none';
   negBox.style.display = mode === 'stamp' ? '' : 'none';
   outputStepTitle.textContent = mode === 'image' ? 'Bild für den Lasercutter (Positiv, quadratisch)'
-    : mode === 'stamp' ? 'Stempel für den Lasercutter (Negativ, konturfolgend)'
+    : mode === 'stamp' ? 'Dein Stempel'
     : 'Sticker für den Schneideplotter (Positiv, konturfolgend)';
   renderOutputs();
 }
@@ -1357,7 +1366,9 @@ laserCutOffsetSlider.addEventListener('input', () => {
   laserCutOffsetDebounce = setTimeout(renderOutputs, 150);
 });
 updateLaserCutModeUI();
-selectMode('image');
+// Pflichtweg ist der Negativ-Stempel. Die anderen Wege nur mit ?extras in der Adresse.
+if(/[?&]extras\b/.test(location.search)) document.getElementById('extrasPanel').hidden = false;
+selectMode('stamp');
 
 let plotterOffsetDebounce = null;
 plotterOffsetSlider.addEventListener('input', () => {
