@@ -3,7 +3,12 @@
 // Kamera-App aufnehmen, die App spielt es in Schleife ab und BodyPix rechnet Bild für
 // Bild mit. Regler und Ansicht wirken sofort. Das Video bleibt nur im Arbeitsspeicher.
 (function(){
-  const ARBEIT_PX = 480; // längere Seite, auf der BodyPix rechnet (schont alte iPads)
+  // Schonend für alte iPads: kleines Arbeitsbild, leichtes Modell, höchstens
+  // MAX_BILDER_PRO_SEK und bei zu wenig Tempo automatisch auf „grob“
+  const ARBEIT_PX = 320; // längere Seite, auf der BodyPix rechnet
+  const MAX_BILDER_PRO_SEK = 6;
+  const MIN_TEMPO = 1.5; // darunter schaltet die App auf grob
+  const PAUSE_PRUEF_MS = 250; // so oft schaut die App nach, ob das Video wieder läuft
   const VIDEO_TIMEOUT_MS = 30000; // so lange darf Laden + erstes KI-Bild dauern
   const ANSICHTEN = [
     { id: 'person', text: 'Person' },
@@ -22,7 +27,7 @@
       const eintrag = api.eintrag;
       eintrag.aufgaben = eintrag.aufgaben || {};
       eintrag.bildKi = eintrag.bildKi || {};
-      const einstellung = { ansicht: 'person', aufloesung: 'medium', schwelle: 0.5, deckkraft: 0.6 };
+      const einstellung = { ansicht: 'person', aufloesung: 'low', schwelle: 0.5, deckkraft: 0.6 };
 
       // ---- Video aufnehmen ----
       const input = el('input', { type: 'file', accept: 'video/*', capture: 'user' });
@@ -60,11 +65,12 @@
         });
         return el('label', { klasse: 'ki-regler' }, [el('span', {}, [el('span', { text: text + ': ' }), wert]), r, el('span', { klasse: 'hinweis', text: hinweis })]);
       }
+      const aufloesungKnoepfe = knopfGruppe(AUFLOESUNGEN, 'aufloesung');
       const regelung = el('div', { klasse: 'ki-regelung' }, [
         el('p', { klasse: 'regel-titel', text: 'Ansicht' }),
         knopfGruppe(ANSICHTEN, 'ansicht'),
         el('p', { klasse: 'regel-titel', text: 'Auflösung' }),
-        knopfGruppe(AUFLOESUNGEN, 'aufloesung'),
+        aufloesungKnoepfe,
         regler('Schwelle', 'schwelle', 0.1, 0.9, 0.05, 'Wie sicher muss die KI sein, dass ein Pixel zu einer Person gehört?'),
         regler('Deckkraft der Farbe', 'deckkraft', 0, 1, 0.1, '0 = nur Video, 1 = nur KI-Farbe')
       ]);
@@ -102,18 +108,24 @@
 
       // ---- Rechnen: Bild für Bild ----
       let laeuft = false;
-      let rechnet = false;
       let bilder = 0;
       let tempoStart = 0;
+
+      function grobSchalten(){
+        einstellung.aufloesung = 'low';
+        Array.prototype.forEach.call(aufloesungKnoepfe.children, (b, i) => b.classList.toggle('an', AUFLOESUNGEN[i].id === 'low'));
+        status.textContent = 'Das iPad kommt nicht hinterher. Die App hat die Auflösung auf „grob“ gestellt.';
+      }
 
       function zeichnen(net){
         if(!laeuft) return;
         if(!document.body.contains(ausgabe)){ laeuft = false; return; } // Seite gewechselt
-        if(rechnet || video.paused || video.readyState < 2){
-          requestAnimationFrame(() => zeichnen(net));
+        // Pause, Tab im Hintergrund oder Video lädt noch: nicht rechnen, nur ab und zu nachsehen
+        if(video.paused || document.hidden || video.readyState < 2){
+          setTimeout(() => zeichnen(net), PAUSE_PRUEF_MS);
           return;
         }
-        rechnet = true;
+        const beginn = performance.now();
         const ctx = arbeit.getContext('2d');
         ctx.drawImage(video, 0, 0, arbeit.width, arbeit.height);
         const opt = { internalResolution: einstellung.aufloesung, segmentationThreshold: einstellung.schwelle };
@@ -134,17 +146,19 @@
           erstesBild = true;
           const sek = (performance.now() - tempoStart) / 1000;
           if(sek > 2){
-            tempo.textContent = (bilder / sek).toFixed(1).replace('.', ',') + ' Bilder pro Sekunde';
+            const proSek = bilder / sek;
+            tempo.textContent = proSek.toFixed(1).replace('.', ',') + ' Bilder pro Sekunde';
+            if(proSek < MIN_TEMPO && einstellung.aufloesung !== 'low') grobSchalten();
             bilder = 0;
             tempoStart = performance.now();
           }
           bildKnopf.disabled = false;
         }).catch(err => {
           console.error(err);
-          status.textContent = 'Die KI kommt nicht hinterher. Stell die Auflösung auf grob.';
+          grobSchalten();
         }).then(() => {
-          rechnet = false;
-          requestAnimationFrame(() => zeichnen(net));
+          const warten = Math.max(0, 1000 / MAX_BILDER_PRO_SEK - (performance.now() - beginn));
+          setTimeout(() => zeichnen(net), warten);
         });
       }
 
@@ -168,7 +182,7 @@
         video.src = URL.createObjectURL(datei);
         input.value = '';
         Promise.all([
-          Personen.netz(),
+          Personen.netz('leicht'),
           new Promise((resolve, reject) => {
             video.onloadeddata = resolve;
             video.onerror = () => reject(new Error('Video lässt sich nicht abspielen'));

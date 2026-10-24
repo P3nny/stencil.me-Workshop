@@ -4,6 +4,7 @@
 // Freistellen und Zusammensetzen passieren auf dem iPad.
 (function(){
   const KANTE_RADIUS = 2; // Kante weichzeichnen (px), sonst sieht der Rand ausgeschnitten aus
+  const ARBEIT_PX = 640; // längere Seite: reicht für die Anzeige und schont alte iPads
 
   function bildLaden(src){
     return new Promise((resolve, reject) => {
@@ -14,30 +15,32 @@
     });
   }
 
-  // Alpha-Kanal aus der BodyPix-Maske, mit einfacher Box-Unschärfe an den Kanten
+  // Box-Unschärfe in einer Richtung (erst Zeilen, dann Spalten: viel weniger Rechnen als 2D)
+  function unschaerfe1d(a, w, h, waagrecht){
+    const b = new Float32Array(w * h);
+    const laenge = waagrecht ? w : h, anzahl = waagrecht ? h : w;
+    for(let k = 0; k < anzahl; k++){
+      for(let i = 0; i < laenge; i++){
+        let summe = 0, n = 0;
+        for(let d = -KANTE_RADIUS; d <= KANTE_RADIUS; d++){
+          const j = i + d;
+          if(j < 0 || j >= laenge) continue;
+          summe += waagrecht ? a[k * w + j] : a[j * w + k];
+          n++;
+        }
+        b[waagrecht ? k * w + i : i * w + k] = summe / n;
+      }
+    }
+    return b;
+  }
+
+  // Alpha-Kanal aus der BodyPix-Maske, mit weicher Kante
   function alphaAusMaske(seg){
     const w = seg.width, h = seg.height;
     let a = new Float32Array(w * h);
     for(let i = 0; i < a.length; i++) a[i] = seg.data[i] ? 1 : 0;
     for(let durchgang = 0; durchgang < 2; durchgang++){
-      const b = new Float32Array(w * h);
-      for(let y = 0; y < h; y++){
-        for(let x = 0; x < w; x++){
-          let summe = 0, n = 0;
-          for(let dy = -KANTE_RADIUS; dy <= KANTE_RADIUS; dy++){
-            const yy = y + dy;
-            if(yy < 0 || yy >= h) continue;
-            for(let dx = -KANTE_RADIUS; dx <= KANTE_RADIUS; dx++){
-              const xx = x + dx;
-              if(xx < 0 || xx >= w) continue;
-              summe += a[yy * w + xx];
-              n++;
-            }
-          }
-          b[y * w + x] = summe / n;
-        }
-      }
-      a = b;
+      a = unschaerfe1d(unschaerfe1d(a, w, h, true), w, h, false);
     }
     return a;
   }
@@ -167,7 +170,7 @@
           return bildLaden(url);
         })
         .then(bild => {
-          img = bild;
+          img = Personen.verkleinert(bild, ARBEIT_PX);
           return Personen.segmentieren(img);
         })
         .then(seg => {

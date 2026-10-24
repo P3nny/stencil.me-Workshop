@@ -10,6 +10,15 @@ Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Cl
 - Check-in und „beendet“ gehen an den Laptop. Er weiß so, welche Stationen besetzt sind.
 - Das Paar behält sein iPad für alle Stationen. Alles wird zuerst auf dem iPad gespeichert (IndexedDB).
 
+## Leistung auf alten iPads (24.10.)
+
+- Jede Station ist eine eigene Seite: Beim Wechsel gibt das iPad den Speicher der vorigen Station frei
+- BodyPix wird nur auf Stationen geladen, die es brauchen. Grafikspeicher wird sofort freigegeben (`WEBGL_DELETE_TEXTURE_THRESHOLD = 0`)
+- Foto-Prüfung rechnet auf 400 px, „Hintergrund ändern“ auf 640 px, die Stempel-Station bleibt bei voller Qualität (Hauptergebnis)
+- Körpererkennung (Video): leichtes Modell (MobileNet 0.50), Bild 320 px, Auflösung startet auf „grob“, höchstens 6 Bilder pro Sekunde, Pause wenn Video angehalten oder Tab im Hintergrund. Unter 1,5 Bildern pro Sekunde stellt die App selbst auf „grob“
+- Schnittrand: Suche durch Halbieren (höchstens 4 statt 12 Rechnungen)
+- Messung mit gebremster CPU: `tests/leistung-test.js` (nur Chromium, nur zum Vergleichen). Bei 4-fach: Foto-Prüfung 4,2 → 3,1 s, Freistellen 4,5 → 3,4 s, Video 2,9 → 6 Bilder/s. *Die Grafikeinheit bremst der Test nicht: Echte Werte liefert erst ein altes iPad (02.11.)*
+
 ## Reihenfolge der Stationen
 
 - Fest: Check-in → Foto → stencil.me → Laser.

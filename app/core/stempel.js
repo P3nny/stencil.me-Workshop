@@ -393,14 +393,21 @@ function buildStampSvg(mask, offsetMm){
   return { svg: svg, cutLoops: off.cutLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
 }
 
-// Kleinster Schnittrand (ganze mm), bei dem der rote Rand in einem Stück außen herumläuft
+// Kleinster Schnittrand (ganze mm), bei dem der rote Rand in einem Stück außen herumläuft.
+// Gesucht wird durch Halbieren (4 statt bis zu 12 Rechnungen): Ein größerer Rand
+// verbindet höchstens mehr Teile, nie weniger.
 const OFFSET_MIN = 2, OFFSET_MAX = 15, OFFSET_START = 4;
 function autoOffset(mask){
-  for(let mm = OFFSET_START; mm <= OFFSET_MAX; mm++){
-    const scale = STEMPEL_MM / WORK_SIZE;
-    if(computeOffsetCutPath(mask, WORK_SIZE, scale, mm).cutLoops.length <= 1) return mm;
+  const scale = STEMPEL_MM / WORK_SIZE;
+  const einStueck = mm => computeOffsetCutPath(mask, WORK_SIZE, scale, mm).cutLoops.length <= 1;
+  if(einStueck(OFFSET_START)) return OFFSET_START;
+  let zuKlein = OFFSET_START, gross = OFFSET_MAX;
+  if(!einStueck(gross)) return OFFSET_MAX;
+  while(gross - zuKlein > 1){
+    const mitte = Math.floor((zuKlein + gross) / 2);
+    if(einStueck(mitte)) gross = mitte; else zuKlein = mitte;
   }
-  return OFFSET_MAX;
+  return gross;
 }
 
 // ---- Zwischenbilder für die Anzeige ----
