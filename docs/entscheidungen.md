@@ -107,11 +107,17 @@ Umschalten zwischen den Plänen heißt: einen anderen QR-Code zeigen. Was bei Pr
 
 Aktueller Plan: ZIP auf USB-Stick an die Lehrkraft.
 
-## 5. Claude-Station — offen
+## 5. Claude-Station — teilweise entschieden (24.10.2026)
 
-Eigener API-Schlüssel mit Ausgabenlimit, Nutzungsbedingungen prüfen.
+- Für das KI-Selbstporträt: **Claude-API mit eigenem Schlüssel**, nicht das Pro-Abo. Laut Anthropic dürfen Anfragen für andere Nutzer:innen nicht über Pro/Max-Zugänge laufen, Pro-Kontingente gelten für „ordinary, individual usage“ (code.claude.com/docs/en/legal-and-compliance)
+- Schlüssel nur auf dem Laptop (`~/.config/stencilme/anthropic-key`, nicht im Repo), Guthaben vorab ohne automatisches Nachladen, Ausgabenlimit im Workspace `stencilme-workshop`, zusätzlich Grenzen im Server (6 pro Gruppe, 150 pro Tag)
+- Modell: Claude Haiku 5.5 (Test 24.10.: ca. 0,2 Cent und 15 s pro Bild, Ergebnis reicht). Umstellbar
+- Die Code-Erklär-Station mit Claude ist weiter offen
 
-## 6. Ersatz für Canva und KI-Selbstporträt — offen
+## 6. Ersatz für Canva und KI-Selbstporträt — entschieden (24.10.2026)
+
+- Hintergrund ändern: eigene Station mit BodyPix (Screen 5)
+- KI-Selbstporträt: Claude zeichnet SVG aus einem Prompt-Baukasten (Screen 9). Kein Foto der Kinder, kein freier Text, nur die ausgewählten Merkmale gehen an Anthropic
 
 ## 7. Erklärer-/Macher-Rotation oder freier Ablauf — offen
 

@@ -1,7 +1,8 @@
 // Klickt die Workshop-App automatisch durch (Anmeldung → Foto → stencil.me → Lasercutter).
 //
-// Voraussetzung: Test-Server läuft mit eigenem Datenordner, damit echte Stempel unberührt bleiben:
-//   STENCILME_DATEN=archiv/testdaten python3 server/server.py --port 8765
+// Voraussetzung: Test-Server läuft mit eigenem Datenordner (echte Stempel bleiben unberührt)
+// und KI im Testmodus (kein Aufruf bei Claude, keine Kosten):
+//   STENCILME_DATEN=archiv/testdaten STENCILME_KI_TEST=1 python3 server/server.py --port 8765
 // und Playwright
 // ist außerhalb des Repos installiert (~/.cache/stencilme-playwright).
 //
@@ -128,8 +129,8 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 7') >= 0, 'Zähler steht auf 1 von 7');
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Selbstporträts mit KI neu erschaffen'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 8') >= 0, 'Zähler steht auf 1 von 8');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
 
@@ -188,16 +189,16 @@ async function abschliessen(page, sterne){
   await page.locator('input[type=file]').setInputFiles(FOTO);
   await page.locator('.foto-vorschau').waitFor({ state: 'visible' });
   await abschliessen(page, 3);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 7') >= 0, 'Zähler steht auf 3 von 7');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 8') >= 0, 'Zähler steht auf 3 von 8');
 
   console.log('Neu laden: Fortschritt bleibt');
   await page.reload();
   await page.waitForSelector('text=schon erledigt');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 7') >= 0, 'Fortschritt nach Neuladen erhalten');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 8') >= 0, 'Fortschritt nach Neuladen erhalten');
 
   console.log('Startseite nach drei Stationen');
   await page.goto(BASE + '/');
-  await page.waitForSelector('text=3 von 7 Stationen geschafft');
+  await page.waitForSelector('text=3 von 8 Stationen geschafft');
   pruefe(true, 'Startseite zeigt den Stand');
   await page.goto(BASE + '/app/station.html?id=lasercutter');
 
@@ -241,7 +242,7 @@ async function abschliessen(page, sterne){
   await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild an den Laptop schicken")').click();
   await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist abgeschickt') >= 0).length === 2);
   await abschliessen(page, 4);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 7') >= 0, 'Zähler steht auf 5 von 7');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 8') >= 0, 'Zähler steht auf 5 von 8');
 
   console.log('Station Pixel vs. Vektor');
   await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
@@ -296,7 +297,7 @@ async function abschliessen(page, sterne){
   await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
   await page.waitForSelector('.ce-vorschau img');
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 7') >= 0, 'Zähler steht auf 6 von 7');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 8') >= 0, 'Zähler steht auf 6 von 8');
 
   console.log('Station Coding: HTML, CSS und JavaScript');
   await page.goto(BASE + '/app/station.html?id=coding-web&test');
@@ -341,7 +342,34 @@ async function abschliessen(page, sterne){
   await page.locator('button.stern').nth(4).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 7') >= 0, 'Zähler steht auf 7 von 7');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 8') >= 0, 'Zähler steht auf 7 von 8');
+
+  console.log('Station Selbstporträts mit KI (Server im Testmodus, ohne Claude)');
+  await page.goto(BASE + '/app/station.html?id=ki-selbstportraet&test');
+  await page.waitForSelector('.ki-prompt');
+  pruefe((await page.locator('.ki-prompt').textContent()).indexOf('im Stil von Frida Kahlo. Es zeigt einen 14-jährigen Jungen') > 0, 'Prompt-Satz aus den Start-Bausteinen');
+  await page.click('.ki-baustein:has-text("Person") button:has-text("Mädchen")');
+  await page.click('.ki-baustein:has-text("Alter") button:has-text("13")');
+  pruefe((await page.locator('.ki-prompt').textContent()).indexOf('ein 13-jähriges Mädchen') > 0, 'Prompt passt sich an (ein 13-jähriges Mädchen)');
+  await page.click('button:has-text("Bild erzeugen")');
+  await page.waitForSelector('.ki-karte img');
+  pruefe(await page.locator('.ki-karte').count() === 1, 'erstes Bild in der Galerie');
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt: zweiter Kunststil fehlt');
+  await page.click('.ki-baustein:has-text("Kunststil") button:has-text("Pop-Art")');
+  await page.click('button:has-text("Bild erzeugen")');
+  await page.waitForFunction(() => document.querySelectorAll('.ki-karte').length === 2);
+  pruefe(/2 von 6/.test(await page.locator('text=Ihr habt').textContent()), 'Zähler „2 von 6 Bildern“');
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-13-ki-selbstportraet.png'), fullPage: true });
+  await page.fill('#eingabe-unterschied', 'stencil.me verändert nur mein Foto');
+  await page.fill('#eingabe-ethik', 'Schwierig');
+  await page.click('button:has-text("Station beendet")');
+  pruefe(await page.locator('.aufloesung-text').count() === 1, 'Auflösung zur Unterschied-Frage');
+  await page.click('button.wahl:has-text("Generative KI")');
+  pruefe((await page.locator('.aufloesung .etikett').textContent()) === 'Generative KI', 'Auflösung: Generative KI');
+  await page.locator('button.stern').nth(4).click();
+  await page.click('button:has-text("Fertig")');
+  await page.waitForSelector('text=Super, geschafft!');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('8 von 8') >= 0, 'Zähler steht auf 8 von 8');
   pruefe(await page.locator('text=alle Stationen geschafft').count() === 1, '„Du hast alle Stationen geschafft!“');
 
   console.log('Laptop');
@@ -351,9 +379,9 @@ async function abschliessen(page, sterne){
   const g = gruppen.gruppen.filter(x => x.personen.join() === 'Ada,Bo').pop();
   pruefe(!!g, 'Gruppe Ada & Bo auf dem Laptop');
   if(g){
-    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor,coding-web', 'fertige Stationen: ' + g.fertig.join(', '));
+    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor,coding-web,ki-selbstportraet', 'fertige Stationen: ' + g.fertig.join(', '));
     const arten = g.dateien.map(d => d.split('/').pop().split('_')[0]).sort().join(',');
-    pruefe(arten === 'hintergrund,hintergrund,koerpererkennung,lasercutter', 'hochgeladen: Laser-Foto, KI-Ansicht, zwei Hintergrund-Bilder, keine Rohfotos (' + arten + ')');
+    pruefe(arten === 'hintergrund,hintergrund,ki-selbstportraet,ki-selbstportraet,koerpererkennung,lasercutter', 'auf dem Laptop: Laser-Foto, KI-Ansicht, zwei Hintergrund-Bilder, zwei KI-Bilder, keine Rohfotos (' + arten + ')');
     pruefe(g.antworten.lasercutter && g.antworten.lasercutter.antworten.frage === 'Wie heiß wird der Laser?', 'Antwort angekommen');
     const svgCode = g.antworten['pixel-vektor'] && g.antworten['pixel-vektor'].antworten['svg-code'];
     pruefe(!!svgCode && svgCode.indexOf('polygon') > 0, 'SVG-Code auf dem Laptop gespeichert');

@@ -1,0 +1,2 @@
+# Nur für die Station „Selbstporträts mit KI neu erschaffen“. Alles andere braucht nur Python.
+anthropic==2.3.0

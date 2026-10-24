@@ -17,11 +17,17 @@ PORT=8000
   done
 ) &
 
+# Mit der KI-Bibliothek, falls eingerichtet (./server/einrichten.sh), sonst ohne
+PYTHON=python3
+if [ -x "$HOME/.cache/stencilme-venv/bin/python" ]; then
+  PYTHON="$HOME/.cache/stencilme-venv/bin/python"
+fi
+
 if command -v systemd-inhibit >/dev/null 2>&1; then
   systemd-inhibit --what=sleep:idle --who="stencil.me" --why="Workshop-Server läuft" \
-    python3 server/server.py --port "$PORT"
+    "$PYTHON" server/server.py --port "$PORT"
 else
-  python3 server/server.py --port "$PORT"
+  "$PYTHON" server/server.py --port "$PORT"
 fi
 
 echo

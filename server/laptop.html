@@ -89,6 +89,7 @@
       <button id="savePupils" type="button">Speichern</button>
       <span class="hint" id="pupilsState"></span>
     </div>
+    <div class="hint" id="kiStatus"></div>
     <div id="groupsError"></div>
     <table>
       <thead><tr><th>Namen</th><th>Gerade an</th><th>Geschafft</th><th>Fotos</th></tr></thead>
@@ -353,6 +354,17 @@
       });
   }
 
+  function loadKi() {
+    fetch("/api/ki-status", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (k) {
+        document.getElementById("kiStatus").textContent = k.eingerichtet
+          ? "KI-Selbstporträt: " + k.modell + ", heute " + k.bilderHeute + " von höchstens " + k.proTag + " Bildern, Kosten bisher ca. " + k.kostenGesamtUsd.toFixed(3).replace(".", ",") + " $"
+          : "KI-Selbstporträt: nicht eingerichtet (./server/einrichten.sh). Die Station zeigt Beispiele.";
+      })
+      .catch(function () { /* egal */ });
+  }
+
   function loadSettings() {
     fetch("/api/einstellungen", { cache: "no-store" })
       .then(function (r) { return r.json(); })
@@ -380,7 +392,8 @@
   loadStations();
   loadSettings();
   loadList();
-  setInterval(function () { loadList(); loadGroups(); }, 5000);
+  loadKi();
+  setInterval(function () { loadList(); loadGroups(); loadKi(); }, 5000);
 })();
 </script>
 </body>

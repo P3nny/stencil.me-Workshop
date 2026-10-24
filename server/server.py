@@ -27,12 +27,15 @@ import subprocess
 import sys
 import urllib.parse
 
+import ki_bild
+
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # STENCILME_DATEN: anderer Datenordner, z. B. für automatische Tests (echte Stempel bleiben unberührt)
 DATA_ROOT = os.path.abspath(os.environ.get("STENCILME_DATEN") or os.path.join(REPO_DIR, "server", "daten"))
 DATA_DIR = os.path.join(DATA_ROOT, "stempel")
 GROUPS_DIR = os.path.join(DATA_ROOT, "gruppen")
 SETTINGS_FILE = os.path.join(DATA_ROOT, "einstellungen.json")
+KI_LOG_FILE = os.path.join(DATA_ROOT, "ki-protokoll.jsonl")
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MAX_EVENT_BYTES = 64 * 1024
 DEFAULT_SETTINGS = {"schueler": 26}
@@ -223,8 +226,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json({"stationen": station_occupancy()})
         if path == "/api/einstellungen":
             return self.send_json(read_settings())
+        if path == "/api/ki-bereit":
+            return self.send_json({"eingerichtet": ki_bild.eingerichtet()})
 
-        if path in ("/laptop", "/qr", "/api/liste", "/api/info", "/api/gruppen") or path.startswith(("/daten/", "/dateien/")):
+        if path in ("/laptop", "/qr", "/api/liste", "/api/info", "/api/gruppen", "/api/ki-status") or path.startswith(("/daten/", "/dateien/")):
             if not self.is_local():
                 return self.send_error(403, "Nur am Laptop")
             if path in ("/laptop", "/qr"):
@@ -237,6 +242,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({"adressen": ["http://%s:%d/" % (ip, port) for ip in local_ips()]})
             if path == "/api/gruppen":
                 return self.send_json({"gruppen": list_groups(), "ordner": GROUPS_DIR})
+            if path == "/api/ki-status":
+                return self.send_json(ki_bild.status(KI_LOG_FILE))
             if path.startswith("/dateien/"):
                 return self.send_data_file(GROUPS_DIR, path[len("/dateien/"):])
             return self.send_data_file(DATA_DIR, path[len("/daten/"):])
@@ -275,6 +282,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.receive_event()
         if parsed.path == "/api/datei":
             return self.receive_file(urllib.parse.parse_qs(parsed.query))
+        if parsed.path == "/api/ki-bild":
+            return self.ki_bild()
         if parsed.path in ("/api/alle-loeschen", "/api/einstellungen") and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
         if parsed.path == "/api/einstellungen":
@@ -283,7 +292,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             for d in (DATA_DIR, GROUPS_DIR):
                 if os.path.isdir(d):
                     shutil.rmtree(d)
-            print("Alle Stempel, Antworten und Fotos gelöscht.")
+            if os.path.exists(KI_LOG_FILE):
+                os.remove(KI_LOG_FILE)
+            print("Alle Stempel, Antworten, Fotos und KI-Bilder gelöscht.")
             return self.send_json({"ok": True})
         return self.send_error(404)
 
@@ -347,6 +358,21 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         write_atomic(target, body)
         print("Foto empfangen: %s/%s" % (group_id, os.path.basename(target)))
         return self.send_json({"ok": True, "doppelt": False})
+
+    def ki_bild(self):
+        body = self.read_body(MAX_EVENT_BYTES)
+        try:
+            anfrage = json.loads(body.decode("utf-8")) if body else {}
+        except ValueError:
+            anfrage = {}
+        gruppe = str(anfrage.get("gruppe", ""))
+        auswahl = anfrage.get("auswahl")
+        if not ID_RE.match(gruppe) or not isinstance(auswahl, dict):
+            return self.send_json({"ok": False, "fehler": "ungültige Anfrage"}, 400)
+        try:
+            return self.send_json(ki_bild.bild_fuer_gruppe(os.path.join(GROUPS_DIR, gruppe), KI_LOG_FILE, auswahl, gruppe))
+        except ki_bild.KiFehler as err:
+            return self.send_json({"ok": False, "fehler": err.text}, err.status)
 
     def save_settings(self):
         body = self.read_body(MAX_EVENT_BYTES)
@@ -418,6 +444,7 @@ def main():
         print("Adresse für die iPads: http://%s:%d/" % (ip, args.port))
     print("Stempel landen in:   %s" % DATA_DIR)
     print("Stationen landen in: %s" % GROUPS_DIR)
+    print("KI-Selbstporträt:     %s" % ("eingerichtet (%s)" % ki_bild.MODELL if ki_bild.eingerichtet() else "nicht eingerichtet, siehe server/einrichten.sh"))
     print("Beenden: dieses Fenster schließen oder Strg+C")
     try:
         server.serve_forever()

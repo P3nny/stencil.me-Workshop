@@ -154,6 +154,17 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Pflichtfrage „Welcher Baustein sorgt dafür, dass ein Regler sofort das Bild verändert?“, Auflösung (JavaScript) im Abschluss
 - Code geht beim Beenden an den Laptop (`antworten.html-code`)
 
+## Screen 9: Selbstporträts mit KI neu erschaffen — gebaut, Branch `feature/screen-9`
+
+- Ersetzt Canva AI. Prompt-Baukasten (keine freie Eingabe): Kunststil (Frida Kahlo, van Gogh, Pop-Art, Streetart, Comic, Aquarell), Person, Alter, Augen, Haarfarbe, Haare, Brille, Hintergrund. Der fertige Satz steht groß darüber
+- „Bild erzeugen“: Das iPad schickt nur die Auswahl an den Laptop, der Laptop baut den Prompt und fragt Claude (Haiku 5.5). Claude zeichnet ein SVG (ca. 15 s, ca. 0,2 Cent pro Bild)
+- Höchstens 6 Bilder pro Gruppe, 150 pro Tag. Pflicht: 2 Bilder in 2 Kunststilen
+- Pflichtfragen von den Karten (Seite 16, 17): Unterschied zu stencil.me (mit Auflösung) und KI-Ethik
+- Ohne Laptop, Internet oder Schlüssel: drei vorher erzeugte Beispiele (`stationen/bilder/ki-beispiele/`), Station lässt sich trotzdem beenden
+- Laptop-Seite zeigt Modell, Anzahl Bilder heute und Kosten bisher
+- Einrichtung: `./server/einrichten.sh` (einmalig, installiert das Anthropic-SDK und fragt den API-Schlüssel ab), `./server/start.sh` nutzt es dann automatisch
+- Modell wechseln: `STENCILME_KI_MODELL=claude-sonnet-5-5 ./server/start.sh`
+
 ## Weitere Screens
 
 - *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …

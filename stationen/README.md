@@ -36,6 +36,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `koerpererkennung` | Video aufnehmen, BodyPix rechnet live auf dem Video, Regler, Aufgaben (`aufgaben`, mindestens `mindestAufgaben` abhaken), Bild der KI-Ansicht an den Laptop (`app/stationen/koerpererkennung.js`) |
 | `pixel-vektor` | Erklärung (`erklaerung`) mit Infografik, Verständnisfragen (`verstaendnis`, alle richtig), dann SVG-Übung im Code-Editor (`app/core/code-editor.js`): `uebung.vorlage` ist der Code mit Lücken `{{id}}` (Startwerte in `luecken`) und Bausteinen `[[id]]` (in `bausteine`), `aufgaben` kommen eine nach der anderen. Der Code geht beim Beenden an den Laptop (`app/stationen/pixel-vektor.js`) |
 | `coding-web` | HTML, CSS und JavaScript im Code-Editor (`uebung` wie bei `pixel-vektor`: `vorlage` mit Lücken `{{id}}` und Bausteinen `[[id]]`), Vorschau als echte kleine Webseite (`app/stationen/coding-web.js`) |
+| `ki-selbstportraet` | Prompt-Baukasten (`ki.baukasten`, Satz in `ki.satz`), Laptop fragt Claude (`server/ki_bild.py`), höchstens `ki.proGruppe` Bilder, mindestens `ki.mindestBilder` in `ki.mindestStile` Stilen. Ohne KI: `ki.beispiele` (`app/stationen/ki-selbstportraet.js`) |
 | `hintergrund` | Hintergrund ändern: Foto freistellen, Hintergrund aus `hintergruende` wählen, Bild an den Laptop (`app/stationen/hintergrund.js`) |
 
 ## Nächste Station

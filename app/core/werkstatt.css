@@ -177,6 +177,15 @@ button.ce-fertig{margin:0;font-size:.8rem;padding:8px 10px;flex:none;}
 .ce.kompakt .ce-fuss{display:flex;gap:6px;padding:6px;background:#eee;border-top:2px solid var(--ink);flex:none;}
 body.ce-kompakt .test-leiste{display:none;}
 
+/* Station „Selbstporträts mit KI neu erschaffen“ */
+.ki-prompt{margin:0 0 12px;padding:12px 14px;background:var(--ink);color:#fff;font-size:1.15rem;line-height:1.45;border-left:8px solid var(--neon);}
+.ki-baukasten{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.ki-baustein .auswahl button.wahl{padding:8px 12px;margin:3px 4px 3px 0;}
+.ki-galerie{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;}
+.ki-karte{margin:0;width:220px;font-size:.85rem;}
+.ki-karte img{width:220px;height:275px;object-fit:contain;border:3px solid var(--ink);background:#fff;display:block;}
+.ki-karte.beispiel img{border-style:dashed;}
+.ki-karte figcaption{margin-top:4px;line-height:1.3;}
 .video{margin:16px 0;max-width:640px;}
 .video iframe{width:100%;aspect-ratio:16/9;height:auto;min-height:200px;border:3px solid var(--ink);display:block;}
 .video-platzhalter{border:3px dashed var(--ink);background:#f4f4f4;padding:16px;text-align:center;}

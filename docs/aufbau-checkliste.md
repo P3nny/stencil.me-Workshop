@@ -22,6 +22,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] [notfallkarte.md](notfallkarte.md) ausgedruckt, laminierte Karten dabei (Plan C)
 - [ ] QR-Codes für die Stationen: Server starten, `http://localhost:8000/qr` öffnen, Adresse wählen, drucken. Nur gültig für diese Adresse: Bekommt der Laptop im KOMEZ eine andere IP, dort neu drucken (oder Netlify-Version für Plan B mitnehmen)
 - [ ] USB-Stick dabei
+- [ ] KI-Selbstporträt: Guthaben in der Claude Console prüfen, Laptop-Seite zeigt „KI-Selbstporträt: claude-haiku-5-5 …“ (sonst `./server/einrichten.sh`). Braucht Internet im KOMEZ-WLAN
 
 ## 3. Aufbau im Raum
 

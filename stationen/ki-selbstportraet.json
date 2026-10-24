@@ -1,0 +1,303 @@
+{
+  "id": "ki-selbstportraet",
+  "titel": "Selbstporträts mit KI neu erschaffen",
+  "typ": "generativ",
+  "datenweg": "online",
+  "schritte": [
+    "Ihr erzeugt mit einer generativen KI eigene Selbstporträts im Stil berühmter Künstler:innen.",
+    "Baut euren Prompt aus den Bausteinen zusammen. Oben seht ihr den fertigen Satz.",
+    "Tippt auf „Bild erzeugen“. Die KI (Claude) zeichnet das Bild als SVG-Code.",
+    "Probiert einen zweiten Prompt mit einem anderen Kunststil.",
+    "Schickt denselben Prompt ruhig zweimal ab: Kommt dasselbe Bild heraus?"
+  ],
+  "ki": {
+    "satz": "Zeichne ein Selbstporträt {stil}. Es zeigt {person} mit {augen} Augen und {haarlaenge} {haarfarbe} Haaren{brille}. Hintergrund: {hintergrund}.",
+    "proGruppe": 6,
+    "mindestBilder": 2,
+    "mindestStile": 2,
+    "baukasten": [
+      {
+        "id": "stil",
+        "frage": "Kunststil",
+        "optionen": [
+          {
+            "id": "kahlo",
+            "name": "Frida Kahlo",
+            "text": "im Stil von Frida Kahlo"
+          },
+          {
+            "id": "vangogh",
+            "name": "Vincent van Gogh",
+            "text": "im Stil von Vincent van Gogh"
+          },
+          {
+            "id": "popart",
+            "name": "Pop-Art",
+            "text": "als Pop-Art wie von Andy Warhol"
+          },
+          {
+            "id": "streetart",
+            "name": "Streetart",
+            "text": "als Streetart-Schablone wie von Blek le Rat"
+          },
+          {
+            "id": "comic",
+            "name": "Comic",
+            "text": "als Comic"
+          },
+          {
+            "id": "aquarell",
+            "name": "Aquarell",
+            "text": "als Aquarell"
+          }
+        ]
+      },
+      {
+        "id": "person",
+        "frage": "Person",
+        "optionen": [
+          {
+            "id": "maedchen",
+            "name": "Mädchen",
+            "text": "ein {alter}-jähriges Mädchen"
+          },
+          {
+            "id": "junge",
+            "name": "Junge",
+            "text": "einen {alter}-jährigen Jungen"
+          },
+          {
+            "id": "person",
+            "name": "Person",
+            "text": "eine {alter}-jährige Person"
+          }
+        ]
+      },
+      {
+        "id": "alter",
+        "frage": "Alter",
+        "optionen": [
+          {
+            "id": "11",
+            "name": "11",
+            "text": "11"
+          },
+          {
+            "id": "12",
+            "name": "12",
+            "text": "12"
+          },
+          {
+            "id": "13",
+            "name": "13",
+            "text": "13"
+          },
+          {
+            "id": "14",
+            "name": "14",
+            "text": "14"
+          },
+          {
+            "id": "15",
+            "name": "15",
+            "text": "15"
+          },
+          {
+            "id": "16",
+            "name": "16",
+            "text": "16"
+          },
+          {
+            "id": "17",
+            "name": "17",
+            "text": "17"
+          },
+          {
+            "id": "18",
+            "name": "18",
+            "text": "18"
+          }
+        ]
+      },
+      {
+        "id": "augen",
+        "frage": "Augen",
+        "optionen": [
+          {
+            "id": "braun",
+            "name": "braun",
+            "text": "braunen"
+          },
+          {
+            "id": "blau",
+            "name": "blau",
+            "text": "blauen"
+          },
+          {
+            "id": "gruen",
+            "name": "grün",
+            "text": "grünen"
+          },
+          {
+            "id": "grau",
+            "name": "grau",
+            "text": "grauen"
+          }
+        ]
+      },
+      {
+        "id": "haarfarbe",
+        "frage": "Haarfarbe",
+        "optionen": [
+          {
+            "id": "blond",
+            "name": "blond",
+            "text": "blonden"
+          },
+          {
+            "id": "braun",
+            "name": "braun",
+            "text": "braunen"
+          },
+          {
+            "id": "schwarz",
+            "name": "schwarz",
+            "text": "schwarzen"
+          },
+          {
+            "id": "rot",
+            "name": "rot",
+            "text": "roten"
+          },
+          {
+            "id": "bunt",
+            "name": "bunt gefärbt",
+            "text": "bunt gefärbten"
+          }
+        ]
+      },
+      {
+        "id": "haarlaenge",
+        "frage": "Haare",
+        "optionen": [
+          {
+            "id": "kurz",
+            "name": "kurz",
+            "text": "kurzen"
+          },
+          {
+            "id": "kinnlang",
+            "name": "kinnlang",
+            "text": "kinnlangen"
+          },
+          {
+            "id": "lang",
+            "name": "lang",
+            "text": "langen"
+          },
+          {
+            "id": "lockig",
+            "name": "lockig",
+            "text": "lockigen"
+          }
+        ]
+      },
+      {
+        "id": "brille",
+        "frage": "Brille",
+        "optionen": [
+          {
+            "id": "ohne",
+            "name": "ohne Brille",
+            "text": ""
+          },
+          {
+            "id": "mit",
+            "name": "mit Brille",
+            "text": ", dazu eine Brille"
+          }
+        ]
+      },
+      {
+        "id": "hintergrund",
+        "frage": "Hintergrund",
+        "optionen": [
+          {
+            "id": "blumen",
+            "name": "Blumen und Blätter",
+            "text": "Blumen und Blätter"
+          },
+          {
+            "id": "stadt",
+            "name": "Stadt",
+            "text": "eine Stadt"
+          },
+          {
+            "id": "weltall",
+            "name": "Weltall",
+            "text": "das Weltall"
+          },
+          {
+            "id": "meer",
+            "name": "Meer",
+            "text": "das Meer"
+          },
+          {
+            "id": "einfarbig",
+            "name": "einfarbig",
+            "text": "eine einzige kräftige Farbe"
+          }
+        ]
+      }
+    ],
+    "start": {
+      "stil": "kahlo",
+      "person": "junge",
+      "alter": "14",
+      "augen": "braun",
+      "haarfarbe": "blond",
+      "haarlaenge": "kinnlang",
+      "brille": "mit",
+      "hintergrund": "blumen"
+    },
+    "beispiele": [
+      {
+        "bild": "bilder/ki-beispiele/kahlo.svg",
+        "prompt": "Zeichne ein Selbstporträt im Stil von Frida Kahlo. Es zeigt einen 14-jährigen Jungen mit braunen Augen und kinnlangen blonden Haaren, dazu eine Brille. Hintergrund: Blumen und Blätter."
+      },
+      {
+        "bild": "bilder/ki-beispiele/popart.svg",
+        "prompt": "Zeichne ein Selbstporträt als Pop-Art wie von Andy Warhol. Es zeigt ein 13-jähriges Mädchen mit grünen Augen und lockigen roten Haaren. Hintergrund: eine einzige kräftige Farbe."
+      },
+      {
+        "bild": "bilder/ki-beispiele/streetart.svg",
+        "prompt": "Zeichne ein Selbstporträt als Streetart-Schablone wie von Blek le Rat. Es zeigt eine 16-jährige Person mit blauen Augen und kurzen schwarzen Haaren. Hintergrund: eine Stadt."
+      }
+    ]
+  },
+  "check": {
+    "art": "ki-selbstportraet"
+  },
+  "eingaben": [
+    {
+      "id": "unterschied",
+      "text": "Diese KI erfindet Bildinhalte komplett neu. Was macht stencil.me stattdessen mit eurem echten Foto? Was ist der Unterschied?",
+      "pflicht": true,
+      "aufloesung": "stencil.me verändert nur, wie euer eigenes Foto dargestellt wird: Eine Bildbearbeitungs-KI stellt euch frei, ein Programm macht daraus Schwarz-Weiß und einen Stempel. Die generative KI hier erfindet dagegen ein komplett neues Bild aus Text. Gleicher Prompt, und trotzdem kommt jedes Mal etwas anderes heraus."
+    },
+    {
+      "id": "ethik",
+      "text": "KI und Ethik: Bilder „im Stil von …“ wirken oft täuschend echt. Wem gehört so ein Bild: euch, der KI-Firma oder der Künstlerin, deren Stil kopiert wurde? Ist das anders bei lebenden und verstorbenen Künstler:innen?",
+      "pflicht": true
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Euer Prompt (nur die Bausteine, kein Name, kein Foto) geht über den Laptop an Claude, eine KI der Firma Anthropic in den USA. Die Bilder kommen in eure Ergebnis-Mappe.",
+  "braucht": [
+    "foto"
+  ],
+  "plaetze": 4
+}
