@@ -31,9 +31,11 @@
 
 <div class="panel">
   <h2>Stationen</h2>
-  <p class="hint">Sterne: Wie hat dir die Station gefallen? KI-Frage: Haben die Kinder richtig erkannt, ob Programm, Bildbearbeitungs-KI, generative KI oder ohne Computer?</p>
+  <p class="hint">Sterne: Wie hat dir die Station gefallen? KI-Frage: Haben die Kinder richtig erkannt, ob Programm, Bildbearbeitungs-KI, generative KI oder ohne Computer?<br>
+  Dauer: vom ersten Check-in (QR-Code) bis „Fertig“, Uhr des iPads. Typischer Wert (Median) und kürzeste–längste Gruppe. Über 4 Stunden zählt nicht (Station offen gelassen).</p>
+  <p id="gesamt"><b>Workshop-Dauer:</b> –</p>
   <table>
-    <thead><tr><th>Station</th><th>Geschafft</th><th>Sterne ⌀</th><th>Verteilung 1–5 ★</th><th>KI-Frage richtig</th></tr></thead>
+    <thead><tr><th>Station</th><th>Geschafft</th><th>Dauer (Min.)</th><th>Sterne ⌀</th><th>Verteilung 1–5 ★</th><th>KI-Frage richtig</th></tr></thead>
     <tbody id="stationen"></tbody>
   </table>
 </div>
@@ -76,7 +78,17 @@
     if (!eintraege.length) ul.innerHTML = "<li>–</li>";
   }
 
+  function minuten(m) { return Math.round(m).toString(); }
+  function dauer(s) {
+    if (!s.dauerAnzahl) return "–";
+    return minuten(s.dauerMedian) + (s.dauerAnzahl > 1 ? " (" + minuten(s.dauerMin) + "–" + minuten(s.dauerMax) + ")" : "");
+  }
+
   function zeigen(d) {
+    var g = d.gesamt;
+    document.getElementById("gesamt").innerHTML = "<b>Workshop-Dauer:</b> " + (g.dauerAnzahl
+      ? "Anmeldung bis letzte Pflichtstation typisch " + minuten(g.dauerMedian) + " Min." + (g.dauerAnzahl > 1 ? " (" + minuten(g.dauerMin) + "–" + minuten(g.dauerMax) + ")" : "") + ", " + g.dauerAnzahl + (g.dauerAnzahl === 1 ? " Gruppe" : " Gruppen") + " mit allen Pflichtstationen"
+      : "noch keine Gruppe mit allen Pflichtstationen");
     document.getElementById("stand").textContent = d.gruppen + " Gruppen, Stand " + new Date().toLocaleTimeString("de-DE").slice(0, 5);
     var titel = {};
     var body = document.getElementById("stationen");
@@ -86,6 +98,7 @@
       var row = document.createElement("tr");
       td(row, s.titel);
       td(row, String(s.fertig));
+      td(row, dauer(s));
       td(row, s.sterneSchnitt === null ? "–" : balken(s.sterneSchnitt / 5, false, s.sterneSchnitt.toString().replace(".", ",") + " ★"));
       var v = document.createElement("span");
       v.className = "verteilung";

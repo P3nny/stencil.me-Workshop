@@ -215,20 +215,65 @@ def load_stations():
         return []
 
 
+MAX_DAUER_MIN = 240  # länger: Station offen gelassen (Pause, Tab vergessen), zählt nicht
+
+
+def event_time(e):
+    """Zeit des Ereignisses auf dem iPad (kommt auch bei späterem Nachsenden richtig an), sonst Empfang."""
+    for key in ("zeit", "empfangen"):
+        try:
+            t = datetime.datetime.fromisoformat(str(e.get(key, "")).replace("Z", "+00:00"))
+            return t if t.tzinfo else t.astimezone()
+        except ValueError:
+            continue
+    return None
+
+
+def median(werte):
+    w = sorted(werte)
+    if not w:
+        return None
+    mitte = len(w) // 2
+    return w[mitte] if len(w) % 2 else (w[mitte - 1] + w[mitte]) / 2
+
+
+def dauer_stats(minuten):
+    return {"dauerAnzahl": len(minuten), "dauerMedian": round(median(minuten), 1) if minuten else None,
+            "dauerMin": round(min(minuten), 1) if minuten else None, "dauerMax": round(max(minuten), 1) if minuten else None}
+
+
 def evaluation():
-    """Auswertung über alle Gruppen: Sterne und KI-Frage pro Station, Feedbackbögen."""
+    """Auswertung über alle Gruppen: Sterne, KI-Frage und Dauer pro Station, Feedbackbögen."""
     stations = load_stations()
     per_station = {s["id"]: {"id": s["id"], "titel": s.get("titel", s["id"]), "typ": s.get("typ", ""),
-                             "fertig": 0, "sterne": [], "kiTyp": {}} for s in stations}
+                             "fertig": 0, "sterne": [], "kiTyp": {}, "dauern": []} for s in stations}
+    pflicht = [s["id"] for s in stations if not s.get("bonus") and not s.get("optional")]
     feedback = []
+    gesamt = []  # Minuten von der Anmeldung bis zur letzten Pflichtstation, nur Gruppen mit allen Pflichtstationen
     groups = [g for g in sorted(os.listdir(GROUPS_DIR)) if ID_RE.match(g)] if os.path.isdir(GROUPS_DIR) else []
     for g in groups:
         done = {}
+        start, checkin, ende = None, {}, {}
         for e in read_events(g):
-            if e.get("art") == "beendet":
-                done[e.get("station")] = e.get("daten", {})  # letzte Meldung pro Station zählt
+            art, sid, zeit = e.get("art"), e.get("station"), event_time(e)
+            if art == "anmeldung":
+                start = zeit
+            elif art == "checkin" and zeit and sid not in checkin:
+                checkin[sid] = zeit  # erster Check-in zählt
+            elif art == "beendet":
+                done[sid] = e.get("daten", {})  # letzte Meldung pro Station zählt
+                if zeit:
+                    ende[sid] = zeit
+        if start and pflicht and all(s in ende for s in pflicht):
+            minuten = (max(ende[s] for s in pflicht) - start).total_seconds() / 60
+            if minuten > 0:
+                gesamt.append(minuten)
         for sid, daten in done.items():
-            st = per_station.setdefault(sid, {"id": sid, "titel": sid, "typ": "", "fertig": 0, "sterne": [], "kiTyp": {}})
+            st = per_station.setdefault(sid, {"id": sid, "titel": sid, "typ": "", "fertig": 0, "sterne": [], "kiTyp": {}, "dauern": []})
+            if sid in checkin and sid in ende:
+                minuten = (ende[sid] - checkin[sid]).total_seconds() / 60
+                if 0 < minuten <= MAX_DAUER_MIN:
+                    st["dauern"].append(minuten)
             st["fertig"] += 1
             if daten.get("sterne"):
                 st["sterne"].append(int(daten["sterne"]))
@@ -241,10 +286,12 @@ def evaluation():
         n = len(s["sterne"])
         richtig = s["kiTyp"].get(s["typ"], 0)
         antworten = sum(s["kiTyp"].values())
-        stats.append(dict(s, sterneSchnitt=round(sum(s["sterne"]) / n, 1) if n else None,
-                          sterneVerteilung=[s["sterne"].count(k) for k in range(1, 6)],
-                          kiRichtig=richtig, kiAntworten=antworten))
-    return {"gruppen": len(groups), "stationen": stats, "feedback": feedback}
+        werte = dict(s, sterneSchnitt=round(sum(s["sterne"]) / n, 1) if n else None,
+                     sterneVerteilung=[s["sterne"].count(k) for k in range(1, 6)],
+                     kiRichtig=richtig, kiAntworten=antworten)
+        werte.update(dauer_stats(werte.pop("dauern")))
+        stats.append(werte)
+    return {"gruppen": len(groups), "stationen": stats, "feedback": feedback, "gesamt": dauer_stats(gesamt)}
 
 
 # Stand der Server-Dateien beim Start. Ändern sie sich danach (neue Version), zeigt die

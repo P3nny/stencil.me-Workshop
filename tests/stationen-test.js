@@ -135,7 +135,7 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Optional: Selbstporträts mit KI neu erschaffen', 'Mit der Hand drucken: Linolplatten', 'Kunst-Quiz: Künstler:innen und Streetart', 'Optional: Bild-App vibe coden'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Optional: Selbstporträts mit KI neu erschaffen', 'Mit der Hand drucken: Linolplatten', 'Kunst-Quiz: Künstler:innen und Streetart', 'Berufe: Wer macht das in echt?', 'Optional: Bild-App vibe coden'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
   pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 12') >= 0, 'Zähler steht auf 1 von 12');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
@@ -659,6 +659,9 @@ async function abschliessen(page, sterne){
   await laptop.goto(BASE + '/auswertung');
   await laptop.waitForSelector('#stationen tr');
   pruefe(await laptop.locator('#stationen tr').count() === 17, 'Auswertung: eine Zeile pro Station');
+  const fotoZeile = await laptop.locator('#stationen tr').first().locator('td').nth(2).textContent();
+  pruefe(/^\d/.test(fotoZeile), 'Auswertung: Dauer pro Station (Foto: ' + fotoZeile + ' Min.)');
+  pruefe(/1 Gruppe mit allen Pflichtstationen/.test(await laptop.locator('#gesamt').textContent()), 'Auswertung: Workshop-Dauer der Gruppe');
   pruefe(/2 Bögen/.test(await laptop.locator('#fbAnzahl').textContent()), 'Auswertung: 2 Feedbackbögen');
   pruefe(await laptop.locator('#woerter span').count() === 2, 'Auswertung: zwei Wörter');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-18-auswertung.png'), fullPage: true });

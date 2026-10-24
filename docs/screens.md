@@ -249,6 +249,12 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - `/qr` druckt 4 Karten pro A4-Blatt (2 × 2), Codes 45 mm
 - Löschen auf dem iPad wartet bis zu 5 s, bis andere Tabs den Speicher freigeben (Chromium meldete sonst manchmal „blockiert“)
 
+## Dauer in der Auswertung (24.10. spät, Branch `feature/dauer`)
+
+- `/auswertung` zeigt pro Station die Dauer: erster Check-in bis „Fertig“, Uhr des iPads (stimmt auch, wenn Ereignisse später nachgesendet werden). Median und kürzeste–längste Gruppe, über 4 Stunden zählt nicht
+- Oben: Workshop-Dauer von der Anmeldung bis zur letzten Pflichtstation, nur für Gruppen mit allen Pflichtstationen
+- Ziel: echte Zahlen vom Test am 02.11. statt Schätzung
+
 ## Noch offen
 
 - Kunst-Quiz mit Bildern aus `03_stencil.me-Künstlerinnen_A4.pdf`, nur über den Laptop ausgeliefert, nicht im Repo
