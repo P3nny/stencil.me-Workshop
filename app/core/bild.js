@@ -41,6 +41,8 @@
 
   window.Bild = {
     MAX_SEITE: MAX_SEITE,
+    // Canvas als PNG zum Speichern (z. B. Stempel-Porträt fürs Puzzle)
+    alsPng: canvas => ({ daten: dataUrlZuBuffer(canvas.toDataURL('image/png')), typ: 'image/png', breite: canvas.width, hoehe: canvas.height }),
     fotoVerkleinern: datei => bildLaden(datei).then(img => alsJpeg(verkleinern(img)))
   };
 })();

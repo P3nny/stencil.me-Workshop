@@ -22,6 +22,11 @@
   }
 
   function senden(eintrag){
+    if(eintrag.art === 'stempel'){
+      // Gleicher Weg wie in stencil.html: Der Laptop legt den Stempel zu den anderen für den Mr Beam
+      const url = '/api/stempel?id=' + eintrag.id + '&name=' + encodeURIComponent(eintrag.name);
+      return mitZeitlimit(fetch(url, { method: 'POST', headers: { 'Content-Type': 'image/svg+xml' }, body: eintrag.svg }).then(antwortPruefen));
+    }
     if(eintrag.art === 'datei'){
       return Speicher.dateiLesen(eintrag.dateiKey).then(datei => {
         if(!datei) return; // Foto inzwischen ersetzt: nichts mehr zu senden
@@ -88,6 +93,9 @@
     // Datei: liegt schon in Speicher.dateien unter dateiKey, hier nur der Verweis
     datei: (gruppe, station, dateiKey) =>
       hinzufuegen({ art: 'datei', gruppe: gruppe, station: station, dateiKey: dateiKey }),
+    // Stempel-Datei (SVG) für den Lasercutter, mit Vorname oder Spitzname
+    stempel: (gruppe, name, svg) =>
+      hinzufuegen({ art: 'stempel', gruppe: gruppe, name: name, svg: svg }),
     beobachten: fn => { beobachter.push(fn); meldeStand(); },
     abarbeiten: abarbeiten,
     starten: () => {

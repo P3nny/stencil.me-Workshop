@@ -127,14 +127,44 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=noch nicht');
   pruefe(await page.locator('text=Bild bearbeiten').count() > 0, 'Lasercutter verlangt zuerst „Bild bearbeiten“');
 
-  console.log('Station stencil.me (Platzhalter)');
+  console.log('Station Bild bearbeiten (stencil.me)');
+  const stempelVorher = (await (await page.request.get(BASE + '/api/liste')).json()).stempel.length;
   await page.goto(BASE + '/app/station.html?id=stencilme&test');
   await page.waitForSelector('h1:has-text("Bild bearbeiten")');
-  await page.check('#erledigt');
+  pruefe(await page.locator('.stempel-person').count() === 2, 'ein Bereich pro Person');
+  // Beide Personen nacheinander: warten, bis beide Stempel fertig gerechnet sind
+  await page.waitForFunction(() => document.querySelectorAll('.stempel-person .schritt-bild svg').length === 2, null, { timeout: 120000 });
+  pruefe(await page.locator('.stempel-person').first().locator('.schritt-bild.leer').count() === 0, 'alle fünf Schritte als Bild sichtbar');
+  pruefe((await page.locator('.stempel-person').first().locator('.schritt-notiz').nth(2).textContent()).indexOf('Pink = Person') === 0, 'KI hat die Person gefunden');
+  const randText = await page.locator('.rand strong').first().textContent();
+  pruefe(/mm/.test(randText), 'Schnittrand automatisch gewählt: ' + randText);
+  pruefe(await page.locator('.rand-warnung:visible').count() === 0, 'roter Rand in einem Stück');
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-6-stencilme.png'), fullPage: true });
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor die Stempel abgeschickt sind');
+  await page.locator('button:has-text("Stempel an den Laptop schicken")').first().click();
+  await page.waitForSelector('button:has-text("Stempel ist abgeschickt")');
+  // Regler ändern: Stempel kann neu geschickt werden
+  await page.locator('.rand input').first().fill('12');
+  await page.waitForSelector('button:has-text("Geänderten Stempel neu schicken")');
+  pruefe(true, 'nach Änderung am Rand: „neu schicken“');
+  await page.locator('.rand input').first().fill(String(parseFloat(randText.replace(',', '.'))));
+  await page.waitForFunction(() => document.querySelectorAll('button').length && Array.prototype.some.call(document.querySelectorAll('.stempel-person:first-of-type button'), b => b.textContent.indexOf('abgeschickt') >= 0));
+  await page.locator('button:has-text("Stempel an den Laptop schicken")').first().click();
+  await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Stempel ist abgeschickt') >= 0).length === 2);
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne Antwort zu den Farben');
   await page.fill('#eingabe-farben', 'Rot schneidet, Blau graviert');
-  await abschliessen(page, 5);
-  pruefe(true, 'stencil.me abgeschlossen');
+  await page.click('button:has-text("Station beendet")');
+  pruefe(await page.locator('.aufloesung-text').count() === 1, 'Auflösung zu den Farben im Abschluss');
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-7-stencilme-abschluss.png'), fullPage: true });
+  await page.click('button.wahl:has-text("Bildbearbeitungs-KI")');
+  await page.locator('button.stern').nth(4).click();
+  await page.click('button:has-text("Fertig")');
+  await page.waitForSelector('text=Super, geschafft!');
+  pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 2, 'Puzzle: zwei Teile mit Stempel-Porträt');
+  await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
+  const stempelNachher = (await (await page.request.get(BASE + '/api/liste')).json()).stempel;
+  const neu = stempelNachher.slice(0, stempelNachher.length - stempelVorher).map(x => x.name).sort().join(',');
+  pruefe(neu === 'Ada,Bo', 'zwei Stempel auf dem Laptop: ' + neu);
 
   console.log('Station Lasercutter');
   await page.goto(BASE + '/app/station.html?id=lasercutter&test');

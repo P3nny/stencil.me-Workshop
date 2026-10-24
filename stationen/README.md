@@ -16,7 +16,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `beispiele` | nein | Beispielbilder: `{ "bild": "bilder/….svg", "gut": true, "text": "…" }`. Bilder liegen in `stationen/bilder/` |
 | `links` | nein | z. B. Erklärvideo: `{ "text": "…", "url": "…" }`. Ohne `url` wird der Link nicht angezeigt |
 | `check` | ja | Was muss erledigt sein, bevor „Station beendet“ geht (siehe unten) |
-| `eingaben` | nein | Textfelder: `{ "id": "…", "text": "Frage", "pflicht": true }` |
+| `eingaben` | nein | Textfelder: `{ "id": "…", "text": "Frage", "pflicht": true }`. Mit `"aufloesung": "…"` zeigt die App nach „Station beendet“ die richtige Antwort |
 | `fragen` | ja | am Ende: `ki-typ` („Programm, KI oder generative KI?“) und/oder `sterne` (1–5) |
 | `datenschutz` | ja | ein Satz: Was passiert mit den Daten dieser Station? |
 | `braucht` | ja | Stationen, die vorher fertig sein müssen, z. B. `["foto"]` |
@@ -30,7 +30,8 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `text` | nur die `eingaben` müssen ausgefüllt sein |
 | `quiz` | Quiz öffnen (`url`), danach „Quiz geschafft“ antippen |
 | `bestaetigung` | „Erledigt“ antippen |
-| `stempel`, `greenscreen` | eigene Seite, wird in Screen 3 bzw. 5 gebaut. Bis dahin: „Erledigt“ antippen |
+| `stempel` | stencil.me: Schritte pro Person, Schnittrand, Stempel an den Laptop (`app/stationen/stencilme.js`) |
+| `greenscreen` | eigene Seite, wird in Screen 5 gebaut. Bis dahin: „Erledigt“ antippen |
 
 ## Nächste Station
 

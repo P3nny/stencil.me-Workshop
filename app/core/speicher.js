@@ -72,6 +72,29 @@
     });
   }
 
+  // Alles auf diesem iPad löschen (neue Gruppe, Datenschutz). Erst die eigene
+  // Verbindung schließen, sonst wartet das Löschen und die alten Daten bleiben.
+  function allesLoeschen(){
+    return oeffnen().then(db => {
+      if(db) db.close();
+      dbPromise = null;
+      ersatz.werte = {}; ersatz.dateien = {}; ersatz.outbox = {};
+      return new Promise((resolve, reject) => {
+        let req;
+        try{
+          req = indexedDB.deleteDatabase(DB_NAME);
+        }catch(err){
+          resolve();
+          return;
+        }
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+        // Andere offene Tabs halten die Datenbank fest: Dann sagen wir es
+        req.onblocked = () => reject(new Error('blockiert'));
+      });
+    });
+  }
+
   function neueId(){
     const bytes = new Uint8Array(6);
     crypto.getRandomValues(bytes);
@@ -81,6 +104,7 @@
   const Speicher = {
     dauerhaft: false,
     bereit: oeffnen,
+    allesLoeschen: allesLoeschen,
     neueId: neueId,
     lesen: key => lesen('werte', key),
     schreiben: (key, wert) => schreiben('werte', key, wert),

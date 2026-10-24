@@ -64,6 +64,29 @@ textarea{width:100%;font:inherit;border:3px solid var(--ink);padding:8px;border-
 .hinweis{color:var(--muted);font-size:.95rem;}
 .datenschutz{font-size:.9rem;background:#f4f4f4;padding:8px 10px;border-left:4px solid var(--ink);}
 .gross-text{font-size:1.4rem;}
+/* Station „Bild bearbeiten“ */
+.stempel-person{border-top:3px solid var(--ink);padding-top:14px;margin-top:18px;}
+.schritte-reihe{display:flex;flex-wrap:wrap;gap:10px;}
+.schritt{margin:0;width:130px;font-size:.85rem;}
+.schritt-bild{width:130px;height:130px;border:3px solid var(--ink);display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden;}
+.schritt-bild.leer{border-style:dashed;border-color:#bbb;background:#f4f4f4;}
+.schritt-bild canvas,.schritt-bild svg{max-width:100%;max-height:100%;width:auto;height:auto;display:block;}
+.schritt-bild canvas{width:100%;height:100%;}
+/* Stempel größer zeigen, roten Rand nur in der Vorschau dicker (die Datei bleibt 0,15 mm) */
+.schritt:last-child,.schritt:last-child .schritt-bild{width:200px;}
+.schritt:last-child .schritt-bild{height:200px;}
+.schritt-bild svg path[stroke="#d6291e"]{stroke-width:.8;}
+.schritt figcaption{margin-top:4px;display:flex;flex-wrap:wrap;align-items:center;gap:4px;}
+.etikett.mini{font-size:.6rem;padding:1px 4px;}
+.schritt-notiz{color:var(--muted);font-size:.8rem;line-height:1.25;margin-top:2px;}
+.rand{margin:14px 0 4px;max-width:520px;}
+.rand input[type=range]{width:100%;accent-color:#d6291e;height:32px;}
+.rand-warnung{background:var(--neon);border:3px solid var(--ink);padding:8px 10px;font-weight:700;}
+.legende{display:flex;flex-wrap:wrap;align-items:center;gap:4px;}
+.farbe{display:inline-block;width:18px;height:18px;border:2px solid var(--ink);margin-left:6px;}
+.farbe.rot{background:#d6291e;}.farbe.blau{background:#1e4fd6;}.farbe.weiss{background:#fff;}
+.deine-antwort{margin:0 0 6px;}
+.aufloesung-text{background:#e6f7ea;border:3px solid var(--ink);padding:8px 10px;}
 
 /* Abschlussfragen */
 .auswahl{display:flex;flex-wrap:wrap;}

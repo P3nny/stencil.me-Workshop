@@ -5,16 +5,29 @@
   "datenweg": "laptop",
   "schritte": [
     "Die App nimmt dein Foto von der Foto-Station.",
-    "Schau zu: Schwarz-Weiß, Person erkennen, Stempel.",
-    "Beantworte die Frage zu den Farben.",
-    "Schick deinen Stempel an den Laptop."
+    "Schau zu: Schwarz-Weiß, die KI findet dich, Otsu macht daraus Schwarz und Weiß.",
+    "Prüf den roten Rand: Er muss in einem Stück um alles herumlaufen.",
+    "Schick deinen Stempel an den Laptop.",
+    "Beantworte die Frage zu den Farben."
   ],
-  "check": { "art": "stempel" },
+  "check": {
+    "art": "stempel"
+  },
   "eingaben": [
-    { "id": "farben", "text": "Was bedeuten die Farben?", "pflicht": true }
+    {
+      "id": "farben",
+      "text": "Was bedeuten die Farben Rot, Blau und Weiß?",
+      "pflicht": true,
+      "aufloesung": "Rot: Hier schneidet der Laser durch, das ist der Rand deines Stempels. Blau: Hier graviert der Laser, das Holz wird abgetragen. Weiß: Hier bleibt das Holz stehen und nimmt beim Drucken die Farbe auf."
+    }
   ],
-  "fragen": ["ki-typ", "sterne"],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
   "datenschutz": "Die Bearbeitung passiert auf dem iPad. Nur der fertige Stempel und dein Name gehen an den Laptop.",
-  "braucht": ["foto"],
+  "braucht": [
+    "foto"
+  ],
   "plaetze": 13
 }

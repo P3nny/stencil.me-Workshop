@@ -59,7 +59,16 @@ Beschreibung von Patricia:
 - Input: Selbstporträt ist aufgenommen und gespeichert
 - Das Rohfoto **bleibt auf dem iPad**
 
-## Screen 3: Bild bearbeiten (stencil.me)
+## Screen 3: Bild bearbeiten (stencil.me) — gebaut, Branch `feature/screen-3`
+
+- Pro Person nacheinander fünf Bilder: Foto → Schwarz-Weiß → KI findet dich (Person pink) → Otsu-Schwelle → Stempel (gespiegelt). Jedes mit Etikett Programm/KI
+- Alles automatisch. Einstellbar nur der rote Schnittrand (2–15 mm). Die App wählt den kleinsten Rand, bei dem der Stempel in einem Stück bleibt. Zerfällt er, gibt es eine Warnung und „Abschicken“ ist gesperrt
+- „Stempel an den Laptop schicken“ pro Person. Der Stempel landet bei den anderen Stempeln auf der Laptop-Seite (Name = Vorname/Spitzname). Ändert ein Kind danach den Rand: „Geänderten Stempel neu schicken“ (dann liegen zwei Versionen auf dem Laptop, die neuere oben)
+- Frage „Was bedeuten die Farben Rot, Blau und Weiß?“, Auflösung im Abschluss
+- Puzzle in der Kopfleiste zeigt ab jetzt das Schwarz-Weiß-Porträt
+- Rechenkern in `app/core/stempel.js` (aus `stencil.html` übernommen). `stencil.html` bleibt bis nach dem 02.11. unverändert als Rückfallebene. *Danach: `stencil.html` auf den Kern umstellen, damit es den Code nur einmal gibt*
+
+Beschreibung von Patricia:
 
 - Nimmt die Fotos aus Screen 2 und die Namen aus Screen 1
 - Jeder Schritt ist sichtbar: Rohbild → Schwarz-Weiß → BodyPix → Otsu → Stempel

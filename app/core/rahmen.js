@@ -1,8 +1,8 @@
 // ---- Rahmen jeder Station ----
 // Kopfleiste (Namen, „x von y“, Puzzle), Check-in, Schritte, Input,
 // „Station beendet“, Abschlussfragen und Vorschlag für die nächste Station.
-// Eigene Stationen (Foto, stencil.me, Greenscreen) nutzen denselben Rahmen und
-// melden mit Rahmen.inputErledigt(), dass ihr Teil geschafft ist.
+// Eigene Stationsteile (stencil.me, später Greenscreen) liegen in app/stationen/
+// und melden sich mit Rahmen.eigeneArt() an.
 (function(){
   const TYP_TEXT = { programm: 'Computerprogramm', ki: 'KI (Bildbearbeitung)', generativ: 'Generative KI', analog: 'Ohne Computer' };
   const DATENWEG_TEXT = { ipad: 'Bleibt auf dem iPad', laptop: 'Geht an den Laptop', online: 'Geht an einen Online-Dienst' };
@@ -12,7 +12,8 @@
     { wert: 'programm', text: 'Keine KI, nur ein Programm' },
     { wert: 'weiss-nicht', text: 'Weiß nicht' }
   ];
-  const EIGENE_SEITEN = ['stempel', 'greenscreen'];
+  // Eigene Stationsteile (z. B. stencil.me): art -> { anzeigen(station, api), erfuellt(eintrag, gruppe) }
+  const eigeneArten = {};
   const TEST = /[?&]test\b/.test(location.search);
 
   // ---- kleine Helfer ----
@@ -208,6 +209,11 @@
   function checkBereich(station){
     const check = station.check || { art: 'bestaetigung' };
     const eintrag = ctx.eintrag;
+    if(eigeneArten[check.art]){
+      return el('div', { klasse: 'check' }, [eigeneArten[check.art].anzeigen(station, {
+        gruppe: ctx.gruppe, eintrag: eintrag, speichern: speichern, pruefen: () => ctx.pruefen(), fehler: fehler, el: el
+      })]);
+    }
     if(check.art === 'foto'){
       const personen = check.proPerson ? ctx.gruppe.personen : [''];
       return el('div', { klasse: 'check' }, personen.map((name, i) => fotoFeld(station, i, name)));
@@ -219,7 +225,8 @@
       text = 'Quiz geschafft';
       link = check.url ? el('a', { href: check.url, target: '_blank', klasse: 'knopf-link', text: 'Quiz öffnen' }) : null;
     }
-    const hinweis = EIGENE_SEITEN.indexOf(check.art) >= 0 ? el('p', { klasse: 'hinweis', text: 'Diese Seite wird noch gebaut. Bis dahin: wie bisher an der Station arbeiten und dann „Erledigt“ antippen.' }) : null;
+    const bekannt = ['bestaetigung', 'quiz'].indexOf(check.art) >= 0;
+    const hinweis = bekannt ? null : el('p', { klasse: 'hinweis', text: 'Diese Seite wird noch gebaut. Bis dahin: wie bisher an der Station arbeiten und dann „Erledigt“ antippen.' });
     const box = el('input', { type: 'checkbox', id: 'erledigt' });
     box.checked = !!eintrag.bestaetigt;
     box.addEventListener('change', () => {
@@ -262,6 +269,7 @@
       return true;
     }
     if(check.art === 'text') return true;
+    if(eigeneArten[check.art]) return eigeneArten[check.art].erfuellt(eintrag, ctx.gruppe);
     return !!eintrag.bestaetigt;
   }
 
@@ -329,6 +337,12 @@
       }))));
       teile.push(aufloesung);
     }
+    // Auflösung zu Fragen der Station (z. B. „Was bedeuten die Farben?“), erst nach der eigenen Antwort
+    (station.eingaben || []).filter(e => e.aufloesung).forEach(e => {
+      teile.push(el('h2', { text: e.text }));
+      teile.push(el('p', { klasse: 'deine-antwort' }, [el('span', { text: 'Deine Antwort: ' }), el('em', { text: (eintrag.antworten || {})[e.id] || '–' })]));
+      teile.push(el('p', { klasse: 'aufloesung-text' }, [el('strong', { text: 'Auflösung: ' }), el('span', { text: e.aufloesung })]));
+    });
     if(fragen.indexOf('sterne') >= 0){
       teile.push(el('h2', { text: 'Wie hat dir die Station gefallen?' }));
       const sterne = el('div', { klasse: 'sterne' });
@@ -416,8 +430,9 @@
       el('span', { text: 'Test: ' }),
       el('button', { type: 'button', klasse: 'secondary', text: 'Alles zurücksetzen', onclick: () => {
         if(!confirm('Gruppe, Fortschritt und Fotos auf diesem iPad löschen?')) return;
-        try{ indexedDB.deleteDatabase('werkstatt'); }catch(err){ /* egal */ }
-        setTimeout(() => location.reload(), 300);
+        Speicher.allesLoeschen()
+          .then(() => location.reload())
+          .catch(err => fehler('Löschen hat nicht geklappt. Andere Tabs mit der Workshop-App schließen und nochmal versuchen.', err));
       } })
     ]));
   }
@@ -465,10 +480,7 @@
     station: station,
     fehler: fehler,
     el: el,
-    // Für eigene Stationsseiten (Screen 3, 5): ihr Teil ist geschafft
-    inputErledigt: () => {
-      ctx.eintrag.bestaetigt = true;
-      return speichern().then(() => ctx.pruefen());
-    }
+    // Eigene Stationsteile anmelden (app/stationen/*.js), z. B. Rahmen.eigeneArt('stempel', {...})
+    eigeneArt: (art, teil) => { eigeneArten[art] = teil; }
   };
 })();

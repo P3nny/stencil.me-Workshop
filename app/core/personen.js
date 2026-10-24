@@ -48,24 +48,33 @@
     });
   }
 
+  function mitZeitlimit(promise){
+    const limit = new Promise((resolve, reject) => setTimeout(() => reject(new Error('Zeitüberschreitung')), ZEITLIMIT_MS));
+    return Promise.race([promise, limit]);
+  }
+
+  // BodyPix-Ergebnis für ein Bild oder Canvas (data: 1 = Person). Fehler werden weitergegeben.
+  function segmentieren(bild){
+    return mitZeitlimit(netz().then(net => net.segmentPerson(bild, { internalResolution: 'medium', segmentationThreshold: 0.4 })));
+  }
+
   // Ergebnis: { status: 'ok' | 'klein' | 'keine' | 'fehler', anteil }
   // 'fehler' heißt: Die KI konnte nicht prüfen (zu langsam, kein Speicher). Dann
   // gilt das Foto trotzdem, der Workshop darf daran nicht hängen bleiben.
   function pruefen(url){
-    const arbeit = Promise.all([netz(), bildAusUrl(url)])
-      .then(werte => werte[0].segmentPerson(werte[1], { internalResolution: 'medium', segmentationThreshold: 0.4 }))
+    return bildAusUrl(url)
+      .then(segmentieren)
       .then(seg => {
         let summe = 0;
         for(let i = 0; i < seg.data.length; i++) summe += seg.data[i];
         const anteil = summe / seg.data.length;
         return { status: anteil < MIN_ANTEIL ? 'keine' : anteil < KLEIN_ANTEIL ? 'klein' : 'ok', anteil: anteil };
+      })
+      .catch(err => {
+        console.error(err);
+        return { status: 'fehler', anteil: 0 };
       });
-    const limit = new Promise((resolve, reject) => setTimeout(() => reject(new Error('Zeitüberschreitung')), ZEITLIMIT_MS));
-    return Promise.race([arbeit, limit]).catch(err => {
-      console.error(err);
-      return { status: 'fehler', anteil: 0 };
-    });
   }
 
-  window.Personen = { pruefen: pruefen, vorladen: () => netz().catch(err => console.error(err)) };
+  window.Personen = { pruefen: pruefen, segmentieren: segmentieren, bildAusUrl: bildAusUrl, vorladen: () => netz().catch(err => console.error(err)) };
 })();
