@@ -165,6 +165,13 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Einrichtung: `./server/einrichten.sh` (einmalig, installiert das Anthropic-SDK und fragt den API-Schlüssel ab), `./server/start.sh` nutzt es dann automatisch
 - Modell wechseln: `STENCILME_KI_MODELL=claude-sonnet-5-5 ./server/start.sh`
 
+## Screen 10 und 11: Mit der Hand drucken — gebaut, Branch `feature/screen-10-11`
+
+- **10 Linolplatten** (`druck-linol`): jede Person druckt eine Postkarte mit einer fertigen Linolplatte. Schritte von der Karte (Seite 18), Beispielbild der Postkarte aus dem PDF
+- **11 Lasercut-Stempel** (`druck-stempel`): erst nach dem Lasercutter frei. Stempel abholen, einfärben, Postkarte drucken (Pflichtweg Schritt 5). Freiwillige Frage „Wo ist die Farbe gelandet?“ mit Auflösung
+- Beide: ein Foto der Postkarte pro Person (Rückkamera), geht an den Laptop. Freiwillige Frage „Warum spiegelverkehrt?“ mit Auflösung
+- *Die App weiß nicht, ob der Stempel schon gelasert ist (keine Laser-Queue). Kommen Kinder zu früh, schickt Penny sie zu einer anderen Station*
+
 ## Weitere Screens
 
 - *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …

@@ -1,0 +1,49 @@
+{
+  "id": "druck-stempel",
+  "titel": "Mit der Hand drucken: euer Lasercut-Stempel",
+  "typ": "analog",
+  "datenweg": "laptop",
+  "schritte": [
+    "Holt euch euren fertigen Stempel bei Penny am Lasercutter ab.",
+    "Rollt die Druckfarbe dünn und gleichmäßig auf den Stempel.",
+    "Druckt den Stempel auf eure Postkarte: fest andrücken oder durch die Druckpresse.",
+    "Vergleicht den Abdruck mit eurem Stempel-Bild aus „Bild bearbeiten“: Wo ist die Farbe gelandet?",
+    "Jede Person fotografiert ihre Postkarte."
+  ],
+  "beispiele": [
+    {
+      "bild": "bilder/drucken/postkarte.jpg",
+      "gut": true,
+      "text": "So kann eure Postkarte aussehen (Linoldruck-Stempel-Postkarte, Bild: pen)"
+    }
+  ],
+  "check": {
+    "art": "foto",
+    "proPerson": true,
+    "hochladen": true,
+    "text": "Foto von der Postkarte von"
+  },
+  "eingaben": [
+    {
+      "id": "farbe",
+      "text": "Wo ist die Farbe gelandet? Vergleicht mit dem Stempel-Bild (Blau, Weiß, Rot).",
+      "pflicht": false,
+      "aufloesung": "Farbe nimmt nur das Holz auf, das stehen geblieben ist: im Stempel-Bild weiß. Wo der Laser graviert hat (blau), liegt das Holz tiefer und die Postkarte bleibt hell. Rot ist der Rand, an dem der Laser den Stempel ausgeschnitten hat."
+    },
+    {
+      "id": "spiegel",
+      "text": "Warum muss das Motiv spiegelverkehrt auf der Druckplatte sein?",
+      "pflicht": false,
+      "aufloesung": "Beim Drucken dreht sich das Bild um, wie bei einem Spiegel. Damit es auf der Postkarte richtig herum steht, muss es auf der Platte spiegelverkehrt sein. Darum spiegelt stencil.me auch euren Stempel."
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Das Foto eurer Postkarte geht an den Laptop, für eure Ergebnis-Mappe. Fotografiert nur die Karte, keine Leute.",
+  "braucht": [
+    "lasercutter"
+  ],
+  "plaetze": 4
+}

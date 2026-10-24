@@ -1,0 +1,43 @@
+{
+  "id": "druck-linol",
+  "titel": "Mit der Hand drucken: Linolplatten",
+  "typ": "analog",
+  "datenweg": "laptop",
+  "schritte": [
+    "Lasst euch kurz zeigen, wie man mit dem Schnitzeisen ein Motiv in Linol schneidet.",
+    "Sucht euch eine der fertigen Linolplatten aus.",
+    "Rollt die Druckfarbe gleichmäßig mit der Rolle auf die Platte.",
+    "Legt die Postkarte auf, schiebt alles durch die Druckpresse und zieht den Abdruck ab.",
+    "Jede Person druckt eine eigene Postkarte und fotografiert sie."
+  ],
+  "beispiele": [
+    {
+      "bild": "bilder/drucken/postkarte.jpg",
+      "gut": true,
+      "text": "So kann eure Postkarte aussehen (Linoldruck-Stempel-Postkarte, Bild: pen)"
+    }
+  ],
+  "check": {
+    "art": "foto",
+    "proPerson": true,
+    "hochladen": true,
+    "text": "Foto von der Postkarte von"
+  },
+  "eingaben": [
+    {
+      "id": "spiegel",
+      "text": "Warum muss das Motiv spiegelverkehrt auf der Druckplatte sein?",
+      "pflicht": false,
+      "aufloesung": "Beim Drucken dreht sich das Bild um, wie bei einem Spiegel. Damit es auf der Postkarte richtig herum steht, muss es auf der Platte spiegelverkehrt sein. Darum spiegelt stencil.me auch euren Stempel."
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Das Foto eurer Postkarte geht an den Laptop, für eure Ergebnis-Mappe. Fotografiert nur die Karte, keine Leute.",
+  "braucht": [
+    "foto"
+  ],
+  "plaetze": 4
+}
