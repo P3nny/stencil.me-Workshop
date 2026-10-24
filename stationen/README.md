@@ -20,7 +20,8 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `eingaben` | nein | Textfelder: `{ "id": "…", "text": "Frage", "pflicht": true }`. Mit `"aufloesung": "…"` zeigt die App nach „Station beendet“ die richtige Antwort |
 | `fragen` | ja | am Ende: `ki-typ` („Programm, KI oder generative KI?“) und/oder `sterne` (1–5) |
 | `datenschutz` | ja | ein Satz: Was passiert mit den Daten dieser Station? |
-| `braucht` | ja | Stationen, die vorher fertig sein müssen, z. B. `["foto"]` |
+| `braucht` | ja | Stationen, die vorher fertig sein müssen, z. B. `["foto"]`. Gibt es eine davon (noch) nicht, zählt sie nicht |
+| `hintergruende` | nein | nur Station Hintergrund: `{ "datei": "bilder/hintergruende/….jpg", "titel": "…" }`, Lizenzen in `bilder/hintergruende/README.md` |
 | `plaetze` | ja | wie viele Gruppen gleichzeitig an der Station sein können |
 
 ## `check`
@@ -32,7 +33,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `quiz` | Quiz öffnen (`url`), danach „Quiz geschafft“ antippen |
 | `bestaetigung` | „Erledigt“ antippen |
 | `stempel` | stencil.me: Schritte pro Person, Schnittrand, Stempel an den Laptop (`app/stationen/stencilme.js`) |
-| `greenscreen` | eigene Seite, wird in Screen 5 gebaut. Bis dahin: „Erledigt“ antippen |
+| `hintergrund` | Hintergrund ändern: Foto freistellen, Hintergrund aus `hintergruende` wählen, Bild an den Laptop (`app/stationen/hintergrund.js`) |
 
 ## Nächste Station
 

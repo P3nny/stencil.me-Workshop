@@ -1,7 +1,7 @@
 // ---- Rahmen jeder Station ----
 // Kopfleiste (Namen, „x von y“, Puzzle), Check-in, Schritte, Input,
 // „Station beendet“, Abschlussfragen und Vorschlag für die nächste Station.
-// Eigene Stationsteile (stencil.me, später Greenscreen) liegen in app/stationen/
+// Eigene Stationsteile (stencil.me, Hintergrund ändern) liegen in app/stationen/
 // und melden sich mit Rahmen.eigeneArt() an.
 (function(){
   const TYP_TEXT = { programm: 'Computerprogramm', ki: 'KI (Bildbearbeitung)', generativ: 'Generative KI', analog: 'Ohne Computer' };
@@ -483,7 +483,7 @@
         if(st.check && st.check.personPruefen && window.Personen) Personen.vorladen();
         return kopfleiste(gruppe, liste, f).then(() => {
           if(ctx.eintrag.status === 'fertig') return weiterZeigen(false);
-          const fehlend = (st.braucht || []).filter(b => !Stationen.istFertig(f, b)).map(b => liste.filter(s => s.id === b)[0]).filter(Boolean);
+          const fehlend = Stationen.voraussetzungen(liste, st).filter(b => !Stationen.istFertig(f, b)).map(b => liste.filter(s => s.id === b)[0]);
           if(fehlend.length) return nochNichtDran(fehlend);
           if(ctx.eintrag.status !== 'begonnen'){
             // Check-in: Station ist ab jetzt für diese Gruppe besetzt

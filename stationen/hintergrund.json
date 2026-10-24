@@ -1,0 +1,58 @@
+{
+  "id": "hintergrund",
+  "titel": "Hintergrund ändern",
+  "typ": "ki",
+  "datenweg": "laptop",
+  "schritte": [
+    "Die KI stellt dein Foto frei: Sie erkennt, welche Pixel zu dir gehören, und lässt den Rest weg.",
+    "Such dir einen neuen Hintergrund aus.",
+    "Schau genau hin: Wo hat die KI sauber gearbeitet, wo nicht (Haare, Hände, Ränder)?",
+    "Schick dein Bild an den Laptop."
+  ],
+  "hintergruende": [
+    {
+      "datei": "bilder/hintergruende/weltall-erdaufgang.jpg",
+      "titel": "Erdaufgang (Weltall)"
+    },
+    {
+      "datei": "bilder/hintergruende/welle.jpg",
+      "titel": "Die große Welle (Hokusai)"
+    },
+    {
+      "datei": "bilder/hintergruende/sternennacht.jpg",
+      "titel": "Sternennacht (van Gogh)"
+    },
+    {
+      "datei": "bilder/hintergruende/dschungel.jpg",
+      "titel": "Dschungel mit Tiger (Rousseau)"
+    },
+    {
+      "datei": "bilder/hintergruende/kandinsky.jpg",
+      "titel": "Komposition 8 (Kandinsky)"
+    },
+    {
+      "datei": "bilder/hintergruende/galaxien.jpg",
+      "titel": "Tausende Galaxien (Hubble)"
+    }
+  ],
+  "check": {
+    "art": "hintergrund"
+  },
+  "eingaben": [
+    {
+      "id": "fehler",
+      "text": "Wo hat die KI beim Freistellen Fehler gemacht?",
+      "pflicht": false
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Das Freistellen passiert auf dem iPad. Dein fertiges Bild mit dem neuen Hintergrund geht an den Laptop, für deine Ergebnis-Mappe.",
+  "braucht": [
+    "foto",
+    "koerpererkennung"
+  ],
+  "plaetze": 3
+}

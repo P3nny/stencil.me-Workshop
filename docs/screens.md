@@ -92,7 +92,16 @@ Beschreibung von Patricia:
 - Input: Foto vom Lasercutter
 - Für Penny: Die Laptop-Seite ordnet die Stempel auf einer A4-SVG an. Ist die Platte voll, wird sie heruntergeladen und in der Mr-Beam-Oberfläche geöffnet. Einzelne Stempel gehen weiterhin.
 
-## Screen 5: Greenscreen
+## Screen 5: Hintergrund ändern (vorher „Greenscreen“) — gebaut, Branch `feature/screen-5`
+
+- Neuer Name „Hintergrund ändern“ (wie auf der alten Karte), ID `hintergrund` (Patricia, 24.10.)
+- Pro Person: KI stellt das Foto frei (Karomuster = durchsichtig), Hintergrund aus sechs gemeinfreien Bildern wählen, „Bild an den Laptop schicken“. Erst wenn beide Bilder abgeschickt sind, geht „Station beendet“
+- Hintergründe (Public Domain, Lizenzen in `stationen/bilder/hintergruende/README.md`): Erdaufgang (NASA), Die große Welle (Hokusai), Sternennacht (van Gogh), Dschungel mit Tiger (Rousseau), Komposition 8 (Kandinsky), Tausende Galaxien (Hubble)
+- Freiwillige Frage „Wo hat die KI beim Freistellen Fehler gemacht?“ (heller Rand um die Person ist so ein Fehler)
+- Kommt nach der Körpererkennung: `braucht: ["foto", "koerpererkennung"]`. Solange es die Station Körpererkennung nicht gibt, zählt nur das Foto
+- Findet die KI keine Person: Hinweis, Station kann trotzdem beendet werden
+
+Beschreibung von Patricia:
 
 - Das Rohfoto wird auf dem iPad freigestellt (BodyPix)
 - Die Jugendlichen wählen einen Hintergrund aus festen, gemeinfreien Bildern

@@ -40,8 +40,14 @@
     return liste.filter(s => istFertig(f, s.id)).length;
   }
 
+  // Voraussetzungen, die es als Station (noch) nicht gibt, zählen nicht.
+  // So kann eine Station schon auf eine spätere verweisen (z. B. Körpererkennung).
+  function voraussetzungen(liste, station){
+    return (station.braucht || []).filter(b => liste.some(s => s.id === b));
+  }
+
   function moeglich(liste, f){
-    return liste.filter(s => !istFertig(f, s.id) && (s.braucht || []).every(b => istFertig(f, b)));
+    return liste.filter(s => !istFertig(f, s.id) && voraussetzungen(liste, s).every(b => istFertig(f, b)));
   }
 
   // Belegung vom Laptop: { <id>: Anzahl Gruppen }. Ohne Laptop: null
@@ -67,6 +73,7 @@
     istFertig: istFertig,
     anzahlFertig: anzahlFertig,
     moeglich: moeglich,
+    voraussetzungen: voraussetzungen,
     belegung: belegung,
     naechste: naechste
   };

@@ -35,9 +35,13 @@ async function abschliessen(page, sterne){
   // iPad-Größe im Querformat
   const page = await browser.newPage({ viewport: { width: 1180, height: 820 } });
   const konsolenFehler = [];
-  page.on('pageerror', e => konsolenFehler.push(e.message));
-  // Fehler von YouTube selbst (Video im Test ohne Internet) zählen nicht
-  page.on('console', m => { if(m.type() === 'error' && !/youtube|ytimg|google/i.test(m.text() + (m.location().url || ''))) konsolenFehler.push(m.text()); });
+  page.on('pageerror', e => { if(!/access control checks/.test(e.message)) konsolenFehler.push(e.message); });
+  // Zählen nicht: Fehler von YouTube selbst und Anfragen, die WebKit abbricht, weil der
+  // Test zur nächsten Seite springt („due to access control checks“ bei eigener Adresse)
+  page.on('console', m => {
+    const text = m.text() + (m.location().url || '');
+    if(m.type() === 'error' && !/youtube|ytimg|google/i.test(text) && !/access control checks/.test(text)) konsolenFehler.push(m.text());
+  });
   const youtubeAnfragen = [];
   page.on('request', r => { if(/youtube|ytimg|googlevideo/.test(r.url())) youtubeAnfragen.push(r.url()); });
 
@@ -122,7 +126,7 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Greenscreen'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
   pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 4') >= 0, 'Zähler steht auf 1 von 4');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
@@ -195,6 +199,24 @@ async function abschliessen(page, sterne){
   pruefe(true, 'Startseite zeigt den Stand');
   await page.goto(BASE + '/app/station.html?id=lasercutter');
 
+  console.log('Station Hintergrund ändern');
+  await page.goto(BASE + '/app/station.html?id=hintergrund&test');
+  await page.waitForSelector('h1:has-text("Hintergrund ändern")');
+  await page.waitForFunction(() => document.querySelectorAll('.frei-bild canvas').length === 2, null, { timeout: 120000 });
+  pruefe(true, 'beide Fotos freigestellt');
+  pruefe(await page.locator('.hintergrund-person').first().locator('button.hintergrund-wahl').count() === 6, 'sechs Hintergründe zur Auswahl');
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor die Bilder abgeschickt sind');
+  await page.locator('.hintergrund-person').nth(0).locator('button.hintergrund-wahl').nth(2).click();
+  await page.locator('.hintergrund-person').nth(1).locator('button.hintergrund-wahl').nth(0).click();
+  await page.waitForFunction(() => document.querySelectorAll('.ergebnis-bild canvas').length === 2);
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-9-hintergrund.png'), fullPage: true });
+  await page.locator('.hintergrund-person').nth(0).locator('button:has-text("Bild an den Laptop schicken")').click();
+  await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild an den Laptop schicken")').click();
+  await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist abgeschickt') >= 0).length === 2);
+  await abschliessen(page, 4);
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('4 von 4') >= 0, 'Zähler steht auf 4 von 4');
+  pruefe(await page.locator('text=alle Stationen geschafft').count() === 1, '„Du hast alle Stationen geschafft!“');
+
   console.log('Laptop');
   await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
   pruefe(true, 'Outbox leer: „Gesichert auf dem Laptop“');
@@ -202,8 +224,9 @@ async function abschliessen(page, sterne){
   const g = gruppen.gruppen.filter(x => x.personen.join() === 'Ada,Bo').pop();
   pruefe(!!g, 'Gruppe Ada & Bo auf dem Laptop');
   if(g){
-    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter', 'fertige Stationen: ' + g.fertig.join(', '));
-    pruefe(g.dateien.length === 1 && g.dateien[0].indexOf('lasercutter_') >= 0, 'nur das Laser-Foto hochgeladen, Rohfotos nicht');
+    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,hintergrund', 'fertige Stationen: ' + g.fertig.join(', '));
+    const arten = g.dateien.map(d => d.split('/').pop().split('_')[0]).sort().join(',');
+    pruefe(arten === 'hintergrund,hintergrund,lasercutter', 'hochgeladen: Laser-Foto und zwei Hintergrund-Bilder, keine Rohfotos (' + arten + ')');
     pruefe(g.antworten.lasercutter && g.antworten.lasercutter.antworten.frage === 'Wie heiß wird der Laser?', 'Antwort angekommen');
   }
   const laptop = await browser.newPage({ viewport: { width: 1400, height: 900 } });
