@@ -170,8 +170,9 @@
   // Neue Gruppe auf diesem iPad: alte Fotos und Antworten löschen (Datenschutz)
   document.getElementById('neu').addEventListener('click', () => {
     if(!confirm('Neu anmelden? Alle Fotos und Antworten auf diesem iPad werden gelöscht.')) return;
-    try{ indexedDB.deleteDatabase('werkstatt'); }catch(err){ /* egal */ }
-    setTimeout(() => location.reload(), 300);
+    Speicher.allesLoeschen()
+      .then(() => location.reload())
+      .catch(err => Rahmen.fehler('Löschen hat nicht geklappt. Sind noch andere Tabs mit der Workshop-App offen? Bitte schließen und nochmal versuchen.', err));
   });
 
   Outbox.starten();
