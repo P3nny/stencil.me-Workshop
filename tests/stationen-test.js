@@ -143,7 +143,9 @@ async function abschliessen(page, sterne){
   console.log('Reihenfolge');
   await page.goto(BASE + '/app/station.html?id=sticker&test');
   await page.waitForSelector('text=Bonus-Station');
-  pruefe(/noch 7/.test(await page.locator('#inhalt').textContent()), 'Bonus-Sticker gesperrt: „noch 7“');
+  const sperre = await page.locator('#inhalt').textContent();
+  pruefe(/Euch fehlen noch 7\./.test(sperre), 'Bonus-Sticker gesperrt: „Euch fehlen noch 7.“');
+  pruefe(/Vorher müsst ihr noch machen: Bild bearbeiten, Lasercutter, Mit der Hand drucken: euer Lasercut-Stempel\./.test(sperre), 'Sperre nennt die fehlenden Stationen');
   await page.goto(BASE + '/app/station.html?id=lasercutter&test');
   await page.waitForSelector('text=noch nicht');
   pruefe(await page.locator('text=Bild bearbeiten').count() > 0, 'Lasercutter verlangt zuerst „Bild bearbeiten“');
@@ -151,7 +153,8 @@ async function abschliessen(page, sterne){
   console.log('Freigabe Feedbackbogen vom Laptop');
   await page.goto(BASE + '/app/station.html?id=feedback&test');
   await page.waitForSelector('text=Bonus-Station');
-  pruefe(true, 'Feedbackbogen vor Bonus 1 gesperrt');
+  const sperreFb = await page.locator('#inhalt').textContent();
+  pruefe(sperreFb.indexOf('undefined') < 0 && /Vorher müsst ihr noch machen: Bonus: Sticker/.test(sperreFb), 'Feedbackbogen vor Bonus 1 gesperrt, nennt den Sticker');
   await page.request.post(BASE + '/api/einstellungen', { data: { freigaben: ['feedback'] } });
   await page.reload();
   await page.waitForSelector('.feedback-person');

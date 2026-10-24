@@ -593,9 +593,10 @@
           const fehlend = Stationen.voraussetzungen(liste, st).filter(b => !Stationen.istFertig(f, b)).map(b => liste.filter(s => s.id === b)[0]);
           const bonusFehlen = Stationen.fehlenBisBonus(liste, f, st);
           if(st.bonus && (bonusFehlen || fehlend.length)){
-            return nochNichtDran([], 'Das ist eine Bonus-Station. Sie geht auf, wenn ihr ' + st.mindestFertig + ' Stationen geschafft habt' +
-              (bonusFehlen ? ' (noch ' + bonusFehlen + ')' : '') +
-              (fehlend.length ? ', darunter: ' + fehlend.map(x => x.titel).join(', ') : '') + '.');
+            // Klar sagen, was noch fehlt: Anzahl und/oder bestimmte Stationen
+            return nochNichtDran([], 'Das ist eine Bonus-Station.' +
+              (bonusFehlen ? ' Sie geht auf, wenn ihr ' + st.mindestFertig + ' Stationen geschafft habt. Euch fehlen noch ' + bonusFehlen + '.' : '') +
+              (fehlend.length ? ' Vorher müsst ihr noch machen: ' + fehlend.map(x => x.titel).join(', ') + '.' : ''));
           }
           if(fehlend.length) return nochNichtDran(fehlend);
           if(ctx.eintrag.status !== 'begonnen'){
