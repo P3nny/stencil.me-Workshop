@@ -145,13 +145,64 @@
           status.textContent = station.check.hochladen ? '✓ Foto gespeichert' : '✓ Foto gespeichert (bleibt auf dem iPad)';
           knopf.textContent = 'Neues Foto';
           ctx.pruefen();
+          if(station.check.personPruefen) return personPruefen(knopf.parentNode.querySelector('.ki-pruefung'), index, url);
         })
         .catch(err => fehler('Das Foto hat nicht geklappt. Mach bitte ein neues.', err))
         .then(() => { knopf.disabled = false; input.value = ''; });
     });
 
     const titel = station.check.proPerson ? (station.check.text || 'Foto von') + ' ' + name : (station.check.text || 'Foto');
-    return el('div', { klasse: 'foto-feld' }, [el('p', { text: titel }), knopf, input, status, vorschau]);
+    const ki = el('div', { klasse: 'ki-pruefung' });
+    if(station.check.personPruefen){
+      // Abgebrochene Prüfung (Seite neu geladen): Foto gilt, der Workshop soll nicht hängen
+      if((eintrag.person || {})[index] === 'pruefen') eintrag.person[index] = 'fehler';
+      personAnzeigen(ki, index);
+    }
+    return el('div', { klasse: 'foto-feld' }, [el('p', { klasse: 'foto-titel', text: titel }), knopf, input, status, el('div', { klasse: 'foto-ergebnis' }, [vorschau, ki])]);
+  }
+
+  // ---- KI prüft: Ist eine Person auf dem Foto? ----
+  const PERSON_TEXT = {
+    pruefen: '🔍 Die KI sucht dich auf dem Foto … (beim ersten Mal dauert es etwas)',
+    ok: '✓ Die KI hat dich erkannt.',
+    klein: '✓ Die KI hat dich erkannt, aber du bist ziemlich klein. Tipp: näher ran an die Kamera.',
+    keine: '✗ Die KI findet hier keine Person. Mach ein neues Foto: Gesicht groß, nur Packpapier dahinter.',
+    trotzdem: 'Du nimmst das Foto, obwohl die KI keine Person gefunden hat.',
+    fehler: 'Die KI konnte das Foto nicht prüfen. Es geht trotzdem weiter.'
+  };
+  const pruefTokens = {};
+
+  function personAnzeigen(box, index){
+    const zustand = (ctx.eintrag.person || {})[index];
+    box.innerHTML = '';
+    box.className = 'ki-pruefung' + (zustand ? ' ' + zustand : '');
+    if(!zustand) return;
+    box.appendChild(el('p', { text: PERSON_TEXT[zustand] }));
+    if(zustand === 'keine'){
+      box.appendChild(el('button', { type: 'button', klasse: 'secondary klein', text: 'Trotzdem nehmen', onclick: () => {
+        ctx.eintrag.person[index] = 'trotzdem';
+        speichern();
+        personAnzeigen(box, index);
+        ctx.pruefen();
+      } }));
+    }
+  }
+
+  function personPruefen(box, index, url){
+    const token = (pruefTokens[index] || 0) + 1;
+    pruefTokens[index] = token;
+    ctx.eintrag.person = ctx.eintrag.person || {};
+    ctx.eintrag.person[index] = 'pruefen';
+    personAnzeigen(box, index);
+    ctx.pruefen();
+    return Personen.pruefen(url).then(ergebnis => {
+      if(pruefTokens[index] !== token) return; // inzwischen neues Foto
+      ctx.eintrag.person[index] = ergebnis.status;
+      return speichern().then(() => {
+        personAnzeigen(box, index);
+        ctx.pruefen();
+      });
+    });
   }
 
   function checkBereich(station){
@@ -203,11 +254,24 @@
     if(!texteOk) return false;
     if(check.art === 'foto'){
       const anzahl = check.proPerson ? ctx.gruppe.personen.length : 1;
-      for(let i = 0; i < anzahl; i++) if(!(eintrag.dateien || {})[i]) return false;
+      for(let i = 0; i < anzahl; i++){
+        if(!(eintrag.dateien || {})[i]) return false;
+        const person = (eintrag.person || {})[i];
+        if(check.personPruefen && (person === 'pruefen' || person === 'keine')) return false;
+      }
       return true;
     }
     if(check.art === 'text') return true;
     return !!eintrag.bestaetigt;
+  }
+
+  // Beispielbilder: gut (✓) und nicht so gut (✗). Bilder liegen in /stationen/bilder
+  function beispiele(station){
+    if(!station.beispiele || !station.beispiele.length) return null;
+    return el('div', { klasse: 'beispiele' }, station.beispiele.map(b => el('figure', { klasse: b.gut ? 'gut' : 'schlecht' }, [
+      el('img', { src: '/stationen/' + b.bild, alt: b.text }),
+      el('figcaption', { text: (b.gut ? '✓ ' : '✗ ') + b.text })
+    ])));
   }
 
   function stationZeigen(){
@@ -226,6 +290,7 @@
       el('h1', { text: station.titel }),
       etiketten(station, false),
       el('ol', { klasse: 'schritte' }, station.schritte.map(s => el('li', { text: s }))),
+      beispiele(station),
       links.length ? el('div', { klasse: 'links' }, links) : null,
       checkBereich(station),
       eingabenBereich(station),
@@ -375,6 +440,8 @@
         f.stationen[id] = f.stationen[id] || {};
         ctx = { gruppe: gruppe, liste: liste, f: f, station: st, eintrag: f.stationen[id] };
         document.title = st.titel + ' · stencil.me';
+        // KI schon laden, während die Kinder die Tipps lesen
+        if(st.check && st.check.personPruefen && window.Personen) Personen.vorladen();
         return kopfleiste(gruppe, liste, f).then(() => {
           if(ctx.eintrag.status === 'fertig') return weiterZeigen(false);
           const fehlend = (st.braucht || []).filter(b => !Stationen.istFertig(f, b)).map(b => liste.filter(s => s.id === b)[0]).filter(Boolean);

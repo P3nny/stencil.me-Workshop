@@ -41,7 +41,17 @@ Beschreibung von Patricia:
 - Allein oder zu zweit? Namen oder Nicknames eingeben
 - Weiter geht es immer mit dem Foto: „Macht nacheinander ein Foto von euch“ (allein: „Mach ein Foto von dir“)
 
-## Screen 2: Foto machen
+## Screen 2: Foto machen — gebaut, Branch `feature/screen-2`
+
+- Selfie-Kamera vorne, jede Person fotografiert sich selbst (Patricia, 24.10.)
+- Vier Beispielbilder (Zeichnungen in `stationen/bilder/`): gut, zu weit weg, unruhiger Hintergrund, Gegenlicht. *Können durch echte Fotos ersetzt werden (gleicher Dateiname oder Eintrag in `foto.json` ändern).*
+- Nach jedem Foto prüft die KI (BodyPix, auf dem iPad), ob eine Person zu sehen ist:
+  - erkannt → ✓, sehr klein im Bild → Tipp „näher ran“
+  - keine Person → Station gesperrt, „Neues Foto“ oder „Trotzdem nehmen“
+  - KI zu langsam oder Fehler (nach 30 s) → Foto gilt trotzdem, der Workshop hängt nicht
+- Typ der Station jetzt `ki` (wegen der Prüfung)
+
+Beschreibung von Patricia:
 
 - Jede Person macht ein Foto (vor Packpapier, Ringlicht)
 - Tipps: Kopf- oder Schulterporträt, Hintergrund nur Packpapier. Überlegt euch einen Ausdruck und eine Pose: Was soll euer Porträt sagen?

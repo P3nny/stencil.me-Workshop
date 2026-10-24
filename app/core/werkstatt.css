@@ -4,6 +4,8 @@
   --head:'Oswald','Arial Narrow',sans-serif;
 }
 *{box-sizing:border-box;}
+/* hidden muss immer gewinnen, auch gegen display:block weiter unten */
+[hidden]{display:none !important;}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;padding:16px 16px 80px;font-size:1.1rem;line-height:1.4;}
 h1,h2{font-family:var(--head);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;}
 h1{font-size:1.8rem;}
@@ -37,7 +39,22 @@ button:disabled{opacity:.35;cursor:not-allowed;background:#888;}
 .schritte{padding-left:1.4em;}
 .schritte li{margin-bottom:8px;}
 .check,.eingaben{margin:18px 0;}
-.foto-feld{margin-bottom:16px;}
+.foto-feld{margin-bottom:22px;}
+.foto-titel{font-family:var(--head);text-transform:uppercase;letter-spacing:.06em;font-size:1.2rem;margin:0 0 4px;}
+.foto-ergebnis{display:flex;flex-wrap:wrap;align-items:flex-start;gap:14px;}
+.ki-pruefung{max-width:340px;margin-top:8px;}
+.ki-pruefung p{margin:0 0 6px;padding:8px 10px;border:3px solid var(--ink);}
+.ki-pruefung.ok p,.ki-pruefung.klein p{background:#e6f7ea;}
+.ki-pruefung.keine p{background:var(--neon);font-weight:700;}
+.ki-pruefung.pruefen p,.ki-pruefung.fehler p,.ki-pruefung.trotzdem p{background:#f4f4f4;}
+button.klein{font-size:.8rem;padding:6px 10px;}
+.beispiele{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0;}
+.beispiele figure{margin:0;width:150px;font-size:.85rem;}
+.beispiele img{display:block;width:150px;height:188px;object-fit:cover;border:4px solid var(--ink);}
+.beispiele .gut img{border-color:#1e9e4a;}
+.beispiele .schlecht img{opacity:.85;}
+.beispiele figcaption{margin-top:4px;line-height:1.25;}
+.beispiele .gut figcaption{font-weight:700;}
 .foto-vorschau{display:block;max-width:220px;max-height:220px;border:3px solid var(--ink);margin-top:8px;}
 .eingabe{display:block;margin-bottom:12px;}
 .eingabe span{display:block;font-weight:700;margin-bottom:4px;}

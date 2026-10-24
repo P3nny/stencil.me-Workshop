@@ -13,6 +13,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `typ` | ja | `programm`, `ki`, `generativ` oder `analog` (Etikett an der Station) |
 | `datenweg` | ja | `ipad`, `laptop` oder `online` (Etikett an der Station) |
 | `schritte` | ja | höchstens 5, je ein kurzer Satz |
+| `beispiele` | nein | Beispielbilder: `{ "bild": "bilder/….svg", "gut": true, "text": "…" }`. Bilder liegen in `stationen/bilder/` |
 | `links` | nein | z. B. Erklärvideo: `{ "text": "…", "url": "…" }`. Ohne `url` wird der Link nicht angezeigt |
 | `check` | ja | Was muss erledigt sein, bevor „Station beendet“ geht (siehe unten) |
 | `eingaben` | nein | Textfelder: `{ "id": "…", "text": "Frage", "pflicht": true }` |
@@ -25,7 +26,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 
 | `art` | Bedeutung |
 | --- | --- |
-| `foto` | Foto aufnehmen. `proPerson: true`: ein Foto pro Person. `hochladen: false`: bleibt auf dem iPad. `text`: Hinweis |
+| `foto` | Foto aufnehmen. `proPerson: true`: ein Foto pro Person. `hochladen: false`: bleibt auf dem iPad. `personPruefen: true`: KI (BodyPix) prüft, ob eine Person zu sehen ist. `text`: Hinweis |
 | `text` | nur die `eingaben` müssen ausgefüllt sein |
 | `quiz` | Quiz öffnen (`url`), danach „Quiz geschafft“ antippen |
 | `bestaetigung` | „Erledigt“ antippen |

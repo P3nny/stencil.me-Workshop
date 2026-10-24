@@ -80,11 +80,27 @@ async function abschliessen(page, sterne){
   pruefe(await beenden.isDisabled(), '„Station beendet“ gesperrt ohne Fotos');
   const inputs = page.locator('input[type=file]');
   pruefe(await inputs.count() === 2, 'ein Foto-Feld pro Person');
+  pruefe(await page.locator('.beispiele figure').count() === 4, 'vier Beispielbilder');
+  // Foto ohne Person: eine leere Fläche
+  const leer = await browser.newPage({ viewport: { width: 600, height: 800 } });
+  await leer.setContent('<body style="margin:0;background:#c9a97f"></body>');
+  const leerJpeg = await leer.screenshot({ type: 'jpeg' });
+  await leer.close();
+  await inputs.nth(0).setInputFiles({ name: 'leer.jpg', mimeType: 'image/jpeg', buffer: leerJpeg });
+  await page.waitForSelector('.ki-pruefung.keine', { timeout: 60000 });
+  pruefe(true, 'Foto ohne Person: „Die KI findet hier keine Person“');
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-1a-keine-person.png'), fullPage: true });
   await inputs.nth(0).setInputFiles(FOTO);
-  await page.locator('.foto-vorschau').nth(0).waitFor({ state: 'visible' });
+  await page.waitForSelector('.foto-feld:nth-child(1) .ki-pruefung.ok', { timeout: 60000 });
+  pruefe(true, 'Foto mit Person: „Die KI hat dich erkannt“');
   pruefe(await beenden.isDisabled(), 'nach einem Foto noch gesperrt');
+  await inputs.nth(1).setInputFiles({ name: 'leer.jpg', mimeType: 'image/jpeg', buffer: leerJpeg });
+  await page.waitForSelector('.foto-feld:nth-child(2) .ki-pruefung.keine', { timeout: 60000 });
+  pruefe(await beenden.isDisabled(), 'gesperrt, solange keine Person erkannt ist');
+  await page.click('.foto-feld:nth-child(2) button:has-text("Trotzdem nehmen")');
+  pruefe(await page.locator('.foto-feld:nth-child(2) .ki-pruefung.trotzdem').count() === 1, '„Trotzdem nehmen“ geht');
   await inputs.nth(1).setInputFiles(FOTO);
-  await page.locator('.foto-vorschau').nth(1).waitFor({ state: 'visible' });
+  await page.waitForSelector('.foto-feld:nth-child(2) .ki-pruefung.ok', { timeout: 60000 });
   // WebKit gibt den Knopf ein paar Millisekunden nach der Vorschau frei
   pruefe(await page.waitForFunction(() => {
     const b = Array.prototype.filter.call(document.querySelectorAll('button'), x => x.textContent === 'Station beendet')[0];

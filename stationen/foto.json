@@ -1,7 +1,7 @@
 {
   "id": "foto",
   "titel": "Foto machen",
-  "typ": "programm",
+  "typ": "ki",
   "datenweg": "ipad",
   "schritte": [
     "Stell dich vor das Packpapier, das Ringlicht leuchtet dich an.",
@@ -9,9 +9,40 @@
     "Überleg dir einen Ausdruck und eine Pose: Was soll dein Porträt sagen?",
     "Mach das Foto. Zu zweit: nacheinander, jede Person ein Foto."
   ],
-  "check": { "art": "foto", "proPerson": true, "hochladen": false, "text": "Foto von" },
-  "fragen": ["ki-typ", "sterne"],
-  "datenschutz": "Dein Foto bleibt auf diesem iPad. Es geht nicht an den Laptop.",
+  "beispiele": [
+    {
+      "bild": "bilder/foto-gut.svg",
+      "gut": true,
+      "text": "So ist es gut: Kopf und Schultern groß, nur Packpapier dahinter"
+    },
+    {
+      "bild": "bilder/foto-zu-weit.svg",
+      "gut": false,
+      "text": "Zu weit weg"
+    },
+    {
+      "bild": "bilder/foto-unruhig.svg",
+      "gut": false,
+      "text": "Zu viel im Hintergrund"
+    },
+    {
+      "bild": "bilder/foto-gegenlicht.svg",
+      "gut": false,
+      "text": "Gegenlicht: Fenster im Rücken"
+    }
+  ],
+  "check": {
+    "art": "foto",
+    "proPerson": true,
+    "hochladen": false,
+    "text": "Foto von",
+    "personPruefen": true
+  },
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Dein Foto bleibt auf diesem iPad. Auch die KI, die dich auf dem Foto sucht, läuft auf dem iPad.",
   "braucht": [],
   "plaetze": 13
 }
