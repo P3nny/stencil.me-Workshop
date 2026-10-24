@@ -12,7 +12,7 @@
     { wert: 'programm', text: 'Keine KI, nur ein Programm' },
     { wert: 'weiss-nicht', text: 'Weiß nicht' }
   ];
-  // Eigene Stationsteile (z. B. stencil.me): art -> { anzeigen(station, api), erfuellt(eintrag, gruppe) }
+  // Eigene Stationsteile (z. B. stencil.me): art -> { anzeigen(station, api), erfuellt(eintrag, gruppe, station) }
   const eigeneArten = {};
   const TEST = /[?&]test\b/.test(location.search);
 
@@ -269,7 +269,7 @@
       return true;
     }
     if(check.art === 'text') return true;
-    if(eigeneArten[check.art]) return eigeneArten[check.art].erfuellt(eintrag, ctx.gruppe);
+    if(eigeneArten[check.art]) return eigeneArten[check.art].erfuellt(eintrag, ctx.gruppe, station);
     return !!eintrag.bestaetigt;
   }
 

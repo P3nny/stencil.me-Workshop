@@ -100,6 +100,19 @@ button.hintergrund-wahl{width:120px;padding:4px;background:#fff;color:var(--ink)
 button.hintergrund-wahl img{width:100%;height:80px;object-fit:cover;display:block;}
 button.hintergrund-wahl.an{background:var(--neon);}
 button.hintergrund-wahl:disabled{background:#fff;opacity:.4;}
+/* Station „Körpererkennung testen“ */
+.ki-buehne{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;margin:12px 0;}
+.ki-ausgabe{display:block;max-width:100%;width:360px;height:auto;border:3px solid var(--ink);background:#000;cursor:pointer;}
+.tempo{font-family:var(--head);text-transform:uppercase;font-size:.9rem;margin:4px 0 0;}
+.ki-regelung{flex:1;min-width:260px;}
+.regel-titel{font-weight:700;margin:6px 0 2px;}
+.ki-regler{display:block;margin-top:10px;}
+.ki-regler input{width:100%;accent-color:var(--neon);height:32px;}
+.ki-regler .hinweis{display:block;}
+.aufgaben{display:flex;flex-direction:column;gap:8px;}
+.aufgabe{display:flex;gap:10px;align-items:flex-start;}
+.aufgabe input{width:26px;height:26px;flex:none;accent-color:var(--neon);}
+.ki-bild{display:block;max-width:260px;border:3px solid var(--ink);margin-top:8px;}
 .video{margin:16px 0;max-width:640px;}
 .video iframe{width:100%;aspect-ratio:16/9;height:auto;min-height:200px;border:3px solid var(--ink);display:block;}
 .video-platzhalter{border:3px dashed var(--ink);background:#f4f4f4;padding:16px;text-align:center;}

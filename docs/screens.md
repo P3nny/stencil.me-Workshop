@@ -108,6 +108,16 @@ Beschreibung von Patricia:
 - Canva fällt weg, dafür gibt es eine eigene Seite (HTML, CSS, JavaScript)
 - *Offen: Input = Bild mit Hintergrund. Nur auf dem iPad speichern oder an den Laptop senden?*
 
+## Screen 6: Körpererkennung testen — gebaut, Branch `feature/screen-6`
+
+- Live-Kamera geht nur mit HTTPS, der Laptop hat HTTP. Darum (Patricia, 24.10.): kurzes Video (5–10 s) mit der Kamera-App aufnehmen, die App spielt es in Schleife ab und BodyPix rechnet Bild für Bild. Tippen = Pause
+- Ansichten: Person (pink), Körperteile (farbig), Hintergrund unscharf. Regler: Auflösung grob/mittel/genau, Schwelle, Deckkraft. Anzeige „x Bilder pro Sekunde“
+- 8 Aufgaben zum Abhaken (Gegenstand, Seite, Hand, Kapuze, Foto auf dem Handy, Schwelle, Auflösung, linker Arm), mindestens 3
+- „Bild der KI-Ansicht speichern“: Video-Bild mit KI-Farben darüber (mit Gesicht, Patricia, 24.10.) → Laptop
+- Pflicht: zwei Ethik-Fragen von der alten Karte (gleich gut erkannt? Folgen bei Bewerbung/Überwachung?)
+- Läuft ein Video nicht (Format, Speicher), kommt nach 30 s ein Hinweis
+- *Ungetestet: Video vom iPad (.mov) in Safari. Der Test am Rechner läuft nur in Chromium mit echtem Bild*
+
 ## Weitere Screens
 
 - *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …

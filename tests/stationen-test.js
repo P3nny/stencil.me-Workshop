@@ -15,6 +15,8 @@ const BROWSER = process.argv[2] || 'webkit';
 const SHOTS = process.argv[3] || path.join(__dirname, '..', 'archiv', 'screenshots');
 const BASE = process.env.BASE || 'http://localhost:8765';
 const FOTO = path.join(__dirname, '..', 'docs', 'test-foto.jpg');
+// Testvideo (nicht im Repo): ffmpeg -loop 1 -i docs/test-foto.jpg -t 3 … archiv/testdateien/test-video.webm
+const VIDEO = process.env.VIDEO || path.join(__dirname, '..', 'archiv', 'testdateien', 'test-video.webm');
 
 let fehler = 0;
 function pruefe(ok, text){
@@ -126,8 +128,8 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Hintergrund ändern'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 4') >= 0, 'Zähler steht auf 1 von 4');
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 5') >= 0, 'Zähler steht auf 1 von 5');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
 
@@ -186,18 +188,43 @@ async function abschliessen(page, sterne){
   await page.locator('input[type=file]').setInputFiles(FOTO);
   await page.locator('.foto-vorschau').waitFor({ state: 'visible' });
   await abschliessen(page, 3);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 4') >= 0, 'Zähler steht auf 3 von 4');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 5') >= 0, 'Zähler steht auf 3 von 5');
 
   console.log('Neu laden: Fortschritt bleibt');
   await page.reload();
   await page.waitForSelector('text=schon erledigt');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 4') >= 0, 'Fortschritt nach Neuladen erhalten');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 5') >= 0, 'Fortschritt nach Neuladen erhalten');
 
   console.log('Startseite nach drei Stationen');
   await page.goto(BASE + '/');
-  await page.waitForSelector('text=3 von 4 Stationen geschafft');
+  await page.waitForSelector('text=3 von 5 Stationen geschafft');
   pruefe(true, 'Startseite zeigt den Stand');
   await page.goto(BASE + '/app/station.html?id=lasercutter');
+
+  console.log('Station Körpererkennung testen');
+  await page.goto(BASE + '/app/station.html?id=koerpererkennung&test');
+  await page.waitForSelector('h1:has-text("Körpererkennung")');
+  pruefe(await page.locator('.aufgabe').count() === 8, 'acht Aufgaben zum Abhaken');
+  await page.locator('input[type=file]').setInputFiles(VIDEO);
+  await page.waitForFunction(() => Array.prototype.some.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild der KI-Ansicht speichern') >= 0 && !b.disabled), null, { timeout: 120000 });
+  pruefe(true, 'Video läuft, die KI rechnet');
+  for(const ansicht of ['Körperteile', 'Hintergrund unscharf', 'Person']){
+    await page.click('.ki-regelung button:has-text("' + ansicht + '")');
+    await page.waitForTimeout(1500);
+  }
+  await page.waitForFunction(() => /Bilder pro Sekunde/.test(document.querySelector('.tempo').textContent), null, { timeout: 30000 });
+  pruefe(true, 'Tempo: ' + await page.locator('.tempo').textContent());
+  await page.click('.ki-regelung button:has-text("Körperteile")');
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-10-koerpererkennung.png'), fullPage: true });
+  await page.click('button:has-text("Bild der KI-Ansicht speichern")');
+  await page.waitForSelector('.ki-bild:visible');
+  for(const i of [0, 5, 6]) await page.check('#aufgabe-' + i);
+  await page.fill('#eingabe-gleich-gut', 'Bei Haaren unsicher');
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne zweite Ethik-Frage');
+  await page.fill('#eingabe-folgen', 'Manche werden benachteiligt');
+  await abschliessen(page, 5);
+  pruefe(true, 'Körpererkennung abgeschlossen');
 
   console.log('Station Hintergrund ändern');
   await page.goto(BASE + '/app/station.html?id=hintergrund&test');
@@ -214,7 +241,7 @@ async function abschliessen(page, sterne){
   await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild an den Laptop schicken")').click();
   await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist abgeschickt') >= 0).length === 2);
   await abschliessen(page, 4);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('4 von 4') >= 0, 'Zähler steht auf 4 von 4');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 5') >= 0, 'Zähler steht auf 5 von 5');
   pruefe(await page.locator('text=alle Stationen geschafft').count() === 1, '„Du hast alle Stationen geschafft!“');
 
   console.log('Laptop');
@@ -224,9 +251,9 @@ async function abschliessen(page, sterne){
   const g = gruppen.gruppen.filter(x => x.personen.join() === 'Ada,Bo').pop();
   pruefe(!!g, 'Gruppe Ada & Bo auf dem Laptop');
   if(g){
-    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,hintergrund', 'fertige Stationen: ' + g.fertig.join(', '));
+    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund', 'fertige Stationen: ' + g.fertig.join(', '));
     const arten = g.dateien.map(d => d.split('/').pop().split('_')[0]).sort().join(',');
-    pruefe(arten === 'hintergrund,hintergrund,lasercutter', 'hochgeladen: Laser-Foto und zwei Hintergrund-Bilder, keine Rohfotos (' + arten + ')');
+    pruefe(arten === 'hintergrund,hintergrund,koerpererkennung,lasercutter', 'hochgeladen: Laser-Foto, KI-Ansicht, zwei Hintergrund-Bilder, keine Rohfotos (' + arten + ')');
     pruefe(g.antworten.lasercutter && g.antworten.lasercutter.antworten.frage === 'Wie heiß wird der Laser?', 'Antwort angekommen');
   }
   const laptop = await browser.newPage({ viewport: { width: 1400, height: 900 } });

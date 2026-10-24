@@ -33,6 +33,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `quiz` | Quiz öffnen (`url`), danach „Quiz geschafft“ antippen |
 | `bestaetigung` | „Erledigt“ antippen |
 | `stempel` | stencil.me: Schritte pro Person, Schnittrand, Stempel an den Laptop (`app/stationen/stencilme.js`) |
+| `koerpererkennung` | Video aufnehmen, BodyPix rechnet live auf dem Video, Regler, Aufgaben (`aufgaben`, mindestens `mindestAufgaben` abhaken), Bild der KI-Ansicht an den Laptop (`app/stationen/koerpererkennung.js`) |
 | `hintergrund` | Hintergrund ändern: Foto freistellen, Hintergrund aus `hintergruende` wählen, Bild an den Laptop (`app/stationen/hintergrund.js`) |
 
 ## Nächste Station

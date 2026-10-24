@@ -76,5 +76,5 @@
       });
   }
 
-  window.Personen = { pruefen: pruefen, segmentieren: segmentieren, bildAusUrl: bildAusUrl, vorladen: () => netz().catch(err => console.error(err)) };
+  window.Personen = { netz: netz, pruefen: pruefen, segmentieren: segmentieren, bildAusUrl: bildAusUrl, vorladen: () => netz().catch(err => console.error(err)) };
 })();
