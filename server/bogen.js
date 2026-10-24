@@ -230,6 +230,7 @@
 
     el("bauen").addEventListener("click", zusammenstellen);
     el("zuruecksetzen").addEventListener("click", function () {
+      if (!window.confirm("Alle wieder anhaken, auch die schon gelaserten? Nur nötig, wenn ein Bogen schiefging.")) return;
       platziert = [];
       auswahl = {};
       schreiben(o.schluessel + "-platziert", platziert);
