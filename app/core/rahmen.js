@@ -282,6 +282,29 @@
     ])));
   }
 
+  // Video erst nach Antippen laden (Zwei-Klick): Vorher geht nichts an YouTube
+  function video(station){
+    const v = station.video;
+    if(!v || !/^[A-Za-z0-9_-]{11}$/.test(v.youtube || '')) return null;
+    const box = el('div', { klasse: 'video' });
+    const knopf = el('button', { type: 'button', text: '▶ Video laden', onclick: () => {
+      box.innerHTML = '';
+      box.appendChild(el('iframe', {
+        src: 'https://www.youtube-nocookie.com/embed/' + v.youtube + '?rel=0',
+        title: v.titel || 'Video',
+        allow: 'encrypted-media; picture-in-picture; fullscreen',
+        allowfullscreen: 'allowfullscreen',
+        referrerpolicy: 'strict-origin-when-cross-origin'
+      }));
+    } });
+    box.appendChild(el('div', { klasse: 'video-platzhalter' }, [
+      el('p', { klasse: 'video-titel', text: '🎬 ' + (v.titel || 'Video') + (v.quelle ? ' (' + v.quelle + ')' : '') }),
+      knopf,
+      el('p', { klasse: 'hinweis', text: 'Das Video kommt von YouTube. Wenn du es lädst, sieht YouTube die Adresse dieses iPads.' })
+    ]));
+    return box;
+  }
+
   function stationZeigen(){
     const station = ctx.station;
     const inhalt = document.getElementById('inhalt');
@@ -300,6 +323,7 @@
       el('ol', { klasse: 'schritte' }, station.schritte.map(s => el('li', { text: s }))),
       beispiele(station),
       links.length ? el('div', { klasse: 'links' }, links) : null,
+      video(station),
       checkBereich(station),
       eingabenBereich(station),
       el('p', { klasse: 'datenschutz', text: '🔒 ' + station.datenschutz }),

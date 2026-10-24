@@ -7,14 +7,14 @@
     "Geh zu Penny am Lasercutter.",
     "Schau zu, wie Penny deinen Stempel auf der Platte anordnet.",
     "Schau dir den Laser an: Röhre, Spiegel, Motoren.",
+    "Sieh dir das Erklärvideo an.",
     "Stell Penny eine Frage zum Laser und schreib sie mit der Antwort auf."
   ],
-  "links": [
-    {
-      "text": "Erklärvideo Lasercutter (YouTube)",
-      "url": "https://www.youtube.com/watch?v=alhusM1cpYw"
-    }
-  ],
+  "video": {
+    "youtube": "VKd2WsdRPvY",
+    "titel": "Wie funktioniert ein Laser Cutter?",
+    "quelle": "Coding For Tomorrow"
+  },
   "check": {
     "art": "foto",
     "hochladen": true,
@@ -36,7 +36,7 @@
     "ki-typ",
     "sterne"
   ],
-  "datenschutz": "Deine Frage, die Antwort und das Foto vom Laser gehen an den Laptop. Das Erklärvideo läuft bei YouTube: Google sieht dabei die Adresse des iPads.",
+  "datenschutz": "Deine Frage, die Antwort und das Foto vom Laser gehen an den Laptop. Das Video kommt von YouTube: Erst wenn du „Video laden“ antippst, sieht YouTube die Adresse des iPads.",
   "braucht": [
     "stencilme"
   ],

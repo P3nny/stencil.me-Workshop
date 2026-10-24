@@ -14,6 +14,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `datenweg` | ja | `ipad`, `laptop` oder `online` (Etikett an der Station) |
 | `schritte` | ja | höchstens 5, je ein kurzer Satz |
 | `beispiele` | nein | Beispielbilder: `{ "bild": "bilder/….svg", "gut": true, "text": "…" }`. Bilder liegen in `stationen/bilder/` |
+| `video` | nein | YouTube-Video, lädt erst nach Antippen: `{ "youtube": "<11 Zeichen aus der Adresse>", "titel": "…", "quelle": "…" }` |
 | `links` | nein | z. B. Erklärvideo: `{ "text": "…", "url": "…" }`. Ohne `url` wird der Link nicht angezeigt |
 | `check` | ja | Was muss erledigt sein, bevor „Station beendet“ geht (siehe unten) |
 | `eingaben` | nein | Textfelder: `{ "id": "…", "text": "Frage", "pflicht": true }`. Mit `"aufloesung": "…"` zeigt die App nach „Station beendet“ die richtige Antwort |

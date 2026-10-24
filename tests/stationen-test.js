@@ -36,7 +36,10 @@ async function abschliessen(page, sterne){
   const page = await browser.newPage({ viewport: { width: 1180, height: 820 } });
   const konsolenFehler = [];
   page.on('pageerror', e => konsolenFehler.push(e.message));
-  page.on('console', m => { if(m.type() === 'error') konsolenFehler.push(m.text()); });
+  // Fehler von YouTube selbst (Video im Test ohne Internet) zählen nicht
+  page.on('console', m => { if(m.type() === 'error' && !/youtube|ytimg|google/i.test(m.text() + (m.location().url || ''))) konsolenFehler.push(m.text()); });
+  const youtubeAnfragen = [];
+  page.on('request', r => { if(/youtube|ytimg|googlevideo/.test(r.url())) youtubeAnfragen.push(r.url()); });
 
   console.log('Station ohne Anmeldung');
   await page.goto(BASE + '/app/station.html?id=foto');
@@ -171,6 +174,9 @@ async function abschliessen(page, sterne){
   console.log('Station Lasercutter');
   await page.goto(BASE + '/app/station.html?id=lasercutter&test');
   await page.waitForSelector('h1:has-text("Lasercutter")');
+  pruefe(youtubeAnfragen.length === 0 && await page.locator('.video iframe').count() === 0, 'Video: vor dem Antippen nichts von YouTube geladen');
+  await page.click('button:has-text("Video laden")');
+  pruefe((await page.locator('.video iframe').getAttribute('src')).indexOf('https://www.youtube-nocookie.com/embed/VKd2WsdRPvY') === 0, 'Video nach Antippen eingebettet (youtube-nocookie)');
   await page.fill('#eingabe-frage', 'Wie heiß wird der Laser?');
   await page.fill('#eingabe-antwort', 'Sehr heiß');
   await page.locator('input[type=file]').setInputFiles(FOTO);

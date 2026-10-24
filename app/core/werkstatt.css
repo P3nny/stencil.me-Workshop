@@ -85,6 +85,10 @@ textarea{width:100%;font:inherit;border:3px solid var(--ink);padding:8px;border-
 .legende{display:flex;flex-wrap:wrap;align-items:center;gap:4px;}
 .farbe{display:inline-block;width:18px;height:18px;border:2px solid var(--ink);margin-left:6px;}
 .farbe.rot{background:#d6291e;}.farbe.blau{background:#1e4fd6;}.farbe.weiss{background:#fff;}
+.video{margin:16px 0;max-width:640px;}
+.video iframe{width:100%;aspect-ratio:16/9;height:auto;min-height:200px;border:3px solid var(--ink);display:block;}
+.video-platzhalter{border:3px dashed var(--ink);background:#f4f4f4;padding:16px;text-align:center;}
+.video-titel{font-weight:700;margin:0 0 6px;}
 .deine-antwort{margin:0 0 6px;}
 .aufloesung-text{background:#e6f7ea;border:3px solid var(--ink);padding:8px 10px;}
 

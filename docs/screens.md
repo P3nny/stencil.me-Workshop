@@ -78,7 +78,7 @@ Beschreibung von Patricia:
 
 ## Screen 4: Lasercutter — gebaut, Branch `feature/screen-4`
 
-- Station: Schritte, Link zum Erklärvideo (YouTube, neuer Tab), Frage + Antwort an Penny, Foto vom Laser (geht an den Laptop)
+- Station: Schritte, Erklärvideo „Wie funktioniert ein Laser Cutter?“ (Coding For Tomorrow, Link von der alten Stationenkarte) direkt eingebettet, lädt erst nach „▶ Video laden“ (Zwei-Klick, `youtube-nocookie.com`), Frage + Antwort an Penny, Foto vom Laser (geht an den Laptop)
 - Laptop-Seite, Bereich „A4-Platte für den Mr Beam“: Stempel anhaken → „Platte zusammenstellen“ → Vorschau → „Platte herunterladen (SVG)“
   - 5 mm Rand, 3 mm Abstand (Patricia, 24.10.). Bei ca. 45 × 52 mm passen 20 Stempel auf eine Platte
   - Wer zuerst fertig war, kommt zuerst auf die Platte. Was nicht passt, steht als „nächste Platte“ da
