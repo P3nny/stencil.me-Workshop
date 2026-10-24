@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pop-Art-Maschine</title>
+<style>
+  /* Grundfarben der Seite: Pink und Schwarz */
+  :root {
+    --pink: #ff1493;
+    --hellpink: #ff8ccf;
+    --schwarz: #0b0b0b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px 14px 40px;
+    background: var(--schwarz);
+    color: #fff;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    text-align: center;
+  }
+  h1 {
+    margin: 0 0 6px;
+    font-size: clamp(2rem, 7vw, 3.4rem);
+    color: var(--pink);
+    text-shadow: 3px 3px 0 #fff;
+    letter-spacing: 1px;
+  }
+  .untertitel {
+    margin: 0 0 18px;
+    color: var(--hellpink);
+    font-size: 1.1rem;
+  }
+  /* Der echte Datei-Knopf bleibt unsichtbar, das Label sieht aus wie ein Knopf */
+  #datei { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .knopf {
+    display: inline-block;
+    background: var(--pink);
+    color: #fff;
+    border: 4px solid #fff;
+    border-radius: 14px;
+    padding: 12px 28px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 5px 5px 0 var(--hellpink);
+    transition: transform 0.1s;
+  }
+  .knopf:hover { transform: scale(1.05); }
+  .knopf:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--hellpink); }
+  #datei:focus-visible + .knopf { outline: 4px dashed #fff; outline-offset: 4px; }
+
+  .regler-box {
+    margin: 22px auto 16px;
+    max-width: 460px;
+    border: 3px solid var(--pink);
+    border-radius: 14px;
+    padding: 12px 16px;
+  }
+  .regler-box label { display: block; font-weight: bold; margin-bottom: 8px; }
+  #staerke { width: 100%; accent-color: var(--pink); height: 28px; }
+
+  #meldung {
+    min-height: 1.5em;
+    margin: 6px 0 12px;
+    color: var(--hellpink);
+    font-weight: bold;
+  }
+  canvas {
+    display: block;
+    margin: 0 auto;
+    width: min(100%, 800px);
+    height: auto;
+    background: #000;
+    border: 6px solid var(--pink);
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Pop-Art-Maschine</h1>
+<p class="untertitel">Verwandle dein Foto in knallige Farbflächen wie bei Andy Warhol!</p>
+
+<!-- Foto auswählen -->
+<input type="file" id="datei" accept="image/*">
+<label for="datei" class="knopf">Foto wählen</label>
+
+<!-- Regler für die Stärke des Effekts -->
+<div class="regler-box">
+  <label for="staerke">Stärke des Effekts: <span id="prozent">100</span> %</label>
+  <input type="range" id="staerke" min="0" max="100" value="100">
+</div>
+
+<div id="meldung">Wähle ein Foto und schau, was passiert!</div>
+
+<canvas id="leinwand" width="800" height="800"></canvas>
+
+<script>
+  // ---------- Bauteile der Seite holen ----------
+  const dateiFeld = document.getElementById('datei');
+  const regler = document.getElementById('staerke');
+  const prozentText = document.getElementById('prozent');
+  const meldung = document.getElementById('meldung');
+  const leinwand = document.getElementById('leinwand');
+  const ctx = leinwand.getContext('2d', { willReadFrequently: true });
+
+  const MAX_GROESSE = 800; // Fotos werden auf höchstens 800 Pixel verkleinert
+
+  // ---------- Die vier Farbpaletten (je dunkel, mittel, hell) ----------
+  const paletten = [
+    [[25, 10, 50],  [255, 0, 140],  [255, 235, 0]],    // Pink & Gelb
+    [[10, 20, 100], [255, 120, 0],  [0, 230, 230]],    // Orange & Türkis
+    [[60, 0, 110],  [0, 200, 80],   [255, 170, 220]],  // Grün & Rosa
+    [[30, 0, 0],    [230, 20, 40],  [255, 250, 150]]   // Rot & Hellgelb
+  ];
+
+  // ---------- Gemerkte Daten vom aktuellen Foto ----------
+  let kachelB = 0, kachelH = 0;   // Größe einer einzelnen Kachel
+  let originalDaten = null;       // Original-Pixel (verkleinert)
+  let stufen = null;              // pro Pixel: 0 = dunkel, 1 = mittel, 2 = hell
+
+  // Startbild: schwarze Fläche mit freundlichem Text
+  function zeigeStart() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, leinwand.width, leinwand.height);
+    ctx.fillStyle = '#ff1493';
+    ctx.font = 'bold 56px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Hier erscheint', 400, 380);
+    ctx.fillText('deine Pop-Art!', 400, 450);
+  }
+  zeigeStart();
+
+  // ---------- Foto laden (aus Datei oder Nachricht) ----------
+  function ladeBild(url) {
+    const bild = new Image();
+    bild.onload = () => {
+      // Verkleinern: längste Seite höchstens 800 Pixel
+      const faktor = Math.min(1, MAX_GROESSE / Math.max(bild.width, bild.height));
+      const gesamtB = Math.max(2, Math.round(bild.width * faktor));
+      const gesamtH = Math.max(2, Math.round(bild.height * faktor));
+
+      // Jede der 4 Kacheln ist halb so groß, zusammen passen sie in 800 Pixel
+      kachelB = Math.floor(gesamtB / 2);
+      kachelH = Math.floor(gesamtH / 2);
+
+      // Foto in Kachelgröße auf eine versteckte Fläche zeichnen
+      const klein = document.createElement('canvas');
+      klein.width = kachelB;
+      klein.height = kachelH;
+      const kctx = klein.getContext('2d', { willReadFrequently: true });
+      kctx.drawImage(bild, 0, 0, kachelB, kachelH);
+      originalDaten = kctx.getImageData(0, 0, kachelB, kachelH);
+
+      berechneStufen();
+
+      leinwand.width = kachelB * 2;
+      leinwand.height = kachelH * 2;
+      meldung.textContent = 'Fertig! Probiere den Regler aus.';
+      zeichne();
+    };
+    bild.onerror = () => {
+      meldung.textContent = 'Hoppla, dieses Bild konnte nicht geladen werden. Versuche ein anderes!';
+    };
+    bild.src = url;
+  }
+
+  // ---------- Helligkeit in 3 Stufen einteilen ----------
+  function berechneStufen() {
+    const d = originalDaten.data;
+    const anzahl = kachelB * kachelH;
+    const hell = new Uint8Array(anzahl);
+    const zaehler = new Array(256).fill(0);
+
+    for (let i = 0; i < anzahl; i++) {
+      const h = Math.round(0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]);
+      hell[i] = h;
+      zaehler[h]++;
+    }
+
+    // Grenzen so wählen, dass jedes Drittel der Pixel etwa gleich viele hat
+    // (so kommen immer alle drei Farben vor)
+    let summe = 0, grenze1 = 85, grenze2 = 170;
+    let ersteFertig = false;
+    for (let h = 0; h < 256; h++) {
+      summe += zaehler[h];
+      if (!ersteFertig && summe >= anzahl / 3) { grenze1 = h; ersteFertig = true; }
+      if (summe >= (anzahl * 2) / 3) { grenze2 = h; break; }
+    }
+
+    stufen = new Uint8Array(anzahl);
+    for (let i = 0; i < anzahl; i++) {
+      stufen[i] = hell[i] <= grenze1 ? 0 : (hell[i] <= grenze2 ? 1 : 2);
+    }
+  }
+
+  // ---------- Das Pop-Art-Bild zeichnen ----------
+  function zeichne() {
+    if (!originalDaten || !stufen) return;
+
+    const mix = regler.value / 100;   // 0 = Original, 1 = volle Pop-Art
+    const breite = kachelB * 2;
+    const hoehe = kachelH * 2;
+    const ausgabe = ctx.createImageData(breite, hoehe);
+    const o = originalDaten.data;
+    const a = ausgabe.data;
+
+    for (let k = 0; k < 4; k++) {
+      const palette = paletten[k];
+      const startX = (k % 2) * kachelB;
+      const startY = Math.floor(k / 2) * kachelH;
+
+      for (let y = 0; y < kachelH; y++) {
+        for (let x = 0; x < kachelB; x++) {
+          const quelle = y * kachelB + x;
+          const farbe = palette[stufen[quelle]];
+          const ziel = ((startY + y) * breite + (startX + x)) * 4;
+
+          // Mischen zwischen Originalfarbe und Pop-Art-Farbe
+          a[ziel]     = o[quelle * 4]     * (1 - mix) + farbe[0] * mix;
+          a[ziel + 1] = o[quelle * 4 + 1] * (1 - mix) + farbe[1] * mix;
+          a[ziel + 2] = o[quelle * 4 + 2] * (1 - mix) + farbe[2] * mix;
+          a[ziel + 3] = 255;
+        }
+      }
+    }
+    ctx.putImageData(ausgabe, 0, 0);
+  }
+
+  // ---------- Ereignisse ----------
+
+  // Foto aus dem Dateiauswahl-Feld
+  dateiFeld.addEventListener('change', () => {
+    const datei = dateiFeld.files && dateiFeld.files[0];
+    if (!datei) return;
+    if (!datei.type.startsWith('image/')) {
+      meldung.textContent = 'Bitte wähle ein Foto aus.';
+      return;
+    }
+    const leser = new FileReader();
+    leser.onload = () => ladeBild(leser.result);
+    leser.onerror = () => { meldung.textContent = 'Das Foto konnte nicht gelesen werden.'; };
+    leser.readAsDataURL(datei);
+  });
+
+  // Regler: Effekt sofort verändern
+  regler.addEventListener('input', () => {
+    prozentText.textContent = regler.value;
+    zeichne();
+  });
+
+  // Foto per Nachricht empfangen (Data-URL)
+  window.addEventListener('message', e => {
+    if (e.data && e.data.bild) {
+      // Nur echte Bild-Data-URLs erlauben
+      if (typeof e.data.bild === 'string' && /^data:image\//i.test(e.data.bild)) {
+        ladeBild(e.data.bild);
+      }
+    }
+  });
+</script>
+</body>
+</html>

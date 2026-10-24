@@ -28,6 +28,7 @@ import sys
 import threading
 import urllib.parse
 
+import ki_app
 import ki_bild
 import plotter
 
@@ -348,7 +349,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         full = os.path.abspath(os.path.join(base, rel))
         if not full.startswith(base + os.sep) or not os.path.isfile(full):
             return self.send_error(404)
-        types = {".svg": "image/svg+xml", ".jpg": "image/jpeg", ".png": "image/png"}
+        types = {".svg": "image/svg+xml", ".jpg": "image/jpeg", ".png": "image/png", ".html": "text/html; charset=utf-8"}
         ctype = types.get(os.path.splitext(full)[1])
         if not ctype:
             return self.send_error(404)
@@ -376,6 +377,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.receive_file(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/ki-bild":
             return self.ki_bild()
+        if parsed.path == "/api/ki-app":
+            return self.ki_app()
         if (parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
         if parsed.path == "/api/einstellungen":
@@ -472,6 +475,44 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json(ki_bild.bild_fuer_gruppe(os.path.join(GROUPS_DIR, gruppe), KI_LOG_FILE, auswahl, gruppe))
         except ki_bild.KiFehler as err:
             return self.send_json({"ok": False, "fehler": err.text}, err.status)
+
+    def ki_app(self):
+        """Claude schreibt eine Mini-App. Der Code geht Stück für Stück ans iPad (kein JSON):
+        so sehen die Kinder ihn entstehen. Fehler mittendrin: Marke ki_app.FEHLER_MARKE."""
+        body = self.read_body(MAX_EVENT_BYTES)
+        try:
+            anfrage = json.loads(body.decode("utf-8")) if body else {}
+        except ValueError:
+            anfrage = {}
+        gruppe = str(anfrage.get("gruppe", ""))
+        auswahl = anfrage.get("auswahl")
+        if not ID_RE.match(gruppe) or not isinstance(auswahl, dict):
+            return self.send_json({"ok": False, "fehler": "ungültige Anfrage"}, 400)
+        gruppe_dir = os.path.join(GROUPS_DIR, gruppe)
+        try:
+            auftrag = ki_app.vorbereiten(gruppe_dir, KI_LOG_FILE, auswahl)
+        except ki_bild.KiFehler as err:
+            return self.send_json({"ok": False, "fehler": err.text}, err.status)
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.close_connection = True
+
+        def schreiben(text):
+            self.wfile.write(text.encode("utf-8"))
+            self.wfile.flush()
+
+        try:
+            text, ein, aus, modell = ki_app.streamen(auftrag, schreiben)
+            ki_app.speichern(gruppe_dir, KI_LOG_FILE, gruppe, auftrag, text, ein, aus, modell)
+        except ki_bild.KiFehler as err:
+            schreiben(ki_app.FEHLER_MARKE + err.text)
+        except (BrokenPipeError, ConnectionResetError):
+            print("KI-App: iPad hat die Verbindung getrennt.")
+        except Exception as err:  # Server darf nie abstürzen
+            print("KI-App-Fehler: %r" % err)
+            schreiben(ki_app.FEHLER_MARKE + "Da ist etwas schiefgegangen. Bitte nochmal versuchen.")
 
     def plotter_folie(self):
         body = self.read_body(MAX_SHEET_BYTES)

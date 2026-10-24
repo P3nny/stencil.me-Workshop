@@ -187,6 +187,15 @@ body.ce-kompakt .test-leiste{display:none;}
 .ki-karte img{width:220px;height:275px;object-fit:contain;border:3px solid var(--ink);background:#fff;display:block;}
 .ki-karte.beispiel img{border-style:dashed;}
 .ki-karte figcaption{margin-top:4px;line-height:1.3;}
+/* Station „Bild-App vibe coden“ */
+.vibe-auftrag{font-size:1.2rem;line-height:2.4;background:#fffbe6;border:3px solid var(--ink);padding:10px 14px;}
+.vibe-luecke{font:inherit;font-size:1.05rem;border:3px solid var(--neon);background:#fff;padding:2px 6px;border-radius:0;max-width:100%;}
+.vibe-code{background:#111;color:#9effa8;font-family:'Courier Prime',monospace;font-size:.8rem;line-height:1.3;max-height:260px;overflow:auto;padding:10px;white-space:pre-wrap;word-break:break-all;}
+.vibe-apps{display:flex;flex-direction:column;gap:18px;}
+.vibe-karte{margin:0;}
+.vibe-karte figcaption{margin-bottom:6px;}
+.vibe-rahmen{width:100%;height:520px;border:3px solid var(--ink);background:#fff;display:block;margin-bottom:6px;}
+
 /* Quiz eingebettet */
 .quiz-rahmen{width:100%;height:760px;border:3px solid var(--ink);display:block;margin:8px 0 16px;background:#fff;}
 .quiz-status{font-weight:700;padding:6px 10px;border:3px solid var(--ink);background:#f4f4f4;}

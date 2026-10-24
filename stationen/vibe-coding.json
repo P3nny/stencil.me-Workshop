@@ -1,0 +1,143 @@
+{
+  "id": "vibe-coding",
+  "titel": "Bild-App vibe coden",
+  "typ": "generativ",
+  "datenweg": "online",
+  "schritte": [
+    "Ihr erlebt, wie eine KI (Claude) auf Zuruf eine kleine Web-App programmiert, so wie stencil.me selbst entstanden ist.",
+    "Füllt den Auftrag aus: Welchen Effekt soll eure App haben?",
+    "Tippt auf „App bauen lassen“ und schaut zu, wie der Code entsteht (etwa eine Minute).",
+    "Testet eure App mit eurem Foto.",
+    "Vergleicht: Welche Schritte aus stencil.me findet ihr in eurer App wieder?"
+  ],
+  "ki": {
+    "satz": "Baue eine Webseite, die ein Foto {effekt}. Die App heißt {name}. Der Knopf zum Foto-Wählen heißt {knopf}. Die Farben der Seite: {farben}. {regler}",
+    "proGruppe": 3,
+    "mindestApps": 1,
+    "baukasten": [
+      {
+        "id": "effekt",
+        "frage": "Effekt",
+        "optionen": [
+          {
+            "id": "warhol",
+            "name": "Pop-Art wie Warhol",
+            "text": "in 4 knallige Farbflächen wie bei Andy Warhol umwandelt"
+          },
+          {
+            "id": "pixel",
+            "name": "Pixel-Art",
+            "text": "in Pixel-Art mit großen, sichtbaren Blöcken verwandelt"
+          },
+          {
+            "id": "farbe",
+            "name": "Farben verrückt",
+            "text": "mit verrückten Farben verfremdet, zum Beispiel Farben vertauscht oder umgekehrt"
+          },
+          {
+            "id": "comic",
+            "name": "Comic-Look",
+            "text": "wie ein Comic mit dicken schwarzen Konturen und wenigen Farben aussehen lässt"
+          },
+          {
+            "id": "stencil",
+            "name": "Schablone (Stencil)",
+            "text": "in Schwarz-Weiß wie eine Schablone (Stencil) verwandelt"
+          }
+        ]
+      },
+      {
+        "id": "name",
+        "frage": "Name der App",
+        "art": "text",
+        "maxLaenge": 24,
+        "start": "Mein Foto-Zauber"
+      },
+      {
+        "id": "knopf",
+        "frage": "Text auf dem Knopf",
+        "art": "text",
+        "maxLaenge": 24,
+        "start": "Foto wählen"
+      },
+      {
+        "id": "farben",
+        "frage": "Farben der Seite",
+        "optionen": [
+          {
+            "id": "pink",
+            "name": "Pink und Schwarz",
+            "text": "Pink und Schwarz"
+          },
+          {
+            "id": "bunt",
+            "name": "Bunt",
+            "text": "bunt und fröhlich"
+          },
+          {
+            "id": "dunkel",
+            "name": "Dunkel",
+            "text": "dunkel mit Neonfarben"
+          },
+          {
+            "id": "pastell",
+            "name": "Pastell",
+            "text": "sanfte Pastellfarben"
+          }
+        ]
+      },
+      {
+        "id": "regler",
+        "frage": "Regler",
+        "optionen": [
+          {
+            "id": "mit",
+            "name": "mit Regler",
+            "text": "Ein Regler verändert die Stärke des Effekts sofort."
+          },
+          {
+            "id": "ohne",
+            "name": "ohne Regler",
+            "text": ""
+          }
+        ]
+      }
+    ],
+    "start": {
+      "effekt": "warhol",
+      "farben": "pink",
+      "regler": "mit"
+    },
+    "beispiele": [
+      {
+        "datei": "bilder/ki-beispiele/app-warhol.html",
+        "prompt": "Baue eine Webseite, die ein Foto in 4 knallige Farbflächen wie bei Andy Warhol umwandelt. Die App heißt „Pop-Art-Maschine“. Der Knopf zum Foto-Wählen heißt „Foto wählen“. Die Farben der Seite: Pink und Schwarz. Ein Regler verändert die Stärke des Effekts sofort."
+      }
+    ]
+  },
+  "check": {
+    "art": "vibe-coding"
+  },
+  "eingaben": [
+    {
+      "id": "vergleich",
+      "text": "Welche Schritte aus der stencil.me-Pipeline findet ihr in eurer neuen App wieder?",
+      "pflicht": false,
+      "aufloesung": "Foto laden (wie in der Foto-Station) und die Farbe jedes Pixels verändern (wie Schwarz-Weiß in „Bild bearbeiten“). Was fehlt: die KI, die die Person erkennt, und der SVG-Export für den Laser."
+    },
+    {
+      "id": "ethik",
+      "text": "KI und Ethik: Claude.ai darf man erst ab 18 benutzen. Hier nutzt ihr Claude über Pennys Workshop-Zugang mit Sicherheitsregeln. Warum gibt es solche Altersgrenzen bei KI-Chatbots? Findet ihr das sinnvoll oder übertrieben?",
+      "pflicht": true
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Nur euer ausgefüllter Auftrag geht über den Laptop an Claude (Anthropic, USA), kein Name, kein Foto. Eure fertige App läuft abgeschottet ohne Internet. Die App kommt in eure Ergebnis-Mappe.",
+  "braucht": [
+    "coding-web"
+  ],
+  "plaetze": 3
+}

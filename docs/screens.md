@@ -191,6 +191,17 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - **Plotter** (`server/plotter.py`, Vorbild `archiv/00_fotobox-karte/fotobox-queue.py`): Sticker im Fotobox-Format (Gruppe `zeichnen-stift`: Schraffur 1,2 mm + Umriss; Gruppe `schneiden-rot`: Messer). Laptop-Seite führt durch die Schritte: Folie + Stift einlegen → „Zeichnen starten“ → „Stift raus, Messer rein“ → „Schneiden starten“ → „FERTIG“. Gleiche Einstellungen wie die Fotobox (Stift Druck 5/Tempo 5, Messer Autoblade Tiefe 4, Druck 14, Tempo 3, 2 Durchgänge), änderbar per Umgebungsvariable. `STENCILME_PLOTTER_TEST=1`: Testlauf ohne Plotter. *Mit echter Cameo noch nicht getestet*
 - **Nachrichten an die Gruppen:** Stempel und Sticker tragen die Gruppen-ID im Dateinamen. Laptop-Seite → „Letzte Platten“: pro Platte „📣 Wird gelasert“ und „📣 Fertig, abholen“. Jede Gruppe bekommt eine eigene Nachricht mit ihren Namen, die iPads zeigen sie oben an (Abfrage alle 15 s), „OK“ blendet sie aus
 
+## Station 12: Bild-App vibe coden — gebaut, Branch `feature/vibe-coding`
+
+- Ersetzt die Betreuungsperson: Lückentext statt freiem Auftrag. Auswahl: Effekt (Warhol, Pixel-Art, Farben verrückt, Comic, Schablone), Farben, Regler. Frei nur App-Name und Knopf-Text (höchstens 24 Zeichen, nur Buchstaben, Zahlen, Satzzeichen, Laptop prüft nochmal und setzt sie in Anführungszeichen)
+- Laptop baut den Auftrag, Claude (Sonnet) schreibt eine HTML-App, der Code erscheint live auf dem iPad (`server/ki_app.py`, Streaming). Test 24.10.: 41 s, ca. 6 Cent
+- Die App läuft abgeschottet: `sandbox="allow-scripts"` (eigener Ursprung, kein Zugriff auf App-Daten, keine Navigation), CSP ohne Netz, vorher werden alle Adressen nach außen entfernt. Geprüft: fetch, Navigation, Speicher werden blockiert
+- „📷 Euer Foto in die App schicken“: Ausgangsfoto geht nur per postMessage in die abgeschottete App, nicht zu Claude
+- Höchstens 3 Apps pro Gruppe, 60 pro Tag. Gespeichert bei der Gruppe (`vibe-coding_*.html`). Ohne KI: Beispiel-App `stationen/bilder/ki-beispiele/app-warhol.html`
+- Pflicht: Ethik-Frage zur Altersgrenze (angepasst: Claude.ai ab 18, hier über Pennys Workshop-Zugang mit Sicherheitsregeln), freiwillig: Vergleich mit der stencil.me-Pipeline (mit Auflösung)
+- **Anthropic-Regeln für Minderjährige** (support.claude.com, „Guidelines for organizations serving minors“) gelten für Station 9 und 12: Schutzmaßnahmen, Datenschutzrecht einhalten, öffentliche Erklärung, Hinweis „ihr sprecht mit einer KI“ → in `Datenschutz.md`
+- Laptop-Seite: kleinere Karten (Liste scrollt ab ca. 20), Gruppen-Tabelle zählt Bonus nicht mit
+
 ## Feedback, Auswertung, Bonus 2 (24.10.)
 
 - **Feedbackbogen** (`feedback`, Fragen aus `07_stencil.me - Abschluss.pdf`): jede Person einzeln: Lieblingsstation (Auswahl aus den geschafften), ein Wort, „beim nächsten Mal anders“, freiwillig „am meisten überrascht“. Geht nach Bonus 1 auf, oder für alle über den Laptop-Knopf „Feedbackbogen für alle freigeben“ (`freigaben` in den Einstellungen). Zählt nicht zu „x von y“

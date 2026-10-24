@@ -20,10 +20,11 @@
   .hint { color:var(--muted); font-size:.9rem; margin-top:8px; }
   .list-panel { flex:1; min-width:300px; }
   .count { font-family:'Oswald',sans-serif; font-size:1.4rem; }
-  .grid { display:flex; flex-wrap:wrap; gap:14px; margin-top:14px; }
-  .stamp { width:160px; border:3px solid var(--ink); padding:8px; text-align:center; font-family:'Courier Prime',monospace; font-size:.85rem; }
-  .stamp img { width:100%; height:140px; object-fit:contain; background:#f4f4f4; }
-  .stamp .name { font-weight:700; font-size:1rem; }
+  /* Kleine Karten: bleibt auch bei 20+ Stempeln und Stickern übersichtlich */
+  .grid { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; max-height:420px; overflow-y:auto; }
+  .stamp { width:104px; border:2px solid var(--ink); padding:4px; text-align:center; font-family:'Courier Prime',monospace; font-size:.72rem; line-height:1.2; }
+  .stamp img { width:100%; height:84px; object-fit:contain; background:#f4f4f4; }
+  .stamp .name { font-weight:700; font-size:.85rem; word-break:break-all; }
   .stamp.new { background:var(--neon); }
   .folder { font-family:'Courier Prime',monospace; background:#f4f4f4; padding:6px 8px; word-break:break-all; }
   button { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.1em; border:3px solid var(--ink); background:#fff; padding:8px 14px; cursor:pointer; margin-top:16px; }
@@ -40,8 +41,8 @@
   .plotter-schritt.fertig { background:#e6f7ea; }
   .plotter-fehler { background:var(--neon); border:2px solid var(--ink); padding:8px; font-weight:700; }
   .stamp a.download { display:inline-block; margin-top:4px; font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:.8rem; color:var(--ink); }
-  .stamp label { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px; cursor:pointer; }
-  .stamp input { width:20px; height:20px; accent-color:var(--neon); }
+  .stamp label { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:2px; cursor:pointer; font-size:.7rem; }
+  .stamp input { width:18px; height:18px; accent-color:var(--neon); }
   .stamp.placed { opacity:.45; }
   .plate-layout { display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; margin-top:14px; }
   .plate { width:420px; max-width:100%; aspect-ratio:210/297; border:3px dashed var(--muted); background:#e9dcc8; }
@@ -304,6 +305,7 @@
 
   var stationTitles = {}; // id -> Titel, aus /stationen
   var stationCount = 0;
+  var bonusIds = {};
 
   function loadStations() {
     fetch("/stationen/index.json", { cache: "no-store" })
@@ -316,6 +318,7 @@
       .then(function (list) {
         list.forEach(function (s) { stationTitles[s.id] = s.titel; });
         stationCount = list.filter(function (s) { return !s.bonus; }).length; // Bonus zählt nicht mit
+        list.forEach(function (s) { if (s.bonus) bonusIds[s.id] = true; });
       })
       .catch(function () { /* dann eben die IDs anzeigen */ })
       .then(loadGroups);
@@ -337,7 +340,8 @@
       var row = document.createElement("tr");
       cell(row, g.personen.length ? g.personen.join(" & ") : "(noch ohne Namen)");
       cell(row, g.aktuell ? (stationTitles[g.aktuell] || g.aktuell) : "–", "station");
-      cell(row, g.fertig.length + (stationCount ? " von " + stationCount : "") + ": " + g.fertig.map(function (id) { return stationTitles[id] || id; }).join(", "));
+      var pflicht = g.fertig.filter(function (id) { return !bonusIds[id]; }).length;
+      cell(row, pflicht + (stationCount ? " von " + stationCount : "") + ": " + g.fertig.map(function (id) { return stationTitles[id] || id; }).join(", "));
       var photos = cell(row, "");
       g.dateien.forEach(function (pfad) {
         var img = document.createElement("img");
@@ -371,7 +375,7 @@
       .then(function (r) { return r.json(); })
       .then(function (k) {
         document.getElementById("kiStatus").textContent = k.eingerichtet
-          ? "KI-Selbstporträt: " + k.modell + ", heute " + k.bilderHeute + " von höchstens " + k.proTag + " Bildern, Kosten bisher ca. " + k.kostenGesamtUsd.toFixed(3).replace(".", ",") + " $"
+          ? "KI (" + k.modell + "): heute " + k.bilderHeute + " Bilder (höchstens " + k.proTag + ") und " + k.appsHeute + " Apps, Kosten bisher ca. " + k.kostenGesamtUsd.toFixed(3).replace(".", ",") + " $"
           : "KI-Selbstporträt: nicht eingerichtet (./server/einrichten.sh). Die Station zeigt Beispiele.";
       })
       .catch(function () { /* egal */ });

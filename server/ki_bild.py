@@ -54,17 +54,27 @@ class KiFehler(Exception):
         self.status = status
 
 
-def station():
-    with open(STATION_DATEI, encoding="utf-8") as fh:
+# Freie Lücken (z. B. App-Name): nur kurze, harmlose Zeichen
+FREI_RE = re.compile(r"^[A-Za-zÄÖÜäöüß0-9 !?.,:'-]+$")
+
+
+def station(datei=STATION_DATEI):
+    with open(datei, encoding="utf-8") as fh:
         return json.load(fh)["ki"]
 
 
-def prompt_bauen(auswahl):
-    """Satz aus dem Baukasten. Nur Werte aus der Liste sind erlaubt, kein freier Text."""
-    ki = station()
+def prompt_bauen(auswahl, ki=None):
+    """Satz aus dem Baukasten. Auswahl-Lücken: nur Werte aus der Liste. Freie Lücken
+    (art „text“): kurz, nur harmlose Zeichen, im Satz in Anführungszeichen."""
+    ki = ki or station()
     texte = {}
     for baustein in ki["baukasten"]:
-        wahl = str(auswahl.get(baustein["id"], ""))
+        wahl = str(auswahl.get(baustein["id"], "")).strip()
+        if baustein.get("art") == "text":
+            if not wahl or len(wahl) > baustein.get("maxLaenge", 24) or not FREI_RE.match(wahl):
+                raise KiFehler("Bei „%s“ bitte kurz und nur mit Buchstaben, Zahlen und Satzzeichen." % baustein["frage"])
+            texte[baustein["id"]] = "„%s“" % wahl
+            continue
         option = next((o for o in baustein["optionen"] if o["id"] == wahl), None)
         if not option:
             raise KiFehler("Bitte bei „%s“ etwas auswählen." % baustein["frage"])
@@ -168,11 +178,15 @@ def protokoll_lesen(protokoll_datei):
 def status(protokoll_datei):
     eintraege = protokoll_lesen(protokoll_datei)
     heute = datetime.date.today().isoformat()
+    bilder = [e for e in eintraege if e.get("art", "bild") == "bild"]
+    apps = [e for e in eintraege if e.get("art") == "app"]
     return {
         "eingerichtet": eingerichtet(),
         "modell": "Test" if TEST else MODELL,
-        "bilderHeute": sum(1 for e in eintraege if e.get("zeit", "").startswith(heute)),
-        "bilderGesamt": len(eintraege),
+        "bilderHeute": sum(1 for e in bilder if e.get("zeit", "").startswith(heute)),
+        "bilderGesamt": len(bilder),
+        "appsHeute": sum(1 for e in apps if e.get("zeit", "").startswith(heute)),
+        "appsGesamt": len(apps),
         "kostenGesamtUsd": round(sum(e.get("kostenUsd", 0) for e in eintraege), 4),
         "proTag": PRO_TAG,
     }
