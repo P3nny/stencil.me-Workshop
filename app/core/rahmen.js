@@ -74,9 +74,12 @@
       kopf.innerHTML = '';
       const gesamt = Stationen.anzahlPflicht(liste);
       kopf.appendChild(el('div', { klasse: 'puzzles' }, gruppe.personen.map((name, i) => puzzle(name, urls[i], gesamt, fertig))));
+      // Optionale und Bonus-Stationen zählen nicht fürs Puzzle, sollen aber sichtbar sein
+      const extra = liste.filter(s => (s.optional || s.bonus) && Stationen.istFertig(f, s.id)).length;
       kopf.appendChild(el('div', { klasse: 'zaehler' }, [
         el('strong', { text: fertig + ' von ' + gesamt }),
-        el('span', { text: ' Stationen geschafft' })
+        el('span', { text: ' Stationen geschafft' }),
+        extra ? el('span', { klasse: 'extra', text: ' · + ' + extra + ' extra ⭐' }) : null
       ]));
       kopf.appendChild(el('div', { klasse: 'sync', id: 'sync' }));
       // Nachrichten vom Laptop (einmal pro Seite starten, der Kopf wird öfter neu gezeichnet)
@@ -497,6 +500,9 @@
     inhalt.innerHTML = '';
     const panel = el('section', { klasse: 'panel' }, [
       el('h1', { text: geradeFertig ? 'Super, geschafft!' : '✓ ' + ctx.station.titel + ' ist schon erledigt' }),
+      geradeFertig && (ctx.station.optional || ctx.station.bonus)
+        ? el('p', { text: 'Diese Station war ' + (ctx.station.optional ? 'optional' : 'ein Bonus') + '. Sie bringt kein Puzzleteil, dafür gibt es oben einen Extra-Stern ⭐.' })
+        : null,
       el('p', { klasse: 'hinweis', text: 'Nächste Station wird gesucht …' })
     ]);
     inhalt.appendChild(panel);

@@ -390,6 +390,8 @@ async function abschliessen(page, sterne){
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
   pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 12') >= 0, 'Optionale Station zählt nicht mit: weiter 7 von 12');
+  pruefe(/\+ 1 extra/.test(await page.locator('.zaehler').textContent()), 'optionale Station: „+ 1 extra ⭐“ neben dem Zähler');
+  pruefe(await page.locator('text=Diese Station war optional').count() === 1, 'Hinweis: optional, kein Puzzleteil');
 
   console.log('Station Bild-App vibe coden (Server im Testmodus, ohne Claude)');
   await page.goto(BASE + '/app/station.html?id=vibe-coding&test');
