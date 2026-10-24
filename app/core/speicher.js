@@ -26,6 +26,11 @@
       };
       req.onsuccess = () => {
         Speicher.dauerhaft = true;
+        // Ein anderer Tab löscht alles (Abschluss): Verbindung freigeben, sonst wartet das Löschen
+        req.result.onversionchange = () => {
+          req.result.close();
+          dbPromise = null;
+        };
         resolve(req.result);
       };
       req.onerror = () => resolve(null);

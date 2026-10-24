@@ -19,7 +19,7 @@ function pruefe(ok, text){
   const context = await browser.newContext();
   const tabB = await context.newPage();
   await tabB.goto(BASE + '/index.html');
-  await tabB.evaluate(() => Speicher.schreiben('gruppe', { id: 'tabtest', personen: ['Ada'], angemeldet: new Date().toISOString() })
+  await tabB.evaluate(() => Speicher.schreiben('gruppe', { id: 'abcdefabcdef', personen: ['Ada'], angemeldet: new Date().toISOString() })
     .then(() => Speicher.schreiben('fortschritt', { stationen: { foto: { status: 'fertig' }, stencilme: { status: 'fertig' } } })));
 
   console.log('Älterer Tab speichert nach einem anderen Tab');
@@ -46,6 +46,20 @@ function pruefe(ok, text){
   await tabA.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
   await tabA.waitForTimeout(500);
   pruefe((await tabA.locator('.zaehler').textContent()).indexOf('3 von') >= 0, 'Tab A zeigt jetzt 3 Stationen');
+
+  console.log('Abschluss: Löschen auf dem iPad (anderer Tab bleibt offen)');
+  await tabB.request.post(BASE + '/api/einstellungen', { data: { freigaben: ['loeschen'] } });
+  await tabA.goto(BASE + '/app/station.html?id=lasercutter');
+  await tabA.waitForSelector('text=Der Workshop ist vorbei', { timeout: 10000 });
+  pruefe(true, 'Station zeigt den Abschluss-Hinweis mit „Meine Daten“');
+  await tabB.goto(BASE + '/app/meine-daten.html');
+  await tabB.waitForSelector('button:has-text("Jetzt alles löschen")');
+  tabB.once('dialog', d => d.accept());
+  await tabB.click('button:has-text("Jetzt alles löschen")');
+  await tabB.waitForSelector('text=Gelöscht', { timeout: 15000 });
+  pruefe(true, 'Löschen klappt, obwohl ein anderer Tab offen ist');
+  pruefe(await tabB.evaluate(() => Speicher.lesen('gruppe')) === undefined, 'Gruppe ist vom iPad gelöscht');
+  await tabB.request.post(BASE + '/api/einstellungen', { data: { freigaben: [] } });
 
   await browser.close();
   console.log(fehler ? fehler + ' Fehler' : 'Alles in Ordnung');

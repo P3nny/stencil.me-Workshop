@@ -20,3 +20,23 @@ Darum bleibt dein Foto heute auf dem iPad und auf Pennys Laptop. Die KI Claude b
 ## Frage an die Gruppe (mündlich)
 
 Habt ihr schon mal ein Foto in eine KI-App hochgeladen? Wisst ihr, wo es jetzt ist?
+
+---
+
+# Text für die Abschlusspräsentation (Canva)
+
+Neue Folie ganz am Ende, nach dem Feedback. Vorher auf der Laptop-Seite „Abschluss: Löschen auf den iPads freigeben“ drücken. Dann zeigt jedes iPad innerhalb einer Minute den Hinweis mit „Meine Daten“.
+
+## Überschrift
+
+Aufräumen: Deine Daten gehören dir.
+
+## Folientext (3 Schritte)
+
+1. 🔒 Tippt oben auf **„Meine Daten“**. Schaut euch an, was gespeichert ist: auf dem iPad und auf Pennys Laptop.
+2. 🗑 Ganz unten: **„Jetzt alles löschen“**. Dann ist auf dem iPad nichts mehr von euch.
+3. 📦 Eure Werke bekommt ihr über eure Lehrkraft. Danach löscht Penny alles auf dem Laptop, spätestens nach einer Woche.
+
+## Fußzeile
+
+Das solltet ihr mit jeder App machen: nachsehen, was sie speichert, und löschen, was ihr nicht mehr braucht.

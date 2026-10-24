@@ -84,7 +84,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 ## Wie lange bleiben die Daten?
 
-- **Auf dem iPad:** bis Penny das iPad nach dem Workshop zurücksetzt. Dann ist alles weg. Die nächste Gruppe sieht nichts von euch.
+- **Auf dem iPad:** bis zum Ende des Workshops. Dann seht ihr unter „Meine Daten“ noch einmal alles an und löscht es selbst mit „Jetzt alles löschen“. Die nächste Gruppe sieht nichts von euch.
 - **Auf Pennys Laptop:** bis zum Ende des Workshops. Penny macht daraus eine Ergebnis-Mappe für jedes Paar und gibt sie eurer Lehrkraft. In der Mappe sind nur eure Werke: Fotos, Stempel, Bilder, Apps und euer Code. Eure Antworten, Sterne und euer Feedback sind nicht dabei. Danach löscht Penny alles auf dem Laptop.
 - **Bei Claude:** höchstens 30 Tage (siehe oben).
 

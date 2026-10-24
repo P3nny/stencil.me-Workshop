@@ -135,6 +135,10 @@
       <a href="/auswertung" style="margin-left:auto">Auswertung: Sterne, KI-Frage, Feedback →</a>
     </div>
     <div class="settings" style="margin-top:10px">
+      <button id="loeschenFreigabe" type="button">Abschluss: Löschen auf den iPads freigeben</button>
+      <span class="hint" id="loeschenState"></span>
+    </div>
+    <div class="settings" style="margin-top:10px">
       <a class="knopf" id="mappenAlle" href="/api/mappe-alle">Alle Mappen als ZIP herunterladen</a>
       <button id="mappenUsb" type="button" hidden>Auf USB-Stick kopieren</button>
       <span class="hint" id="mappenState">Mappe = nur die Werke (Fotos, Stempel, Bilder, Apps, Code), keine Antworten und kein Feedback.</span>
@@ -415,6 +419,11 @@
     var an = freigaben.indexOf("feedback") >= 0;
     document.getElementById("feedbackFreigabe").textContent = an ? "Feedbackbogen-Freigabe zurücknehmen" : "Feedbackbogen für alle freigeben";
     document.getElementById("freigabeState").textContent = an ? "✓ Alle Gruppen können den Feedbackbogen ausfüllen (iPads merken es beim nächsten Öffnen einer Station)." : "Feedbackbogen nur nach Bonus 1 (Sticker).";
+    var loeschen = freigaben.indexOf("loeschen") >= 0;
+    document.getElementById("loeschenFreigabe").textContent = loeschen ? "Löschen-Freigabe zurücknehmen" : "Abschluss: Löschen auf den iPads freigeben";
+    document.getElementById("loeschenState").textContent = loeschen
+      ? "✓ Die iPads zeigen innerhalb einer Minute: „Workshop vorbei, Meine Daten ansehen und löschen“. Die Mappen bleiben auf dem Laptop."
+      : "Am Ende des Workshops: Die Kinder sehen „Meine Daten“ an und löschen dann selbst alles auf ihrem iPad.";
   }
 
   function loadSettings() {
@@ -427,13 +436,15 @@
       });
   }
 
-  document.getElementById("feedbackFreigabe").addEventListener("click", function () {
-    var neu = freigaben.indexOf("feedback") >= 0 ? freigaben.filter(function (f) { return f !== "feedback"; }) : freigaben.concat(["feedback"]);
+  function freigabeUmschalten(name, stateId) {
+    var neu = freigaben.indexOf(name) >= 0 ? freigaben.filter(function (f) { return f !== name; }) : freigaben.concat([name]);
     fetch("/api/einstellungen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ freigaben: neu }) })
       .then(function (r) { return r.json(); })
       .then(function (s) { freigaben = s.freigaben || []; freigabeZeigen(); })
-      .catch(function () { document.getElementById("freigabeState").textContent = "Speichern hat nicht geklappt"; });
-  });
+      .catch(function () { document.getElementById(stateId).textContent = "Speichern hat nicht geklappt"; });
+  }
+  document.getElementById("feedbackFreigabe").addEventListener("click", function () { freigabeUmschalten("feedback", "freigabeState"); });
+  document.getElementById("loeschenFreigabe").addEventListener("click", function () { freigabeUmschalten("loeschen", "loeschenState"); });
 
   document.getElementById("savePupils").addEventListener("click", function () {
     var state = document.getElementById("pupilsState");

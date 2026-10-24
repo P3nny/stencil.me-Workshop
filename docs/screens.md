@@ -235,6 +235,13 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Drei Fragen „Wer macht was?“ (abgehakt, wenn alle richtig), dann Pflichtfeld „Welchen Beruf wünscht ihr euch?“. Der Wunschberuf geht an den Laptop, nicht in die Mappe
 - *Soll sie optional sein: `"optional": true` in `stationen/berufe.json`*
 
+## Abschluss: Löschen auf den iPads (24.10. spät, Branch `feature/ipad-loeschen`)
+
+- Laptop-Seite: „Abschluss: Löschen auf den iPads freigeben“ (Freigabe `loeschen`). Die iPads erfahren es mit der Nachrichten-Abfrage (einmal pro Minute) und zeigen einen bleibenden Hinweis mit Knopf „Meine Daten“
+- „Meine Daten“ zeigt dann unten „🗑 Jetzt alles löschen“: erst wenn die Outbox leer ist (alles beim Laptop), mit Rückfrage. Danach „✓ Gelöscht“
+- Andere offene Tabs geben die Datenbank frei (`onversionchange`), sonst würde das Löschen hängen (`tests/tabs-test.js`)
+- Text für die letzte Folie der Abschlusspräsentation: `docs/canva-folie-datenschutz.md`
+
 ## Noch offen
 
 - Kunst-Quiz mit Bildern aus `03_stencil.me-Künstlerinnen_A4.pdf`, nur über den Laptop ausgeliefert, nicht im Repo

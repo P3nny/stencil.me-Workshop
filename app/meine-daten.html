@@ -21,6 +21,7 @@
 <main id="inhalt"><section class="panel"><p>Wird geladen …</p></section></main>
 <div class="fehler" id="fehler" role="alert" hidden></div>
 <script src="/app/core/speicher.js"></script>
+<script src="/app/core/outbox.js"></script>
 <script src="/app/core/stationen.js"></script>
 <script src="/app/core/rahmen.js"></script>
 <script>
@@ -93,6 +94,52 @@
     return box;
   }
 
+  // Abschluss: Erst wenn der Laptop es freigibt (oder mit ?test), können die Kinder alles auf dem
+  // iPad löschen. Vorher muss alles beim Laptop sein, sonst fehlt es in der Mappe.
+  function loeschenTeil(){
+    const box = el('section', { klasse: 'panel' }, [
+      el('h1', { text: '🗑 Alles auf diesem iPad löschen' }),
+      el('p', { text: 'Der Workshop ist vorbei. Eure Werke sind auf Pennys Laptop und kommen in eure Mappe. Auf dem iPad braucht ihr nichts mehr.' }),
+      el('p', { text: 'Wenn ihr löscht, sind eure Namen, Fotos und Antworten auf diesem iPad weg. Die nächste Gruppe sieht nichts von euch.' })
+    ]);
+    const status = el('p', { klasse: 'hinweis' });
+    const knopf = el('button', { type: 'button', klasse: 'gross', text: '🗑 Jetzt alles löschen' });
+    knopf.addEventListener('click', () => {
+      knopf.disabled = true;
+      status.textContent = 'Prüfe, ob alles beim Laptop ist …';
+      Outbox.abarbeiten()
+        .then(() => Speicher.outboxAlle())
+        .then(eintraege => {
+          const offen = eintraege.filter(e => !e.gesendet).length;
+          if(offen){
+            status.textContent = '⚠ ' + offen + (offen === 1 ? ' Sache ist' : ' Sachen sind') + ' noch nicht beim Laptop. Wartet ein paar Sekunden und tippt nochmal. Klappt es nicht: Sagt Penny Bescheid.';
+            knopf.disabled = false;
+            return;
+          }
+          if(!confirm('Wirklich alles auf diesem iPad löschen?')){
+            status.textContent = '';
+            knopf.disabled = false;
+            return;
+          }
+          return Speicher.allesLoeschen().then(() => {
+            inhalt.innerHTML = '';
+            inhalt.appendChild(el('section', { klasse: 'panel' }, [
+              el('h1', { text: '✓ Gelöscht' }),
+              el('p', { text: 'Auf diesem iPad ist nichts mehr von euch gespeichert. Danke fürs Mitmachen! Gebt das iPad jetzt zurück.' })
+            ]));
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          status.textContent = '⚠ Löschen hat nicht geklappt. Sagt Penny Bescheid.';
+          knopf.disabled = false;
+        });
+    });
+    box.appendChild(knopf);
+    box.appendChild(status);
+    return box;
+  }
+
   function ipadTeil(gruppe, liste, f){
     const box = el('section', { klasse: 'panel' }, [
       el('h1', { text: '📱 Auf diesem iPad' }),
@@ -126,6 +173,12 @@
       ]));
       inhalt.appendChild(ipadTeil(gruppe, werte[1], werte[2]));
       inhalt.appendChild(laptopTeil(gruppe, werte[1]));
+      const platz = el('div');
+      inhalt.appendChild(platz);
+      fetch('/api/einstellungen', { cache: 'no-store' }).then(r => r.json())
+        .then(e => (e.freigaben || []).indexOf('loeschen') >= 0)
+        .catch(() => false)
+        .then(frei => { if(frei || /[?&]test/.test(location.search)) platz.appendChild(loeschenTeil()); });
     })
     .catch(err => Rahmen.fehler('Meine Daten konnten nicht geladen werden.', err));
 })();

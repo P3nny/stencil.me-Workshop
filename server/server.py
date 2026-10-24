@@ -326,7 +326,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
             if not ID_RE.match(group_id):
                 return self.send_json({"nachrichten": []})
-            return self.send_json({"nachrichten": read_messages().get(group_id, [])})
+            # loeschen: Laptop hat zum Abschluss das Löschen auf den iPads freigegeben
+            return self.send_json({"nachrichten": read_messages().get(group_id, []),
+                                   "loeschen": "loeschen" in read_settings().get("freigaben", [])})
         if path in ("/api/meine-daten", "/api/meine-datei"):
             # „Meine Daten“: wie bei den Nachrichten nur mit der zufälligen ID der eigenen Gruppe
             query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
