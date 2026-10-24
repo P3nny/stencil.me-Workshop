@@ -12,7 +12,7 @@ Sammlung, kein fertiger Text. Wird in einem eigenen Schritt zu einer kindgerecht
 
 ## Stationen-App (geplant, Stand 24.10.2026, siehe `docs/screens.md`)
 
-- **Rohfoto** aus der Foto-Station bleibt auf dem iPad (IndexedDB). Es wird für stencil.me, Greenscreen und das Puzzle wiederverwendet, aber nicht gesendet.
+- **Rohfoto (Ausgangsfoto):** wird auf dem iPad bearbeitet und **geht seit 24.10.2026 auch an den Laptop** (Patricia: lückenlose Dokumentation, die Kinder sollen am Ende nachvollziehen können, was gespeichert war). Ablage `server/daten/gruppen/<ID>/dateien/foto_*.jpg`. Muss in `Datenschutz.md` und in die Einwilligung. Das Video der Körpererkennung bleibt weiter nur im Arbeitsspeicher des iPads (wird nirgends gespeichert).
 - **An den Laptop sollen gehen:** Check-in und „Station beendet“ (Name/Kürzel, Station, Uhrzeit), Textantworten, Bewertung (Sterne), Input-Fotos der Stationen (z. B. Foto vom Lasercutter).
   → Input-Fotos können Kinder zeigen (z. B. am Laser). Hinweis in der App: „Fotografiere die Maschine, nicht die Leute“?
 - **Station Bild bearbeiten:** Foto, Schwarz-Weiß-Bild und Personenmaske bleiben auf dem iPad (Schwarz-Weiß-Porträt auch fürs Puzzle in IndexedDB). An den Laptop geht nur die Stempel-Datei (SVG) mit Vorname/Spitzname, wie bisher in `stencil.html`.

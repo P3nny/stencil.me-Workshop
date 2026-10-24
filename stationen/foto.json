@@ -2,7 +2,7 @@
   "id": "foto",
   "titel": "Foto machen",
   "typ": "ki",
-  "datenweg": "ipad",
+  "datenweg": "laptop",
   "schritte": [
     "Stell dich vor das Packpapier, das Ringlicht leuchtet dich an.",
     "Nur Kopf oder Kopf mit Schultern kommt aufs Bild.",
@@ -34,7 +34,7 @@
   "check": {
     "art": "foto",
     "proPerson": true,
-    "hochladen": false,
+    "hochladen": true,
     "text": "Foto von",
     "personPruefen": true
   },
@@ -42,7 +42,7 @@
     "ki-typ",
     "sterne"
   ],
-  "datenschutz": "Dein Foto bleibt auf diesem iPad. Auch die KI, die dich auf dem Foto sucht, läuft auf dem iPad.",
+  "datenschutz": "Dein Foto wird auf dem iPad bearbeitet und kommt auf den Laptop, damit eure Ergebnis-Mappe vollständig ist. Am Ende seht ihr, was dort gespeichert ist. Auch die KI, die dich auf dem Foto sucht, läuft auf dem iPad.",
   "braucht": [],
   "plaetze": 13
 }
