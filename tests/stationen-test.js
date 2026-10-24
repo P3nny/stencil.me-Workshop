@@ -204,7 +204,7 @@ async function abschliessen(page, sterne){
   console.log('Station Körpererkennung testen');
   await page.goto(BASE + '/app/station.html?id=koerpererkennung&test');
   await page.waitForSelector('h1:has-text("Körpererkennung")');
-  pruefe(await page.locator('.aufgabe').count() === 8, 'acht Aufgaben zum Abhaken');
+  pruefe(await page.locator('.aufgabe').count() === 6, 'sechs Aufgaben zum Abhaken');
   await page.locator('input[type=file]').setInputFiles(VIDEO);
   await page.waitForFunction(() => Array.prototype.some.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild der KI-Ansicht speichern') >= 0 && !b.disabled), null, { timeout: 120000 });
   pruefe(true, 'Video läuft, die KI rechnet');
@@ -219,7 +219,7 @@ async function abschliessen(page, sterne){
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-10-koerpererkennung.png'), fullPage: true });
   await page.click('button:has-text("Bild der KI-Ansicht speichern")');
   await page.waitForSelector('.ki-bild:visible');
-  for(const i of [0, 5, 6]) await page.check('#aufgabe-' + i);
+  for(const i of [0, 3, 5]) await page.check('#aufgabe-' + i);
   await page.fill('#eingabe-gleich-gut', 'Bei Haaren unsicher');
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne zweite Ethik-Frage');
   await page.fill('#eingabe-folgen', 'Manche werden benachteiligt');
