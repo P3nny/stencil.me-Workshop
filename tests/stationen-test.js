@@ -128,8 +128,8 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 5') >= 0, 'Zähler steht auf 1 von 5');
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 6') >= 0, 'Zähler steht auf 1 von 6');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
 
@@ -188,16 +188,16 @@ async function abschliessen(page, sterne){
   await page.locator('input[type=file]').setInputFiles(FOTO);
   await page.locator('.foto-vorschau').waitFor({ state: 'visible' });
   await abschliessen(page, 3);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 5') >= 0, 'Zähler steht auf 3 von 5');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 6') >= 0, 'Zähler steht auf 3 von 6');
 
   console.log('Neu laden: Fortschritt bleibt');
   await page.reload();
   await page.waitForSelector('text=schon erledigt');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 5') >= 0, 'Fortschritt nach Neuladen erhalten');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 6') >= 0, 'Fortschritt nach Neuladen erhalten');
 
   console.log('Startseite nach drei Stationen');
   await page.goto(BASE + '/');
-  await page.waitForSelector('text=3 von 5 Stationen geschafft');
+  await page.waitForSelector('text=3 von 6 Stationen geschafft');
   pruefe(true, 'Startseite zeigt den Stand');
   await page.goto(BASE + '/app/station.html?id=lasercutter');
 
@@ -241,7 +241,38 @@ async function abschliessen(page, sterne){
   await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild an den Laptop schicken")').click();
   await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist abgeschickt') >= 0).length === 2);
   await abschliessen(page, 4);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 5') >= 0, 'Zähler steht auf 5 von 5');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 6') >= 0, 'Zähler steht auf 5 von 6');
+
+  console.log('Station Pixel vs. Vektor');
+  await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
+  await page.waitForSelector('h1:has-text("Pixel vs. Vektor")');
+  pruefe(await page.locator('.pv-infografik img').evaluate(img => img.complete && img.naturalWidth > 0), 'Infografik aus der Stationenkarte geladen');
+  pruefe(await page.locator('.pv-teil').nth(1).isHidden(), 'SVG-Übung erst nach den Fragen');
+  await page.click('.pv-frage:nth-of-type(1) button:has-text("Aus mathematischen Pfaden")');
+  pruefe(await page.locator('.pv-rueckmeldung.falsch').count() === 1, 'falsche Antwort: „Noch nicht“');
+  await page.click('.pv-frage:nth-of-type(1) button:has-text("Aus einzelnen Bildpunkten")');
+  await page.click('button:has-text("Die Kanten werden unscharf")');
+  await page.click('button:has-text("Weil er Pfaden folgt")');
+  pruefe(await page.locator('.pv-teil').nth(1).isVisible(), 'alle Fragen richtig: SVG-Übung erscheint');
+  const kreis = (fill, r) => '<svg width="100" height="100">\n  <circle cx="50" cy="50" r="' + r + '" stroke="green" stroke-width="4" fill="' + fill + '" />\n</svg>\n';
+  const haken = async id => (await page.locator('.pv-aufgaben li').nth(id).getAttribute('class') || '').indexOf('ok') >= 0;
+  await page.fill('.pv-code', kreis('gelbgrün', 40));
+  await page.waitForTimeout(500);
+  pruefe(!(await haken(0)) && /kennt der Browser nicht/.test(await page.locator('.pv-aufgaben li').nth(0).textContent()), 'ungültige Farbe: Hinweis');
+  await page.fill('.pv-code', kreis('pink', 20));
+  await page.waitForTimeout(500);
+  pruefe(await haken(0) && await haken(1), 'Farbe und Radius geändert: zwei Haken');
+  // Dreieck mit typografischen Anführungszeichen, wie die iPad-Tastatur sie setzt
+  await page.fill('.pv-code', kreis('pink', 20) + '<svg width=„100“ height=„100“><polygon points=„50,10 90,90 10,90“ stroke=„green“ stroke-width=„4“ fill=„yellow“ /></svg>\n');
+  await page.waitForTimeout(500);
+  pruefe(await haken(2), 'Dreieck erkannt (auch mit „“ von der iPad-Tastatur)');
+  await page.click('button:has-text("Hilfe: Baustein einfügen") >> nth=1');
+  await page.waitForTimeout(500);
+  pruefe(await haken(3), 'Stern erkannt');
+  pruefe(await page.locator('.pv-vorschau img').count() === 3, 'Vorschau zeigt Kreis, Dreieck, Stern');
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-11-pixel-vektor.png'), fullPage: true });
+  await abschliessen(page, 5);
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 6') >= 0, 'Zähler steht auf 6 von 6');
   pruefe(await page.locator('text=alle Stationen geschafft').count() === 1, '„Du hast alle Stationen geschafft!“');
 
   console.log('Laptop');
@@ -251,10 +282,12 @@ async function abschliessen(page, sterne){
   const g = gruppen.gruppen.filter(x => x.personen.join() === 'Ada,Bo').pop();
   pruefe(!!g, 'Gruppe Ada & Bo auf dem Laptop');
   if(g){
-    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund', 'fertige Stationen: ' + g.fertig.join(', '));
+    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor', 'fertige Stationen: ' + g.fertig.join(', '));
     const arten = g.dateien.map(d => d.split('/').pop().split('_')[0]).sort().join(',');
     pruefe(arten === 'hintergrund,hintergrund,koerpererkennung,lasercutter', 'hochgeladen: Laser-Foto, KI-Ansicht, zwei Hintergrund-Bilder, keine Rohfotos (' + arten + ')');
     pruefe(g.antworten.lasercutter && g.antworten.lasercutter.antworten.frage === 'Wie heiß wird der Laser?', 'Antwort angekommen');
+    const svgCode = g.antworten['pixel-vektor'] && g.antworten['pixel-vektor'].antworten['svg-code'];
+    pruefe(!!svgCode && svgCode.indexOf('polygon') > 0, 'SVG-Code auf dem Laptop gespeichert');
   }
   const laptop = await browser.newPage({ viewport: { width: 1400, height: 900 } });
   await laptop.goto(BASE + '/laptop');

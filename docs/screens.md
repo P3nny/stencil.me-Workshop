@@ -118,6 +118,16 @@ Beschreibung von Patricia:
 - Läuft ein Video nicht (Format, Speicher), kommt nach 30 s ein Hinweis
 - *Ungetestet: Video vom iPad (.mov) in Safari. Der Test am Rechner läuft nur in Chromium mit echtem Bild*
 
+## Screen 7: Pixel vs. Vektor (mit SVG Kreis, Dreieck, Stern) — gebaut, Branch `feature/screen-7`
+
+- Für die Gruppe gemeinsam (nicht pro Person)
+- Teil 1: Text, Merkhilfe, „Bezug zu stencil.me“ und Infografik aus `02_stencil.me-Stationen.pdf` (Seite 11, ausgeschnitten nach `stationen/bilder/pixel-vektor/infografik.png`)
+- 3 Verständnisfragen mit Rückmeldung (falsch: „Noch nicht, schaut nochmal oben“), erst wenn alle richtig sind, erscheint Teil 2
+- Teil 2: SVG-Editor in der App (wie w3schools, PDF Seite 12 und 13), Ergebnis sofort daneben. Die App prüft: Kreisfarbe geändert (gültige Farbe?), Radius geändert, Dreieck (3 Punkte), Stern (10 Punkte), Bonus zweiter Stern in anderer Farbe. Hinweise bei typischen Fehlern, auch bei fehlenden Zeichen
+- „Hilfe: Baustein einfügen“ für Dreieck und Stern. *Patricia: Soll es die Hilfe geben, oder sollen die Kinder alles abtippen?*
+- Typografische Anführungszeichen der iPad-Tastatur („ “) werden erkannt und beim Speichern zu geraden " gemacht
+- Der Code geht beim Beenden an den Laptop (`antworten.svg-code` in den Ereignissen der Gruppe). *Später (Roadmap 8, ZIP): als `.svg`/`.html`-Datei in die Ergebnis-Mappe*
+
 ## Weitere Screens
 
 - *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …

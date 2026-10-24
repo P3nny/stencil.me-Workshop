@@ -113,6 +113,36 @@ button.hintergrund-wahl:disabled{background:#fff;opacity:.4;}
 .aufgabe{display:flex;gap:10px;align-items:flex-start;}
 .aufgabe input{width:26px;height:26px;flex:none;accent-color:var(--neon);}
 .ki-bild{display:block;max-width:260px;border:3px solid var(--ink);margin-top:8px;}
+/* Station „Pixel vs. Vektor“ */
+.pv-teil{border-top:3px solid var(--ink);padding-top:14px;margin-top:18px;}
+.pv-erklaerung{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;}
+.pv-infografik{margin:0;width:280px;max-width:100%;}
+.pv-infografik img{width:100%;display:block;border:3px solid var(--ink);}
+.pv-text{flex:1;min-width:260px;}
+.pv-merk{background:#fffbe6;border:3px solid var(--ink);padding:8px 10px;}
+.pv-bezug{background:#f4f4f4;border-left:4px solid var(--neon);padding:8px 10px;}
+.pv-quiz{margin-top:18px;}
+.pv-frage{margin-bottom:14px;}
+.pv-frage-text{font-weight:700;margin:0 0 4px;}
+button.wahl.falsch{background:#eee;color:#999;text-decoration:line-through;}
+.pv-rueckmeldung{margin:4px 0 0;padding:0;}
+.pv-rueckmeldung.richtig{background:#e6f7ea;border:3px solid var(--ink);padding:6px 10px;}
+.pv-rueckmeldung.falsch{background:var(--neon);border:3px solid var(--ink);padding:6px 10px;font-weight:700;}
+.pv-arbeitsplatz{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;}
+.pv-links{flex:1;min-width:280px;}
+.pv-code{font-family:'Courier Prime',monospace;font-size:1rem;line-height:1.35;background:#111;color:#f4f4f4;min-height:260px;}
+.pv-rechts{width:240px;}
+.pv-label{font-family:var(--head);text-transform:uppercase;margin:0 0 4px;}
+.pv-vorschau{display:flex;flex-wrap:wrap;gap:6px;min-height:110px;border:3px solid var(--ink);padding:6px;background:#fff;}
+.pv-vorschau img{width:100px;height:100px;border:1px dashed #ccc;}
+.pv-syntax{background:var(--neon);border:3px solid var(--ink);padding:6px 10px;font-weight:700;}
+.pv-aufgaben{padding-left:1.4em;margin-top:16px;}
+.pv-aufgaben li{margin-bottom:12px;}
+.pv-aufgaben li.ok{color:#1e7a3c;}
+.pv-aufgaben li.freiwillig{color:var(--muted);}
+.pv-haken{font-weight:700;font-size:1.2rem;}
+.pv-hinweis{color:#c0006a;font-weight:700;}
+.pv-baustein{font-family:'Courier Prime',monospace;background:#f4f4f4;border:2px solid var(--ink);padding:6px 8px;white-space:pre-wrap;word-break:break-all;font-size:.85rem;margin:6px 0 4px;}
 .video{margin:16px 0;max-width:640px;}
 .video iframe{width:100%;aspect-ratio:16/9;height:auto;min-height:200px;border:3px solid var(--ink);display:block;}
 .video-platzhalter{border:3px dashed var(--ink);background:#f4f4f4;padding:16px;text-align:center;}

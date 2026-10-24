@@ -1,0 +1,96 @@
+{
+  "id": "pixel-vektor",
+  "titel": "Pixel vs. Vektor",
+  "typ": "programm",
+  "datenweg": "laptop",
+  "schritte": [
+    "Lest die Erklärung und schaut euch die Infografik an.",
+    "Beantwortet die Fragen dazu.",
+    "Schreibt SVG-Code: Kreis, Dreieck, Stern. Rechts seht ihr sofort das Ergebnis.",
+    "Ihr könnt die Station gemeinsam lösen."
+  ],
+  "erklaerung": {
+    "titel": "Pixel vs. Pfade",
+    "absaetze": [
+      "Pixel- und Vektorgrafiken speichern Bilder auf unterschiedliche Weise.",
+      "Pixelgrafiken bestehen aus einzelnen Bildpunkten und eignen sich besonders für Fotos. Werden sie stark vergrößert, wirken die Kanten unscharf.",
+      "Vektorgrafiken bestehen dagegen aus mathematisch beschriebenen Linien und Pfaden. Sie lassen sich beliebig vergrößern und bleiben dabei scharf.",
+      "Deshalb sind sie ideal für Logos, Icons und Illustrationen, und für Lasercutter oder Schneideplotter, die den Pfaden beim Schneiden folgen."
+    ],
+    "merkhilfe": "Pixel sind Bildpunkte, Vektoren sind Pfade.",
+    "bezug": "Lasercutter und Schneideplotter brauchen zum Arbeiten Pfade, denen sie folgen können. Dafür kannst du direkt mit Vektorgrafiken arbeiten oder Pixelgrafiken umwandeln, indem du oder ein Programm die Pfade nachfährt. Genau das macht stencil.me mit deinem Foto.",
+    "infografik": "bilder/pixel-vektor/infografik.png"
+  },
+  "verstaendnis": [
+    {
+      "frage": "Woraus besteht eine Pixelgrafik?",
+      "antworten": [
+        "Aus einzelnen Bildpunkten",
+        "Aus mathematischen Pfaden",
+        "Aus Linien und Kurven"
+      ],
+      "richtig": 0,
+      "erklaerung": "Pixel sind Bildpunkte. Jeder Punkt hat eine Farbe, zusammen ergeben sie das Bild."
+    },
+    {
+      "frage": "Was passiert, wenn du ein Foto (Pixelgrafik) stark vergrößerst?",
+      "antworten": [
+        "Es bleibt gestochen scharf",
+        "Die Kanten werden unscharf und pixelig",
+        "Es wird automatisch zu einer Vektorgrafik"
+      ],
+      "richtig": 1,
+      "erklaerung": "Beim Vergrößern werden die Bildpunkte nur größer. Darum sieht man die Pixel-Treppchen."
+    },
+    {
+      "frage": "Warum braucht der Lasercutter eine Vektorgrafik?",
+      "antworten": [
+        "Weil Vektoren bunter sind",
+        "Weil er Pfaden folgt, wenn er schneidet",
+        "Weil Pixel zu klein für Holz sind"
+      ],
+      "richtig": 1,
+      "erklaerung": "Der Laser fährt Linien ab. Eine Vektorgrafik sagt ihm genau, wo die Linien (Pfade) sind."
+    }
+  ],
+  "uebung": {
+    "start": "<svg width=\"100\" height=\"100\">\n  <circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n</svg>\n",
+    "aufgaben": [
+      {
+        "id": "farbe",
+        "text": "Kreis verändern: Ersetzt fill=\"yellow\" durch eine andere Farbe (z. B. red, pink, blue)."
+      },
+      {
+        "id": "radius",
+        "text": "Ändert r=\"40\". Was passiert bei r=\"20\" oder r=\"80\"?"
+      },
+      {
+        "id": "dreieck",
+        "text": "Klickt hinter </svg>, drückt Enter und tippt einen neuen Block. Das Dreieck steht dann neben dem Kreis.",
+        "baustein": "<svg width=\"100\" height=\"100\">\n  <polygon points=\"50,10 90,90 10,90\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n</svg>"
+      },
+      {
+        "id": "stern",
+        "text": "Aus 3 Punkten (Dreieck) werden 10 Punkte, und ihr habt einen Stern. Tippt einen dritten Block hinter das letzte </svg>.",
+        "baustein": "<svg width=\"100\" height=\"100\">\n  <polygon points=\"50,5 60,35 95,35 70,55 80,90 50,70 20,90 30,55 5,35 40,35\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n</svg>"
+      },
+      {
+        "id": "bonus",
+        "text": "Bonus: Kopiert den Stern-Block, fügt ihn nochmal ein und gebt dem zweiten Stern eine andere Farbe. Probiert auch dickere Ränder mit stroke-width.",
+        "freiwillig": true
+      }
+    ]
+  },
+  "check": {
+    "art": "pixel-vektor"
+  },
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Eure Antworten und euer SVG-Code gehen an den Laptop. Der Code kommt später mit in eure Ergebnis-Mappe.",
+  "braucht": [
+    "foto"
+  ],
+  "plaetze": 4
+}
