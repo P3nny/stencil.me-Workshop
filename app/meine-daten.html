@@ -104,39 +104,72 @@
     ]);
     const status = el('p', { klasse: 'hinweis' });
     const knopf = el('button', { type: 'button', klasse: 'gross', text: '🗑 Jetzt alles löschen' });
+    const trotzdem = el('button', { type: 'button', klasse: 'secondary', text: 'Trotzdem löschen (fehlt dann in der Mappe)' });
+    trotzdem.hidden = true;
+
+    // Wartet höchstens ms Millisekunden, dann geht es mit 'zeit' weiter (nie hängen bleiben)
+    function hoechstens(promise, ms){
+      return Promise.race([promise, new Promise(resolve => setTimeout(() => resolve('zeit'), ms))]);
+    }
+
+    function loeschen(){
+      knopf.disabled = true;
+      trotzdem.hidden = true;
+      status.textContent = 'Lösche …';
+      return Speicher.allesLoeschen().then(() => {
+        inhalt.innerHTML = '';
+        inhalt.appendChild(el('section', { klasse: 'panel' }, [
+          el('h1', { text: '✓ Gelöscht' }),
+          el('p', { text: 'Auf diesem iPad ist nichts mehr von euch gespeichert. Danke fürs Mitmachen! Gebt das iPad jetzt zurück.' })
+        ]));
+      }).catch(err => {
+        console.error(err);
+        status.textContent = '⚠ Löschen hat nicht geklappt. Schließt alle anderen Safari-Tabs (unten rechts: Tabs, dann wegwischen) und tippt nochmal.';
+        knopf.disabled = false;
+      });
+    }
+
+    function beschreiben(e){
+      if(e.art === 'ereignis') return (e.ereignis === 'beendet' ? 'Station ' : e.ereignis + ' ') + (e.station || '');
+      if(e.art === 'datei') return 'Foto ' + (e.station || '');
+      return e.sorte || 'Stempel';
+    }
+
     knopf.addEventListener('click', () => {
       knopf.disabled = true;
-      status.textContent = 'Prüfe, ob alles beim Laptop ist …';
-      Outbox.abarbeiten()
-        .then(() => Speicher.outboxAlle())
+      trotzdem.hidden = true;
+      status.textContent = 'Prüfe, ob alles beim Laptop ist … (höchstens 20 Sekunden)';
+      hoechstens(Outbox.abarbeiten(), 20000)
+        .then(() => hoechstens(Speicher.outboxAlle(), 5000))
         .then(eintraege => {
-          const offen = eintraege.filter(e => !e.gesendet).length;
-          if(offen){
-            status.textContent = '⚠ ' + offen + (offen === 1 ? ' Sache ist' : ' Sachen sind') + ' noch nicht beim Laptop. Wartet ein paar Sekunden und tippt nochmal. Klappt es nicht: Sagt Penny Bescheid.';
-            knopf.disabled = false;
-            return;
+          const offene = eintraege === 'zeit' ? null : eintraege.filter(e => !e.gesendet);
+          if(offene && !offene.length){
+            if(!confirm('Wirklich alles auf diesem iPad löschen?')){
+              status.textContent = '';
+              knopf.disabled = false;
+              return;
+            }
+            return loeschen();
           }
-          if(!confirm('Wirklich alles auf diesem iPad löschen?')){
-            status.textContent = '';
-            knopf.disabled = false;
-            return;
-          }
-          return Speicher.allesLoeschen().then(() => {
-            inhalt.innerHTML = '';
-            inhalt.appendChild(el('section', { klasse: 'panel' }, [
-              el('h1', { text: '✓ Gelöscht' }),
-              el('p', { text: 'Auf diesem iPad ist nichts mehr von euch gespeichert. Danke fürs Mitmachen! Gebt das iPad jetzt zurück.' })
-            ]));
-          });
+          status.textContent = offene
+            ? '⚠ ' + offene.length + (offene.length === 1 ? ' Sache ist' : ' Sachen sind') + ' noch nicht beim Laptop (' + offene.slice(0, 3).map(beschreiben).join(', ') + (offene.length > 3 ? ' …' : '') + '). Wartet kurz und tippt nochmal. Klappt es nicht: Sagt Penny Bescheid.'
+            : '⚠ Der Speicher des iPads antwortet nicht. Tippt nochmal oder sagt Penny Bescheid.';
+          knopf.disabled = false;
+          trotzdem.hidden = false;
         })
         .catch(err => {
           console.error(err);
-          status.textContent = '⚠ Löschen hat nicht geklappt. Sagt Penny Bescheid.';
+          status.textContent = '⚠ Prüfen hat nicht geklappt. Sagt Penny Bescheid.';
           knopf.disabled = false;
+          trotzdem.hidden = false;
         });
+    });
+    trotzdem.addEventListener('click', () => {
+      if(confirm('Was noch nicht beim Laptop ist, fehlt dann in eurer Mappe. Trotzdem alles löschen?')) loeschen();
     });
     box.appendChild(knopf);
     box.appendChild(status);
+    box.appendChild(trotzdem);
     return box;
   }
 
@@ -147,12 +180,22 @@
       el('p', {}, [el('strong', { text: 'Eure Namen: ' }), el('span', { text: gruppe.personen.join(' und ') })]),
       el('p', { text: Stationen.anzahlFertig(liste, f) + ' von ' + Stationen.anzahlPflicht(liste) + ' Stationen geschafft.' })
     ]);
-    Speicher.dateienAlle().then(dateien => {
-      const fotos = dateien.filter(d => d && /^image\//.test(d.typ));
-      box.appendChild(el('h2', { text: 'Fotos und Bilder (' + fotos.length + ')' }));
-      box.appendChild(el('p', { klasse: 'hinweis', text: 'Hier sind auch Fotos dabei, die ihr verworfen habt. Die gehen nicht an den Laptop.' }));
-      box.appendChild(bilder(fotos.map(d => URL.createObjectURL(new Blob([d.daten], { type: d.typ })))));
-    }).catch(err => console.error(err));
+    // Erst auf Knopfdruck: Alle Fotos auf einmal zu lesen, belastet alte iPads und hält den Speicher auf
+    box.appendChild(el('h2', { text: 'Fotos und Bilder' }));
+    box.appendChild(el('p', { klasse: 'hinweis', text: 'Hier sind auch Fotos dabei, die ihr verworfen habt. Die gehen nicht an den Laptop.' }));
+    const zeigen = el('button', { type: 'button', klasse: 'secondary', text: 'Fotos auf dem iPad anzeigen' });
+    zeigen.addEventListener('click', () => {
+      zeigen.disabled = true;
+      zeigen.textContent = 'Lade …';
+      Speicher.dateienAlle().then(dateien => {
+        const fotos = dateien.filter(d => d && /^image\//.test(d.typ));
+        zeigen.replaceWith(fotos.length ? bilder(fotos.map(d => URL.createObjectURL(new Blob([d.daten], { type: d.typ })))) : el('p', { text: 'Keine.' }));
+      }).catch(err => {
+        console.error(err);
+        zeigen.textContent = 'Fotos konnten nicht geladen werden';
+      });
+    });
+    box.appendChild(zeigen);
     return box;
   }
 

@@ -591,7 +591,9 @@ async function abschliessen(page, sterne){
     await page.waitForSelector('text=Feedbackbogen');
     await page.waitForFunction(() => document.querySelectorAll('.panel')[2].querySelectorAll('.daten-bilder img').length > 10);
     pruefe(await page.locator('text=Wie heiß wird der Laser?').count() === 1, 'Meine Daten: Antworten vom Laptop');
-    pruefe(await page.locator('.panel').nth(1).locator('.daten-bilder img').count() >= 2, 'Meine Daten: Fotos auf dem iPad');
+    await page.click('button:has-text("Fotos auf dem iPad anzeigen")');
+    await page.locator('.panel').nth(1).locator('.daten-bilder img').nth(1).waitFor();
+    pruefe(await page.locator('.panel').nth(1).locator('.daten-bilder img').count() >= 2, 'Meine Daten: Fotos auf dem iPad (erst auf Knopfdruck)');
     await page.screenshot({ path: path.join(SHOTS, BROWSER + '-20-meine-daten.png'), fullPage: true });
   }
   const laptop = await browser.newPage({ viewport: { width: 1400, height: 900 } });

@@ -54,8 +54,15 @@ function pruefe(ok, text){
   pruefe(true, 'Station zeigt den Abschluss-Hinweis mit „Meine Daten“');
   await tabB.goto(BASE + '/app/meine-daten.html');
   await tabB.waitForSelector('button:has-text("Jetzt alles löschen")');
-  tabB.once('dialog', d => d.accept());
+  // Laptop nimmt nichts an: Die Prüfung darf nicht hängen bleiben
+  await tabB.route('**/api/ereignis', r => r.fulfill({ status: 500, body: '{}' }));
+  await tabB.evaluate(() => Outbox.ereignis('abcdefabcdef', 'checkin', 'berufe', {}));
   await tabB.click('button:has-text("Jetzt alles löschen")');
+  await tabB.waitForSelector('text=noch nicht beim Laptop', { timeout: 30000 });
+  pruefe(/Sache ist noch nicht beim Laptop \(checkin berufe\)/.test(await tabB.locator('.hinweis').last().textContent()), 'offener Eintrag wird genannt, nichts hängt');
+  pruefe(await tabB.locator('button:has-text("Trotzdem löschen")').isVisible(), 'Ausweg „Trotzdem löschen“');
+  tabB.once('dialog', d => d.accept());
+  await tabB.click('button:has-text("Trotzdem löschen")');
   await tabB.waitForSelector('h1:has-text("✓ Gelöscht")', { timeout: 15000 });
   pruefe(true, 'Löschen klappt, obwohl ein anderer Tab offen ist');
   const rest = await tabB.evaluate(() => Speicher.lesen('gruppe'));
