@@ -1,5 +1,7 @@
 # Aufbau-Checkliste
 
+Was vorher noch zu erledigen ist (Canva, Einwilligung, KOMEZ): [merkliste-patricia.md](merkliste-patricia.md)
+
 ## 0. Gerätecheck (so früh wie möglich)
 
 - [ ] KOMEZ bitten, `https://stencilme-workshop.netlify.app/app/geraetecheck.html` auf einem ihrer iPads zu öffnen und das Ergebnis zu schicken
