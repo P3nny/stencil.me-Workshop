@@ -92,10 +92,15 @@
           resolve();
           return;
         }
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
-        // Andere offene Tabs halten die Datenbank fest: Dann sagen wir es
-        req.onblocked = () => reject(new Error('blockiert'));
+        let warten = null;
+        req.onsuccess = () => { clearTimeout(warten); resolve(); };
+        req.onerror = () => { clearTimeout(warten); reject(req.error); };
+        // Andere offene Tabs geben die Datenbank bei „versionchange“ frei, manchmal mit
+        // Verzögerung (Hintergrund-Tab). Erst wenn das zu lange dauert, sagen wir es
+        req.onblocked = () => {
+          clearTimeout(warten);
+          warten = setTimeout(() => reject(new Error('blockiert')), 5000);
+        };
       });
     });
   }

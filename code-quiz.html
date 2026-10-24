@@ -10,6 +10,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
 body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.01em;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+.eingebettet body{min-height:0}
 a{color:var(--ink)}a:hover{color:var(--neon);background:var(--ink)}
 .topbar{display:flex;align-items:center;gap:14px;padding:16px 20px 10px;flex-shrink:0;max-width:760px;width:100%;margin:0 auto}
 .dots{display:flex;gap:8px;flex:1}
@@ -321,6 +322,7 @@ function render(){
   `;
 
   window.scrollTo(0,0);
+  if(window.parent !== window) window.parent.postMessage({ stencilOben: true }, location.origin);
   document.getElementById('backBtn').style.visibility = idx === 0 ? 'hidden' : 'visible';
   const nextBtn = document.getElementById('nextBtn');
 
@@ -396,6 +398,19 @@ function finish(){
 }
 // In der Workshop-App eingebettet: „Zurück zum Workshop“ ausblenden, die Station ist ja drumherum
 if(window.parent !== window) Array.prototype.forEach.call(document.querySelectorAll('.backlink'), a => { a.hidden = true; });
+// Eingebettet: so hoch wie der Inhalt, die Station lässt den Rahmen mitwachsen. Dann scrollt
+// nur noch die Seite, nicht der kleine Rahmen (Patricia, 24.10.)
+if(window.parent !== window){
+  document.documentElement.classList.add('eingebettet');
+  let letzteHoehe = 0;
+  setInterval(() => {
+    const hoehe = Math.ceil(document.body.getBoundingClientRect().height);
+    if(hoehe !== letzteHoehe){
+      letzteHoehe = hoehe;
+      window.parent.postMessage({ stencilHoehe: hoehe }, location.origin);
+    }
+  }, 300);
+}
 </script>
 </body>
 </html>

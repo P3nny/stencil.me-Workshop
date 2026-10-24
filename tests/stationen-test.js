@@ -460,6 +460,21 @@ async function abschliessen(page, sterne){
   console.log('Station Kunst-Quiz');
   await page.goto(BASE + '/app/station.html?id=kunst-quiz&test');
   await page.waitForSelector('.quiz-rahmen');
+  if((await page.request.get(BASE + '/kunst-bilder/yayoi-kusama-1.jpg')).ok()){
+    const kunst = page.frameLocator('.quiz-rahmen');
+    await kunst.locator('.startbtn:has-text("Los geht")').click();
+    await kunst.locator('.kunstbilder img').nth(1).waitFor();
+    pruefe(await kunst.locator('.kunstbilder img').count() === 2, 'Kunst-Quiz zeigt Porträt und Werk (vom Laptop)');
+    await page.waitForTimeout(800);
+    const mass = await page.evaluate(() => { const r = document.querySelector('.quiz-rahmen'); return { rahmen: r.clientHeight, inhalt: Math.ceil(r.contentDocument.body.getBoundingClientRect().height) }; });
+    pruefe(mass.rahmen >= mass.inhalt, 'Quiz-Rahmen wächst mit, kein Scrollen im Rahmen (' + mass.rahmen + ' ≥ ' + mass.inhalt + ')');
+    await page.screenshot({ path: path.join(SHOTS, BROWSER + '-23-kunst-quiz.png'), fullPage: true });
+    await page.reload();
+    await page.waitForSelector('.quiz-rahmen');
+  }else{
+    console.log('  (ohne archiv/kunst-quiz-bilder: Bilder nicht geprüft)');
+  }
+  pruefe((await page.request.get(BASE + '/kunst-bilder/..%2Fkunst-quiz-bilder%2FLIESMICH.txt')).status() === 404, 'Kunst-Bilder: nur .jpg aus dem Ordner');
   await quizSpielen();
   pruefe(/richtig/.test(await page.locator('.quiz-status').textContent()), 'Kunst-Quiz abgehakt');
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne Fotos vom Lieblings-Streetart');

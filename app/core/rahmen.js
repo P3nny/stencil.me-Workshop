@@ -271,7 +271,17 @@
     }
     const rahmen = el('iframe', { src: check.url, klasse: 'quiz-rahmen', title: 'Quiz' });
     window.addEventListener('message', ev => {
-      if(ev.source !== rahmen.contentWindow || ev.origin !== location.origin || !ev.data || !ev.data.stencilQuiz) return;
+      if(ev.source !== rahmen.contentWindow || ev.origin !== location.origin || !ev.data) return;
+      // Rahmen wächst mit dem Quiz: Es scrollt die Seite, nicht der Rahmen
+      if(ev.data.stencilHoehe){
+        rahmen.style.height = Math.max(300, Number(ev.data.stencilHoehe) + 6) + 'px';
+        return;
+      }
+      if(ev.data.stencilOben){
+        if(rahmen.getBoundingClientRect().top < 0) rahmen.scrollIntoView();
+        return;
+      }
+      if(!ev.data.stencilQuiz) return;
       const e = ev.data.stencilQuiz;
       eintrag.quizErgebnis = { richtig: Number(e.richtig) || 0, gesamt: Number(e.gesamt) || 0 };
       eintrag.antworten = eintrag.antworten || {};

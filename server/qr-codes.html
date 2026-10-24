@@ -26,10 +26,15 @@
   .url { font-family:'Courier Prime',monospace; font-size:.7rem; word-break:break-all; margin-top:2mm; }
   .scan { font-size:.85rem; margin-top:2mm; }
   .fehler { background:var(--neon); border:2px solid var(--ink); padding:10px; font-weight:700; }
+  /* Druck: 4 Karten pro A4-Blatt (2 × 2), kleinere Codes (Patricia, 24.10.) */
+  @page { size:A4; margin:8mm; }
   @media print {
     body { padding:0; }
     h1, .steuerung, .hinweis.bildschirm { display:none; }
-    .karten { gap:6mm; }
+    .karten { gap:4mm; }
+    .karte { width:95mm; height:136mm; box-sizing:border-box; padding:4mm; display:flex; flex-direction:column; justify-content:center; }
+    .titel { font-size:1.3rem; }
+    .qr svg { width:45mm; height:45mm; }
   }
 </style>
 </head>

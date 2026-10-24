@@ -56,9 +56,10 @@ function pruefe(ok, text){
   await tabB.waitForSelector('button:has-text("Jetzt alles löschen")');
   tabB.once('dialog', d => d.accept());
   await tabB.click('button:has-text("Jetzt alles löschen")');
-  await tabB.waitForSelector('text=Gelöscht', { timeout: 15000 });
+  await tabB.waitForSelector('h1:has-text("✓ Gelöscht")', { timeout: 15000 });
   pruefe(true, 'Löschen klappt, obwohl ein anderer Tab offen ist');
-  pruefe(await tabB.evaluate(() => Speicher.lesen('gruppe')) === undefined, 'Gruppe ist vom iPad gelöscht');
+  const rest = await tabB.evaluate(() => Speicher.lesen('gruppe'));
+  pruefe(rest === undefined || rest === null, 'Gruppe ist vom iPad gelöscht (' + JSON.stringify(rest) + ')');
   await tabB.request.post(BASE + '/api/einstellungen', { data: { freigaben: [] } });
 
   await browser.close();

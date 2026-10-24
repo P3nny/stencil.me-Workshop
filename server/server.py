@@ -42,6 +42,9 @@ STICKER_DIR = os.path.join(DATA_ROOT, "sticker")  # für den Schneideplotter (Bo
 PLOTTER_DIR = os.path.join(DATA_ROOT, "plotter")  # Sticker-Folien (Aufträge an die Cameo)
 MAX_SHEET_BYTES = 20 * 1024 * 1024
 GROUPS_DIR = os.path.join(DATA_ROOT, "gruppen")
+# Bilder fürs Kunst-Quiz: urheberrechtlich geschützt, liegen nur lokal (nicht im Repo, nicht auf Netlify)
+KUNST_DIR = os.path.abspath(os.environ.get("STENCILME_KUNST_BILDER") or os.path.join(REPO_DIR, "archiv", "kunst-quiz-bilder"))
+KUNST_RE = re.compile(r"^[a-z0-9-]{1,60}\.jpg$")
 SETTINGS_FILE = os.path.join(DATA_ROOT, "einstellungen.json")
 KI_LOG_FILE = os.path.join(DATA_ROOT, "ki-protokoll.jsonl")
 MESSAGES_FILE = os.path.join(DATA_ROOT, "nachrichten.json")  # Laptop -> Gruppen („wird gelasert“, „fertig“)
@@ -329,6 +332,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             # loeschen: Laptop hat zum Abschluss das Löschen auf den iPads freigegeben
             return self.send_json({"nachrichten": read_messages().get(group_id, []),
                                    "loeschen": "loeschen" in read_settings().get("freigaben", [])})
+        if path.startswith("/kunst-bilder/"):
+            name = path[len("/kunst-bilder/"):]
+            if not KUNST_RE.match(name) or not os.path.isfile(os.path.join(KUNST_DIR, name)):
+                return self.send_error(404)
+            return self.send_file(os.path.join(KUNST_DIR, name))
         if path in ("/api/meine-daten", "/api/meine-datei"):
             # „Meine Daten“: wie bei den Nachrichten nur mit der zufälligen ID der eigenen Gruppe
             query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)

@@ -242,6 +242,13 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Andere offene Tabs geben die Datenbank frei (`onversionchange`), sonst würde das Löschen hängen (`tests/tabs-test.js`)
 - Text für die letzte Folie der Abschlusspräsentation: `docs/canva-folie-datenschutz.md`
 
+## Kunst-Bilder, Quiz-Höhe, QR-Druck (24.10. spät, Branch `feature/kunst-bilder`)
+
+- Kunst-Quiz zeigt pro Karte Porträt und Werk aus `03_stencil.me-Künstlerinnen_A4.pdf`. Die Bilder liegen nur in `archiv/kunst-quiz-bilder/` (nicht im Repo), der Laptop liefert sie unter `/kunst-bilder/` aus. Auf Netlify fehlen sie einfach
+- Eingebettete Quizze (Code- und Kunst-Quiz) sind so hoch wie ihr Inhalt: Es scrollt die Seite, nicht der kleine Rahmen. Neue Karte: Die Seite springt zum Quiz-Anfang
+- `/qr` druckt 4 Karten pro A4-Blatt (2 × 2), Codes 45 mm
+- Löschen auf dem iPad wartet bis zu 5 s, bis andere Tabs den Speicher freigeben (Chromium meldete sonst manchmal „blockiert“)
+
 ## Noch offen
 
 - Kunst-Quiz mit Bildern aus `03_stencil.me-Künstlerinnen_A4.pdf`, nur über den Laptop ausgeliefert, nicht im Repo
