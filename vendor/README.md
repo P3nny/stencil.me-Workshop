@@ -10,4 +10,4 @@ Damit die App ohne Internet läuft und keine Daten an CDNs gehen, liegen alle Bi
 | `qrcode/` | qrcode-generator (QR-Code auf der Laptop-Seite) | 1.4.4 | `cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js` | MIT |
 | `fonts/` | Oswald, DM Sans, Courier Prime (nur latin, latin-ext) | – | Google Fonts | SIL Open Font License 1.1 |
 
-Das Modell passt zu den Einstellungen in `index.html` (`getBodyPixNet`). Wer `multiplier`, `outputStride` oder `quantBytes` ändert, muss das passende Modell herunterladen.
+Das Modell passt zu den Einstellungen in `stencil.html` (`getBodyPixNet`). Wer `multiplier`, `outputStride` oder `quantBytes` ändert, muss das passende Modell herunterladen.

@@ -41,7 +41,7 @@ EVENT_TYPES = ("anmeldung", "checkin", "beendet")
 IMAGE_TYPES = ((b"\xff\xd8\xff", ".jpg", "image/jpeg"), (b"\x89PNG", ".png", "image/png"))
 
 # Paths the iPads may load. Everything else (archiv/, .git/, server/) stays private.
-PUBLIC_FILES = {"/", "/index.html", "/code-quiz.html", "/kunst-quiz.html", "/docs/ipad-test.html", "/docs/test-foto.jpg"}
+PUBLIC_FILES = {"/", "/index.html", "/stencil.html", "/code-quiz.html", "/kunst-quiz.html", "/docs/ipad-test.html", "/docs/test-foto.jpg"}
 PUBLIC_PREFIXES = ("/vendor/", "/app/", "/stationen/")
 
 ID_RE = re.compile(r"^[a-f0-9]{12}$")

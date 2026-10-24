@@ -20,5 +20,6 @@ Ausdrucken und neben den Laptop legen. Ruhig bleiben: Es gibt immer einen Plan B
 
 ## Versteckte Funktionen (für die Leitung)
 
-- `?extras` an die Adresse hängen: Bild (Positiv) und Sticker, nur wenn Zeit bleibt. Beispiel: `http://__________:8000/?extras`
-- `?test`: Knopf „Test-Foto verwenden“ zum Ausprobieren ohne Kamera
+- stencil.me direkt (ohne Stationen): `http://__________:8000/stencil.html`
+- `?extras` an diese Adresse hängen: Bild (Positiv) und Sticker, nur wenn Zeit bleibt. Beispiel: `http://__________:8000/stencil.html?extras`
+- `?test`: in `stencil.html` Knopf „Test-Foto verwenden“, in den Stationen „Test-Gruppe anlegen“ und „Alles zurücksetzen“

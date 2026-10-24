@@ -1,7 +1,7 @@
 // ---- Fotos verkleinern ----
 // iPad-Fotos haben bis zu 12 Megapixel. In voller Größe sprengen sie auf älteren
 // iPads den Speicher (Absturz). Darum wird jedes Foto sofort auf höchstens
-// MAX_SEITE px verkleinert und nur diese Kopie gespeichert (wie in index.html).
+// MAX_SEITE px verkleinert und nur diese Kopie gespeichert (wie in stencil.html).
 (function(){
   const MAX_SEITE = 1024;
   const JPEG_QUALITAET = 0.85;

@@ -1,5 +1,5 @@
 // ---- Outbox: erst aufs iPad, dann an den Laptop ----
-// Wie beim Stempel in index.html: Jeder Eintrag (Check-in, Antworten, Foto) wird
+// Wie beim Stempel in stencil.html: Jeder Eintrag (Check-in, Antworten, Foto) wird
 // sofort auf dem iPad gespeichert und dann an den Laptop geschickt. Ist der Laptop
 // nicht erreichbar, versucht es die App alle 15 s erneut. Jeder Eintrag hat eine
 // eigene ID, damit er beim Laptop nie doppelt ankommt.

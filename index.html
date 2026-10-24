@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>stencil.me · Workshop</title>
+<meta name="theme-color" content="#111111">
+<link href="/vendor/fonts/fonts.css" rel="stylesheet">
+<link href="/app/core/werkstatt.css" rel="stylesheet">
+<style>
+  /* Startbildschirm wie stencilme.netlify.app: schwarz, Titel mit pinkem Balken */
+  body{background:var(--ink);color:#fff;padding:0;}
+  .screen{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px 16px;}
+  .screen[hidden]{display:none;}
+  .inner{width:100%;max-width:620px;}
+  .eyebrow{font-family:var(--head);font-size:18px;font-weight:500;letter-spacing:.2em;color:var(--neon);text-transform:uppercase;margin-bottom:18px;}
+  .titel{font-family:var(--head);font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:52px;line-height:1.1;margin:0 0 40px;}
+  .titel .hl{display:inline-block;background:var(--neon);color:var(--ink);padding:0 .15em;line-height:1.15;}
+  .frage{font-family:var(--head);font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:34px;margin:0 0 28px;}
+  .start{display:inline-block;text-decoration:none;font-family:var(--head);text-transform:uppercase;cursor:pointer;padding:20px 44px;border:4px solid #fff;background:var(--neon);color:var(--ink);font-size:24px;font-weight:700;letter-spacing:.12em;box-shadow:8px 8px 0 #fff;margin:10px;}
+  .start:hover{background:#fff;box-shadow:8px 8px 0 var(--neon);}
+  button.start:disabled{background:#555;color:#999;border-color:#999;box-shadow:none;opacity:1;}
+  .wahl-gross{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;}
+  .wahl-gross button{width:220px;padding:26px 10px;font-size:26px;border:4px solid #fff;background:var(--ink);color:#fff;box-shadow:8px 8px 0 var(--neon);margin:0;}
+  .wahl-gross button:hover{background:var(--neon);color:var(--ink);}
+  .wahl-gross .icon{display:block;font-size:56px;margin-bottom:8px;}
+  .namen label{display:block;text-align:left;font-family:var(--head);text-transform:uppercase;letter-spacing:.08em;font-size:18px;margin:0 auto 22px;max-width:420px;}
+  .namen label[hidden]{display:none;}
+  .namen input{display:block;width:100%;margin-top:6px;font:inherit;font-family:'DM Sans',sans-serif;text-transform:none;letter-spacing:0;font-size:26px;padding:12px;border:4px solid #fff;background:#fff;color:var(--ink);border-radius:0;}
+  .klein{color:#bbb;font-size:15px;margin-top:22px;}
+  .klein a{color:#fff;}
+  button.link{background:none;border:none;color:#bbb;text-decoration:underline;text-transform:none;letter-spacing:0;font-family:'DM Sans',sans-serif;font-size:15px;padding:6px;}
+  button.link:hover{background:none;color:#fff;}
+  .gruss{font-size:22px;margin:0 0 30px;line-height:1.5;}
+  @media (max-width:600px){ .titel{font-size:36px;} .frage{font-size:26px;} }
+</style>
+</head>
+<body>
+
+<!-- 1. Start -->
+<section class="screen" id="s-start">
+  <div class="inner">
+    <div class="eyebrow">stencil.me · Workshop</div>
+    <h1 class="titel"><span class="hl">Vom Selfie</span><br><span class="hl">zum Stempel.</span></h1>
+    <button type="button" class="start" id="los">📸 Los geht's</button>
+    <p class="klein">Ein Workshop von Patricia Ennenbach im KOMEZ</p>
+  </div>
+</section>
+
+<!-- 2. Allein oder zu zweit? -->
+<section class="screen" id="s-anzahl" hidden>
+  <div class="inner">
+    <h2 class="frage">Allein oder zu zweit?</h2>
+    <div class="wahl-gross">
+      <button type="button" data-anzahl="1"><span class="icon">🙋</span>Allein</button>
+      <button type="button" data-anzahl="2"><span class="icon">👯</span>Zu zweit</button>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Namen -->
+<section class="screen" id="s-namen" hidden>
+  <div class="inner">
+    <h2 class="frage" id="namenFrage">Wie heißt du?</h2>
+    <form class="namen" id="namenForm" autocomplete="off">
+      <label id="feld1">Vorname oder Spitzname<input id="name1" maxlength="20" autocapitalize="words" spellcheck="false"></label>
+      <label id="feld2">Vorname oder Spitzname<input id="name2" maxlength="20" autocapitalize="words" spellcheck="false"></label>
+      <p class="klein">Kein Nachname. Ein Spitzname ist auch okay.</p>
+      <button type="submit" class="start" id="namenWeiter" disabled>Los geht's</button>
+    </form>
+    <button type="button" class="link" id="zurueck">← zurück</button>
+  </div>
+</section>
+
+<!-- 4. Angemeldet: weiter zum Foto (oder zur aktuellen Station) -->
+<section class="screen" id="s-weiter" hidden>
+  <div class="inner">
+    <h2 class="frage" id="gruss">Hallo!</h2>
+    <p class="gruss" id="auftrag"></p>
+    <a class="start" id="weiterLink" href="/app/station.html?id=foto">📸 Zur Foto-Station</a>
+    <p class="klein"><button type="button" class="link" id="neu">Andere Gruppe? Neu anmelden</button></p>
+  </div>
+</section>
+
+<div class="fehler" id="fehler" role="alert" hidden></div>
+<script src="/app/core/speicher.js"></script>
+<script src="/app/core/outbox.js"></script>
+<script src="/app/core/stationen.js"></script>
+<script src="/app/core/rahmen.js"></script>
+<script>
+(function(){
+  const screens = ['s-start', 's-anzahl', 's-namen', 's-weiter'];
+  let anzahl = 1;
+
+  function zeige(id){
+    screens.forEach(s => { document.getElementById(s).hidden = s !== id; });
+    window.scrollTo(0, 0);
+  }
+
+  function cleanName(name){
+    return (name || '').trim().replace(/\s+/g, ' ').slice(0, 20);
+  }
+
+  function namenFelder(){
+    return anzahl === 2 ? ['name1', 'name2'] : ['name1'];
+  }
+
+  function namenPruefen(){
+    const werte = namenFelder().map(id => cleanName(document.getElementById(id).value));
+    const doppelt = werte.length === 2 && werte[0].toLowerCase() === werte[1].toLowerCase();
+    document.getElementById('namenWeiter').disabled = werte.some(w => !w) || doppelt;
+    return werte;
+  }
+
+  // Begrüßung und Auftrag nach der Anmeldung, oder wenn die Gruppe zurückkommt
+  function weiterZeigen(gruppe, f, liste){
+    const zwei = gruppe.personen.length === 2;
+    const fertig = liste ? Stationen.anzahlFertig(liste, f) : 0;
+    const link = document.getElementById('weiterLink');
+    const knopf = link;
+    document.getElementById('gruss').textContent = 'Hallo ' + gruppe.personen.join(' und ') + '!';
+    if(f.aktuell){
+      const st = liste && liste.filter(s => s.id === f.aktuell)[0];
+      document.getElementById('auftrag').textContent = (zwei ? 'Ihr seid' : 'Du bist') + ' gerade an der Station „' + (st ? st.titel : f.aktuell) + '“.';
+      link.href = '/app/station.html?id=' + f.aktuell;
+      knopf.textContent = 'Zurück zur Station';
+    }else if(fertig > 0){
+      document.getElementById('auftrag').textContent = fertig + ' von ' + liste.length + ' Stationen geschafft. Scanne den QR-Code an der nächsten Station.';
+      link.href = '/app/station.html?id=' + liste.filter(s => Stationen.istFertig(f, s.id)).pop().id;
+      knopf.textContent = 'Nächste Station zeigen';
+    }else{
+      document.getElementById('auftrag').textContent = zwei
+        ? 'Als Erstes macht ihr nacheinander ein Foto von euch.'
+        : 'Als Erstes machst du ein Foto von dir.';
+      link.href = '/app/station.html?id=foto';
+      knopf.textContent = '📸 Zur Foto-Station';
+    }
+    zeige('s-weiter');
+  }
+
+  document.getElementById('los').addEventListener('click', () => zeige('s-anzahl'));
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-anzahl]'), b => b.addEventListener('click', () => {
+    anzahl = parseInt(b.getAttribute('data-anzahl'), 10);
+    document.getElementById('namenFrage').textContent = anzahl === 2 ? 'Wie heißt ihr?' : 'Wie heißt du?';
+    document.getElementById('feld1').firstChild.textContent = anzahl === 2 ? 'Person 1: Vorname oder Spitzname' : 'Vorname oder Spitzname';
+    document.getElementById('feld2').firstChild.textContent = 'Person 2: Vorname oder Spitzname';
+    document.getElementById('feld2').hidden = anzahl !== 2;
+    namenPruefen();
+    zeige('s-namen');
+    document.getElementById('name1').focus();
+  }));
+
+  ['name1', 'name2'].forEach(id => document.getElementById(id).addEventListener('input', namenPruefen));
+  document.getElementById('zurueck').addEventListener('click', () => zeige('s-anzahl'));
+
+  document.getElementById('namenForm').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const personen = namenPruefen();
+    if(document.getElementById('namenWeiter').disabled) return;
+    const gruppe = { id: Speicher.neueId(), personen: personen, angemeldet: new Date().toISOString() };
+    const f = { stationen: {} };
+    Speicher.schreiben('gruppe', gruppe)
+      .then(() => Stationen.fortschrittSpeichern(f))
+      .then(() => Outbox.ereignis(gruppe.id, 'anmeldung', '', { personen: personen }))
+      .then(() => weiterZeigen(gruppe, f, null))
+      .catch(err => Rahmen.fehler('Anmelden hat nicht geklappt. Bitte nochmal versuchen.', err));
+  });
+
+  // Neue Gruppe auf diesem iPad: alte Fotos und Antworten löschen (Datenschutz)
+  document.getElementById('neu').addEventListener('click', () => {
+    if(!confirm('Neu anmelden? Alle Fotos und Antworten auf diesem iPad werden gelöscht.')) return;
+    try{ indexedDB.deleteDatabase('werkstatt'); }catch(err){ /* egal */ }
+    setTimeout(() => location.reload(), 300);
+  });
+
+  Outbox.starten();
+  // Stationen jetzt schon laden: Dann sind sie auf dem iPad, auch wenn das Netz später wackelt
+  const stationenGeladen = Stationen.laden().catch(err => { console.error(err); return null; });
+
+  // Schon angemeldet (QR-Code nochmal gescannt, Seite neu geladen)? Dann direkt weiter
+  Promise.all([Speicher.lesen('gruppe'), Stationen.fortschritt(), stationenGeladen])
+    .then(werte => { if(werte[0]) weiterZeigen(werte[0], werte[1], werte[2]); })
+    .catch(err => console.error(err));
+})();
+</script>
+</body>
+</html>

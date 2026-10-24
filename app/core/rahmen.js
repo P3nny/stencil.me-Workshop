@@ -326,6 +326,7 @@
     inhalt.appendChild(el('section', { klasse: 'panel' }, [
       el('h1', { text: 'Erst anmelden' }),
       el('p', { text: 'Melde dich zuerst auf der Startseite an.' }),
+      el('a', { klasse: 'knopf-link', href: '/', text: 'Zur Startseite' }),
       TEST ? el('button', { type: 'button', text: 'Test-Gruppe anlegen (Ada und Bo)', onclick: () => {
         const gruppe = { id: Speicher.neueId(), personen: ['Ada', 'Bo'] };
         Speicher.schreiben('gruppe', gruppe)

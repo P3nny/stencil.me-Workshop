@@ -28,7 +28,14 @@ Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Cl
 - Zum Ausprobieren ohne Anmeldung: `?test` an die Adresse hängen → „Test-Gruppe anlegen“, „Alles zurücksetzen“
 - Alles läuft im normalen Safari, ohne Home-Bildschirm (entschieden 24.10.). Start: ein QR-Code in der Startpräsentation. An jeder Station: QR-Code öffnet einen neuen Safari-Tab mit demselben Speicher.
 
-## Screen 1: Check-in (Startseite)
+## Screen 1: Check-in (Startseite) — gebaut, Branch `feature/screen-1`
+
+- Adresse: `/` (Startseite). Die bisherige stencil.me-App liegt jetzt unter `/stencil.html`
+- Ablauf: „Los geht's“ → „Allein oder zu zweit?“ → Vornamen/Spitznamen → „Hallo …!“ → Zur Foto-Station
+- Wer die Startseite nochmal öffnet, sieht den Stand und kommt zurück zur aktuellen Station
+- „Andere Gruppe? Neu anmelden“ löscht vorher alle Fotos und Antworten auf dem iPad
+
+Beschreibung von Patricia:
 
 - Startseite wie `stencilme.netlify.app`, Knopf „Los geht's“
 - Allein oder zu zweit? Namen oder Nicknames eingeben
@@ -48,7 +55,7 @@ Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Cl
 - Jeder Schritt ist sichtbar: Rohbild → Schwarz-Weiß → BodyPix → Otsu → Stempel
 - Frage: „Was bedeuten die Farben?“ (Texteingabe)
 - Input: Der fertige Stempel geht an den Laptop
-- *Die Bildverarbeitung kommt nach `app/core/`. Die vorhandene Outbox aus `index.html` wird wiederverwendet.*
+- *Die Bildverarbeitung kommt nach `app/core/`. Die vorhandene Outbox aus `stencil.html` wird durch `app/core/outbox.js` ersetzt.*
 
 ## Screen 4: Lasercutter
 
