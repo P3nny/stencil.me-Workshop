@@ -113,7 +113,7 @@ ZIP pro Paar auf USB-Stick an die Lehrkraft, Verteilung über die Schulplattform
 - Schlüssel nur auf dem Laptop (`~/.config/stencilme/anthropic-key`, nicht im Repo), Guthaben vorab ohne automatisches Nachladen, Ausgabenlimit im Workspace `stencilme-workshop`, zusätzlich Grenzen im Server (6 pro Gruppe, 150 pro Tag)
 - Modell: **Claude Sonnet 5.5** (Vergleich 24.10. mit demselben Prompt: Haiku 17 s / 0,2 Cent, sehr grob; Sonnet 52 s / 7 Cent, deutlich besser; Opus 71 s / 15 Cent, kaum besser als Sonnet). Ca. 2–6 € pro Workshop. Mit Rückfall-Modell bei Ablehnung (`fallbacks: "default"`). Umstellbar mit `STENCILME_KI_MODELL`
 - Zweite Claude-Station: **Bild-App vibe coden** (Lückentext, Streaming, App läuft abgeschottet, 3 pro Gruppe, 60 pro Tag). Die Code-Erklärung bleibt ein Quiz ohne Claude
-- **Beide Claude-Stationen sind optional** (Patricia, 24.10. spät): zählen nicht zu „x von 11“, nur mit Einwilligung. Erklärung zu den Anthropic-Vorgaben für Minderjährige steht in `Datenschutz.md`
+- **Beide Claude-Stationen sind optional** (Patricia, 24.10. spät): zählen nicht zu „x von y“, nur mit Einwilligung. Erklärung zu den Anthropic-Vorgaben für Minderjährige steht in `Datenschutz.md`
 
 ## 6. Ersatz für Canva und KI-Selbstporträt — entschieden (24.10.2026)
 
@@ -136,7 +136,7 @@ Freier Ablauf: Die App schlägt die nächste Station vor (Voraussetzungen `brauc
 
 - **Fotos an den Laptop** erst bei „Station beendet“, nur das letzte pro Person, keine verworfenen Versuche
 - **Feedbackbogen** nach Bonus 1 oder über den Laptop-Knopf „für alle freigeben“, jede Person einzeln. **Bonus 2 Lasercut-Porträt** nach Sticker + Feedbackbogen, blau = gravieren, rot = schneiden
-- **Bonus 1 (Sticker)** bleibt bei 8 geschafften Stationen (jetzt 8 von 11)
+- **Bonus 1 (Sticker)** bleibt bei 8 geschafften Stationen (jetzt 8 von 12, seit der Station Berufe)
 - **Nachrichten-Abfrage** einmal pro Minute. **Diktieren** nur als Hinweis auf die Mikrofon-Taste, keine eigene Spracherkennung
 - **Datenschutz:** `Datenschutz.md` im Stil der Stationstexte, Kontakt patricia.ennenbach@bildung.koeln.de, Löschung auf dem Laptop spätestens eine Woche nach dem Workshop
 - **Android-Tablets:** nicht getestet. Wahrscheinlich lauffähig (Tests laufen auch in Chromium), Risiko: QR-Scan öffnet einen anderen Browser mit eigenem Speicher

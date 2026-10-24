@@ -229,3 +229,10 @@ button.stern.an{color:var(--neon);}
 .ki-hilfe { margin: 0 0 12px; }
 .ki-hilfe summary { cursor: pointer; font-weight: 600; }
 .ki-hilfe p { margin: 6px 0; }
+
+/* Station Berufe */
+.berufe-karten{display:grid;gap:14px;}
+.beruf{border:3px solid var(--ink);padding:12px 14px;background:#fff;}
+.beruf h2{margin-top:0;}
+.beruf-station{display:inline-block;background:var(--neon);font-family:var(--head);text-transform:uppercase;font-size:.8rem;letter-spacing:.08em;padding:2px 8px;margin:0 0 6px;}
+.beruf p{margin:6px 0;}

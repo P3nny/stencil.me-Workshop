@@ -46,7 +46,7 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 
 - `index.html`: Startseite der Workshop-App (Anmeldung allein/zu zweit, dann Foto-Station).
 - `app/station.html?id=<station>`: eine Seite für alle Stationen, Inhalte aus `stationen/*.json` (Format: `stationen/README.md`). Gemeinsamer Code in `app/core/`, eigene Stationsteile in `app/stationen/`. Gerätecheck: `app/geraetecheck.html`.
-- Stationen (Stand 24.10.2026): 11 Pflichtstationen (zählen für „x von 11“ und das Puzzle), 2 optionale Claude-Stationen (KI-Selbstporträt, Bild-App vibe coden), 3 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen, Lasercut-Porträt). Reihenfolge über `braucht` und `plaetze`, Überblick und Verlauf in `docs/screens.md`.
+- Stationen (Stand 24.10.2026): 12 Pflichtstationen (zählen für „x von 12“ und das Puzzle), 2 optionale Claude-Stationen (KI-Selbstporträt, Bild-App vibe coden), 3 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen, Lasercut-Porträt). Reihenfolge über `braucht` und `plaetze`, Überblick und Verlauf in `docs/screens.md`.
 - `server/`: Workshop-Server (Python, nur Standardbibliothek; Ausnahme: Anthropic-SDK im venv für die Claude-Stationen, `server/einrichten.sh`). Laptop-Seite `/laptop` (Holzplatte, Stickerfolie mit Plotter, Nachrichten, Freigaben), `/qr`, `/auswertung`.
 - `tests/`: Playwright-Tests (`stationen-test.js` kompletter Durchlauf, `tabs-test.js`, `leistung-test.js`), laufen in WebKit und Chromium.
 - `Datenschutz.md`: kindgerechte Datenschutzinformation (dazu `docs/datenschutz-kurz.md`, `docs/canva-folie-datenschutz.md`).
@@ -167,7 +167,7 @@ Patricia möchte durch die Entwicklung geführt werden. Immer nur den aktuellen 
 - c) **Minimaler Upload**: Server + Startskript mit QR-Code. In der App: „Stempel speichern“, „An Laptop senden“, „Teilen“.
 - d) Testlauf im KOMEZ spätestens eine Woche vorher.
 
-**Stand 24.10.2026:** b) und c) sind erledigt. Die Stationen-App ist bis auf die Punkte unten gebaut: Stationen, Offline-Gerüst, Laptop-Seite mit Platte, Folie, Plotter, Nachrichten, Feedback, Auswertung, Claude-Stationen, Texte geprüft, `Datenschutz.md`. **Offen:** Station Berufe, Kunst-Quiz mit Bildern (nur über den Laptop), Test vor Ort am 02.11.2026. Das große Aufräumen von `stencil.html` (Roadmap 1) ist zurückgestellt. Jetzt wird die Stationen-App **Screen für Screen** gebaut, nach Patricias Beschreibung in `docs/screens.md`. Nicht auf Tests warten. Gesamttest vor Ort am **02.11.2026**. Funktionen aus `index.html` wandern erst dann in Stationen bzw. `app/core/`, wenn ein Screen sie braucht.
+**Stand 24.10.2026:** b) und c) sind erledigt. Die Stationen-App ist bis auf die Punkte unten gebaut: Stationen, Offline-Gerüst, Laptop-Seite mit Platte, Folie, Plotter, Nachrichten, Feedback, Auswertung, Claude-Stationen, Texte geprüft, `Datenschutz.md`. **Offen:** Kunst-Quiz mit Bildern (nur über den Laptop), Test vor Ort am 02.11.2026. Das große Aufräumen von `stencil.html` (Roadmap 1) ist zurückgestellt. Jetzt wird die Stationen-App **Screen für Screen** gebaut, nach Patricias Beschreibung in `docs/screens.md`. Nicht auf Tests warten. Gesamttest vor Ort am **02.11.2026**. Funktionen aus `index.html` wandern erst dann in Stationen bzw. `app/core/`, wenn ein Screen sie braucht.
 
 0. **Infrastruktur klären**: erledigt, siehe `docs/entscheidungen.md`.
 1. **`index.html` reviewen, aufräumen, aufteilen** (siehe Ziel ganz oben): Funktionsliste mit Empfehlung, Freigabe, dann in Stationen `lasercut-stempel`, `lasercut-portraet`, `schneideplotter` plus gemeinsamem Kern zerlegen.

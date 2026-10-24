@@ -50,6 +50,7 @@ Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Fo
 | Mit der Hand drucken (2 Stationen) | –                                                | Fotos eurer Postkarten                                    | –                                             |
 | Code-Quiz                          | –                                                | Wie viele Antworten richtig waren                         | –                                             |
 | Kunst-Quiz                         | –                                                | Quiz-Ergebnis, Foto eures Lieblingswerks, euer Satz       | –                                             |
+| Berufe                             | –                                                | Euer Wunschberuf                                          | –                                             |
 | Bonus: Sticker                     | –                                                | Dein Sticker und dein Name                                | –                                             |
 | Feedback                           | –                                                | Dein Feedback mit deinem Vornamen                         | –                                             |
 | Bonus 2: Lasercut-Porträt          | –                                                | Dein Porträt und dein Name                                | –                                             |

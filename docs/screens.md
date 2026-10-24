@@ -24,7 +24,7 @@ Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Cl
 - Fest: Check-in → Foto → stencil.me → Laser.
 - 26 Jugendliche gleichzeitig am Laser sind zu viel. Sie sollen nacheinander ankommen. Auch andere Stationen bauen aufeinander auf.
 - **Gebaut:** Jede Station hat in den Daten `braucht: [...]` (Voraussetzungen) und `plaetze` (wie viele Paare gleichzeitig). Die App schlägt nur Stationen vor, deren Voraussetzungen erfüllt sind und die noch Platz haben. Optionale Stationen nur, wenn keine andere frei ist.
-- **Zählung (Stand 24.10. spät):** 11 Pflichtstationen für „x von 11“ und das Puzzle. Dazu 2 optionale Stationen (Claude: KI-Selbstporträt, vibe coding) und 3 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen, Lasercut-Porträt), die nicht mitzählen.
+- **Zählung (Stand 24.10. spät):** 12 Pflichtstationen für „x von 12“ und das Puzzle (seit Station Berufe). Dazu 2 optionale Stationen (Claude: KI-Selbstporträt, vibe coding) und 3 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen, Lasercut-Porträt), die nicht mitzählen.
 
 ## Gerüst (gebaut, Branch `feature/geruest`)
 
@@ -229,7 +229,12 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - **USB-Stick:** Steckt einer unter `/media/<user>/`, zeigt die Laptop-Seite „Auf USB-Stick kopieren“. *Mit echtem Stick noch nicht getestet*
 - **Meine Daten** (`app/meine-daten.html`, Link auf der Startseite): was auf dem iPad liegt (auch verworfene Fotos) und was auf dem Laptop liegt (Bilder, Antworten, KI-Frage, Sterne, Feedback). Der Laptop gibt nur die Daten der eigenen Gruppen-ID heraus
 
+## Station Berufe (24.10. spät, Branch `feature/berufe`)
+
+- `berufe`: Pflichtstation nach dem Foto, drei Berufsbilder aus `04_stencil.me-Berufe.pdf` gekürzt (Mediengestalter:in/Fotograf:in, Fachinformatiker:in, Verfahrensmechaniker:in/Modellbauer:in), je mit Bezug zur Station. Bilder nur als Icon, weil die Fotos im PDF von Canva sind
+- Drei Fragen „Wer macht was?“ (abgehakt, wenn alle richtig), dann Pflichtfeld „Welchen Beruf wünscht ihr euch?“. Der Wunschberuf geht an den Laptop, nicht in die Mappe
+- *Soll sie optional sein: `"optional": true` in `stationen/berufe.json`*
+
 ## Noch offen
 
-- Station Berufe: 3 Berufsbilder aus `04_stencil.me-Berufe.pdf`, Quizfrage, „Welchen Beruf wünschst du dir?“
 - Kunst-Quiz mit Bildern aus `03_stencil.me-Künstlerinnen_A4.pdf`, nur über den Laptop ausgeliefert, nicht im Repo
