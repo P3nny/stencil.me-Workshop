@@ -1,0 +1,57 @@
+# Screens der Workshop-App
+
+Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Claude ergänzt Hinweise (*kursiv*) und baut nach Freigabe. Ein Screen pro Branch. Ziel: Test vor Ort am **02.11.2026**.
+
+## Grundprinzip
+
+- Patricia gibt zu Beginn auf der Laptop-Seite die Anzahl der Schüler:innen ein. Anzahl und Reihenfolge der Stationen kommen aus den Daten in `stationen/`.
+- Fortschritt: „x von y Stationen“. Oben setzt sich pro abgeschlossener Station ein Puzzleteil des stencil.me-Porträts zusammen, bei Paaren zwei Porträts.
+- Ablauf jeder Station: QR-Code scannen (Check-in) → Station bearbeiten → **Input** (Bild-Upload, Text oder Quiz) → „Station beendet“ → „Wie hat dir die Station gefallen?“
+- Check-in und „beendet“ gehen an den Laptop. Er weiß so, welche Stationen besetzt sind.
+- Das Paar behält sein iPad für alle Stationen. Alles wird zuerst auf dem iPad gespeichert (IndexedDB).
+
+## Reihenfolge der Stationen
+
+- Fest: Check-in → Foto → stencil.me → Laser.
+- **Offen:** 26 Jugendliche gleichzeitig am Laser sind zu viel. Sie sollen nacheinander ankommen. Auch andere Stationen bauen aufeinander auf.
+- *Vorschlag:* Jede Station bekommt in den Daten `braucht: [...]` (Voraussetzungen) und `plaetze` (wie viele Paare gleichzeitig). Die App weist nur Stationen zu, deren Voraussetzungen erfüllt sind und die noch Platz haben.
+
+## Screen 1: Check-in (Startseite)
+
+- Startseite wie `stencilme.netlify.app`, Knopf „Los geht's“
+- Allein oder zu zweit? Namen oder Nicknames eingeben
+- Weiter geht es immer mit dem Foto: „Macht nacheinander ein Foto von euch“ (allein: „Mach ein Foto von dir“)
+
+## Screen 2: Foto machen
+
+- Jede Person macht ein Foto (vor Packpapier, Ringlicht)
+- Tipps: Kopf- oder Schulterporträt, Hintergrund nur Packpapier. Überlegt euch einen Ausdruck und eine Pose: Was soll euer Porträt sagen?
+- Die App zeigt ein Porträt pro Person
+- Input: Selbstporträt ist aufgenommen und gespeichert
+- Das Rohfoto **bleibt auf dem iPad**
+
+## Screen 3: Bild bearbeiten (stencil.me)
+
+- Nimmt die Fotos aus Screen 2 und die Namen aus Screen 1
+- Jeder Schritt ist sichtbar: Rohbild → Schwarz-Weiß → BodyPix → Otsu → Stempel
+- Frage: „Was bedeuten die Farben?“ (Texteingabe)
+- Input: Der fertige Stempel geht an den Laptop
+- *Die Bildverarbeitung kommt nach `app/core/`. Die vorhandene Outbox aus `index.html` wird wiederverwendet.*
+
+## Screen 4: Lasercutter
+
+- „Geht zu Penny am Lasercutter“. Zusehen beim Positionieren, den Laser anschauen, Erklärvideo (Link)
+- Eingabe: eine Frage an die Person am Laser, dazu die Antwort
+- Input: Foto vom Lasercutter
+- Für Penny: Die Laptop-Seite ordnet die Stempel auf einer A4-SVG an. Ist die Platte voll, wird sie heruntergeladen und in der Mr-Beam-Oberfläche geöffnet. Einzelne Stempel gehen weiterhin.
+
+## Screen 5: Greenscreen
+
+- Das Rohfoto wird auf dem iPad freigestellt (BodyPix)
+- Die Jugendlichen wählen einen Hintergrund aus festen, gemeinfreien Bildern
+- Canva fällt weg, dafür gibt es eine eigene Seite (HTML, CSS, JavaScript)
+- *Offen: Input = Bild mit Hintergrund. Nur auf dem iPad speichern oder an den Laptop senden?*
+
+## Weitere Screens
+
+- *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …

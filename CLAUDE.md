@@ -158,6 +158,8 @@ Patricia möchte durch die Entwicklung geführt werden. Immer nur den aktuellen 
 - c) **Minimaler Upload**: Server + Startskript mit QR-Code. In der App: „Stempel speichern“, „An Laptop senden“, „Teilen“.
 - d) Testlauf im KOMEZ spätestens eine Woche vorher.
 
+**Stand 24.10.2026:** b) und c) sind erledigt. Jetzt wird die Stationen-App **Screen für Screen** gebaut, nach Patricias Beschreibung in `docs/screens.md`. Nicht auf Tests warten. Gesamttest vor Ort am **02.11.2026**. Funktionen aus `index.html` wandern erst dann in Stationen bzw. `app/core/`, wenn ein Screen sie braucht.
+
 0. **Infrastruktur klären**: erledigt, siehe `docs/entscheidungen.md`.
 1. **`index.html` reviewen, aufräumen, aufteilen** (siehe Ziel ganz oben): Funktionsliste mit Empfehlung, Freigabe, dann in Stationen `lasercut-stempel`, `lasercut-portraet`, `schneideplotter` plus gemeinsamem Kern zerlegen.
 2. **Stabilität auf alten iPads**: Bibliotheken lokal einbinden, Crash bei leerer Maske beheben, Bildgröße begrenzen, Test auf echten Geräten (Safari, danach Chrome als Fallback), Optimierungen aus `archiv/fotobox-karte` prüfen.

@@ -10,6 +10,13 @@ Sammlung, kein fertiger Text. Wird in einem eigenen Schritt zu einer kindgerecht
 - **Stempel-Warteschlange:** Jeder abgeschickte Stempel (SVG + Vorname/Kürzel) liegt im Browser-Speicher des iPads (IndexedDB `stencilme`). **Er bleibt dort auch nach dem Workshop.** Löschen ist noch offen (Roadmap Schritt 8).
 - **Testseite `docs/ipad-test.html`:** speichert nur einen Zeitstempel (IndexedDB `ipad-test`).
 
+## Stationen-App (geplant, Stand 24.10.2026, siehe `docs/screens.md`)
+
+- **Rohfoto** aus der Foto-Station bleibt auf dem iPad (IndexedDB). Es wird für stencil.me, Greenscreen und das Puzzle wiederverwendet, aber nicht gesendet.
+- **An den Laptop sollen gehen:** Check-in und „Station beendet“ (Name/Kürzel, Station, Uhrzeit), Textantworten, Bewertung (Sterne), Input-Fotos der Stationen (z. B. Foto vom Lasercutter).
+  → Input-Fotos können Kinder zeigen (z. B. am Laser). Hinweis in der App: „Fotografiere die Maschine, nicht die Leute“?
+- **Greenscreen:** Freistellen auf dem iPad. Ob das fertige Bild an den Laptop geht, ist offen.
+
 ## Was an den Laptop geht (Plan A)
 
 - **Stempel-Datei (SVG)** und **Vorname oder Kürzel**, mehr nicht. Kein Foto.

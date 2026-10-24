@@ -23,7 +23,7 @@ Wir bauen mit diesen Annahmen weiter. Stellt sich eine als falsch heraus, greift
 | iPads sind älter, wenig Arbeitsspeicher (2–3 GB) | Abstürze bei der Bildverarbeitung im letzten Workshop | — darum: Bilder klein rechnen, Fehler abfangen |
 | iPadOS-Version unbekannt | — | vorsichtige Syntax (kein `?.`, `??`), keine neuen Web-APIs voraussetzen |
 | „Zum Home-Bildschirm“ evtl. gesperrt | MDM unbekannt | App muss auch im normalen Safari-Tab laufen |
-| Mr Beam ist vom Laptop im KOMEZ-WLAN erreichbar | noch nicht geprüft, beim nächsten Besuch testen | USB-Stick, später lasern |
+| Mr Beam ist vom Ubuntu-Laptop erreichbar | laut Patricia möglich, Test am 02.11. | Pairdrop vom Laptop an das KOMEZ-MacBook am Mr Beam |
 
 Tests laufen mit Patricias Ubuntu-Laptop und ihrem eigenen iPad. Das ist eine Annäherung: Die KOMEZ-iPads können älter und langsamer sein.
 
@@ -69,7 +69,7 @@ Umschalten zwischen den Plänen heißt: einen anderen QR-Code zeigen. Was bei Pr
 - Eigener Router ohne Internet
 - HTTPS mit `workshop.datenhandlung.de` (Anleitung: [https-einrichten.md](https-einrichten.md))
 - Laser-Queue mit automatischem Anordnen
-- Großes Aufteilen von `index.html`, Stationen-App, Anmeldung, Outbox
+- Großes Aufteilen von `index.html` (stattdessen: Funktionen wandern in Stationen, sobald ein Screen sie braucht)
 
 ### Warum zurückgestellt: Risiken des Router-/HTTPS-Aufbaus
 
@@ -86,10 +86,19 @@ Umschalten zwischen den Plänen heißt: einen anderen QR-Code zeigen. Was bei Pr
 
 ## Reihenfolge bis zum nächsten Workshop (< 4 Wochen)
 
-1. Frage ans KOMEZ schicken, 30-Minuten-Test vor Ort vereinbaren ([fragen-medienzentrum.md](fragen-medienzentrum.md)).
-2. Stabilität in `index.html`: Bibliotheken lokal, Bilder auf 1024 px verkleinern, leere Maske abfangen.
-3. Minimaler Upload: Server, Startskript mit QR-Code. In der App: „Stempel speichern“, „An Laptop senden“, „Teilen“.
-4. Testlauf im KOMEZ spätestens eine Woche vorher.
+1. ~~Frage ans KOMEZ schicken~~, Test vor Ort am **02.11.2026** ([fragen-medienzentrum.md](fragen-medienzentrum.md)).
+2. ~~Stabilität in `index.html`~~ (erledigt)
+3. ~~Minimaler Upload~~ (erledigt, auf eigenem iPad getestet)
+4. **Neu (24.10.):** Nicht auf Tests warten, sondern die Stationen-App Screen für Screen bauen ([screens.md](screens.md)). Am 02.11. wird alles zusammen vor Ort getestet.
+
+## Entscheidungen vom 24.10.2026 (Stationen-App)
+
+- **Ablauf:** Check-in, danach immer zuerst das Foto, dann stencil.me, dann Laser. Wie es danach weitergeht, ist noch offen (siehe [screens.md](screens.md)).
+- **Rohfoto bleibt auf dem iPad** (IndexedDB). Das Paar behält sein iPad für alle Stationen.
+- **Laser:** Der Laptop ordnet die Stempel auf einer A4-SVG an, Patricia lädt sie in die Mr-Beam-Oberfläche. Einzelne Stempel bleiben möglich. Keine Mr-Beam-Schnittstelle.
+- **Anzahl Schüler:innen** gibt Patricia auf der Laptop-Seite ein.
+- **Canva fällt weg**, die Greenscreen-Station wird eine eigene Seite mit festen, gemeinfreien Hintergründen.
+- **Test am Rechner** mit Playwright-WebKit (dieselbe Engine wie Safari). Kamera, Speicher und Tempo alter iPads prüft nur das echte iPad.
 
 ---
 
