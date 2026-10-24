@@ -85,7 +85,11 @@ async function abschliessen(page, sterne){
   pruefe(await beenden.isDisabled(), 'nach einem Foto noch gesperrt');
   await inputs.nth(1).setInputFiles(FOTO);
   await page.locator('.foto-vorschau').nth(1).waitFor({ state: 'visible' });
-  pruefe(await beenden.isEnabled(), 'nach zwei Fotos frei');
+  // WebKit gibt den Knopf ein paar Millisekunden nach der Vorschau frei
+  pruefe(await page.waitForFunction(() => {
+    const b = Array.prototype.filter.call(document.querySelectorAll('button'), x => x.textContent === 'Station beendet')[0];
+    return b && !b.disabled;
+  }, null, { timeout: 3000 }).then(() => true, () => false), 'nach zwei Fotos frei');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-1-foto.png'), fullPage: true });
   await page.click('button:has-text("Station beendet")');
   pruefe(await page.locator('button:has-text("Fertig")').isDisabled(), '„Fertig“ gesperrt ohne Antworten');
