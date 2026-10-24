@@ -5,7 +5,7 @@
 // und melden sich mit Rahmen.eigeneArt() an.
 (function(){
   const TYP_TEXT = { programm: 'Computerprogramm', ki: 'KI (Bildbearbeitung)', generativ: 'Generative KI', analog: 'Ohne Computer' };
-  const DATENWEG_TEXT = { ipad: 'Bleibt auf dem iPad', laptop: 'Geht an den Laptop', online: 'Geht an einen Online-Dienst' };
+  const DATENWEG_TEXT = { ipad: 'Bleibt auf dem iPad', laptop: 'Geht an den Laptop', 'laptop-video': 'Geht an den Laptop · Video: YouTube', online: 'Geht an einen Online-Dienst' };
   const KI_ANTWORTEN = [
     { wert: 'generativ', text: 'Generative KI' },
     { wert: 'ki', text: 'Bildbearbeitungs-KI' },

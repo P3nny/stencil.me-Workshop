@@ -146,6 +146,7 @@
       galerieZeigen();
       return el('div', { klasse: 'ki-station' }, [
         el('h2', { text: 'Euer Prompt' }),
+        el('p', { klasse: 'hinweis', text: 'Wählt aus den Bausteinen. Das Bild malt eine KI (Claude), kein Mensch.' }),
         promptBox,
         baukasten,
         erzeugenKnopf, status, rest,
