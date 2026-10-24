@@ -111,7 +111,7 @@ Aktueller Plan: ZIP auf USB-Stick an die Lehrkraft.
 
 - Für das KI-Selbstporträt: **Claude-API mit eigenem Schlüssel**, nicht das Pro-Abo. Laut Anthropic dürfen Anfragen für andere Nutzer:innen nicht über Pro/Max-Zugänge laufen, Pro-Kontingente gelten für „ordinary, individual usage“ (code.claude.com/docs/en/legal-and-compliance)
 - Schlüssel nur auf dem Laptop (`~/.config/stencilme/anthropic-key`, nicht im Repo), Guthaben vorab ohne automatisches Nachladen, Ausgabenlimit im Workspace `stencilme-workshop`, zusätzlich Grenzen im Server (6 pro Gruppe, 150 pro Tag)
-- Modell: Claude Haiku 5.5 (Test 24.10.: ca. 0,2 Cent und 15 s pro Bild, Ergebnis reicht). Umstellbar
+- Modell: **Claude Sonnet 5.5** (Vergleich 24.10. mit demselben Prompt: Haiku 17 s / 0,2 Cent, sehr grob; Sonnet 52 s / 7 Cent, deutlich besser; Opus 71 s / 15 Cent, kaum besser als Sonnet). Ca. 2–6 € pro Workshop. Mit Rückfall-Modell bei Ablehnung (`fallbacks: "default"`). Umstellbar mit `STENCILME_KI_MODELL`
 - Die Code-Erklär-Station mit Claude ist weiter offen
 
 ## 6. Ersatz für Canva und KI-Selbstporträt — entschieden (24.10.2026)
@@ -120,6 +120,14 @@ Aktueller Plan: ZIP auf USB-Stick an die Lehrkraft.
 - KI-Selbstporträt: Claude zeichnet SVG aus einem Prompt-Baukasten (Screen 9). Kein Foto der Kinder, kein freier Text, nur die ausgewählten Merkmale gehen an Anthropic
 
 ## 7. Erklärer-/Macher-Rotation oder freier Ablauf — offen
+
+## 8. Entscheidungen vom 24.10.2026, abends
+
+- **Sticker:** Cameo 4 mit Stift + Messer wie `archiv/00_fotobox-karte/fotobox-queue.py` (Stift zeichnet Schraffur auf weiße Folie, Messer schneidet außen)
+- **Kunst-Quiz-Bilder:** urheberrechtlich geschützt, darum **nur über den Laptop** ausliefern (nicht im Repo, nicht auf GitHub/Netlify)
+- **Daten an die Kinder:** ZIP pro Paar auf USB-Stick an die Lehrkraft, Verteilung über die Schulplattform. Am Ende sieht jedes Paar auf dem iPad, was auf dem Laptop gespeichert war
+- **Alle Fotos an den Laptop**, auch das Ausgangsfoto, damit die Dokumentation lückenlos ist (muss in `Datenschutz.md`)
+- Reihenfolge der nächsten Schritte: Abschluss jeder Station → alle Fotos → Nachrichten an Gruppen → Sticker-Folie + Plotter → Bonus 2 Positiv → ZIP + „Meine Daten“ → Berufe → Kunst-Quiz-Bilder
 
 ---
 

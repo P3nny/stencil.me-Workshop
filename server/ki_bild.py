@@ -19,7 +19,7 @@ import threading
 
 STATION_DATEI = pathlib.Path(__file__).resolve().parents[1] / "stationen" / "ki-selbstportraet.json"
 SCHLUESSEL_DATEI = pathlib.Path.home() / ".config" / "stencilme" / "anthropic-key"
-MODELL = os.environ.get("STENCILME_KI_MODELL", "claude-haiku-5-5")
+MODELL = os.environ.get("STENCILME_KI_MODELL", "claude-sonnet-5-5")  # Patricia, 24.10.2026: Sonnet statt Haiku
 # US-Dollar pro 1 Mio. Token (Eingabe, Ausgabe), Stand Oktober 2026, nur für die Anzeige am Laptop
 PREISE = {
     "claude-haiku-5-5": (0.10, 0.50),
@@ -28,7 +28,7 @@ PREISE = {
 }
 PRO_TAG = int(os.environ.get("STENCILME_KI_PRO_TAG", "150"))  # Obergrenze für alle Gruppen zusammen
 TEST = os.environ.get("STENCILME_KI_TEST") == "1"
-TIMEOUT_S = 90
+TIMEOUT_S = 150  # Sonnet braucht ca. 50 s pro Bild
 
 SYSTEM = (
     "Du bist eine Illustratorin für einen Kunst-Workshop mit Jugendlichen. "
@@ -109,9 +109,10 @@ def svg_reinigen(text):
 
 
 def erzeugen(prompt):
-    """Ruft Claude auf. Rückgabe: (svg, eingabe_token, ausgabe_token)."""
+    """Ruft Claude auf. Rückgabe: (svg, eingabe_token, ausgabe_token, modell). Das Modell
+    kann bei einer Ablehnung ein anderes sein als MODELL (Rückfall der API)."""
     if TEST:
-        return TEST_SVG, 0, 0
+        return TEST_SVG, 0, 0, "Test"
     try:
         import anthropic
     except ImportError:
@@ -120,12 +121,16 @@ def erzeugen(prompt):
     if not key:
         raise KiFehler("Die KI ist auf dem Laptop nicht eingerichtet.", 503)
     client = anthropic.Anthropic(api_key=key, timeout=TIMEOUT_S, max_retries=1)
+    # Lehnt das Modell eine Anfrage ab, springt die API auf ein passendes anderes Modell
+    # (nur Sonnet/Opus, nur Claude API). Haiku kennt das nicht.
+    rueckfall = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"} if MODELL in ("claude-sonnet-5-5", "claude-opus-5-5") else {}
     try:
-        antwort = client.messages.create(
+        antwort = client.beta.messages.create(
             model=MODELL,
             max_tokens=16000,
             system=SYSTEM,
             messages=[{"role": "user", "content": prompt}],
+            **rueckfall,
         )
     except anthropic.RateLimitError:
         raise KiFehler("Gerade wollen sehr viele gleichzeitig ein Bild. Bitte in einer Minute nochmal.", 429)
@@ -138,7 +143,7 @@ def erzeugen(prompt):
     if antwort.stop_reason == "refusal":
         raise KiFehler("Die KI wollte dieses Bild nicht zeichnen. Probiert andere Bausteine.", 422)
     text = "".join(b.text for b in antwort.content if b.type == "text")
-    return svg_reinigen(text), antwort.usage.input_tokens, antwort.usage.output_tokens
+    return svg_reinigen(text), antwort.usage.input_tokens, antwort.usage.output_tokens, antwort.model
 
 
 def kosten_usd(modell, ein, aus):
@@ -184,17 +189,17 @@ def bild_fuer_gruppe(gruppe_dir, protokoll_datei, auswahl, gruppe):
             raise KiFehler("Ihr habt schon %d Bilder erzeugt, mehr geht nicht. Super!" % bisher, 429)
         if status(protokoll_datei)["bilderHeute"] >= PRO_TAG:
             raise KiFehler("Für heute sind alle KI-Bilder aufgebraucht. Sagt Penny Bescheid.", 429)
-    svg, ein, aus = erzeugen(prompt)
+    svg, ein, aus, modell = erzeugen(prompt)
     jetzt = datetime.datetime.now()
     os.makedirs(dateien_dir, exist_ok=True)
     name = "ki-selbstportraet_%s.svg" % jetzt.strftime("%H%M%S%f")
     with open(os.path.join(dateien_dir, name), "w", encoding="utf-8") as fh:
         fh.write(svg)
-    kosten = kosten_usd(MODELL, ein, aus)
+    kosten = kosten_usd(modell, ein, aus)
     with _sperre:
         with open(protokoll_datei, "a", encoding="utf-8") as fh:
             fh.write(json.dumps({"zeit": jetzt.isoformat(timespec="seconds"), "gruppe": gruppe, "prompt": prompt,
-                                 "modell": MODELL, "eingabe": ein, "ausgabe": aus, "kostenUsd": round(kosten, 5)},
+                                 "modell": modell, "eingabe": ein, "ausgabe": aus, "kostenUsd": round(kosten, 5)},
                                 ensure_ascii=False) + "\n")
     print("KI-Bild für %s: %d + %d Token, ca. %.4f $" % (gruppe, ein, aus, kosten))
     return {"ok": True, "svg": svg, "prompt": prompt, "nr": bisher + 1, "rest": ki["proGruppe"] - bisher - 1}

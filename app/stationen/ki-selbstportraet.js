@@ -5,7 +5,7 @@
 // Ohne Laptop oder Internet zeigt die Station vorher erzeugte Beispiele.
 (function(){
   const BEREIT_TIMEOUT_MS = 4000;
-  const ERZEUGEN_TIMEOUT_MS = 100000;
+  const ERZEUGEN_TIMEOUT_MS = 170000; // Sonnet braucht ca. 50 s, im Workshop evtl. mehr
 
   // Gleiche Regeln wie prompt_bauen() in server/ki_bild.py
   function satz(ki, auswahl){
@@ -100,7 +100,7 @@
         erzeugenKnopf.disabled = true;
         const start = Date.now();
         const uhr = setInterval(() => {
-          status.textContent = 'Die KI zeichnet … ' + Math.round((Date.now() - start) / 1000) + ' Sekunden (meist etwa 15)';
+          status.textContent = 'Die KI zeichnet … ' + Math.round((Date.now() - start) / 1000) + ' Sekunden (meist knapp eine Minute). Schaut euch solange die Bausteine an: Was würdet ihr als Nächstes ändern?';
         }, 1000);
         status.textContent = 'Die KI zeichnet …';
         mitZeitlimit(fetch('/api/ki-bild', {
