@@ -225,3 +225,7 @@ button.stern.an{color:var(--neon);}
 .fehler{position:fixed;left:16px;right:16px;bottom:16px;background:var(--neon);border:3px solid var(--ink);padding:12px;font-weight:700;z-index:10;}
 .test-leiste{position:fixed;right:8px;top:8px;background:#ffe;border:2px dashed var(--ink);padding:4px 8px;font-size:.8rem;z-index:5;}
 .test-leiste button{font-size:.7rem;padding:4px 8px;margin:0;}
+
+.ki-hilfe { margin: 0 0 12px; }
+.ki-hilfe summary { cursor: pointer; font-weight: 600; }
+.ki-hilfe p { margin: 6px 0; }

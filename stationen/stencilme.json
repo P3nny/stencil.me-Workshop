@@ -5,7 +5,7 @@
   "datenweg": "laptop",
   "schritte": [
     "Die App nimmt dein Foto von der Foto-Station.",
-    "Schau zu: Schwarz-Weiß, die KI findet dich, Otsu macht daraus Schwarz und Weiß.",
+    "Schau zu: Das Foto wird grau, die KI findet dich, ein Programm (Otsu) macht daraus reines Schwarz und Weiß.",
     "Prüf den roten Rand: Er muss in einem Stück um alles herumlaufen.",
     "Schick deinen Stempel an den Laptop.",
     "Beantworte die Frage zu den Farben."

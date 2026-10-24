@@ -5,8 +5,8 @@
   "datenweg": "online",
   "schritte": [
     "Ihr erzeugt mit einer generativen KI eigene Selbstporträts im Stil berühmter Künstler:innen.",
-    "Baut euren Prompt aus den Bausteinen zusammen. Oben seht ihr den fertigen Satz.",
-    "Tippt auf „Bild erzeugen“. Die KI (Claude) zeichnet das Bild als SVG-Code. Das dauert knapp eine Minute.",
+    "Baut euren Prompt (so heißt der Auftrag an die KI) aus den Bausteinen zusammen. Oben seht ihr den fertigen Satz.",
+    "Tippt auf „Bild erzeugen“. Die KI (Claude) zeichnet das Bild als SVG-Code, also als Vektorgrafik aus Text. Das dauert knapp eine Minute.",
     "Erzeugt mindestens 2 Bilder. Probiert dabei ruhig einen anderen Kunststil.",
     "Schickt denselben Prompt ruhig zweimal ab: Kommt dasselbe Bild heraus?"
   ],

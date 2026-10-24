@@ -4,7 +4,7 @@
   "typ": "generativ",
   "datenweg": "online",
   "schritte": [
-    "Ihr erlebt, wie eine KI (Claude) auf Zuruf eine kleine Web-App programmiert, so wie stencil.me selbst entstanden ist.",
+    "Vibe coding heißt: Ihr sagt einer KI (Claude), was eine App können soll, und sie schreibt den Code. So ist auch stencil.me entstanden.",
     "Füllt den Auftrag aus: Welchen Effekt soll eure App haben?",
     "Tippt auf „App bauen lassen“ und schaut zu, wie der Code entsteht (etwa eine Minute).",
     "Testet eure App mit eurem Foto.",
@@ -121,7 +121,7 @@
   "eingaben": [
     {
       "id": "vergleich",
-      "text": "Welche Schritte aus der stencil.me-Pipeline findet ihr in eurer neuen App wieder?",
+      "text": "Welche Schritte aus stencil.me (Foto, Schwarz-Weiß, Person erkennen, Stempel) findet ihr in eurer neuen App wieder?",
       "pflicht": false,
       "aufloesung": "Foto laden (wie in der Foto-Station) und die Farbe jedes Pixels verändern (wie Schwarz-Weiß in „Bild bearbeiten“). Was fehlt: die KI, die die Person erkennt, und der SVG-Export für den Laser."
     },

@@ -125,6 +125,8 @@ async function abschliessen(page, sterne){
   await page.click('button.wahl:has-text("Keine KI")');
   pruefe(await page.locator('.aufloesung .etikett').count() === 1, 'Auflösung erscheint nach der Antwort');
   await page.locator('button.stern').nth(3).click();
+  await page.click('.ki-hilfe summary');
+  pruefe(await page.locator('.ki-hilfe p').first().isVisible(), 'Erklärung Programm / KI / generativ klappt auf');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-2-abschluss.png'), fullPage: true });
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
