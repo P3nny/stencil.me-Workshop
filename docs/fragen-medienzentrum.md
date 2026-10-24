@@ -28,6 +28,7 @@
 
 ## Internet und Datenschutz
 
+- [ ] Ist das WLAN mit Passwort verschlüsselt (WPA2/WPA3), oder ist es offen? Wer ist am Workshop-Tag sonst noch im selben WLAN (Gäste, andere Kurse)? Die iPads schicken Fotos unverschlüsselt (HTTP) an den Laptop.
 - [ ] Darf der Laptop im KOMEZ-WLAN ins Internet (`api.anthropic.com`, für die zwei optionalen Claude-Stationen)?
 - [ ] Wer holt die Einwilligungen der Erziehungsberechtigten ein (KOMEZ, Schule oder Patricia)? `Datenschutz.md` liegt bei.
 
