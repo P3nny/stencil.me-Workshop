@@ -11,6 +11,7 @@
 - [ ] „Foto aufnehmen“ testen, Seite einmal neu laden, „Ergebnis kopieren“
 - [ ] Ergebnis ins Testprotokoll in [entscheidungen.md](entscheidungen.md) eintragen
 - [ ] Mr-Beam-Oberfläche vom Laptop aus öffnen
+- [ ] IP-Adresse des Laptops notieren und beim nächsten Besuch vergleichen: Bleibt sie gleich, können die QR-Karten laminiert werden
 
 Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testseite auf dem iPad funktioniert, aber nicht, ob das KOMEZ-WLAN mitspielt.
 

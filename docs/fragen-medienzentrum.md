@@ -4,6 +4,7 @@
 
 - [ ] Können sich Geräte im WLAN gegenseitig erreichen? Darf also ein iPad eine Seite auf meinem Laptop im selben WLAN öffnen (keine „Client-Isolation“)?
 - [ ] Darf mein Laptop am Workshop-Tag wieder ins WLAN?
+- [ ] Kann mein Laptop im WLAN eine **feste IP-Adresse** bekommen (DHCP-Reservierung für die MAC-Adresse)? Dann kann ich die QR-Codes für die Stationen einmal drucken und laminieren.
 - [ ] Können wir vor dem Workshop 30 Minuten vor Ort testen, mit 2 iPads? Termin: __________
 
 ## iPads
