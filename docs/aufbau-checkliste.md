@@ -19,6 +19,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Laptop voll geladen, Netzteil eingepackt
 - [ ] Netlify-Version ist aktuell (Plan B)
 - [ ] [notfallkarte.md](notfallkarte.md) ausgedruckt, laminierte Karten dabei (Plan C)
+- [ ] QR-Codes für die Stationen: Server starten, `http://localhost:8000/qr` öffnen, Adresse wählen, drucken. Nur gültig für diese Adresse: Bekommt der Laptop im KOMEZ eine andere IP, dort neu drucken (oder Netlify-Version für Plan B mitnehmen)
 - [ ] USB-Stick dabei
 
 ## 3. Aufbau im Raum

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stencil.me QR-Codes</title>
+<link href="/vendor/fonts/fonts.css" rel="stylesheet">
+<script src="/vendor/qrcode/qrcode.js"></script>
+<style>
+  :root { --ink:#111; --paper:#fff; --neon:#ff2d95; --kraft:#b89b74; --muted:#4a4a4a; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:'DM Sans',-apple-system,sans-serif; }
+  h1 { font-family:'Oswald','Arial Narrow',sans-serif; text-transform:uppercase; letter-spacing:.06em; font-size:2rem; border-bottom:4px solid var(--ink); padding-bottom:12px; margin:0 0 20px; }
+  .steuerung { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:24px; }
+  select, button { font-family:'Oswald',sans-serif; font-size:1rem; border:3px solid var(--ink); background:#fff; padding:8px 12px; }
+  button { text-transform:uppercase; letter-spacing:.1em; cursor:pointer; background:var(--ink); color:#fff; }
+  button:hover { background:var(--neon); color:var(--ink); }
+  .hinweis { color:var(--muted); font-size:.9rem; }
+  .karten { display:flex; flex-wrap:wrap; gap:20px; }
+  .karte { width:90mm; border:3px solid var(--ink); padding:6mm; text-align:center; break-inside:avoid; page-break-inside:avoid; }
+  .karte.start { border-color:var(--neon); border-width:5px; }
+  .nr { font-family:'Oswald',sans-serif; color:var(--neon); letter-spacing:.2em; text-transform:uppercase; font-size:.9rem; }
+  .titel { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.05em; font-size:1.6rem; margin:2mm 0 3mm; line-height:1.1; }
+  .etiketten { display:flex; justify-content:center; flex-wrap:wrap; gap:2mm; margin-bottom:3mm; }
+  .etikett { font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:.7rem; letter-spacing:.08em; border:2px solid var(--ink); padding:1mm 2mm; }
+  .qr svg { width:60mm; height:60mm; }
+  .url { font-family:'Courier Prime',monospace; font-size:.7rem; word-break:break-all; margin-top:2mm; }
+  .scan { font-size:.85rem; margin-top:2mm; }
+  .fehler { background:var(--neon); border:2px solid var(--ink); padding:10px; font-weight:700; }
+  @media print {
+    body { padding:0; }
+    h1, .steuerung, .hinweis.bildschirm { display:none; }
+    .karten { gap:6mm; }
+  }
+</style>
+</head>
+<body>
+<h1>QR-Codes für die Stationen</h1>
+<div class="steuerung">
+  <label for="adresse">Adresse:</label>
+  <select id="adresse"></select>
+  <button type="button" onclick="window.print()">Drucken</button>
+  <a href="/laptop">← zurück zur Laptop-Seite</a>
+</div>
+<p class="hinweis bildschirm">Die Karte „Start“ kommt in die Präsentation, die anderen an die Stationen. Wechselt die Adresse (anderes WLAN, Plan B), neu drucken: Die Codes gelten nur für die gewählte Adresse.</p>
+<div id="fehler"></div>
+<div class="karten" id="karten"></div>
+<script>
+(function () {
+  "use strict";
+  var NETLIFY = "https://stencilme-workshop.netlify.app/";
+  var TYP = { programm: "Computerprogramm", ki: "KI (Bildbearbeitung)", generativ: "Generative KI", analog: "Ohne Computer" };
+  var DATENWEG = { ipad: "Bleibt auf dem iPad", laptop: "Geht an den Laptop", online: "Geht an einen Online-Dienst" };
+  var stationen = [];
+
+  function qrSvg(url) {
+    var qr = qrcode(0, "M");
+    qr.addData(url);
+    qr.make();
+    return qr.createSvgTag(6, 2);
+  }
+
+  function div(cls, text) {
+    var d = document.createElement("div");
+    d.className = cls;
+    if (text) d.textContent = text;
+    return d;
+  }
+
+  function karte(nr, titel, url, etiketten, scan, start) {
+    var k = div("karte" + (start ? " start" : ""));
+    k.appendChild(div("nr", nr));
+    k.appendChild(div("titel", titel));
+    if (etiketten.length) {
+      var e = div("etiketten");
+      etiketten.forEach(function (t) { e.appendChild(div("etikett", t)); });
+      k.appendChild(e);
+    }
+    var q = div("qr");
+    q.innerHTML = qrSvg(url);
+    k.appendChild(q);
+    k.appendChild(div("scan", scan));
+    k.appendChild(div("url", url));
+    return k;
+  }
+
+  function zeichnen() {
+    var basis = document.getElementById("adresse").value;
+    var box = document.getElementById("karten");
+    box.innerHTML = "";
+    box.appendChild(karte("Start", "stencil.me Workshop", basis, [], "Kamera-App auf den Code richten, Link antippen", true));
+    stationen.forEach(function (s, i) {
+      // Der Typ steht absichtlich nicht auf der Karte: Die Kinder sollen ihn erst raten
+      box.appendChild(karte("Station " + (i + 1), s.titel, basis + "app/station.html?id=" + s.id,
+        [DATENWEG[s.datenweg] || s.datenweg], "Hier einchecken: Code scannen", false));
+    });
+  }
+
+  function adressen() {
+    return fetch("/api/info", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (info) { return info.adressen; })
+      .catch(function () { return []; });
+  }
+
+  function stationenLaden() {
+    return fetch("/stationen/index.json", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (index) {
+        return Promise.all(index.stationen.map(function (id) {
+          return fetch("/stationen/" + id + ".json", { cache: "no-store" }).then(function (r) { return r.json(); });
+        }));
+      });
+  }
+
+  Promise.all([adressen(), stationenLaden()])
+    .then(function (werte) {
+      var select = document.getElementById("adresse");
+      werte[0].concat([NETLIFY]).forEach(function (a) {
+        var o = document.createElement("option");
+        o.value = a;
+        o.textContent = a === NETLIFY ? a + " (Plan B)" : a + " (Laptop)";
+        select.appendChild(o);
+      });
+      stationen = werte[1];
+      select.addEventListener("change", zeichnen);
+      zeichnen();
+    })
+    .catch(function () {
+      document.getElementById("fehler").innerHTML = '<div class="fehler">Stationen konnten nicht geladen werden. Läuft der Server?</div>';
+    });
+})();
+</script>
+</body>
+</html>

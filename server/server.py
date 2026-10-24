@@ -223,11 +223,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path == "/api/einstellungen":
             return self.send_json(read_settings())
 
-        if path in ("/laptop", "/api/liste", "/api/info", "/api/gruppen") or path.startswith(("/daten/", "/dateien/")):
+        if path in ("/laptop", "/qr", "/api/liste", "/api/info", "/api/gruppen") or path.startswith(("/daten/", "/dateien/")):
             if not self.is_local():
                 return self.send_error(403, "Nur am Laptop")
-            if path == "/laptop":
-                self.path = "/server/laptop.html"
+            if path in ("/laptop", "/qr"):
+                self.path = "/server/laptop.html" if path == "/laptop" else "/server/qr-codes.html"
                 return super().do_GET()
             if path == "/api/liste":
                 return self.send_json({"stempel": list_stamps(), "ordner": DATA_DIR})
@@ -412,6 +412,7 @@ def main():
 
     print("stencil.me Workshop-Server läuft.")
     print("Übersicht am Laptop:  http://localhost:%d/laptop" % args.port)
+    print("QR-Codes zum Drucken: http://localhost:%d/qr" % args.port)
     for ip in local_ips():
         print("Adresse für die iPads: http://%s:%d/" % (ip, args.port))
     print("Stempel landen in:   %s" % DATA_DIR)
