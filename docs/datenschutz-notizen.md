@@ -16,6 +16,9 @@ Sammlung, kein fertiger Text. Wird in einem eigenen Schritt zu einer kindgerecht
 - **An den Laptop sollen gehen:** Check-in und „Station beendet“ (Name/Kürzel, Station, Uhrzeit), Textantworten, Bewertung (Sterne), Input-Fotos der Stationen (z. B. Foto vom Lasercutter).
   → Input-Fotos können Kinder zeigen (z. B. am Laser). Hinweis in der App: „Fotografiere die Maschine, nicht die Leute“?
 - **Greenscreen:** Freistellen auf dem iPad. Ob das fertige Bild an den Laptop geht, ist offen.
+- **Gebaut (Gerüst):** Auf dem iPad liegt alles in IndexedDB `werkstatt` (Gruppe, Fortschritt, Antworten, Fotos, Outbox). Auf dem Laptop: `server/daten/gruppen/<Gruppen-ID>/ereignisse/*.json` (Anmeldung mit Vornamen, Check-in, Beendet mit Antworten, KI-Antwort und Sternen) und `…/dateien/` (nur Fotos aus Stationen mit `"hochladen": true`, z. B. Lasercutter).
+- **Wer sieht was:** Die iPads können nur abfragen, wie viele Gruppen an jeder Station sind (ohne Namen). Gruppen, Antworten und Fotos sieht nur die Laptop-Seite.
+- **Löschen:** „Alle Daten löschen“ auf der Laptop-Seite löscht Stempel, Antworten und Fotos. Auf dem iPad: noch offen (Roadmap 8), zum Testen `?test` → „Alles zurücksetzen“.
 
 ## Was an den Laptop geht (Plan A)
 

@@ -16,6 +16,18 @@ Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Cl
 - **Offen:** 26 Jugendliche gleichzeitig am Laser sind zu viel. Sie sollen nacheinander ankommen. Auch andere Stationen bauen aufeinander auf.
 - *Vorschlag:* Jede Station bekommt in den Daten `braucht: [...]` (Voraussetzungen) und `plaetze` (wie viele Paare gleichzeitig). Die App weist nur Stationen zu, deren Voraussetzungen erfüllt sind und die noch Platz haben.
 
+## Gerüst (gebaut, Branch `feature/geruest`)
+
+- Stationen als Dateien in `stationen/` (Format: [stationen/README.md](../stationen/README.md)). Bisher: Foto, Bild bearbeiten, Lasercutter, Greenscreen
+- Allgemeine Stationsseite `app/station.html?id=<station>`: Das ist die Adresse für den QR-Code an jeder Station
+  - Kopfleiste: Puzzle pro Person, „x von y Stationen geschafft“, „Gesichert auf dem iPad / auf dem Laptop“
+  - Check-in beim Öffnen, Schritte, Foto/Texteingaben, „Station beendet“ erst, wenn alles erledigt ist
+  - Abschluss: KI-Frage (das Typ-Etikett erscheint erst nach der Antwort als Auflösung) und Sterne
+  - Danach: Vorschlag für die nächste Station (Voraussetzungen + freie Plätze)
+- Laptop-Seite: Anzahl Schüler:innen, Tabelle der Gruppen (gerade an, geschafft, Fotos), „Alle Daten löschen“
+- Zum Ausprobieren ohne Anmeldung: `?test` an die Adresse hängen → „Test-Gruppe anlegen“, „Alles zurücksetzen“
+- *Offen: Der QR-Code öffnet die Seite im Safari-Tab. Eine App auf dem Home-Bildschirm hat auf dem iPad einen eigenen Speicher → siehe Frage vor Screen 1.*
+
 ## Screen 1: Check-in (Startseite)
 
 - Startseite wie `stencilme.netlify.app`, Knopf „Los geht's“
