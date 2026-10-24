@@ -137,6 +137,23 @@ Beschreibung von Patricia:
 - Typografische Anführungszeichen der iPad-Tastatur („ “) werden erkannt und beim Speichern zu geraden " gemacht
 - Der Code geht beim Beenden an den Laptop (`antworten.svg-code` in den Ereignissen der Gruppe). *Später (Roadmap 8, ZIP): als `.svg`/`.html`-Datei in die Ergebnis-Mappe*
 
+## Code-Editor für iPads (24.10., Patricia: A+B+C+D)
+
+Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt es keine Tastaturen, alles muss mit der Bildschirm-Tastatur gehen.
+- **Lückentext:** Code ist zu sehen, ändern lassen sich nur die hellen Felder. Neue Teile kommen per „Baustein einfügen“ an die richtige Stelle (ein Platzhalter zeigt, wo)
+- **Eine Aufgabe nach der anderen:** Punkte 1, 2, 3 … oben, die aktuelle Lücke ist pink markiert, „Zur Lücke“ springt hin
+- **Tastatur offen:** Editor füllt den sichtbaren Bereich: Aufgabe und kleine Vorschau oben, Code in der Mitte, Zeichenleiste (`< > / " = { } ; : ( ) ' #`) direkt über der Tastatur, „Tastatur zu“. Am Rechner zum Ansehen: `&tastatur` an die Adresse
+- **Profi-Modus:** ganzen Code frei bearbeiten (zurück zum Lückentext setzt die Profi-Änderungen zurück)
+- *Ungetestet auf echtem iPad: wie sich der Bereich über der Tastatur verhält (iPadOS meldet ihn über `visualViewport`)*
+
+## Screen 8: Coding: HTML, CSS und JavaScript — gebaut, Branch `feature/editor`
+
+- Übungen von den Karten (Seite 14, 15): Überschrift in eure Namen, Absatz ändern, `<style>` mit Farben, andere Farben, Button mit `alert`, eigene Nachricht, auf den Button klicken. Bonus: Beschriftung des Buttons
+- Vorschau ist eine echte kleine Webseite in einem abgeschirmten Rahmen: `alert` funktioniert, der Code der Kinder kommt nicht an die App-Daten
+- Hinweise bei typischen Fehlern: unbekannte Farbe, fehlende Klammer im CSS, `'` mitten in der Nachricht
+- Pflichtfrage „Welcher Baustein sorgt dafür, dass ein Regler sofort das Bild verändert?“, Auflösung (JavaScript) im Abschluss
+- Code geht beim Beenden an den Laptop (`antworten.html-code`)
+
 ## Weitere Screens
 
 - *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …

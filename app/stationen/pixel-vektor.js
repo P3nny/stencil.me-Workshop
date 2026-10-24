@@ -1,16 +1,11 @@
 // ---- Station „Pixel vs. Vektor“ ----
 // Teil 1: Erklärung und Infografik aus der Stationenkarte, dazu Verständnisfragen.
-// Teil 2 (erst wenn alle Fragen richtig sind): SVG-Code schreiben, Vorschau sofort,
-// die App prüft die Aufgaben und gibt Rückmeldung. Der Code geht beim Beenden mit
-// den Antworten an den Laptop (antworten['svg-code']).
+// Teil 2 (erst wenn alle Fragen richtig sind): SVG-Code im Code-Editor (app/core/code-editor.js),
+// Vorschau sofort, die App prüft die Aufgaben und gibt Rückmeldung. Der Code geht beim
+// Beenden mit den Antworten an den Laptop (antworten['svg-code']).
 (function(){
-  const PRUEF_PAUSE_MS = 300;
   const PFLICHT = ['farbe', 'radius', 'dreieck', 'stern'];
-
-  // iPad-Tastaturen machen aus " gern „ “ ” (typografische Anführungszeichen)
-  function normalisieren(code){
-    return code.replace(/[„“”″]/g, '"').replace(/[‚‘’′]/g, "'");
-  }
+  const normalisieren = code => CodeEditor.normalisieren(code);
 
   function punkte(polygon){
     const zahlen = (polygon.getAttribute('points') || '').trim().split(/[\s,]+/).filter(z => z !== '' && !isNaN(parseFloat(z)));
@@ -68,6 +63,7 @@
 
     const sternFarben = sterne.map(p => (p.getAttribute('fill') || '').toLowerCase());
     erledigt.bonus = sterne.length >= 2 && sternFarben.some(f => f !== sternFarben[0]);
+    if(sterne.length >= 2 && !erledigt.bonus) hinweise.bonus = 'Beide Sterne haben noch dieselbe Farbe. Ändert fill beim zweiten Stern.';
 
     // Grobe Syntaxprüfung: Der Browser repariert viel, als XML gelesen fällt ein Fehler auf
     let syntax = null;
@@ -88,7 +84,7 @@
       eintrag.quiz = eintrag.quiz || {};
       eintrag.fehlversuche = eintrag.fehlversuche || 0;
       eintrag.antworten = eintrag.antworten || {};
-      if(!eintrag.antworten['svg-code']) eintrag.antworten['svg-code'] = uebung.start;
+      let speicherTimer = null;
 
       // ---- Teil 1: Erklärung ----
       const teil1 = el('section', { klasse: 'pv-teil' }, [
@@ -139,71 +135,30 @@
         return el('div', { klasse: 'pv-frage' }, [el('p', { klasse: 'pv-frage-text', text: (i + 1) + '. ' + f.frage }), knoepfe, rueck]);
       })));
 
-      // ---- Teil 2: SVG-Übung ----
-      const editor = el('textarea', { klasse: 'pv-code', rows: '12', spellcheck: 'false', autocapitalize: 'off', autocorrect: 'off', autocomplete: 'off', 'aria-label': 'SVG-Code' });
-      editor.value = eintrag.antworten['svg-code'];
-      const vorschau = el('div', { klasse: 'pv-vorschau' });
-      const syntaxBox = el('p', { klasse: 'pv-syntax' });
-      syntaxBox.hidden = true;
-      const haken = {};
-      const hinweisFelder = {};
-      const liste = el('ol', { klasse: 'pv-aufgaben' }, uebung.aufgaben.map(a => {
-        haken[a.id] = el('span', { klasse: 'pv-haken', text: '○' });
-        hinweisFelder[a.id] = el('span', { klasse: 'pv-hinweis' });
-        const teile = [haken[a.id], el('span', { text: ' ' + a.text }), hinweisFelder[a.id]];
-        if(a.baustein){
-          teile.push(el('pre', { klasse: 'pv-baustein', text: a.baustein }));
-          teile.push(el('button', { type: 'button', klasse: 'secondary klein', text: 'Hilfe: Baustein einfügen', onclick: () => {
-            editor.value = editor.value.replace(/\s*$/, '') + '\n' + a.baustein + '\n';
-            aktualisieren();
-          } }));
-        }
-        return el('li', { klasse: a.freiwillig ? 'freiwillig' : '' }, teile);
-      }));
-
-      let timer = null;
-      function aktualisieren(){
-        const code = editor.value;
-        const ergebnis = pruefen(code);
-        vorschau.innerHTML = '';
-        ergebnis.svgs.forEach(svg => vorschau.appendChild(alsBild(svg)));
-        syntaxBox.hidden = !ergebnis.syntax;
-        syntaxBox.textContent = ergebnis.syntax || '';
-        Object.keys(haken).forEach(id => {
-          const ok = !!ergebnis.erledigt[id];
-          haken[id].textContent = ok ? '✓' : '○';
-          haken[id].parentNode.classList.toggle('ok', ok);
-          hinweisFelder[id].textContent = !ok && ergebnis.hinweise[id] ? ' → ' + ergebnis.hinweise[id] : (ok && ergebnis.hinweise[id] ? ' (' + ergebnis.hinweise[id] + ')' : '');
-        });
-        eintrag.uebung = ergebnis.erledigt;
-        // Gespeichert wird mit geraden Anführungszeichen, damit der Code auch außerhalb der App läuft
-        eintrag.antworten['svg-code'] = normalisieren(code);
-        clearTimeout(timer);
-        timer = setTimeout(() => { api.speichern(); }, 400);
-        api.pruefen();
-      }
-      let eingabeTimer = null;
-      editor.addEventListener('input', () => {
-        clearTimeout(eingabeTimer);
-        eingabeTimer = setTimeout(aktualisieren, PRUEF_PAUSE_MS);
-      });
-
-      const zuruecksetzen = el('button', { type: 'button', klasse: 'secondary klein', text: 'Code zurücksetzen', onclick: () => {
-        if(!confirm('Euren Code löschen und mit dem Kreis neu anfangen?')) return;
-        editor.value = uebung.start;
-        aktualisieren();
-      } });
-
+      // ---- Teil 2: SVG-Übung im Code-Editor (Lückentext, eine Aufgabe nach der anderen) ----
+      eintrag.editor = eintrag.editor || {};
       teil2.appendChild(el('h2', { text: 'Teil 2: SVG-Code schreiben' }));
-      teil2.appendChild(el('p', { text: 'Links schreibt ihr den Code, rechts seht ihr sofort das Ergebnis. Die Haken zeigen, was schon geschafft ist.' }));
-      teil2.appendChild(el('div', { klasse: 'pv-arbeitsplatz' }, [
-        el('div', { klasse: 'pv-links' }, [editor, syntaxBox, zuruecksetzen]),
-        el('div', { klasse: 'pv-rechts' }, [el('p', { klasse: 'pv-label', text: 'Ergebnis' }), vorschau])
-      ]));
-      teil2.appendChild(liste);
+      teil2.appendChild(el('p', { text: 'Tippt in die hellen Felder im Code. Neue Formen kommen mit „Baustein einfügen“ an die richtige Stelle.' }));
+      teil2.appendChild(CodeEditor.erstellen({
+        vorlage: uebung.vorlage,
+        luecken: uebung.luecken,
+        bausteine: uebung.bausteine,
+        aufgaben: uebung.aufgaben,
+        zustand: eintrag.editor,
+        pruefen: pruefen,
+        vorschau: (code, box) => {
+          box.innerHTML = '';
+          pruefen(code).svgs.forEach(svg => box.appendChild(alsBild(svg)));
+        },
+        beiAenderung: (code, erledigt) => {
+          eintrag.uebung = erledigt;
+          eintrag.antworten['svg-code'] = code;
+          clearTimeout(speicherTimer);
+          speicherTimer = setTimeout(() => { api.speichern(); }, 400);
+          api.pruefen();
+        }
+      }));
       teil2.hidden = !quizFertig();
-      aktualisieren();
-
       return el('div', { klasse: 'pv-station' }, [teil1, quiz, teil2]);
     },
     erfuellt: (eintrag, gruppe, station) => {

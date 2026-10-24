@@ -54,30 +54,74 @@
     }
   ],
   "uebung": {
-    "start": "<svg width=\"100\" height=\"100\">\n  <circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n</svg>\n",
+    "vorlage": "<svg width=\"100\" height=\"100\">\n  <circle cx=\"50\" cy=\"50\" r=\"{{radius}}\" stroke=\"green\" stroke-width=\"4\" fill=\"{{farbe}}\" />\n</svg>\n[[dreieck]][[stern]][[stern2]]",
+    "luecken": {
+      "farbe": {
+        "wert": "yellow",
+        "name": "Farbe des Kreises"
+      },
+      "radius": {
+        "wert": "40",
+        "name": "Radius"
+      },
+      "dreieck-farbe": {
+        "wert": "yellow",
+        "name": "Farbe des Dreiecks"
+      },
+      "stern-farbe": {
+        "wert": "yellow",
+        "name": "Farbe des Sterns"
+      },
+      "stern2-farbe": {
+        "wert": "yellow",
+        "name": "Farbe des zweiten Sterns"
+      },
+      "stern2-rand": {
+        "wert": "4",
+        "name": "Randdicke des zweiten Sterns"
+      }
+    },
+    "bausteine": {
+      "dreieck": {
+        "name": "Dreieck",
+        "code": "<svg width=\"100\" height=\"100\">\n  <polygon points=\"50,10 90,90 10,90\" stroke=\"green\" stroke-width=\"4\" fill=\"{{dreieck-farbe}}\" />\n</svg>\n"
+      },
+      "stern": {
+        "name": "Stern",
+        "code": "<svg width=\"100\" height=\"100\">\n  <polygon points=\"50,5 60,35 95,35 70,55 80,90 50,70 20,90 30,55 5,35 40,35\" stroke=\"green\" stroke-width=\"4\" fill=\"{{stern-farbe}}\" />\n</svg>\n"
+      },
+      "stern2": {
+        "name": "zweiter Stern",
+        "code": "<svg width=\"100\" height=\"100\">\n  <polygon points=\"50,5 60,35 95,35 70,55 80,90 50,70 20,90 30,55 5,35 40,35\" stroke=\"green\" stroke-width=\"{{stern2-rand}}\" fill=\"{{stern2-farbe}}\" />\n</svg>\n"
+      }
+    },
     "aufgaben": [
       {
         "id": "farbe",
-        "text": "Kreis verändern: Ersetzt fill=\"yellow\" durch eine andere Farbe (z. B. red, pink, blue)."
+        "luecke": "farbe",
+        "text": "Ersetzt yellow durch eine andere Farbe (z. B. red, pink, blue)."
       },
       {
         "id": "radius",
-        "text": "Ändert r=\"40\". Was passiert bei r=\"20\" oder r=\"80\"?"
+        "luecke": "radius",
+        "text": "Ändert r=\"40\". Was passiert bei 20 oder 80?"
       },
       {
         "id": "dreieck",
-        "text": "Klickt hinter </svg>, drückt Enter und tippt einen neuen Block. Das Dreieck steht dann neben dem Kreis.",
-        "baustein": "<svg width=\"100\" height=\"100\">\n  <polygon points=\"50,10 90,90 10,90\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n</svg>"
+        "baustein": "dreieck",
+        "text": "Das Dreieck kommt in einen neuen <svg>-Block hinter den Kreis."
       },
       {
         "id": "stern",
-        "text": "Aus 3 Punkten (Dreieck) werden 10 Punkte, und ihr habt einen Stern. Tippt einen dritten Block hinter das letzte </svg>.",
-        "baustein": "<svg width=\"100\" height=\"100\">\n  <polygon points=\"50,5 60,35 95,35 70,55 80,90 50,70 20,90 30,55 5,35 40,35\" stroke=\"green\" stroke-width=\"4\" fill=\"yellow\" />\n</svg>"
+        "baustein": "stern",
+        "text": "Aus 3 Punkten (Dreieck) werden 10 Punkte: ein Stern."
       },
       {
         "id": "bonus",
-        "text": "Bonus: Kopiert den Stern-Block, fügt ihn nochmal ein und gebt dem zweiten Stern eine andere Farbe. Probiert auch dickere Ränder mit stroke-width.",
-        "freiwillig": true
+        "baustein": "stern2",
+        "luecke": "stern2-farbe",
+        "freiwillig": true,
+        "text": "Ein zweiter Stern in einer anderen Farbe. Probiert auch einen dickeren Rand (stroke-width)."
       }
     ]
   },

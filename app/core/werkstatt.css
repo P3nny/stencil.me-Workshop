@@ -128,21 +128,55 @@ button.wahl.falsch{background:#eee;color:#999;text-decoration:line-through;}
 .pv-rueckmeldung{margin:4px 0 0;padding:0;}
 .pv-rueckmeldung.richtig{background:#e6f7ea;border:3px solid var(--ink);padding:6px 10px;}
 .pv-rueckmeldung.falsch{background:var(--neon);border:3px solid var(--ink);padding:6px 10px;font-weight:700;}
-.pv-arbeitsplatz{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;}
-.pv-links{flex:1;min-width:280px;}
-.pv-code{font-family:'Courier Prime',monospace;font-size:1rem;line-height:1.35;background:#111;color:#f4f4f4;min-height:260px;}
-.pv-rechts{width:240px;}
-.pv-label{font-family:var(--head);text-transform:uppercase;margin:0 0 4px;}
-.pv-vorschau{display:flex;flex-wrap:wrap;gap:6px;min-height:110px;border:3px solid var(--ink);padding:6px;background:#fff;}
-.pv-vorschau img{width:100px;height:100px;border:1px dashed #ccc;}
-.pv-syntax{background:var(--neon);border:3px solid var(--ink);padding:6px 10px;font-weight:700;}
-.pv-aufgaben{padding-left:1.4em;margin-top:16px;}
-.pv-aufgaben li{margin-bottom:12px;}
-.pv-aufgaben li.ok{color:#1e7a3c;}
-.pv-aufgaben li.freiwillig{color:var(--muted);}
-.pv-haken{font-weight:700;font-size:1.2rem;}
-.pv-hinweis{color:#c0006a;font-weight:700;}
-.pv-baustein{font-family:'Courier Prime',monospace;background:#f4f4f4;border:2px solid var(--ink);padding:6px 8px;white-space:pre-wrap;word-break:break-all;font-size:.85rem;margin:6px 0 4px;}
+.pv-vorschau img,.ce-vorschau img{width:100px;height:100px;border:1px dashed #ccc;background:#fff;}
+
+/* Code-Editor (app/core/code-editor.js) */
+.ce{border:3px solid var(--ink);background:#fff;margin-top:12px;}
+.ce-kopf{display:flex;gap:12px;padding:10px;border-bottom:3px solid var(--ink);background:#fffbe6;}
+.ce-kopf-links{flex:1;min-width:0;}
+.ce-kopf-rechts{width:230px;flex:none;}
+.ce-label{font-family:var(--head);text-transform:uppercase;font-size:.8rem;margin:0 0 4px;}
+.ce-punkte{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
+.ce-punkt{width:28px;height:28px;border:2px solid var(--ink);display:inline-flex;align-items:center;justify-content:center;font-family:var(--head);font-size:.9rem;background:#fff;}
+.ce-punkt.ok{background:#1e9e4a;color:#fff;border-color:#1e9e4a;}
+.ce-punkt.aktiv{background:var(--neon);}
+.ce-punkt.frei{border-style:dashed;}
+.ce-aufgabe p{margin:0 0 6px;}
+.ce-aufgabe-text{font-size:1.05rem;}
+.ce-hinweis{color:#c0006a;font-weight:700;}
+.ce-geschafft{background:#e6f7ea;border:2px solid var(--ink);padding:4px 8px;font-weight:700;}
+.ce-baustein{font-family:'Courier Prime',monospace;background:#f4f4f4;border:2px solid var(--ink);padding:6px 8px;white-space:pre-wrap;word-break:break-all;font-size:.8rem;margin:4px 0;max-height:7.5em;overflow:auto;}
+.ce-vorschau{display:flex;flex-wrap:wrap;gap:4px;min-height:104px;border:2px solid var(--ink);padding:4px;background:#fff;}
+.ce-vorschau iframe{width:100%;height:180px;border:0;background:#fff;}
+.ce-code{padding:10px;background:#111;}
+.ce-lueckentext{margin:0;color:#f4f4f4;font-family:'Courier Prime',monospace;font-size:1.05rem;line-height:2.1;white-space:pre-wrap;word-break:break-word;}
+.ce-luecke{font-family:'Courier Prime',monospace;font-size:1.05rem;background:#fff;color:var(--ink);border:2px solid #fff;border-radius:3px;padding:2px 4px;min-width:3ch;-webkit-appearance:none;}
+.ce-luecke:focus{outline:3px solid var(--neon);border-color:var(--neon);}
+.ce-luecke.aktiv{background:#ffe1f0;border-color:var(--neon);box-shadow:0 0 0 3px var(--neon);}
+.ce-baustein-drin{background:rgba(255,45,149,.18);}
+button.ce-platzhalter{display:block;width:100%;background:transparent;color:#fff;border:2px dashed var(--neon);text-transform:none;letter-spacing:0;font-family:'Courier Prime',monospace;margin:4px 0;padding:8px;}
+.ce-profi{font-family:'Courier Prime',monospace;font-size:1rem;line-height:1.4;background:#111;color:#f4f4f4;border:0;min-height:220px;}
+.ce-syntax{background:var(--neon);border:3px solid var(--ink);padding:6px 10px;font-weight:700;margin:8px 0 0;}
+.ce-fuss{display:none;}
+.ce-modus{padding:6px 10px;border-top:3px solid var(--ink);}
+.ce-zeichen{display:flex;gap:4px;overflow-x:auto;flex:1;}
+.ce-zeichen button{margin:0;min-width:40px;padding:8px 0;font-family:'Courier Prime',monospace;font-size:1.2rem;background:#fff;color:var(--ink);text-transform:none;letter-spacing:0;}
+button.ce-fertig{margin:0;font-size:.8rem;padding:8px 10px;flex:none;}
+
+/* Tastatur offen: der Editor füllt den sichtbaren Bereich über der Tastatur */
+.ce.kompakt{position:fixed;left:0;right:0;z-index:20;margin:0;display:flex;flex-direction:column;border-width:0 0 3px;}
+.ce.kompakt .ce-kopf{padding:6px 8px;flex:none;}
+.ce.kompakt .ce-kopf-rechts{width:120px;}
+.ce.kompakt .ce-vorschau{min-height:0;max-height:110px;overflow:hidden;}
+.ce.kompakt .ce-vorschau img{width:50px;height:50px;}
+.ce.kompakt .ce-vorschau iframe{height:100px;}
+.ce.kompakt .ce-label,.ce.kompakt .ce-punkte,.ce.kompakt .ce-baustein,.ce.kompakt .ce-modus,.ce.kompakt .ce-aufgabe button{display:none;}
+.ce.kompakt .ce-aufgabe-text{font-size:.95rem;}
+.ce.kompakt .ce-code{flex:1;overflow:auto;}
+.ce.kompakt .ce-profi{height:100%;min-height:0;}
+.ce.kompakt .ce-fuss{display:flex;gap:6px;padding:6px;background:#eee;border-top:2px solid var(--ink);flex:none;}
+body.ce-kompakt .test-leiste{display:none;}
+
 .video{margin:16px 0;max-width:640px;}
 .video iframe{width:100%;aspect-ratio:16/9;height:auto;min-height:200px;border:3px solid var(--ink);display:block;}
 .video-platzhalter{border:3px dashed var(--ink);background:#f4f4f4;padding:16px;text-align:center;}

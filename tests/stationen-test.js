@@ -128,8 +128,8 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 6') >= 0, 'Zähler steht auf 1 von 6');
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 7') >= 0, 'Zähler steht auf 1 von 7');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
 
@@ -188,16 +188,16 @@ async function abschliessen(page, sterne){
   await page.locator('input[type=file]').setInputFiles(FOTO);
   await page.locator('.foto-vorschau').waitFor({ state: 'visible' });
   await abschliessen(page, 3);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 6') >= 0, 'Zähler steht auf 3 von 6');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 7') >= 0, 'Zähler steht auf 3 von 7');
 
   console.log('Neu laden: Fortschritt bleibt');
   await page.reload();
   await page.waitForSelector('text=schon erledigt');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 6') >= 0, 'Fortschritt nach Neuladen erhalten');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 7') >= 0, 'Fortschritt nach Neuladen erhalten');
 
   console.log('Startseite nach drei Stationen');
   await page.goto(BASE + '/');
-  await page.waitForSelector('text=3 von 6 Stationen geschafft');
+  await page.waitForSelector('text=3 von 7 Stationen geschafft');
   pruefe(true, 'Startseite zeigt den Stand');
   await page.goto(BASE + '/app/station.html?id=lasercutter');
 
@@ -241,7 +241,7 @@ async function abschliessen(page, sterne){
   await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild an den Laptop schicken")').click();
   await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist abgeschickt') >= 0).length === 2);
   await abschliessen(page, 4);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 6') >= 0, 'Zähler steht auf 5 von 6');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 7') >= 0, 'Zähler steht auf 5 von 7');
 
   console.log('Station Pixel vs. Vektor');
   await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
@@ -254,25 +254,94 @@ async function abschliessen(page, sterne){
   await page.click('button:has-text("Die Kanten werden unscharf")');
   await page.click('button:has-text("Weil er Pfaden folgt")');
   pruefe(await page.locator('.pv-teil').nth(1).isVisible(), 'alle Fragen richtig: SVG-Übung erscheint');
-  const kreis = (fill, r) => '<svg width="100" height="100">\n  <circle cx="50" cy="50" r="' + r + '" stroke="green" stroke-width="4" fill="' + fill + '" />\n</svg>\n';
-  const haken = async id => (await page.locator('.pv-aufgaben li').nth(id).getAttribute('class') || '').indexOf('ok') >= 0;
-  await page.fill('.pv-code', kreis('gelbgrün', 40));
+  const luecke = id => page.locator('.ce-luecke[data-luecke="' + id + '"]');
+  const punktOk = async n => ((await page.locator('.ce-punkt').nth(n).getAttribute('class')) || '').indexOf('ok') >= 0;
+  pruefe(await page.locator('.ce-punkt').count() === 5, 'fünf Aufgaben, eine nach der anderen');
+  pruefe((await luecke('farbe').getAttribute('class')).indexOf('aktiv') >= 0, 'Aufgabe 1: Lücke für die Farbe ist markiert');
+  await luecke('farbe').fill('gelbgrün');
   await page.waitForTimeout(500);
-  pruefe(!(await haken(0)) && /kennt der Browser nicht/.test(await page.locator('.pv-aufgaben li').nth(0).textContent()), 'ungültige Farbe: Hinweis');
-  await page.fill('.pv-code', kreis('pink', 20));
+  pruefe(/kennt der Browser nicht/.test(await page.locator('.ce-hinweis').textContent()), 'ungültige Farbe: Hinweis');
+  await luecke('farbe').fill('pink');
   await page.waitForTimeout(500);
-  pruefe(await haken(0) && await haken(1), 'Farbe und Radius geändert: zwei Haken');
-  // Dreieck mit typografischen Anführungszeichen, wie die iPad-Tastatur sie setzt
-  await page.fill('.pv-code', kreis('pink', 20) + '<svg width=„100“ height=„100“><polygon points=„50,10 90,90 10,90“ stroke=„green“ stroke-width=„4“ fill=„yellow“ /></svg>\n');
+  pruefe(await punktOk(0), 'Farbe geändert: Haken');
+  await luecke('radius').fill('20');
   await page.waitForTimeout(500);
-  pruefe(await haken(2), 'Dreieck erkannt (auch mit „“ von der iPad-Tastatur)');
-  await page.click('button:has-text("Hilfe: Baustein einfügen") >> nth=1');
+  pruefe(await punktOk(1), 'Radius geändert: Haken');
+  pruefe(await page.locator('button.ce-platzhalter').count() === 1, 'Platzhalter zeigt, wo das Dreieck hinkommt');
+  await page.click('.ce-aufgabe button:has-text("Baustein einfügen")');
+  await page.waitForTimeout(400);
+  pruefe(await punktOk(2), 'Dreieck eingefügt: Haken');
+  await page.click('.ce-aufgabe button:has-text("Baustein einfügen")');
+  await page.waitForTimeout(400);
+  pruefe(await punktOk(3), 'Stern eingefügt: Haken');
+  pruefe(await page.locator('.ce-geschafft').count() === 1, '„Alle Pflicht-Aufgaben geschafft“, Bonus angeboten');
+  await page.click('.ce-aufgabe button:has-text("Baustein einfügen")');
+  await luecke('stern2-farbe').fill('blue');
   await page.waitForTimeout(500);
-  pruefe(await haken(3), 'Stern erkannt');
-  pruefe(await page.locator('.pv-vorschau img').count() === 3, 'Vorschau zeigt Kreis, Dreieck, Stern');
+  pruefe(await punktOk(4), 'Bonus: zweiter Stern in Blau');
+  pruefe(await page.locator('.ce-vorschau img').count() === 4, 'Vorschau zeigt Kreis, Dreieck, zwei Sterne');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-11-pixel-vektor.png'), fullPage: true });
+  // Profi-Modus: freier Code, auch mit den Anführungszeichen der iPad-Tastatur
+  await page.click('button:has-text("Profi-Modus")');
+  const profiCode = await page.locator('.ce-profi').inputValue();
+  pruefe(profiCode.indexOf('fill="pink"') > 0 && profiCode.indexOf('r="20"') > 0, 'Profi-Modus zeigt den fertigen Code');
+  await page.locator('.ce-profi').fill(profiCode.replace('fill="pink"', 'fill=„orange“'));
+  await page.waitForTimeout(500);
+  pruefe(await punktOk(0), 'Profi-Modus: „orange“ mit iPad-Anführungszeichen erkannt');
+  // Ansicht bei offener Tastatur (am Rechner erzwungen)
+  await page.goto(BASE + '/app/station.html?id=pixel-vektor&tastatur');
+  await page.waitForSelector('.ce.kompakt');
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-11b-pixel-vektor-tastatur.png') });
+  pruefe(await page.locator('.ce.kompakt .ce-zeichen button').count() > 5, 'Tastatur offen: Zeichenleiste sichtbar');
+  await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
+  await page.waitForSelector('.ce-vorschau img');
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 6') >= 0, 'Zähler steht auf 6 von 6');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 7') >= 0, 'Zähler steht auf 6 von 7');
+
+  console.log('Station Coding: HTML, CSS und JavaScript');
+  await page.goto(BASE + '/app/station.html?id=coding-web&test');
+  await page.waitForSelector('h1:has-text("Coding")');
+  await page.waitForSelector('.ce-vorschau iframe');
+  pruefe(await page.locator('.ce-punkt').count() === 8, 'acht Aufgaben (eine Bonus)');
+  await luecke('ueberschrift').fill('Ada und Bo');
+  await luecke('absatz').fill('Wir lernen HTML.');
+  await page.waitForTimeout(500);
+  pruefe(await punktOk(0) && await punktOk(1), 'HTML: Überschrift und Absatz geändert');
+  const vorschauText = await page.frameLocator('.ce-vorschau iframe').locator('h1').textContent();
+  pruefe(vorschauText === 'Ada und Bo', 'Vorschau zeigt die neue Überschrift');
+  await page.click('.ce-aufgabe button:has-text("Baustein einfügen")');
+  await page.waitForTimeout(400);
+  pruefe(await punktOk(2), 'CSS: <style>-Block eingefügt');
+  await luecke('textfarbe').fill('orangee');
+  await page.waitForTimeout(500);
+  pruefe(/kennt der Browser nicht/.test(await page.locator('.ce-hinweis').textContent()), 'CSS: falsche Farbe gibt Hinweis');
+  await luecke('textfarbe').fill('orange');
+  await page.waitForTimeout(500);
+  pruefe(await punktOk(3), 'CSS: Farbe geändert');
+  await page.click('.ce-aufgabe button:has-text("Baustein einfügen")');
+  await page.waitForTimeout(400);
+  pruefe(await punktOk(4), 'JavaScript: Button eingefügt');
+  await luecke('nachricht').fill("Wir sind's");
+  await page.waitForTimeout(500);
+  pruefe(/zwischen zwei/.test(await page.locator('.ce-hinweis').textContent()), "JavaScript: ' in der Nachricht gibt Hinweis");
+  await luecke('nachricht').fill('Wir sind da!');
+  await page.waitForTimeout(500);
+  pruefe(await punktOk(5), 'JavaScript: eigene Nachricht');
+  let dialogText = '';
+  page.once('dialog', d => { dialogText = d.message(); d.dismiss().catch(() => {}); });
+  await page.frameLocator('.ce-vorschau iframe').locator('button').click();
+  await page.waitForTimeout(800);
+  pruefe(await punktOk(6), 'Klick auf den Button in der Vorschau erkannt');
+  pruefe(dialogText === 'Wir sind da!', 'alert zeigt die eigene Nachricht: ' + dialogText);
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-12-coding-web.png'), fullPage: true });
+  await page.fill('#eingabe-regler', 'JavaScript');
+  await page.click('button:has-text("Station beendet")');
+  pruefe(await page.locator('.aufloesung-text').count() === 1, 'Auflösung zur Regler-Frage');
+  await page.click('button.wahl:has-text("Keine KI")');
+  await page.locator('button.stern').nth(4).click();
+  await page.click('button:has-text("Fertig")');
+  await page.waitForSelector('text=Super, geschafft!');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 7') >= 0, 'Zähler steht auf 7 von 7');
   pruefe(await page.locator('text=alle Stationen geschafft').count() === 1, '„Du hast alle Stationen geschafft!“');
 
   console.log('Laptop');
@@ -282,12 +351,14 @@ async function abschliessen(page, sterne){
   const g = gruppen.gruppen.filter(x => x.personen.join() === 'Ada,Bo').pop();
   pruefe(!!g, 'Gruppe Ada & Bo auf dem Laptop');
   if(g){
-    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor', 'fertige Stationen: ' + g.fertig.join(', '));
+    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor,coding-web', 'fertige Stationen: ' + g.fertig.join(', '));
     const arten = g.dateien.map(d => d.split('/').pop().split('_')[0]).sort().join(',');
     pruefe(arten === 'hintergrund,hintergrund,koerpererkennung,lasercutter', 'hochgeladen: Laser-Foto, KI-Ansicht, zwei Hintergrund-Bilder, keine Rohfotos (' + arten + ')');
     pruefe(g.antworten.lasercutter && g.antworten.lasercutter.antworten.frage === 'Wie heiß wird der Laser?', 'Antwort angekommen');
     const svgCode = g.antworten['pixel-vektor'] && g.antworten['pixel-vektor'].antworten['svg-code'];
     pruefe(!!svgCode && svgCode.indexOf('polygon') > 0, 'SVG-Code auf dem Laptop gespeichert');
+    const htmlCode = g.antworten['coding-web'] && g.antworten['coding-web'].antworten['html-code'];
+    pruefe(!!htmlCode && htmlCode.indexOf("alert('Wir sind da!')") > 0, 'HTML-Code auf dem Laptop gespeichert');
   }
   const laptop = await browser.newPage({ viewport: { width: 1400, height: 900 } });
   await laptop.goto(BASE + '/laptop');

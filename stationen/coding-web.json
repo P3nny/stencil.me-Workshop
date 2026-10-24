@@ -1,0 +1,117 @@
+{
+  "id": "coding-web",
+  "titel": "Coding: HTML, CSS und JavaScript",
+  "typ": "programm",
+  "datenweg": "laptop",
+  "schritte": [
+    "HTML ist das Gerüst jeder Webseite, auch von stencil.me. CSS macht sie hübsch. JavaScript bringt Bewegung hinein: Es reagiert auf Klicks und Eingaben.",
+    "Tippt in die hellen Felder im Code. Rechts seht ihr sofort eure Webseite.",
+    "Neue Teile kommen mit „Baustein einfügen“ an die richtige Stelle.",
+    "Ihr könnt die Station gemeinsam lösen."
+  ],
+  "uebung": {
+    "vorlage": "<!DOCTYPE html>\n<html>\n[[style]]<body>\n\n<h1>{{ueberschrift}}</h1>\n<p>{{absatz}}</p>\n[[button]]\n</body>\n</html>\n",
+    "luecken": {
+      "ueberschrift": {
+        "wert": "My First Heading",
+        "name": "Überschrift",
+        "text": true
+      },
+      "absatz": {
+        "wert": "My first paragraph.",
+        "name": "Absatz",
+        "text": true
+      },
+      "textfarbe": {
+        "wert": "pink",
+        "name": "Textfarbe"
+      },
+      "hintergrundfarbe": {
+        "wert": "purple",
+        "name": "Hintergrundfarbe"
+      },
+      "nachricht": {
+        "wert": "Hallo!",
+        "name": "Nachricht",
+        "text": true
+      },
+      "knopftext": {
+        "wert": "Klick mich",
+        "name": "Beschriftung des Buttons",
+        "text": true
+      }
+    },
+    "bausteine": {
+      "style": {
+        "name": "CSS-Block <style>",
+        "code": "<style> h1 { color: {{textfarbe}}; background-color: {{hintergrundfarbe}}; }</style>\n"
+      },
+      "button": {
+        "name": "Button mit JavaScript",
+        "code": "<button onclick=\"alert('{{nachricht}}')\">{{knopftext}}</button>\n"
+      }
+    },
+    "aufgaben": [
+      {
+        "id": "ueberschrift",
+        "luecke": "ueberschrift",
+        "text": "HTML: Ändert den Text zwischen <h1> und </h1> in eure Namen."
+      },
+      {
+        "id": "absatz",
+        "luecke": "absatz",
+        "text": "HTML: Ändert auch den Text zwischen <p> und </p>."
+      },
+      {
+        "id": "style",
+        "baustein": "style",
+        "text": "CSS: Ein <style>-Block gibt der Überschrift neue Farben. Er kommt direkt hinter <html>."
+      },
+      {
+        "id": "farben",
+        "luecke": "textfarbe",
+        "text": "CSS: Probiert andere Farben aus (red, blue, orange), für den Text und den Hintergrund."
+      },
+      {
+        "id": "button",
+        "baustein": "button",
+        "text": "JavaScript: Ein Button, der auf Klicks reagiert. Er kommt hinter </p>."
+      },
+      {
+        "id": "nachricht",
+        "luecke": "nachricht",
+        "text": "JavaScript: Ändert den Text bei alert('…') in eine eigene Nachricht."
+      },
+      {
+        "id": "klick",
+        "text": "Klickt rechts in eurer Webseite auf den Button: Es erscheint ein Fenster mit eurer Nachricht."
+      },
+      {
+        "id": "bonus",
+        "luecke": "knopftext",
+        "freiwillig": true,
+        "text": "Gebt dem Button eine eigene Beschriftung."
+      }
+    ]
+  },
+  "check": {
+    "art": "coding-web"
+  },
+  "eingaben": [
+    {
+      "id": "regler",
+      "text": "Welcher der drei Bausteine (HTML, CSS, JavaScript) sorgt in stencil.me dafür, dass ein Regler beim Verschieben sofort das Bild verändert?",
+      "pflicht": true,
+      "aufloesung": "JavaScript: Es merkt, dass der Regler bewegt wird, und rechnet das Bild sofort neu. HTML baut den Regler, CSS gestaltet ihn."
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Euer Code und eure Antwort gehen an den Laptop. Der Code kommt später mit in eure Ergebnis-Mappe.",
+  "braucht": [
+    "foto"
+  ],
+  "plaetze": 4
+}

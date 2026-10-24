@@ -17,6 +17,7 @@
   - [ ] Kamera erlaubt?
   - [ ] Werden Website-Daten beim Abmelden oder über Nacht gelöscht?
 - [ ] Wie viel freier Speicher ist auf den iPads?
+- [x] Tastaturen für die iPads? Nein (Patricia, 24.10.). Code-Stationen sind für die Bildschirm-Tastatur gebaut
 - [ ] Dürfen wir die iPads vor dem Workshop einrichten (Seite laden, auf den Home-Bildschirm legen)?
 
 ## Mr Beam
