@@ -383,11 +383,15 @@ function finish(){
   document.getElementById('app').classList.add('hidden');
   document.getElementById('outro').classList.remove('hidden');
   const correctCount = answered.filter(a => a === 'correct').length;
+  // In der Workshop-App eingebettet: Ergebnis an die Station melden (gleiche Adresse)
+  if(window.parent !== window) window.parent.postMessage({ stencilQuiz: { richtig: correctCount, gesamt: CARDS.length } }, location.origin);
   document.getElementById('scoreRow').innerHTML = `
     <div class="badge">${correctCount} von ${CARDS.length} richtig geraten</div>
     <div class="badge">Alle ${STEPS.length} Runden durch</div>
   `;
 }
+// In der Workshop-App eingebettet: „Zurück zum Workshop“ ausblenden, die Station ist ja drumherum
+if(window.parent !== window) Array.prototype.forEach.call(document.querySelectorAll('.backlink'), a => { a.hidden = true; });
 </script>
 </body>
 </html>

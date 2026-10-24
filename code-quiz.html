@@ -99,35 +99,34 @@ const CARDS = [
     step:0,
     eyebrow:"Schritt 1 · Foto aufnehmen",
     title:"Was ist ein Foto für den Computer?",
-    lede:"Wenn ihr eine Datei auswählt, passiert erstmal nur das hier:",
+    lede:"Wenn ihr ein Foto aufnehmt, passiert in der App erstmal nur das hier:",
     code:
-`<span class="kw">const</span> reader = <span class="kw">new</span> FileReader();
-reader.onload = (ev) =&gt; loadImageFromSrc(ev.target.result);
-reader.readAsDataURL(f); <span class="cm">// f = eure ausgewählte Datei</span>`,
+`<span class="kw">const</span> url = URL.createObjectURL(datei); <span class="cm">// datei = euer Foto</span>
+img.src = url;
+<span class="cm">// … auf höchstens 1024 Pixel verkleinern …</span>
+<span class="kw">const</span> daten = dataUrlZuBuffer(canvas.toDataURL(<span class="str">'image/jpeg'</span>));`,
     question:"Ein Foto ist für den Computer im Kern eigentlich …",
     correctText:"eine lange Kette von Bytes (Zahlen)",
     wrongText:"eine Zeichnung, die das Programm im Kopf hat",
-    explain:"Genau — <b>FileReader</b> liest die Bilddatei nur als Bytes ein und wandelt sie in eine sogenannte „data URL“ um. Erst danach kann sie der Browser als Bild anzeigen.",
-    pipeline:"loadImageFromSrc() speichert dieses Bild als sourceImg — die Basis für alle folgenden Schritte."
+    explain:"Genau — das Foto ist nur eine Folge von Bytes. Die App macht es kleiner (damit alte iPads nicht abstürzen) und speichert die Bytes (<b>daten</b>) auf dem iPad. Erst der Browser macht daraus wieder ein Bild.",
+    pipeline:"Bild.fotoVerkleinern() speichert dieses kleine Foto auf dem iPad: die Basis für alle folgenden Schritte."
   },
   {
     step:1,
     eyebrow:"Schritt 2 · Person erkennen",
-    title:"Warum „async“?",
+    title:"Warum „then“?",
     lede:"So lädt die App das KI-Modell BodyPix, das Personen erkennt:",
     code:
-`<span class="kw">async function</span> getBodyPixNet(){
-  bodyPixLoading = bodyPix.load({
+`netzPromise = skriptLaden(<span class="str">'/vendor/tfjs/tf.min.js'</span>)
+  .then(() =&gt; bodyPix.load({
     architecture: <span class="str">'MobileNetV1'</span>,
-    multiplier: <span class="str">0.75</span>
-  });
-  bodyPixNet = <span class="kw">await</span> bodyPixLoading;
-  <span class="kw">return</span> bodyPixNet;
-}`,
-    question:"Wofür steht hier async / await?",
-    correctText:"Der Browser darf beim Laden aus dem Internet weiterarbeiten, statt einzufrieren",
+    multiplier: <span class="str">0.75</span>,
+    modelUrl: <span class="str">'/vendor/body-pix/model/model-stride16.json'</span>
+  }));`,
+    question:"Wofür steht hier .then( … )?",
+    correctText:"Erst wenn das Laden fertig ist, geht es weiter, und der Browser friert solange nicht ein",
     wrongText:"Es ist nur Deko und hat keine Funktion",
-    explain:"Laden aus dem Internet dauert. <b>async/await</b> lässt die App währenddessen reagieren, statt die ganze Seite zu blockieren.",
+    explain:"Das KI-Modell ist gut 2,5 MB groß und kommt vom Workshop-Laptop, nicht aus dem Internet. Laden dauert einen Moment. <b>.then()</b> sagt: „Mach das hier, sobald das Laden fertig ist.“ So bleibt die App währenddessen bedienbar.",
     pipeline:"Dieses Modell entscheidet gleich für jedes Pixel: Person oder Hintergrund?"
   },
   {
@@ -136,9 +135,10 @@ reader.readAsDataURL(f); <span class="cm">// f = eure ausgewählte Datei</span>`
     title:"Was kommt am Ende raus?",
     lede:"Nachdem BodyPix ein Foto analysiert hat:",
     code:
-`<span class="kw">const</span> segmentation = <span class="kw">await</span> net.segmentPerson(img, {
-  segmentationThreshold: <span class="str">0.7</span>
-});
+`net.segmentPerson(bild, {
+  internalResolution: <span class="str">'medium'</span>,
+  segmentationThreshold: <span class="str">0.4</span>
+}).then(segmentation =&gt; { … });
 <span class="cm">// segmentation.data: 1 = Person, 0 = Hintergrund</span>
 <span class="cm">// ... ein Wert pro Pixel</span>`,
     question:"Was steht am Ende in der „Personen-Maske“?",
@@ -215,11 +215,10 @@ next[y*size+x] = count &gt; total/<span class="str">2</span> ? <span class="str"
     step:4,
     eyebrow:"Schritt 5 · SVG-Export",
     title:"Was macht die Spiegelung?",
-    lede:"Für den Mirror-Haken in der App steht im SVG-Code:",
+    lede:"Jeder Stempel bekommt im SVG-Code diese Zeile:",
     code:
-`<span class="kw">const</span> t = mirror
-  ? <span class="str">\`translate(\${sizeMm},0) scale(-1,1)\`</span>
-  : <span class="str">""</span>;`,
+`<span class="str">'&lt;g transform="translate('</span> + w + <span class="str">',0) scale(-1,1)"&gt;'</span>
+<span class="cm">// w = Breite des Stempels in mm</span>`,
     question:"Was bewirkt scale(-1,1) hier?",
     correctText:"Spiegelt die Grafik horizontal (links-rechts vertauscht)",
     wrongText:"Macht die Grafik doppelt so groß",
@@ -230,15 +229,15 @@ next[y*size+x] = count &gt; total/<span class="str">2</span> ? <span class="str"
     step:4,
     eyebrow:"Schritt 5 · SVG-Export",
     title:"Wie entsteht ein „Loch“ im Motiv?",
-    lede:"Beim Positiv-Modus wird die Umgebung graviert, nicht das Motiv:",
+    lede:"Bei eurem Stempel wird die Fläche um das Motiv graviert, nicht das Motiv selbst:",
     code:
-`<span class="kw">const</span> d = <span class="str">\`\${fullRectD} \${motifPathD}\`</span>;
-<span class="cm">// eine volle Fläche + die Motiv-Kontur zusammen,</span>
-<span class="cm">// mit fill-rule="evenodd"</span>`,
-    question:"Was bewirkt fill-rule=\"evenodd\" im Positiv-Modus?",
-    correctText:"Schneidet das Motiv als „Loch“ aus einer voll eingefärbten Fläche heraus",
+`<span class="str">'&lt;path d="'</span> + off.cutPathD + <span class="str">' '</span> + off.motifPathD +
+<span class="str">'" fill="#1e4fd6" fill-rule="evenodd" /&gt;'</span>
+<span class="cm">// roter Rand + Motiv-Kontur zusammen, blau gefüllt</span>`,
+    question:"Was bewirkt fill-rule=\"evenodd\" bei eurem Stempel?",
+    correctText:"Schneidet das Motiv als „Loch“ aus der blauen Gravur-Fläche heraus",
     wrongText:"Färbt das Motiv einfach doppelt so kräftig ein",
-    explain:"Eine volle Rechteck-Fläche plus die Motiv-Kontur zusammen — mit evenodd wird alles, was von einer <b>ungeraden</b> Anzahl Konturen umschlossen ist, zum Loch. So bleibt das Motiv unbearbeitet, während ringsherum graviert wird.",
+    explain:"Die Fläche innerhalb des roten Rands plus die Motiv-Kontur zusammen: Mit evenodd wird alles, was von einer <b>geraden</b> Anzahl Konturen umschlossen ist, zum Loch. So bleibt das Motiv stehen (weiß), während ringsherum graviert wird (blau).",
     pipeline:"Das ist derselbe Trick, mit dem auch Buchstaben wie „O“ ihr Loch in der Mitte bekommen."
   },
 ];
@@ -388,11 +387,15 @@ function finish(){
   document.getElementById('app').classList.add('hidden');
   document.getElementById('outro').classList.remove('hidden');
   const correctCount = answered.filter(a => a === 'correct').length;
+  // In der Workshop-App eingebettet: Ergebnis an die Station melden (gleiche Adresse)
+  if(window.parent !== window) window.parent.postMessage({ stencilQuiz: { richtig: correctCount, gesamt: CARDS.length } }, location.origin);
   document.getElementById('scoreRow').innerHTML = `
     <div class="badge">${correctCount} von ${CARDS.length} richtig geraten</div>
     <div class="badge">Alle 5 Schritte durch</div>
   `;
 }
+// In der Workshop-App eingebettet: „Zurück zum Workshop“ ausblenden, die Station ist ja drumherum
+if(window.parent !== window) Array.prototype.forEach.call(document.querySelectorAll('.backlink'), a => { a.hidden = true; });
 </script>
 </body>
 </html>
