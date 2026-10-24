@@ -1,11 +1,13 @@
 // Klickt die Workshop-App automatisch durch (Anmeldung → Foto → stencil.me → Lasercutter).
 //
-// Voraussetzung: Server läuft (python3 server/server.py --port 8765) und Playwright
+// Voraussetzung: Test-Server läuft mit eigenem Datenordner, damit echte Stempel unberührt bleiben:
+//   STENCILME_DATEN=archiv/testdaten python3 server/server.py --port 8765
+// und Playwright
 // ist außerhalb des Repos installiert (~/.cache/stencilme-playwright).
 //
 //   NODE_PATH=~/.cache/stencilme-playwright/node_modules node tests/stationen-test.js [webkit|chromium] [Screenshot-Ordner, sonst archiv/screenshots]
 //
-// Legt auf dem Server eine Test-Gruppe an. Danach auf der Laptop-Seite löschen.
+// Legt im Testordner eine Test-Gruppe und Test-Stempel an (archiv/testdaten, nicht im Repo).
 const path = require('path');
 const pw = require('playwright');
 

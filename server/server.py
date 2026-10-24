@@ -28,7 +28,8 @@ import sys
 import urllib.parse
 
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-DATA_ROOT = os.path.join(REPO_DIR, "server", "daten")
+# STENCILME_DATEN: anderer Datenordner, z. B. für automatische Tests (echte Stempel bleiben unberührt)
+DATA_ROOT = os.path.abspath(os.environ.get("STENCILME_DATEN") or os.path.join(REPO_DIR, "server", "daten"))
 DATA_DIR = os.path.join(DATA_ROOT, "stempel")
 GROUPS_DIR = os.path.join(DATA_ROOT, "gruppen")
 SETTINGS_FILE = os.path.join(DATA_ROOT, "einstellungen.json")
