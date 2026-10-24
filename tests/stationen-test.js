@@ -129,7 +129,7 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Selbstporträts mit KI neu erschaffen', 'Mit der Hand drucken: Linolplatten'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Selbstporträts mit KI neu erschaffen', 'Mit der Hand drucken: Linolplatten', 'Kunst-Quiz: Künstler:innen und Streetart'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
   pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 12') >= 0, 'Zähler steht auf 1 von 12');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
@@ -471,10 +471,10 @@ async function abschliessen(page, sterne){
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-4-laptop.png'), fullPage: true });
 
   console.log('A4-Platte');
-  await laptop.click('#buildPlate');
-  await laptop.waitForSelector('#platePreview svg g');
+  await laptop.click('#platte-bauen');
+  await laptop.waitForSelector('#platte-vorschau svg g');
   const platte = await laptop.evaluate(() => {
-    const svg = document.querySelector('#platePreview svg');
+    const svg = document.querySelector('#platte-vorschau svg');
     const ids = Array.prototype.map.call(svg.querySelectorAll('[id]'), e => e.id);
     return { gruppen: svg.children.length, ids: ids.length, eindeutig: new Set(ids).size === ids.length, breite: svg.getAttribute('width') };
   });
@@ -482,15 +482,15 @@ async function abschliessen(page, sterne){
   pruefe(platte.eindeutig && platte.ids === platte.gruppen, 'jede Schnittkontur hat eine eigene ID');
   pruefe(platte.breite === '210mm', 'Platte ist A4 (210 mm breit)');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-8-platte.png'), fullPage: true });
-  const [download] = await Promise.all([laptop.waitForEvent('download'), laptop.click('#downloadPlate')]);
+  const [download] = await Promise.all([laptop.waitForEvent('download'), laptop.click('#platte-aktionen button:has-text("Platte herunterladen")')]);
   pruefe(/^platte-.*\.svg$/.test(download.suggestedFilename()), 'Download: ' + download.suggestedFilename());
-  await laptop.waitForSelector('.stamp.placed');
+  await laptop.waitForSelector('#platte-grid .stamp.placed');
   pruefe(true, 'Stempel danach grau markiert');
 
   console.log('Nachricht vom Laptop an die Gruppe');
-  await laptop.waitForSelector('.history-row');
-  await laptop.click('.history-row button:has-text("Wird gelasert")');
-  await laptop.waitForSelector('.history-row .sent');
+  await laptop.waitForSelector('#platte-verlauf .history-row');
+  await laptop.click('#platte-verlauf .history-row button:has-text("Wird gelasert")');
+  await laptop.waitForSelector('#platte-verlauf .history-row .sent');
   await page.goto(BASE + '/app/station.html?id=lasercutter');
   await page.waitForSelector('.nachricht', { timeout: 20000 });
   const nachricht = await page.locator('.nachricht p').first().textContent();
@@ -501,6 +501,32 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('h1');
   await page.waitForTimeout(1500);
   pruefe(await page.locator('.nachricht').count() === 0, 'nach OK bleibt die Nachricht weg');
+
+  console.log('Stickerfolie und Plotter (Testlauf ohne Plotter)');
+  await laptop.click('#folie-bauen');
+  await laptop.waitForSelector('#folie-vorschau svg g');
+  const folienSvg = await laptop.locator('#folie-vorschau svg').evaluate(svg => ({
+    schnitt: svg.querySelectorAll('[id="schneiden-rot"]').length,
+    stift: svg.querySelectorAll('[id="zeichnen-stift"]').length
+  }));
+  pruefe(folienSvg.schnitt === 2 && folienSvg.stift === 2, 'Folie: 2 Sticker mit Stift- und Messer-Gruppe');
+  await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-16-folie.png'), fullPage: true });
+  await laptop.click('#folie-aktionen button:has-text("An den Plotter schicken")');
+  await laptop.waitForSelector('.plotter-schritt:has-text("Stift (1,0 mm)")');
+  pruefe(true, 'Plotter: Schritt 1 „Stift einsetzen“');
+  await laptop.click('.plotter-schritt button:has-text("Zeichnen starten")');
+  await laptop.waitForSelector('.plotter-schritt:has-text("Stift raus, Messer rein")', { timeout: 20000 });
+  pruefe(true, 'Plotter: nach dem Zeichnen „Stift raus, Messer rein“');
+  await laptop.click('.plotter-schritt button:has-text("Schneiden starten")');
+  await laptop.waitForSelector('.plotter-schritt:has-text("FERTIG")', { timeout: 20000 });
+  pruefe(true, 'Plotter: fertig');
+  await laptop.click('.plotter-schritt button:has-text("Auftrag abschließen")');
+  await laptop.waitForSelector('#folie-verlauf .history-row');
+  await laptop.click('#folie-verlauf .history-row button:has-text("Fertig, abholen")');
+  await laptop.waitForSelector('#folie-verlauf .history-row .sent');
+  await page.goto(BASE + '/');
+  await page.waitForSelector('.nachricht', { timeout: 20000 });
+  pruefe(/Sticker von Ada und Bo ist fertig/.test(await page.locator('.nachricht p').first().textContent()), 'Startseite zeigt: Sticker fertig');
 
   pruefe(konsolenFehler.length === 0, 'keine JavaScript-Fehler' + (konsolenFehler.length ? ': ' + konsolenFehler.join(' | ') : ''));
   await browser.close();

@@ -393,17 +393,74 @@ function buildStampSvg(mask, offsetMm){
   return { svg: svg, cutLoops: off.cutLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
 }
 
-// Sticker für den Schneideplotter, wie buildPlotterSvg in stencil.html ohne Schraffur:
-// schwarze Silhouette (Kiss-Cut, nur die Folie) und roter Stanzschnitt um alles herum.
-// Nicht gespiegelt: Ein Sticker zeigt das Motiv so, wie es ist.
+// Schraffur: parallele Linien innerhalb der Silhouette (aus stencil.html übernommen).
+// Der Stift der Cameo kann keine Flächen füllen, darum „malt“ er das Motiv mit Linien aus.
+function buildHatchLinesD(mask, size, scale, spacingMm, angleDeg){
+  const spacingPx = Math.max(0.6, spacingMm / scale);
+  const theta = angleDeg * Math.PI / 180;
+  const dirX = Math.cos(theta), dirY = Math.sin(theta);
+  const perpX = -Math.sin(theta), perpY = Math.cos(theta);
+  const cx = size / 2, cy = size / 2;
+  const halfDiag = Math.sqrt(2) * size / 2 + spacingPx;
+  const stepT = 0.7; // Abtastschritt entlang der Linie in Pixel
+  const minRunPx = 0.5; // zu kurze Krümel-Segmente unterdrücken
+  const maxN = Math.ceil(halfDiag / spacingPx);
+  let d = '';
+  let count = 0;
+
+  for(let n = -maxN; n <= maxN; n++){
+    const c = n * spacingPx;
+    const originX = cx + perpX * c;
+    const originY = cy + perpY * c;
+    let runStartT = null;
+    let prevInside = false;
+    let lastT = -halfDiag;
+
+    for(let t = -halfDiag; t <= halfDiag; t += stepT){
+      const px = originX + dirX * t;
+      const py = originY + dirY * t;
+      const xi = Math.round(px), yi = Math.round(py);
+      const inside = (xi >= 0 && xi < size && yi >= 0 && yi < size) ? !!mask[yi * size + xi] : false;
+      if(inside && !prevInside){
+        runStartT = t;
+      } else if(!inside && prevInside){
+        if((lastT - runStartT) >= minRunPx){
+          const x0 = (originX + dirX * runStartT) * scale, y0 = (originY + dirY * runStartT) * scale;
+          const x1 = (originX + dirX * lastT) * scale, y1 = (originY + dirY * lastT) * scale;
+          d += `M ${x0.toFixed(3)} ${y0.toFixed(3)} L ${x1.toFixed(3)} ${y1.toFixed(3)} `;
+          count++;
+        }
+      }
+      prevInside = inside;
+      lastT = t;
+    }
+    if(prevInside && (lastT - runStartT) >= minRunPx){
+      const x0 = (originX + dirX * runStartT) * scale, y0 = (originY + dirY * runStartT) * scale;
+      const x1 = (originX + dirX * lastT) * scale, y1 = (originY + dirY * lastT) * scale;
+      d += `M ${x0.toFixed(3)} ${y0.toFixed(3)} L ${x1.toFixed(3)} ${y1.toFixed(3)} `;
+      count++;
+    }
+  }
+  return { d: d.trim(), count };
+}
+
+const STICKER_SCHRAFFUR_MM = 1.2; // Linienabstand (wie in stencil.html), Stift 1,0 mm
+const STICKER_WINKEL = 45;
+
+// Sticker für die Cameo 4, gleiches Format wie archiv/00_fotobox-karte (fotobox-queue.py):
+// Alles außerhalb der Gruppe „schneiden-rot“ zeichnet der Stift (Schraffur und Umriss),
+// die Gruppe „schneiden-rot“ schneidet das Messer. Nicht gespiegelt: Ein Sticker zeigt
+// das Motiv so, wie es ist.
 function buildStickerSvg(mask, offsetMm){
   const scale = STEMPEL_MM / WORK_SIZE;
   const off = computeOffsetCutPath(mask, WORK_SIZE, scale, offsetMm);
+  const schraffur = buildHatchLinesD(off.paddedMask, off.paddedSize, scale, STICKER_SCHRAFFUR_MM, STICKER_WINKEL);
   const w = off.widthMm.toFixed(3), h = off.heightMm.toFixed(3);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}mm" height="${h}mm">` +
     `<g transform="translate(${off.dxMm.toFixed(3)},${off.dyMm.toFixed(3)})">` +
-    `<g id="cut-outline"><path d="${off.cutPathD}" fill="none" stroke="${CUT_COLOR}" stroke-width="0.3" stroke-linejoin="round"/></g>` +
-    `<g id="kiss-cut-silhouette"><path d="${off.motifPathD}" fill="#1a1c1a" fill-rule="evenodd" stroke="#1a1c1a" stroke-width="0.05"/></g>` +
+    `<g id="zeichnen-stift" fill="none" stroke="#1a1c1a" stroke-width="0.35" stroke-linecap="round" stroke-linejoin="round">` +
+    `<path d="${schraffur.d}"/><path d="${off.motifPathD}"/></g>` +
+    `<g id="schneiden-rot"><path d="${off.cutPathD}" fill="none" stroke="${CUT_COLOR}" stroke-width="0.3" stroke-linejoin="round"/></g>` +
     `</g></svg>`;
   return { svg: svg, cutLoops: off.cutLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
 }

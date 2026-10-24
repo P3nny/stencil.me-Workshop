@@ -184,6 +184,11 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - KI-Selbstporträt mit Sonnet 5.5 (siehe `docs/entscheidungen.md` Punkt 5)
 - Abschluss jeder Station: erst Auflösungen, dann „Was hast du genutzt?“ (neu: „Ohne Computer“), dann Sterne
 - Alle Fotos gehen an den Laptop, auch das Ausgangsfoto und verworfene Versuche
+- **Laptop-Seite neu gegliedert** (`server/bogen.js`): zwei gleich aufgebaute Bereiche
+  - „Stempel → A4-Holzplatte für den Mr Beam“: anhaken, „Platte zusammenstellen“, „Platte herunterladen (SVG)“ (5 mm Rand, 3 mm Abstand)
+  - „Sticker → A4-Stickerfolie für die Cameo“: anhaken, „Folie zusammenstellen“ (8 mm Rand, 4 mm Abstand), „An den Plotter schicken“ oder „Nur herunterladen“
+  - je ein Verlauf mit Nachrichten-Knöpfen
+- **Plotter** (`server/plotter.py`, Vorbild `archiv/00_fotobox-karte/fotobox-queue.py`): Sticker im Fotobox-Format (Gruppe `zeichnen-stift`: Schraffur 1,2 mm + Umriss; Gruppe `schneiden-rot`: Messer). Laptop-Seite führt durch die Schritte: Folie + Stift einlegen → „Zeichnen starten“ → „Stift raus, Messer rein“ → „Schneiden starten“ → „FERTIG“. Gleiche Einstellungen wie die Fotobox (Stift Druck 5/Tempo 5, Messer Autoblade Tiefe 4, Druck 14, Tempo 3, 2 Durchgänge), änderbar per Umgebungsvariable. `STENCILME_PLOTTER_TEST=1`: Testlauf ohne Plotter. *Mit echter Cameo noch nicht getestet*
 - **Nachrichten an die Gruppen:** Stempel und Sticker tragen die Gruppen-ID im Dateinamen. Laptop-Seite → „Letzte Platten“: pro Platte „📣 Wird gelasert“ und „📣 Fertig, abholen“. Jede Gruppe bekommt eine eigene Nachricht mit ihren Namen, die iPads zeigen sie oben an (Abfrage alle 15 s), „OK“ blendet sie aus
 
 ## Weitere Screens

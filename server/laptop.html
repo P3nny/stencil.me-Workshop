@@ -6,6 +6,7 @@
 <title>stencil.me Laptop</title>
 <link href="/vendor/fonts/fonts.css" rel="stylesheet">
 <script src="/vendor/qrcode/qrcode.js"></script>
+<script src="/laptop/bogen.js"></script>
 <style>
   :root { --ink:#111; --paper:#fff; --neon:#ff2d95; --kraft:#b89b74; --muted:#4a4a4a; }
   body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:'DM Sans',-apple-system,sans-serif; }
@@ -28,7 +29,16 @@
   button { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.1em; border:3px solid var(--ink); background:#fff; padding:8px 14px; cursor:pointer; margin-top:16px; }
   button:hover { background:var(--neon); }
   .error { background:var(--neon); border:2px solid var(--ink); padding:10px; margin-top:12px; font-weight:700; }
-  .groups-panel, .plate-panel, .sticker-panel { width:100%; }
+  .groups-panel { width:100%; }
+  .bogen-panel { flex:1; min-width:480px; }
+  .plate.folie { background:#fff; }
+  .plotter { margin-top:16px; }
+  .plotter-schritt { border:3px solid var(--ink); padding:12px; background:#fffbe6; }
+  .plotter-schritt p { margin:4px 0; font-size:1.05rem; }
+  .plotter-schritt .gross { font-family:'Oswald',sans-serif; font-size:1.3rem; text-transform:uppercase; }
+  .plotter-schritt.laeuft { background:#e6f0ff; }
+  .plotter-schritt.fertig { background:#e6f7ea; }
+  .plotter-fehler { background:var(--neon); border:2px solid var(--ink); padding:8px; font-weight:700; }
   .stamp a.download { display:inline-block; margin-top:4px; font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:.8rem; color:var(--ink); }
   .stamp label { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px; cursor:pointer; }
   .stamp input { width:20px; height:20px; accent-color:var(--neon); }
@@ -63,37 +73,50 @@
     <div class="hint">Kamera-App des iPads auf den Code richten, dann den Link antippen.</div>
     <div class="hint"><a href="/qr">QR-Codes für alle Stationen (zum Drucken) →</a></div>
   </div>
-  <div class="panel list-panel">
-    <h2>Eingegangene Stempel</h2>
-    <div class="count" id="count">–</div>
-    <div class="hint">Ordner für die Mr-Beam-Oberfläche:</div>
-    <div class="folder" id="folder"></div>
-    <div id="listError"></div>
-    <div class="grid" id="grid"></div>
-  </div>
-  <div class="panel sticker-panel">
-    <h2>Sticker für den Schneideplotter (Bonus)</h2>
-    <div class="count" id="stickerCount">–</div>
-    <div class="hint">Ordner: <span class="folder" id="stickerFolder"></span></div>
-    <div class="grid" id="stickerGrid"></div>
-  </div>
-  <div class="panel plate-panel">
-    <h2>A4-Platte für den Mr Beam</h2>
-    <div class="hint">Angehakte Stempel oben kommen auf die Platte: 5 mm Rand, 3 mm Abstand. Stempel, die schon auf einer Platte waren, sind grau und nicht angehakt.</div>
-    <button id="buildPlate" type="button">Platte zusammenstellen</button>
-    <div class="plate-layout" id="plateLayout" hidden>
-      <div class="plate" id="platePreview"></div>
+</div>
+<div class="layout" style="margin-top:28px">
+  <div class="panel bogen-panel" id="platte">
+    <h2>Stempel → A4-Holzplatte für den Mr Beam</h2>
+    <div class="count" id="platte-anzahl">–</div>
+    <div class="hint">Ordner: <span class="folder" id="platte-ordner"></span></div>
+    <div id="platte-fehler"></div>
+    <div class="grid" id="platte-grid"></div>
+    <div class="hint">Angehakte Stempel kommen auf die Platte: 5 mm Rand, 3 mm Abstand. Wer zuerst fertig war, kommt zuerst dran.</div>
+    <button id="platte-bauen" type="button">Platte zusammenstellen</button>
+    <div class="plate-layout" id="platte-layout" hidden>
+      <div class="plate" id="platte-vorschau"></div>
       <div class="plate-info">
-        <div id="plateSummary"></div>
-        <button id="downloadPlate" type="button">Platte herunterladen (SVG)</button>
-        <div class="hint">In der Mr-Beam-Oberfläche: Datei öffnen, Gravur (Blau) mit <b>2 Durchgängen</b>, dann Schnitt (Rot). Danach sind die Stempel grau markiert.</div>
-        <button id="resetPlaced" type="button">Grau-Markierung zurücksetzen</button>
+        <div id="platte-info"></div>
+        <div id="platte-aktionen"></div>
+        <div class="hint">In der Mr-Beam-Oberfläche: Datei öffnen, Gravur (Blau) mit <b>2 Durchgängen</b>, dann Schnitt (Rot).</div>
+        <button id="platte-zuruecksetzen" type="button">Grau-Markierung zurücksetzen</button>
       </div>
     </div>
     <h2 style="margin-top:20px">Letzte Platten: Nachricht an die Kinder</h2>
-    <div class="hint">Die Nachricht erscheint auf den iPads der Gruppen, deren Stempel auf der Platte sind.</div>
-    <div id="plateHistory"></div>
+    <div id="platte-verlauf"></div>
   </div>
+  <div class="panel bogen-panel" id="folie">
+    <h2>Sticker → A4-Stickerfolie für die Cameo (Bonus)</h2>
+    <div class="count" id="folie-anzahl">–</div>
+    <div class="hint">Ordner: <span class="folder" id="folie-ordner"></span></div>
+    <div id="folie-fehler"></div>
+    <div class="grid" id="folie-grid"></div>
+    <div class="hint">Angehakte Sticker kommen auf die Folie: 8 mm Rand, 4 mm Abstand.</div>
+    <button id="folie-bauen" type="button">Folie zusammenstellen</button>
+    <div class="plate-layout" id="folie-layout" hidden>
+      <div class="plate folie" id="folie-vorschau"></div>
+      <div class="plate-info">
+        <div id="folie-info"></div>
+        <div id="folie-aktionen"></div>
+        <button id="folie-zuruecksetzen" type="button">Grau-Markierung zurücksetzen</button>
+      </div>
+    </div>
+    <div class="plotter" id="plotter"></div>
+    <h2 style="margin-top:20px">Letzte Folien: Nachricht an die Kinder</h2>
+    <div id="folie-verlauf"></div>
+  </div>
+</div>
+<div class="layout" style="margin-top:28px">
   <div class="panel groups-panel">
     <h2>Gruppen an den Stationen</h2>
     <div class="settings">
@@ -115,7 +138,6 @@
 <script>
 (function () {
   "use strict";
-  var seen = null; // Pfade der letzten Liste, um neue Stempel hervorzuheben
 
   function showQr(url) {
     var qr = qrcode(0, "M");
@@ -142,252 +164,125 @@
       .catch(function () { setTimeout(loadInfo, 5000); });
   }
 
-  // ---- A4-Platte: Stempel automatisch anordnen ----
-  var PLATE_W = 210, PLATE_H = 297, MARGIN = 5, GAP = 3; // mm
-  var PLACED_KEY = "stencilme-auf-platte";
-  var HISTORY_KEY = "stencilme-platten";
-  var HISTORY_MAX = 10;
-  var selection = {}; // pfad -> true/false (von Hand geändert)
-  var placed = loadPlaced();
-  var stampList = [];
-  var plateSvg = null;
-  var platePaths = [];
-  var plateStamps = [];
-
-  function loadPlaced() {
-    try { return JSON.parse(localStorage.getItem(PLACED_KEY) || "[]"); } catch (e) { return []; }
-  }
-  function savePlaced() {
-    try { localStorage.setItem(PLACED_KEY, JSON.stringify(placed)); } catch (e) { /* nur Komfort */ }
-  }
-  function isSelected(pfad) {
-    return pfad in selection ? selection[pfad] : placed.indexOf(pfad) < 0;
-  }
-
-  // Ein Stempel als Gruppe auf der Platte. IDs (z. B. cutClip) bekommen eine Vorsilbe,
-  // sonst würden sich die Stempel gegenseitig die Schnittkontur wegnehmen.
-  function stampGroup(text, n, x, y) {
-    var doc = new DOMParser().parseFromString(text, "image/svg+xml");
-    var inner = doc.documentElement.innerHTML
-      .replace(/id="([^"]+)"/g, 'id="s' + n + '-$1"')
-      .replace(/url\(#([^)]+)\)/g, "url(#s" + n + "-$1)");
-    return '<g transform="translate(' + x.toFixed(3) + "," + y.toFixed(3) + ')">' + inner + "</g>";
-  }
-
-  function stampSize(text) {
-    var root = new DOMParser().parseFromString(text, "image/svg+xml").documentElement;
-    var vb = (root.getAttribute("viewBox") || "").split(/[\s,]+/).map(parseFloat);
-    return { w: vb[2] || parseFloat(root.getAttribute("width")), h: vb[3] || parseFloat(root.getAttribute("height")) };
-  }
-
-  // Erst in Ankunftsreihenfolge prüfen, wer noch auf die Platte passt (ältester zuerst),
-  // dann diese Stempel platzsparend anordnen: höchste zuerst, sonst Reihenfolge behalten.
-  function layout(items) {
-    var probe = shelfPack(items);
-    var sorted = probe.fits
-      .map(function (it, i) { return { it: it, i: i }; })
-      .sort(function (a, b) { return (b.it.h - a.it.h) || (a.i - b.i); })
-      .map(function (p) { return p.it; });
-    var packed = shelfPack(sorted);
-    return { fits: packed.fits, rest: packed.rest.concat(probe.rest) };
-  }
-
-  // Regal-Packen: Reihe für Reihe von oben links. Nach dem ersten Stempel, der nicht
-  // mehr passt, ist Schluss, damit keiner von später vorrutscht.
-  function shelfPack(items) {
-    var x = MARGIN, y = MARGIN, rowH = 0, fits = [], rest = [];
-    items.forEach(function (it) {
-      if (rest.length) { rest.push(it); return; }
-      if (x + it.w > PLATE_W - MARGIN) { x = MARGIN; y += rowH + GAP; rowH = 0; }
-      if (it.w > PLATE_W - 2 * MARGIN || y + it.h > PLATE_H - MARGIN) { rest.push(it); return; }
-      it.x = x; it.y = y;
-      fits.push(it);
-      x += it.w + GAP;
-      rowH = Math.max(rowH, it.h);
-    });
-    return { fits: fits, rest: rest };
-  }
-
-  function buildPlate() {
-    // Älteste zuerst: Wer zuerst fertig war, kommt zuerst auf die Platte (die Liste ist neueste zuerst)
-    var chosen = stampList.filter(function (s) { return isSelected(s.pfad); }).reverse();
-    var summary = document.getElementById("plateSummary");
-    document.getElementById("plateLayout").hidden = false;
-    if (!chosen.length) {
-      summary.innerHTML = '<p class="warn">Keine Stempel angehakt.</p>';
-      document.getElementById("platePreview").innerHTML = "";
-      plateSvg = null;
-      return;
-    }
-    Promise.all(chosen.map(function (s) {
-      return fetch("/daten/" + encodeURI(s.pfad), { cache: "no-store" }).then(function (r) { return r.text(); })
-        .then(function (text) { var size = stampSize(text); return { s: s, text: text, w: size.w, h: size.h }; });
-    })).then(function (items) {
-      var result = layout(items);
-      var groups = result.fits.map(function (it, n) { return stampGroup(it.text, n, it.x, it.y); }).join("");
-      plateSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + PLATE_W + " " + PLATE_H + '" width="' + PLATE_W + 'mm" height="' + PLATE_H + 'mm">' + groups + "</svg>";
-      platePaths = result.fits.map(function (it) { return it.s.pfad; });
-      plateStamps = result.fits.map(function (it) { return { name: it.s.name, gruppe: it.s.gruppe }; });
-      document.getElementById("platePreview").innerHTML = plateSvg;
-      var html = "<p><b>" + result.fits.length + " Stempel</b> auf der Platte: " +
-        result.fits.map(function (it) { return it.s.name; }).join(", ") + "</p>";
-      if (result.rest.length) {
-        html += '<p class="warn">Passen nicht mehr: ' + result.rest.map(function (it) { return it.s.name; }).join(", ") +
-          ". Die kommen auf die nächste Platte.</p>";
-      }
-      summary.innerHTML = html;
-    }).catch(function () {
-      summary.innerHTML = '<p class="warn">Stempel konnten nicht geladen werden.</p>';
-    });
-  }
-
-  // ---- Nachrichten an die Gruppen einer Platte ----
-  var MESSAGES = {
-    laser: { knopf: "📣 Wird gelasert", text: function (namen) { return "Der Stempel von " + namen + " wird jetzt gelasert. Kommt gern zum Zuschauen!"; } },
-    fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { return "Der Stempel von " + namen + " ist fertig! Holt ihn bei Penny am Lasercutter ab."; } }
-  };
-
-  function loadHistory() {
-    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch (e) { return []; }
-  }
-  function saveHistory(h) {
-    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, HISTORY_MAX))); } catch (e) { /* nur Komfort */ }
-  }
-
-  function namenListe(namen) {
-    return namen.length > 1 ? namen.slice(0, -1).join(", ") + " und " + namen[namen.length - 1] : namen[0];
-  }
-
-  // Pro Gruppe eine eigene Nachricht mit den Namen ihrer Stempel auf dieser Platte
-  function notify(plate, art, feedback) {
-    var proGruppe = {};
-    plate.stempel.forEach(function (s) {
-      if (!s.gruppe) return;
-      (proGruppe[s.gruppe] = proGruppe[s.gruppe] || []).push(s.name);
-    });
-    var gruppen = Object.keys(proGruppe);
-    if (!gruppen.length) {
-      feedback.textContent = "Keine Gruppe bekannt (alte Stempel ohne Gruppe).";
-      return;
-    }
-    Promise.all(gruppen.map(function (g) {
-      return fetch("/api/nachricht", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ gruppen: [g], text: MESSAGES[art].text(namenListe(proGruppe[g])) })
-      }).then(function (r) { if (!r.ok) throw new Error(r.status); });
-    })).then(function () {
-      plate.gesendet = plate.gesendet || {};
-      plate.gesendet[art] = new Date().toTimeString().slice(0, 5);
-      var h = loadHistory().map(function (p) { return p.datei === plate.datei ? plate : p; });
-      saveHistory(h);
-      renderHistory();
-    }).catch(function () {
-      feedback.textContent = "Senden hat nicht geklappt.";
-    });
-  }
-
-  function renderHistory() {
-    var box = document.getElementById("plateHistory");
-    box.innerHTML = "";
-    loadHistory().forEach(function (plate) {
-      var row = document.createElement("div");
-      row.className = "history-row";
-      var label = document.createElement("span");
-      label.innerHTML = "<b></b> ";
-      label.firstChild.textContent = plate.datei;
-      label.appendChild(document.createTextNode(plate.stempel.map(function (s) { return s.name; }).join(", ")));
-      row.appendChild(label);
-      var feedback = document.createElement("span");
-      Object.keys(MESSAGES).forEach(function (art) {
-        var b = document.createElement("button");
-        b.type = "button";
-        b.textContent = MESSAGES[art].knopf;
-        b.addEventListener("click", function () { notify(plate, art, feedback); });
-        row.appendChild(b);
-        if (plate.gesendet && plate.gesendet[art]) {
-          var ok = document.createElement("span");
-          ok.className = "sent";
-          ok.textContent = "✓ " + plate.gesendet[art];
-          row.appendChild(ok);
-        }
-      });
-      row.appendChild(feedback);
-      box.appendChild(row);
-    });
-    if (!box.children.length) box.innerHTML = '<div class="hint">Noch keine Platte heruntergeladen.</div>';
-  }
-
-  document.getElementById("buildPlate").addEventListener("click", buildPlate);
-  document.getElementById("downloadPlate").addEventListener("click", function () {
-    if (!plateSvg) return;
-    var now = new Date();
-    var pad = function (v) { return ("0" + v).slice(-2); };
+  function svgHerunterladen(svg, name) {
     var a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([plateSvg], { type: "image/svg+xml" }));
-    a.download = "platte-" + now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) + "-" + pad(now.getHours()) + pad(now.getMinutes()) + ".svg";
+    a.href = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+    a.download = name;
     a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-    platePaths.forEach(function (p) { if (placed.indexOf(p) < 0) placed.push(p); delete selection[p]; });
-    savePlaced();
-    var history = loadHistory();
-    history.unshift({ datei: a.download, stempel: plateStamps });
-    saveHistory(history);
-    renderHistory();
-    loadList();
-  });
-  document.getElementById("resetPlaced").addEventListener("click", function () {
-    placed = [];
-    selection = {};
-    savePlaced();
-    loadList();
-  });
-
-  function renderList(data) {
-    stampList = data.stempel;
-    var grid = document.getElementById("grid");
-    var count = data.stempel.length;
-    document.getElementById("count").textContent = count + " Stempel";
-    document.getElementById("folder").textContent = data.ordner;
-    grid.innerHTML = "";
-    data.stempel.forEach(function (s) {
-      var box = document.createElement("div");
-      box.className = "stamp" + (seen && seen.indexOf(s.pfad) < 0 ? " new" : "");
-      var img = document.createElement("img");
-      img.src = "/daten/" + encodeURI(s.pfad);
-      img.alt = "Stempel von " + s.name;
-      var name = document.createElement("div");
-      name.className = "name";
-      name.textContent = s.name;
-      var time = document.createElement("div");
-      time.textContent = s.tag + " " + s.zeit;
-      if (placed.indexOf(s.pfad) >= 0) box.className += " placed";
-      var label = document.createElement("label");
-      var check = document.createElement("input");
-      check.type = "checkbox";
-      check.checked = isSelected(s.pfad);
-      check.addEventListener("change", function () { selection[s.pfad] = check.checked; });
-      label.appendChild(check);
-      label.appendChild(document.createTextNode("auf die Platte"));
-      box.appendChild(img);
-      box.appendChild(name);
-      box.appendChild(time);
-      box.appendChild(label);
-      grid.appendChild(box);
-    });
-    seen = data.stempel.map(function (s) { return s.pfad; });
   }
 
-  function loadList() {
-    fetch("/api/liste", { cache: "no-store" })
+  function zeitName(praefix) {
+    var now = new Date();
+    var pad = function (v) { return ("0" + v).slice(-2); };
+    return praefix + "-" + now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) + "-" + pad(now.getHours()) + pad(now.getMinutes());
+  }
+
+  function knopf(text, onclick) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = text;
+    b.addEventListener("click", onclick);
+    return b;
+  }
+
+  // ---- Holzplatte für den Mr Beam: herunterladen, in BeamOS öffnen ----
+  var platte = Bogen.erstellen({
+    id: "platte", schluessel: "stencilme-platte", liste: "/api/liste", dateien: "/daten/",
+    einzahl: "Stempel", mehrzahl: "Stempel", haken: "auf die Platte", bogen: "der Platte", naechster: "die nächste Platte",
+    rand: 5, abstand: 3,
+    nachrichten: {
+      laser: { knopf: "📣 Wird gelasert", text: function (namen) { return "Der Stempel von " + namen + " wird jetzt gelasert. Kommt gern zum Zuschauen!"; } },
+      fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { return "Der Stempel von " + namen + " ist fertig! Holt ihn bei Penny am Lasercutter ab."; } }
+    },
+    bereit: function (aktuell) {
+      var box = document.getElementById("platte-aktionen");
+      box.innerHTML = "";
+      if (!aktuell) return;
+      box.appendChild(knopf("Platte herunterladen (SVG)", function () {
+        var name = zeitName("platte") + ".svg";
+        svgHerunterladen(aktuell.svg, name);
+        platte.abgeschlossen(name);
+      }));
+    }
+  });
+
+  // ---- Stickerfolie für die Cameo: an den Plotter (Stift, dann Messer) ----
+  var folie = Bogen.erstellen({
+    id: "folie", schluessel: "stencilme-folie", liste: "/api/sticker", dateien: "/sticker/",
+    einzahl: "Sticker", mehrzahl: "Sticker", haken: "auf die Folie", bogen: "der Folie", naechster: "die nächste Folie",
+    rand: 8, abstand: 4, einzelDownload: true,
+    nachrichten: {
+      laser: { knopf: "📣 Wird geplottet", text: function (namen) { return "Der Sticker von " + namen + " wird jetzt geplottet. Kommt gern zum Zuschauen!"; } },
+      fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { return "Der Sticker von " + namen + " ist fertig! Holt ihn bei Penny am Schneideplotter ab."; } }
+    },
+    bereit: function (aktuell) {
+      var box = document.getElementById("folie-aktionen");
+      box.innerHTML = "";
+      if (!aktuell) return;
+      box.appendChild(knopf("An den Plotter schicken", function () {
+        fetch("/api/plotter/folie", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ svg: aktuell.svg, sticker: aktuell.stuecke })
+        }).then(function (r) { return r.json(); }).then(function (d) {
+          if (!d.ok) { plotterFehler(d.fehler); return; }
+          folie.abgeschlossen(d.auftrag.name);
+          box.innerHTML = "";
+          plotterLaden();
+        }).catch(function () { plotterFehler("Server nicht erreichbar."); });
+      }));
+      box.appendChild(knopf("Nur herunterladen (SVG)", function () { svgHerunterladen(aktuell.svg, zeitName("folie") + ".svg"); }));
+    }
+  });
+
+  // ---- Plotter Schritt für Schritt (wie die Fotobox, aber mit Knöpfen statt Enter) ----
+  var PLOTTER_SCHRITTE = {
+    bereit: { klasse: "", text: ["1. NEUE weiße Stickerfolie auf die Matte, oben links an die Mattenecke.", "2. Stift (1,0 mm) links einsetzen, Matte laden."], knopf: ["Zeichnen starten", "zeichnen"] },
+    zeichnet: { klasse: "laeuft", text: ["Zeichnen läuft …"] },
+    gezeichnet: { klasse: "", text: ["3. Stift raus, Messer rein. Matte NICHT herausnehmen."], knopf: ["Schneiden starten", "schneiden"] },
+    schneidet: { klasse: "laeuft", text: ["Schneiden läuft …"] },
+    fertig: { klasse: "fertig", text: ["FERTIG. Matte entladen, Sticker abziehen.", "Unten bei „Letzte Folien“: „📣 Fertig, abholen“ schicken."], knopf: ["Auftrag abschließen", "verwerfen"] }
+  };
+
+  function plotterFehler(text) {
+    var box = document.getElementById("plotter");
+    var f = document.createElement("div");
+    f.className = "plotter-fehler";
+    f.textContent = text;
+    box.insertBefore(f, box.firstChild);
+  }
+
+  function plotterSchritt(was) {
+    fetch("/api/plotter/schritt", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ was: was }) })
       .then(function (r) { return r.json(); })
-      .then(function (data) {
-        document.getElementById("listError").innerHTML = "";
-        renderList(data);
+      .then(function (d) { if (!d.ok) plotterFehler(d.fehler); plotterLaden(); })
+      .catch(function () { plotterFehler("Server nicht erreichbar."); });
+  }
+
+  function plotterLaden() {
+    fetch("/api/plotter/status", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (st) {
+        var box = document.getElementById("plotter");
+        box.innerHTML = "";
+        if (!st.plotterBereit) plotterFehler("Silhouette-Erweiterung für Inkscape nicht gefunden: Plotten geht nicht, nur Herunterladen.");
+        var a = st.auftrag;
+        if (!a) return;
+        var schritt = PLOTTER_SCHRITTE[a.zustand] || { klasse: "", text: [a.zustand] };
+        var karte = document.createElement("div");
+        karte.className = "plotter-schritt " + schritt.klasse;
+        var titel = document.createElement("p");
+        titel.className = "gross";
+        titel.textContent = "Folie " + a.name + (st.test ? " (Testlauf, Plotter bleibt aus)" : "");
+        karte.appendChild(titel);
+        schritt.text.forEach(function (t) { var p = document.createElement("p"); p.textContent = t; karte.appendChild(p); });
+        if (a.meldung) { var m = document.createElement("p"); m.className = "plotter-fehler"; m.textContent = a.meldung; karte.appendChild(m); }
+        if (schritt.knopf) karte.appendChild(knopf(schritt.knopf[0], function () { plotterSchritt(schritt.knopf[1]); }));
+        if (a.zustand === "bereit" || a.zustand === "gezeichnet") karte.appendChild(knopf("Auftrag verwerfen", function () { if (confirm("Diesen Plotter-Auftrag verwerfen?")) plotterSchritt("verwerfen"); }));
+        box.appendChild(karte);
       })
-      .catch(function () {
-        document.getElementById("listError").innerHTML = '<div class="error">Server nicht erreichbar. Läuft das Server-Fenster noch?</div>';
-      });
+      .catch(function () { /* egal */ });
   }
 
   var stationTitles = {}; // id -> Titel, aus /stationen
@@ -454,37 +349,6 @@
       });
   }
 
-  function loadSticker() {
-    fetch("/api/sticker", { cache: "no-store" })
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        var grid = document.getElementById("stickerGrid");
-        document.getElementById("stickerCount").textContent = data.stempel.length + " Sticker";
-        document.getElementById("stickerFolder").textContent = data.ordner;
-        grid.innerHTML = "";
-        data.stempel.forEach(function (s) {
-          var box = document.createElement("div");
-          box.className = "stamp";
-          var img = document.createElement("img");
-          img.src = "/sticker/" + encodeURI(s.pfad);
-          img.alt = "Sticker von " + s.name;
-          var name = document.createElement("div");
-          name.className = "name";
-          name.textContent = s.name + " · " + s.zeit;
-          var link = document.createElement("a");
-          link.className = "download";
-          link.href = "/sticker/" + encodeURI(s.pfad);
-          link.download = s.datei;
-          link.textContent = "Herunterladen";
-          box.appendChild(img);
-          box.appendChild(name);
-          box.appendChild(link);
-          grid.appendChild(box);
-        });
-      })
-      .catch(function () { /* egal */ });
-  }
-
   function loadKi() {
     fetch("/api/ki-status", { cache: "no-store" })
       .then(function (r) { return r.json(); })
@@ -516,17 +380,16 @@
 
   document.getElementById("deleteAll").addEventListener("click", function () {
     if (!confirm("Wirklich ALLE Stempel, Antworten und Fotos vom Laptop löschen? Das kann nicht rückgängig gemacht werden.")) return;
-    fetch("/api/alle-loeschen", { method: "POST" }).then(function () { loadList(); loadGroups(); });
+    fetch("/api/alle-loeschen", { method: "POST" }).then(function () { platte.laden(); folie.laden(); loadGroups(); });
   });
 
   loadInfo();
   loadStations();
   loadSettings();
-  loadList();
   loadKi();
-  loadSticker();
-  renderHistory();
-  setInterval(function () { loadList(); loadGroups(); loadKi(); loadSticker(); }, 5000);
+  plotterLaden();
+  setInterval(function () { loadGroups(); loadKi(); }, 5000);
+  setInterval(plotterLaden, 2000);
 })();
 </script>
 </body>

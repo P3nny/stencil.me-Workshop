@@ -29,12 +29,15 @@ import threading
 import urllib.parse
 
 import ki_bild
+import plotter
 
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # STENCILME_DATEN: anderer Datenordner, z. B. für automatische Tests (echte Stempel bleiben unberührt)
 DATA_ROOT = os.path.abspath(os.environ.get("STENCILME_DATEN") or os.path.join(REPO_DIR, "server", "daten"))
 DATA_DIR = os.path.join(DATA_ROOT, "stempel")
 STICKER_DIR = os.path.join(DATA_ROOT, "sticker")  # für den Schneideplotter (Bonus-Station)
+PLOTTER_DIR = os.path.join(DATA_ROOT, "plotter")  # Sticker-Folien (Aufträge an die Cameo)
+MAX_SHEET_BYTES = 20 * 1024 * 1024
 GROUPS_DIR = os.path.join(DATA_ROOT, "gruppen")
 SETTINGS_FILE = os.path.join(DATA_ROOT, "einstellungen.json")
 KI_LOG_FILE = os.path.join(DATA_ROOT, "ki-protokoll.jsonl")
@@ -262,11 +265,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({"nachrichten": []})
             return self.send_json({"nachrichten": read_messages().get(group_id, [])})
 
-        if path in ("/laptop", "/qr", "/api/liste", "/api/sticker", "/api/info", "/api/gruppen", "/api/ki-status") or path.startswith(("/daten/", "/dateien/", "/sticker/")):
+        if path in ("/laptop", "/laptop/bogen.js", "/qr", "/api/liste", "/api/sticker", "/api/info", "/api/gruppen", "/api/ki-status", "/api/plotter/status") or path.startswith(("/daten/", "/dateien/", "/sticker/")):
             if not self.is_local():
                 return self.send_error(403, "Nur am Laptop")
-            if path in ("/laptop", "/qr"):
-                self.path = "/server/laptop.html" if path == "/laptop" else "/server/qr-codes.html"
+            if path in ("/laptop", "/laptop/bogen.js", "/qr"):
+                self.path = {"/laptop": "/server/laptop.html", "/laptop/bogen.js": "/server/bogen.js", "/qr": "/server/qr-codes.html"}[path]
                 return super().do_GET()
             if path == "/api/liste":
                 return self.send_json({"stempel": list_stamps(), "ordner": DATA_DIR})
@@ -281,6 +284,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({"gruppen": list_groups(), "ordner": GROUPS_DIR})
             if path == "/api/ki-status":
                 return self.send_json(ki_bild.status(KI_LOG_FILE))
+            if path == "/api/plotter/status":
+                return self.send_json(plotter.status())
             if path.startswith("/dateien/"):
                 return self.send_data_file(GROUPS_DIR, path[len("/dateien/"):])
             return self.send_data_file(DATA_DIR, path[len("/daten/"):])
@@ -321,14 +326,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.receive_file(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/ki-bild":
             return self.ki_bild()
-        if parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht") and not self.is_local():
+        if (parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
         if parsed.path == "/api/einstellungen":
             return self.save_settings()
         if parsed.path == "/api/nachricht":
             return self.send_message()
+        if parsed.path == "/api/plotter/folie":
+            return self.plotter_folie()
+        if parsed.path == "/api/plotter/schritt":
+            return self.plotter_schritt()
         if parsed.path == "/api/alle-loeschen":
-            for d in (DATA_DIR, STICKER_DIR, GROUPS_DIR):
+            for d in (DATA_DIR, STICKER_DIR, PLOTTER_DIR, GROUPS_DIR):
                 if os.path.isdir(d):
                     shutil.rmtree(d)
             for f in (KI_LOG_FILE, MESSAGES_FILE):
@@ -413,6 +422,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json(ki_bild.bild_fuer_gruppe(os.path.join(GROUPS_DIR, gruppe), KI_LOG_FILE, auswahl, gruppe))
         except ki_bild.KiFehler as err:
             return self.send_json({"ok": False, "fehler": err.text}, err.status)
+
+    def plotter_folie(self):
+        body = self.read_body(MAX_SHEET_BYTES)
+        try:
+            data = json.loads(body.decode("utf-8")) if body else {}
+        except ValueError:
+            data = {}
+        sticker = [s for s in data.get("sticker", []) if isinstance(s, dict)]
+        try:
+            auftrag = plotter.neuer_auftrag(PLOTTER_DIR, str(data.get("svg", "")).encode("utf-8"), sticker)
+        except plotter.PlotterFehler as err:
+            return self.send_json({"ok": False, "fehler": str(err)}, 409)
+        print("Sticker-Folie bereit: %s (%d Sticker)" % (auftrag["name"], len(sticker)))
+        return self.send_json({"ok": True, "auftrag": auftrag})
+
+    def plotter_schritt(self):
+        body = self.read_body(MAX_EVENT_BYTES)
+        try:
+            was = json.loads(body.decode("utf-8")).get("was", "") if body else ""
+        except (ValueError, AttributeError):
+            was = ""
+        try:
+            return self.send_json(dict(plotter.schritt(was), ok=True))
+        except plotter.PlotterFehler as err:
+            return self.send_json({"ok": False, "fehler": str(err)}, 409)
 
     def send_message(self):
         body = self.read_body(MAX_EVENT_BYTES)
