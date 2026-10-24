@@ -393,6 +393,22 @@ function buildStampSvg(mask, offsetMm){
   return { svg: svg, cutLoops: off.cutLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
 }
 
+// Lasercut-Porträt (Positiv), wie „Bild für den Lasercutter“ in stencil.html
+// (buildLaserSvg(variant, 'negative')), aber mit Schnittrand am Umriss wie beim Stempel:
+// Das Motiv (die dunklen Stellen des Fotos) wird graviert und dunkel, der Rest bleibt
+// hell. Nicht gespiegelt: Es ist ein Bild, kein Stempel.
+function buildPortraitSvg(mask, offsetMm){
+  const scale = STEMPEL_MM / WORK_SIZE;
+  const off = computeOffsetCutPath(mask, WORK_SIZE, scale, offsetMm);
+  const w = off.widthMm.toFixed(3), h = off.heightMm.toFixed(3);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}mm" height="${h}mm">` +
+    `<g transform="translate(${off.dxMm.toFixed(3)},${off.dyMm.toFixed(3)})">` +
+    `<path d="${off.motifPathD}" fill="${ENGRAVE_COLOR}" fill-rule="evenodd" stroke="none"/>` +
+    `<path d="${off.cutPathD}" fill="none" stroke="${CUT_COLOR}" stroke-width="0.15" stroke-linejoin="round"/>` +
+    `</g></svg>`;
+  return { svg: svg, cutLoops: off.cutLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
+}
+
 // Schraffur: parallele Linien innerhalb der Silhouette (aus stencil.html übernommen).
 // Der Stift der Cameo kann keine Flächen füllen, darum „malt“ er das Motiv mit Linien aus.
 function buildHatchLinesD(mask, size, scale, spacingMm, angleDeg){
@@ -534,6 +550,7 @@ window.Stempel = {
   berechnen: berechnen,
   svg: buildStampSvg,
   stickerSvg: buildStickerSvg,
+  portraitSvg: buildPortraitSvg,
   autoOffset: autoOffset,
   bilder: {
     roh: squareCanvas,

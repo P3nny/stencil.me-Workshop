@@ -46,7 +46,8 @@ MAX_MESSAGE_LEN = 300
 messages_lock = threading.Lock()
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MAX_EVENT_BYTES = 64 * 1024
-DEFAULT_SETTINGS = {"schueler": 26}
+DEFAULT_SETTINGS = {"schueler": 26, "freigaben": []}  # freigaben: Stationen, die der Laptop für alle öffnet
+FREIGABE_RE = re.compile(r"^[a-z0-9-]{1,40}$")
 
 EVENT_TYPES = ("anmeldung", "checkin", "beendet")
 # Image types accepted from the stations, recognised by their first bytes
@@ -194,6 +195,52 @@ def station_occupancy():
     return counts
 
 
+def load_stations():
+    """Stationen aus stationen/*.json (für Titel und Typ in der Auswertung)."""
+    try:
+        with open(os.path.join(REPO_DIR, "stationen", "index.json"), encoding="utf-8") as fh:
+            ids = json.load(fh)["stationen"]
+        result = []
+        for sid in ids:
+            with open(os.path.join(REPO_DIR, "stationen", sid + ".json"), encoding="utf-8") as fh:
+                result.append(json.load(fh))
+        return result
+    except (OSError, ValueError, KeyError):
+        return []
+
+
+def evaluation():
+    """Auswertung über alle Gruppen: Sterne und KI-Frage pro Station, Feedbackbögen."""
+    stations = load_stations()
+    per_station = {s["id"]: {"id": s["id"], "titel": s.get("titel", s["id"]), "typ": s.get("typ", ""),
+                             "fertig": 0, "sterne": [], "kiTyp": {}} for s in stations}
+    feedback = []
+    groups = [g for g in sorted(os.listdir(GROUPS_DIR)) if ID_RE.match(g)] if os.path.isdir(GROUPS_DIR) else []
+    for g in groups:
+        done = {}
+        for e in read_events(g):
+            if e.get("art") == "beendet":
+                done[e.get("station")] = e.get("daten", {})  # letzte Meldung pro Station zählt
+        for sid, daten in done.items():
+            st = per_station.setdefault(sid, {"id": sid, "titel": sid, "typ": "", "fertig": 0, "sterne": [], "kiTyp": {}})
+            st["fertig"] += 1
+            if daten.get("sterne"):
+                st["sterne"].append(int(daten["sterne"]))
+            if daten.get("kiTyp"):
+                st["kiTyp"][daten["kiTyp"]] = st["kiTyp"].get(daten["kiTyp"], 0) + 1
+            if sid == "feedback":
+                feedback.extend(p for p in (daten.get("antworten") or {}).get("feedback", []) if isinstance(p, dict))
+    stats = []
+    for s in per_station.values():
+        n = len(s["sterne"])
+        richtig = s["kiTyp"].get(s["typ"], 0)
+        antworten = sum(s["kiTyp"].values())
+        stats.append(dict(s, sterneSchnitt=round(sum(s["sterne"]) / n, 1) if n else None,
+                          sterneVerteilung=[s["sterne"].count(k) for k in range(1, 6)],
+                          kiRichtig=richtig, kiAntworten=antworten))
+    return {"gruppen": len(groups), "stationen": stats, "feedback": feedback}
+
+
 def local_ips():
     """IPv4 addresses of this laptop in the local network."""
     ips = []
@@ -265,12 +312,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({"nachrichten": []})
             return self.send_json({"nachrichten": read_messages().get(group_id, [])})
 
-        if path in ("/laptop", "/laptop/bogen.js", "/qr", "/api/liste", "/api/sticker", "/api/info", "/api/gruppen", "/api/ki-status", "/api/plotter/status") or path.startswith(("/daten/", "/dateien/", "/sticker/")):
+        if path in ("/laptop", "/laptop/bogen.js", "/qr", "/auswertung", "/api/auswertung", "/api/liste", "/api/sticker", "/api/info", "/api/gruppen", "/api/ki-status", "/api/plotter/status") or path.startswith(("/daten/", "/dateien/", "/sticker/")):
             if not self.is_local():
                 return self.send_error(403, "Nur am Laptop")
-            if path in ("/laptop", "/laptop/bogen.js", "/qr"):
-                self.path = {"/laptop": "/server/laptop.html", "/laptop/bogen.js": "/server/bogen.js", "/qr": "/server/qr-codes.html"}[path]
+            if path in ("/laptop", "/laptop/bogen.js", "/qr", "/auswertung"):
+                self.path = {"/laptop": "/server/laptop.html", "/laptop/bogen.js": "/server/bogen.js",
+                             "/qr": "/server/qr-codes.html", "/auswertung": "/server/auswertung.html"}[path]
                 return super().do_GET()
+            if path == "/api/auswertung":
+                return self.send_json(evaluation())
             if path == "/api/liste":
                 return self.send_json({"stempel": list_stamps(), "ordner": DATA_DIR})
             if path == "/api/sticker":
@@ -463,16 +513,25 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return self.send_json({"ok": True, "gruppen": len(set(groups))})
 
     def save_settings(self):
+        """Ändert nur, was mitgeschickt wird: schueler (Zahl) und/oder freigaben (Liste)."""
         body = self.read_body(MAX_EVENT_BYTES)
         try:
             data = json.loads(body.decode("utf-8")) if body else {}
-            count = int(data.get("schueler"))
-        except (ValueError, TypeError, AttributeError):
-            return self.send_json({"ok": False, "fehler": "Zahl fehlt"}, 400)
-        if not 1 <= count <= 60:
-            return self.send_json({"ok": False, "fehler": "1 bis 60"}, 400)
+        except ValueError:
+            data = {}
+        if not isinstance(data, dict):
+            data = {}
         settings = read_settings()
-        settings["schueler"] = count
+        if "schueler" in data:
+            try:
+                count = int(data.get("schueler"))
+            except (ValueError, TypeError):
+                return self.send_json({"ok": False, "fehler": "Zahl fehlt"}, 400)
+            if not 1 <= count <= 60:
+                return self.send_json({"ok": False, "fehler": "1 bis 60"}, 400)
+            settings["schueler"] = count
+        if "freigaben" in data:
+            settings["freigaben"] = sorted(set(f for f in data.get("freigaben") or [] if isinstance(f, str) and FREIGABE_RE.match(f)))
         os.makedirs(DATA_ROOT, exist_ok=True)
         write_atomic(SETTINGS_FILE, json.dumps(settings).encode("utf-8"))
         return self.send_json(settings)
@@ -491,7 +550,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not text.startswith("<svg") or "<script" in text.lower():
             return self.send_json({"ok": False, "fehler": "keine Stempel-Datei"}, 400)
 
-        base = STICKER_DIR if (query.get("art") or [""])[0] == "sticker" else DATA_DIR
+        sorte = (query.get("art") or [""])[0]
+        base = STICKER_DIR if sorte == "sticker" else DATA_DIR
+        if sorte == "portraet":
+            # Bonus 2 liegt bei den Stempeln (gleiche Holzplatte), am Namen erkennbar
+            name = (name + "-Portraet")[:30]
         existing = find_stamp(stamp_id, base)
         if existing:
             # Same upload sent again (retry): accept, but store only once

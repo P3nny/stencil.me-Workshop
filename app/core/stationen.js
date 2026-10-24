@@ -47,12 +47,28 @@
 
   // Wie viele Stationen müssen geschafft sein, bevor eine Bonus-Station frei ist?
   function fehlenBisBonus(liste, f, station){
+    if(freigegeben(station)) return 0;
     return Math.max(0, (station.mindestFertig || 0) - anzahlFertig(liste, f));
+  }
+
+  // Freigaben vom Laptop (z. B. „Feedbackbogen für alle“): Station mit passendem
+  // Feld freigabe ist dann ohne Voraussetzungen offen
+  let freigaben = [];
+  function freigabenLaden(){
+    const anfrage = jsonHolen('/api/einstellungen').then(e => e.freigaben || []);
+    const limit = new Promise(resolve => setTimeout(() => resolve(null), BELEGUNG_TIMEOUT_MS));
+    return Promise.race([anfrage, limit]).catch(() => null)
+      .then(f => f ? Speicher.schreiben('freigaben', f).then(() => f) : Speicher.lesen('freigaben'))
+      .then(f => { freigaben = f || []; return freigaben; });
+  }
+  function freigegeben(station){
+    return !!station.freigabe && freigaben.indexOf(station.freigabe) >= 0;
   }
 
   // Voraussetzungen, die es als Station (noch) nicht gibt, zählen nicht.
   // So kann eine Station schon auf eine spätere verweisen (z. B. Körpererkennung).
   function voraussetzungen(liste, station){
+    if(freigegeben(station)) return [];
     return (station.braucht || []).filter(b => liste.some(s => s.id === b));
   }
 
@@ -86,6 +102,7 @@
     fehlenBisBonus: fehlenBisBonus,
     moeglich: moeglich,
     voraussetzungen: voraussetzungen,
+    freigabenLaden: freigabenLaden,
     belegung: belegung,
     naechste: naechste
   };

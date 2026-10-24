@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>stencil.me Auswertung</title>
+<link href="/vendor/fonts/fonts.css" rel="stylesheet">
+<style>
+  :root { --ink:#111; --paper:#fff; --neon:#ff2d95; --muted:#4a4a4a; --gruen:#1e7a3c; }
+  body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:'DM Sans',-apple-system,sans-serif; }
+  h1, h2 { font-family:'Oswald','Arial Narrow',sans-serif; text-transform:uppercase; letter-spacing:.06em; margin:0 0 12px; }
+  h1 { font-size:2rem; border-bottom:4px solid var(--ink); padding-bottom:12px; margin-bottom:12px; }
+  .panel { border:3px solid var(--ink); box-shadow:8px 8px 0 var(--neon); padding:20px; background:#fff; margin-bottom:28px; }
+  .hint { color:var(--muted); font-size:.9rem; }
+  table { border-collapse:collapse; width:100%; }
+  th, td { border-bottom:2px solid var(--ink); padding:6px 8px; text-align:left; vertical-align:middle; }
+  th { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.06em; }
+  .balken { display:inline-block; height:14px; background:var(--neon); vertical-align:middle; margin-right:6px; }
+  .balken.gruen { background:var(--gruen); }
+  .verteilung span { display:inline-block; min-width:3.4em; margin-right:4px; font-size:.85rem; }
+  .woerter { display:flex; flex-wrap:wrap; gap:8px; }
+  .woerter span { border:2px solid var(--ink); padding:4px 10px; font-family:'Oswald',sans-serif; }
+  ul.saetze { padding-left:1.2em; }
+  ul.saetze li { margin-bottom:6px; }
+  a { color:var(--ink); }
+</style>
+</head>
+<body>
+<h1>stencil.me · Auswertung</h1>
+<p class="hint"><a href="/laptop">← zurück zur Laptop-Seite</a> · <span id="stand"></span></p>
+
+<div class="panel">
+  <h2>Stationen</h2>
+  <p class="hint">Sterne: Wie hat dir die Station gefallen? KI-Frage: Haben die Kinder richtig erkannt, ob Programm, Bildbearbeitungs-KI, generative KI oder ohne Computer?</p>
+  <table>
+    <thead><tr><th>Station</th><th>Geschafft</th><th>Sterne ⌀</th><th>Verteilung 1–5 ★</th><th>KI-Frage richtig</th></tr></thead>
+    <tbody id="stationen"></tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <h2>Feedbackbogen</h2>
+  <p class="hint" id="fbAnzahl"></p>
+  <h2 style="font-size:1rem">Welche Station hat am meisten gebracht?</h2>
+  <table><tbody id="lieblinge"></tbody></table>
+  <h2 style="font-size:1rem;margin-top:16px">So war der Tag (ein Wort)</h2>
+  <div class="woerter" id="woerter"></div>
+  <h2 style="font-size:1rem;margin-top:16px">Das würde ich beim nächsten Mal anders machen</h2>
+  <ul class="saetze" id="anders"></ul>
+  <h2 style="font-size:1rem;margin-top:16px">Was hat am meisten überrascht?</h2>
+  <ul class="saetze" id="ueberrascht"></ul>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  function td(row, text) {
+    var c = document.createElement("td");
+    if (typeof text === "string") c.textContent = text; else c.appendChild(text);
+    row.appendChild(c);
+    return c;
+  }
+  function balken(anteil, gruen, text) {
+    var span = document.createElement("span");
+    var b = document.createElement("span");
+    b.className = "balken" + (gruen ? " gruen" : "");
+    b.style.width = Math.round(anteil * 120) + "px";
+    span.appendChild(b);
+    span.appendChild(document.createTextNode(text));
+    return span;
+  }
+  function liste(id, eintraege) {
+    var ul = document.getElementById(id);
+    ul.innerHTML = "";
+    eintraege.forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+    if (!eintraege.length) ul.innerHTML = "<li>–</li>";
+  }
+
+  function zeigen(d) {
+    document.getElementById("stand").textContent = d.gruppen + " Gruppen, Stand " + new Date().toLocaleTimeString("de-DE").slice(0, 5);
+    var titel = {};
+    var body = document.getElementById("stationen");
+    body.innerHTML = "";
+    d.stationen.forEach(function (s) {
+      titel[s.id] = s.titel;
+      var row = document.createElement("tr");
+      td(row, s.titel);
+      td(row, String(s.fertig));
+      td(row, s.sterneSchnitt === null ? "–" : balken(s.sterneSchnitt / 5, false, s.sterneSchnitt.toString().replace(".", ",") + " ★"));
+      var v = document.createElement("span");
+      v.className = "verteilung";
+      s.sterneVerteilung.forEach(function (n, i) { var x = document.createElement("span"); x.textContent = (i + 1) + "★:" + n; v.appendChild(x); });
+      td(row, v);
+      td(row, s.kiAntworten ? balken(s.kiRichtig / s.kiAntworten, true, s.kiRichtig + " von " + s.kiAntworten) : "–");
+      body.appendChild(row);
+    });
+
+    var fb = d.feedback;
+    document.getElementById("fbAnzahl").textContent = fb.length + " Bögen";
+    var zaehler = {};
+    fb.forEach(function (p) { if (p.station) zaehler[p.station] = (zaehler[p.station] || 0) + 1; });
+    var lieblinge = document.getElementById("lieblinge");
+    lieblinge.innerHTML = "";
+    Object.keys(zaehler).sort(function (a, b) { return zaehler[b] - zaehler[a]; }).forEach(function (id) {
+      var row = document.createElement("tr");
+      td(row, titel[id] || id);
+      td(row, balken(zaehler[id] / fb.length, false, String(zaehler[id])));
+      lieblinge.appendChild(row);
+    });
+    var woerter = document.getElementById("woerter");
+    woerter.innerHTML = "";
+    fb.forEach(function (p) { if (p.wort) { var s = document.createElement("span"); s.textContent = p.wort; woerter.appendChild(s); } });
+    liste("anders", fb.map(function (p) { return p.anders; }).filter(Boolean));
+    liste("ueberrascht", fb.map(function (p) { return p.ueberrascht; }).filter(Boolean));
+  }
+
+  function laden() {
+    fetch("/api/auswertung", { cache: "no-store" }).then(function (r) { return r.json(); }).then(zeigen).catch(function () {});
+  }
+  laden();
+  setInterval(laden, 15000);
+})();
+</script>
+</body>
+</html>

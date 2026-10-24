@@ -1,0 +1,48 @@
+{
+  "id": "feedback",
+  "titel": "Feedback zum Workshop",
+  "typ": "analog",
+  "datenweg": "laptop",
+  "bonus": true,
+  "freigabe": "feedback",
+  "schritte": [
+    "Sagt Penny, wie der Workshop für euch war. Ehrlich ist am besten.",
+    "Jede Person füllt ihren eigenen Bogen aus.",
+    "Danach geht Bonus 2 auf: euer Lasercut-Porträt."
+  ],
+  "feedback": [
+    {
+      "id": "station",
+      "art": "station",
+      "text": "Welche Station hat dir am meisten gebracht?",
+      "pflicht": true
+    },
+    {
+      "id": "wort",
+      "art": "wort",
+      "text": "So war der Tag für mich (ein Wort):",
+      "pflicht": true
+    },
+    {
+      "id": "anders",
+      "art": "text",
+      "text": "Das würde ich beim nächsten Mal anders machen:",
+      "pflicht": true
+    },
+    {
+      "id": "ueberrascht",
+      "art": "text",
+      "text": "Was hat dich heute am meisten überrascht?",
+      "pflicht": false
+    }
+  ],
+  "check": {
+    "art": "feedback"
+  },
+  "fragen": [],
+  "datenschutz": "Euer Feedback geht mit euren Vornamen an den Laptop. Penny liest es, um den Workshop besser zu machen.",
+  "braucht": [
+    "sticker"
+  ],
+  "plaetze": 13
+}

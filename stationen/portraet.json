@@ -1,0 +1,36 @@
+{
+  "id": "portraet",
+  "titel": "Bonus 2: Lasercut-Porträt",
+  "typ": "ki",
+  "datenweg": "laptop",
+  "bonus": true,
+  "mindestFertig": 8,
+  "schritte": [
+    "Bonus 2, weil ihr Sticker und Feedback geschafft habt!",
+    "Die App rechnet euer Foto noch einmal, diesmal als Bild für den Lasercutter.",
+    "Der Laser graviert die dunklen Stellen ins Holz, so entsteht ein Porträt.",
+    "Prüft den roten Rand und schickt euer Porträt an den Laptop.",
+    "Penny sagt euch Bescheid, wenn es gelasert wird."
+  ],
+  "check": {
+    "art": "portraet"
+  },
+  "eingaben": [
+    {
+      "id": "unterschied",
+      "text": "Was ist anders als bei eurem Stempel?",
+      "pflicht": false,
+      "aufloesung": "Beim Stempel graviert der Laser alles außer dem Motiv weg, damit das Motiv druckt, und er ist gespiegelt. Beim Porträt graviert er das Motiv selbst ins Holz: ein Bild zum Anschauen, darum nicht gespiegelt."
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Die Bearbeitung passiert auf dem iPad. Nur das fertige Porträt und dein Name gehen an den Laptop.",
+  "braucht": [
+    "sticker",
+    "feedback"
+  ],
+  "plaetze": 3
+}

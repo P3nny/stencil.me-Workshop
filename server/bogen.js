@@ -186,7 +186,7 @@
         return fetch("/api/nachricht", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ gruppen: [g], text: o.nachrichten[art].text(namenListe(proGruppe[g])) })
+          body: JSON.stringify({ gruppen: [g], text: o.nachrichten[art].text(proGruppe[g]) })
         }).then(function (r) { if (!r.ok) throw new Error(r.status); });
       })).then(function () {
         eintrag.gesendet = eintrag.gesendet || {};
@@ -241,5 +241,5 @@
     return { abgeschlossen: abgeschlossen, laden: laden, aktuell: function () { return aktuell; } };
   }
 
-  window.Bogen = { erstellen: erstellen };
+  window.Bogen = { erstellen: erstellen, namenListe: namenListe };
 })();

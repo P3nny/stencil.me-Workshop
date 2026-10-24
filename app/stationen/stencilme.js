@@ -189,6 +189,13 @@
     }
   };
 
+  ARTEN.portraet = {
+    name: 'Porträt', dein: 'Dein Porträt', dieser: 'Dieses Porträt', notiz: 'nicht gespiegelt', puzzle: false,
+    legende: [['blau', 'Blau: Hier graviert der Laser, das Holz wird dunkel.'], ['weiss', 'Weiß: bleibt hell.'], ['rot', 'Rot: Hier schneidet der Laser das Porträt aus.']],
+    svg: (mask, mm) => Stempel.portraitSvg(mask, mm),
+    senden: (gruppe, name, svg) => Outbox.portraet(gruppe, name, svg)
+  };
+
   Object.keys(ARTEN).forEach(id => Rahmen.eigeneArt(id, {
     anzeigen: (station, api) => {
       const personen = api.gruppe.personen.map((name, i) => person(station, api, i, name, ARTEN[id]));

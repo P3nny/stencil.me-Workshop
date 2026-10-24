@@ -219,7 +219,8 @@
     const eintrag = ctx.eintrag;
     if(eigeneArten[check.art]){
       return el('div', { klasse: 'check' }, [eigeneArten[check.art].anzeigen(station, {
-        gruppe: ctx.gruppe, eintrag: eintrag, speichern: speichern, pruefen: () => ctx.pruefen(), fehler: fehler, el: el
+        gruppe: ctx.gruppe, eintrag: eintrag, speichern: speichern, pruefen: () => ctx.pruefen(), fehler: fehler, el: el,
+        liste: ctx.liste, fortschritt: ctx.f
       })]);
     }
     if(check.art === 'foto'){
@@ -522,7 +523,7 @@
   function station(id){
     testWerkzeuge();
     Outbox.starten();
-    return Promise.all([Speicher.lesen('gruppe'), Stationen.laden(), Stationen.fortschritt()])
+    return Promise.all([Speicher.lesen('gruppe'), Stationen.laden(), Stationen.fortschritt(), Stationen.freigabenLaden()])
       .then(werte => {
         const gruppe = werte[0];
         const liste = werte[1];

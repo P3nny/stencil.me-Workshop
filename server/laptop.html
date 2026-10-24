@@ -126,6 +126,11 @@
       <button id="savePupils" type="button">Speichern</button>
       <span class="hint" id="pupilsState"></span>
     </div>
+    <div class="settings" style="margin-top:10px">
+      <button id="feedbackFreigabe" type="button">Feedbackbogen für alle freigeben</button>
+      <span class="hint" id="freigabeState"></span>
+      <a href="/auswertung" style="margin-left:auto">Auswertung: Sterne, KI-Frage, Feedback →</a>
+    </div>
     <div class="hint" id="kiStatus"></div>
     <div id="groupsError"></div>
     <table>
@@ -187,14 +192,25 @@
     return b;
   }
 
+  // „Die Stempel von Ada und Bo“, „Das Porträt von Ada“ (Bonus 2 heißt „Name-Portraet“)
+  function stuecke(namen, einzahl, mehrzahl) {
+    var normal = namen.filter(function (n) { return !/-Portraet$/.test(n); });
+    var portraets = namen.filter(function (n) { return /-Portraet$/.test(n); }).map(function (n) { return n.replace(/-Portraet$/, ""); });
+    var teile = [];
+    if (normal.length) teile.push((normal.length > 1 ? "Die " + mehrzahl : "Der " + einzahl) + " von " + Bogen.namenListe(normal));
+    if (portraets.length) teile.push((portraets.length > 1 ? (teile.length ? "die" : "Die") + " Porträts" : (teile.length ? "das" : "Das") + " Porträt") + " von " + Bogen.namenListe(portraets));
+    var viele = normal.length + portraets.length > 1;
+    return { text: teile.join(" und "), viele: viele };
+  }
+
   // ---- Holzplatte für den Mr Beam: herunterladen, in BeamOS öffnen ----
   var platte = Bogen.erstellen({
     id: "platte", schluessel: "stencilme-platte", liste: "/api/liste", dateien: "/daten/",
     einzahl: "Stempel", mehrzahl: "Stempel", haken: "auf die Platte", bogen: "der Platte", naechster: "die nächste Platte",
     rand: 5, abstand: 3,
     nachrichten: {
-      laser: { knopf: "📣 Wird gelasert", text: function (namen) { return "Der Stempel von " + namen + " wird jetzt gelasert. Kommt gern zum Zuschauen!"; } },
-      fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { return "Der Stempel von " + namen + " ist fertig! Holt ihn bei Penny am Lasercutter ab."; } }
+      laser: { knopf: "📣 Wird gelasert", text: function (namen) { var s = stuecke(namen, "Stempel", "Stempel"); return s.text + (s.viele ? " werden" : " wird") + " jetzt gelasert. Kommt gern zum Zuschauen!"; } },
+      fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { var s = stuecke(namen, "Stempel", "Stempel"); return s.text + (s.viele ? " sind" : " ist") + " fertig! Bitte bei Penny am Lasercutter abholen."; } }
     },
     bereit: function (aktuell) {
       var box = document.getElementById("platte-aktionen");
@@ -214,8 +230,8 @@
     einzahl: "Sticker", mehrzahl: "Sticker", haken: "auf die Folie", bogen: "der Folie", naechster: "die nächste Folie",
     rand: 8, abstand: 4, einzelDownload: true,
     nachrichten: {
-      laser: { knopf: "📣 Wird geplottet", text: function (namen) { return "Der Sticker von " + namen + " wird jetzt geplottet. Kommt gern zum Zuschauen!"; } },
-      fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { return "Der Sticker von " + namen + " ist fertig! Holt ihn bei Penny am Schneideplotter ab."; } }
+      laser: { knopf: "📣 Wird geplottet", text: function (namen) { var s = stuecke(namen, "Sticker", "Sticker"); return s.text + (s.viele ? " werden" : " wird") + " jetzt geplottet. Kommt gern zum Zuschauen!"; } },
+      fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { var s = stuecke(namen, "Sticker", "Sticker"); return s.text + (s.viele ? " sind" : " ist") + " fertig! Bitte bei Penny am Schneideplotter abholen."; } }
     },
     bereit: function (aktuell) {
       var box = document.getElementById("folie-aktionen");
@@ -361,11 +377,30 @@
       .catch(function () { /* egal */ });
   }
 
+  var freigaben = [];
+  function freigabeZeigen() {
+    var an = freigaben.indexOf("feedback") >= 0;
+    document.getElementById("feedbackFreigabe").textContent = an ? "Feedbackbogen-Freigabe zurücknehmen" : "Feedbackbogen für alle freigeben";
+    document.getElementById("freigabeState").textContent = an ? "✓ Alle Gruppen können den Feedbackbogen ausfüllen (iPads merken es beim nächsten Öffnen einer Station)." : "Feedbackbogen nur nach Bonus 1 (Sticker).";
+  }
+
   function loadSettings() {
     fetch("/api/einstellungen", { cache: "no-store" })
       .then(function (r) { return r.json(); })
-      .then(function (s) { document.getElementById("pupils").value = s.schueler; });
+      .then(function (s) {
+        document.getElementById("pupils").value = s.schueler;
+        freigaben = s.freigaben || [];
+        freigabeZeigen();
+      });
   }
+
+  document.getElementById("feedbackFreigabe").addEventListener("click", function () {
+    var neu = freigaben.indexOf("feedback") >= 0 ? freigaben.filter(function (f) { return f !== "feedback"; }) : freigaben.concat(["feedback"]);
+    fetch("/api/einstellungen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ freigaben: neu }) })
+      .then(function (r) { return r.json(); })
+      .then(function (s) { freigaben = s.freigaben || []; freigabeZeigen(); })
+      .catch(function () { document.getElementById("freigabeState").textContent = "Speichern hat nicht geklappt"; });
+  });
 
   document.getElementById("savePupils").addEventListener("click", function () {
     var state = document.getElementById("pupilsState");

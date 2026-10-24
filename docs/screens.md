@@ -191,6 +191,13 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - **Plotter** (`server/plotter.py`, Vorbild `archiv/00_fotobox-karte/fotobox-queue.py`): Sticker im Fotobox-Format (Gruppe `zeichnen-stift`: Schraffur 1,2 mm + Umriss; Gruppe `schneiden-rot`: Messer). Laptop-Seite führt durch die Schritte: Folie + Stift einlegen → „Zeichnen starten“ → „Stift raus, Messer rein“ → „Schneiden starten“ → „FERTIG“. Gleiche Einstellungen wie die Fotobox (Stift Druck 5/Tempo 5, Messer Autoblade Tiefe 4, Druck 14, Tempo 3, 2 Durchgänge), änderbar per Umgebungsvariable. `STENCILME_PLOTTER_TEST=1`: Testlauf ohne Plotter. *Mit echter Cameo noch nicht getestet*
 - **Nachrichten an die Gruppen:** Stempel und Sticker tragen die Gruppen-ID im Dateinamen. Laptop-Seite → „Letzte Platten“: pro Platte „📣 Wird gelasert“ und „📣 Fertig, abholen“. Jede Gruppe bekommt eine eigene Nachricht mit ihren Namen, die iPads zeigen sie oben an (Abfrage alle 15 s), „OK“ blendet sie aus
 
+## Feedback, Auswertung, Bonus 2 (24.10.)
+
+- **Feedbackbogen** (`feedback`, Fragen aus `07_stencil.me - Abschluss.pdf`): jede Person einzeln: Lieblingsstation (Auswahl aus den geschafften), ein Wort, „beim nächsten Mal anders“, freiwillig „am meisten überrascht“. Geht nach Bonus 1 auf, oder für alle über den Laptop-Knopf „Feedbackbogen für alle freigeben“ (`freigaben` in den Einstellungen). Zählt nicht zu „x von y“
+- **Bonus 2 Lasercut-Porträt** (`portraet`): nach Sticker + Feedbackbogen. Der Laser graviert die dunklen Stellen ins Holz (wie „Bild für den Lasercutter“ in `stencil.html`), Schnittrand am Umriss, nicht gespiegelt. Landet bei den Stempeln als „Name-Portraet“ und kommt auf die Holzplatte. Nachrichten nennen es richtig („Das Porträt von …“)
+- **Auswertung** `/auswertung` (nur am Laptop): pro Station geschafft, Sterne (Schnitt, Verteilung), KI-Frage richtig; Feedbackbögen (Lieblingsstationen, Wörter, Sätze)
+- Fotos gehen erst bei „Station beendet“ an den Laptop (nur die letzten), Nachrichten-Abfrage einmal pro Minute, Diktier-Hinweis an allen Textfeldern
+
 ## Gerätecheck und Code-Prüfung (24.10.)
 
 - `app/geraetecheck.html`: prüft auf dem iPad iPadOS/Safari, Speicher (IndexedDB, freier Platz), Kamera-Feld, Video (H.264/HEVC), WebGL, Darstellung, Canvas, Verbindung zum Laptop und BodyPix mit Zeitmessung. Ergebnis als Ampel und Text zum Weiterschicken. Speichert nichts dauerhaft
