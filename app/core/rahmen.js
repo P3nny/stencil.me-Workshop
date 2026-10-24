@@ -10,6 +10,7 @@
     { wert: 'generativ', text: 'Generative KI' },
     { wert: 'ki', text: 'Bildbearbeitungs-KI' },
     { wert: 'programm', text: 'Keine KI, nur ein Programm' },
+    { wert: 'analog', text: 'Ohne Computer' },
     { wert: 'weiss-nicht', text: 'Weiß nicht' }
   ];
   // Eigene Stationsteile (z. B. stencil.me): art -> { anzeigen(station, api), erfuellt(eintrag, gruppe, station) }
@@ -385,6 +386,13 @@
       if(eintrag.kiTyp) aufloesung.appendChild(el('p', {}, [el('span', { text: 'Auflösung: ' }), etiketten(station, true).firstChild]));
     };
     const teile = [el('h1', { text: station.titel + ': geschafft?' })];
+    // Reihenfolge (Patricia, 24.10.): erst Auflösungen, dann „Was hast du genutzt?“, dann Sterne
+    // Auflösung zu Fragen der Station (z. B. „Was bedeuten die Farben?“), erst nach der eigenen Antwort
+    (station.eingaben || []).filter(e => e.aufloesung).forEach(e => {
+      teile.push(el('h2', { text: e.text }));
+      teile.push(el('p', { klasse: 'deine-antwort' }, [el('span', { text: 'Deine Antwort: ' }), el('em', { text: (eintrag.antworten || {})[e.id] || '–' })]));
+      teile.push(el('p', { klasse: 'aufloesung-text' }, [el('strong', { text: 'Auflösung: ' }), el('span', { text: e.aufloesung })]));
+    });
     if(fragen.indexOf('ki-typ') >= 0){
       teile.push(el('h2', { text: 'Hast du hier gerade generative KI oder Bildbearbeitungs-KI genutzt?' }));
       teile.push(el('div', { klasse: 'auswahl' }, KI_ANTWORTEN.map(a => el('button', {
@@ -398,12 +406,6 @@
       }))));
       teile.push(aufloesung);
     }
-    // Auflösung zu Fragen der Station (z. B. „Was bedeuten die Farben?“), erst nach der eigenen Antwort
-    (station.eingaben || []).filter(e => e.aufloesung).forEach(e => {
-      teile.push(el('h2', { text: e.text }));
-      teile.push(el('p', { klasse: 'deine-antwort' }, [el('span', { text: 'Deine Antwort: ' }), el('em', { text: (eintrag.antworten || {})[e.id] || '–' })]));
-      teile.push(el('p', { klasse: 'aufloesung-text' }, [el('strong', { text: 'Auflösung: ' }), el('span', { text: e.aufloesung })]));
-    });
     if(fragen.indexOf('sterne') >= 0){
       teile.push(el('h2', { text: 'Wie hat dir die Station gefallen?' }));
       const sterne = el('div', { klasse: 'sterne' });
