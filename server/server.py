@@ -242,6 +242,19 @@ def evaluation():
     return {"gruppen": len(groups), "stationen": stats, "feedback": feedback}
 
 
+# Stand der Server-Dateien beim Start. Ändern sie sich danach (neue Version), zeigt die
+# Laptop-Seite „bitte neu starten“: Seiten kommen frisch von der Festplatte, der
+# Server-Code aber nur beim Start.
+SERVER_DATEIEN = [os.path.join(REPO_DIR, "server", f) for f in ("server.py", "ki_bild.py", "ki_app.py", "plotter.py")]
+
+
+def server_stand():
+    return max((os.path.getmtime(f) for f in SERVER_DATEIEN if os.path.exists(f)), default=0)
+
+
+START_STAND = server_stand()
+
+
 def local_ips():
     """IPv4 addresses of this laptop in the local network."""
     ips = []
@@ -330,7 +343,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.send_data_file(STICKER_DIR, path[len("/sticker/"):])
             if path == "/api/info":
                 port = self.server.server_address[1]
-                return self.send_json({"adressen": ["http://%s:%d/" % (ip, port) for ip in local_ips()]})
+                return self.send_json({"adressen": ["http://%s:%d/" % (ip, port) for ip in local_ips()],
+                                       "neustartNoetig": server_stand() > START_STAND})
             if path == "/api/gruppen":
                 return self.send_json({"gruppen": list_groups(), "ordner": GROUPS_DIR})
             if path == "/api/ki-status":

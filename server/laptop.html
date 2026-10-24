@@ -65,6 +65,7 @@
 </head>
 <body>
 <h1>stencil.me · Laptop</h1>
+<div class="error" id="neustart" hidden>Der Server-Code wurde aktualisiert, läuft aber noch in der alten Version. Bitte das Server-Fenster schließen und <code>./server/start.sh</code> neu starten.</div>
 <div class="layout">
   <div class="panel qr-panel">
     <h2>iPads: QR-Code scannen</h2>
@@ -163,6 +164,7 @@
           setTimeout(loadInfo, 5000);
           return;
         }
+        document.getElementById("neustart").hidden = !info.neustartNoetig;
         showQr(info.adressen[0]);
         document.getElementById("otherUrls").textContent = info.adressen.length > 1
           ? "Falls der Code nicht geht: " + info.adressen.slice(1).join(", ")
@@ -429,6 +431,7 @@
   loadKi();
   plotterLaden();
   setInterval(function () { loadGroups(); loadKi(); }, 5000);
+  setInterval(loadInfo, 30000); // u. a. „bitte neu starten“ nach einer Aktualisierung
   setInterval(plotterLaden, 2000);
 })();
 </script>
