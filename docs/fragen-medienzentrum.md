@@ -7,6 +7,10 @@
 - [ ] Kann mein Laptop im WLAN eine **feste IP-Adresse** bekommen (DHCP-Reservierung für die MAC-Adresse)? Dann kann ich die QR-Codes für die Stationen einmal drucken und laminieren.
 - [ ] Können wir vor dem Workshop 30 Minuten vor Ort testen, mit 2 iPads? Termin: __________
 
+## Gerätecheck (bitte vorab, dauert 1 Minute)
+
+- [ ] Auf **einem** KOMEZ-iPad in Safari öffnen: `https://stencilme-workshop.netlify.app/app/geraetecheck.html` → „Check starten“ → Screenshot oder Text an Patricia schicken. Die Seite speichert nichts und schickt nichts weg.
+
 ## iPads
 
 - [ ] Welches Modell? (Einstellungen → Allgemein → Info → Modellname)

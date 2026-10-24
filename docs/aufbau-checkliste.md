@@ -1,5 +1,10 @@
 # Aufbau-Checkliste
 
+## 0. Gerätecheck (so früh wie möglich)
+
+- [ ] KOMEZ bitten, `https://stencilme-workshop.netlify.app/app/geraetecheck.html` auf einem ihrer iPads zu öffnen und das Ergebnis zu schicken
+- [ ] Vor Ort über den Laptop: `http://<IP>:8000/app/geraetecheck.html` (prüft zusätzlich die Verbindung zum Laptop)
+
 ## 1. 5-Minuten-Test im KOMEZ (Plan A möglich?)
 
 - [ ] Laptop ins KOMEZ-WLAN

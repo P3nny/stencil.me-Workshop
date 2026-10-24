@@ -191,6 +191,11 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - **Plotter** (`server/plotter.py`, Vorbild `archiv/00_fotobox-karte/fotobox-queue.py`): Sticker im Fotobox-Format (Gruppe `zeichnen-stift`: Schraffur 1,2 mm + Umriss; Gruppe `schneiden-rot`: Messer). Laptop-Seite führt durch die Schritte: Folie + Stift einlegen → „Zeichnen starten“ → „Stift raus, Messer rein“ → „Schneiden starten“ → „FERTIG“. Gleiche Einstellungen wie die Fotobox (Stift Druck 5/Tempo 5, Messer Autoblade Tiefe 4, Druck 14, Tempo 3, 2 Durchgänge), änderbar per Umgebungsvariable. `STENCILME_PLOTTER_TEST=1`: Testlauf ohne Plotter. *Mit echter Cameo noch nicht getestet*
 - **Nachrichten an die Gruppen:** Stempel und Sticker tragen die Gruppen-ID im Dateinamen. Laptop-Seite → „Letzte Platten“: pro Platte „📣 Wird gelasert“ und „📣 Fertig, abholen“. Jede Gruppe bekommt eine eigene Nachricht mit ihren Namen, die iPads zeigen sie oben an (Abfrage alle 15 s), „OK“ blendet sie aus
 
+## Gerätecheck und Code-Prüfung (24.10.)
+
+- `app/geraetecheck.html`: prüft auf dem iPad iPadOS/Safari, Speicher (IndexedDB, freier Platz), Kamera-Feld, Video (H.264/HEVC), WebGL, Darstellung, Canvas, Verbindung zum Laptop und BodyPix mit Zeitmessung. Ergebnis als Ampel und Text zum Weiterschicken. Speichert nichts dauerhaft
+- Aller JavaScript-Code (23 Dateien/Blöcke) ist ES2017-tauglich (geprüft mit `es-check`), also lesbar ab Safari/iOS 11
+
 ## Weitere Screens
 
 - *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …

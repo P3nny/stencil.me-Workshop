@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerätecheck · stencil.me</title>
+<link href="/vendor/fonts/fonts.css" rel="stylesheet">
+<link href="/app/core/werkstatt.css" rel="stylesheet">
+<style>
+  .check-liste{list-style:none;padding:0;margin:0;}
+  .check-liste li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:2px solid #eee;}
+  .check-liste .zeichen{font-size:1.3rem;width:1.6em;flex:none;text-align:center;}
+  .check-liste .ok .zeichen{color:#1e7a3c;}
+  .check-liste .warn .zeichen{color:#c07a00;}
+  .check-liste .fehlt .zeichen{color:#c0006a;}
+  .check-liste .detail{color:var(--muted);font-size:.9rem;}
+  .gesamt{font-family:var(--head);text-transform:uppercase;font-size:1.4rem;padding:10px 14px;border:3px solid var(--ink);}
+  .gesamt.ok{background:#e6f7ea;}
+  .gesamt.warn{background:#fffbe6;}
+  .gesamt.fehlt{background:var(--neon);}
+  textarea{font-family:'Courier Prime',monospace;font-size:.8rem;}
+</style>
+</head>
+<body>
+<!-- Gerätecheck für die iPads im KOMEZ: prüft alles, was die Workshop-App braucht.
+     Speichert nichts dauerhaft (Test-Datenbank wird wieder gelöscht), schickt nichts weg. -->
+<main>
+  <section class="panel">
+    <h1>Gerätecheck</h1>
+    <p>Diese Seite prüft, ob die stencil.me-Workshop-App auf diesem iPad läuft. Sie speichert nichts und schickt nichts weg. Dauer: etwa eine Minute.</p>
+    <button type="button" class="gross" id="start">Check starten</button>
+    <div id="gesamt"></div>
+    <ul class="check-liste" id="liste"></ul>
+    <div id="bericht" hidden>
+      <h2>Ergebnis zum Weiterschicken</h2>
+      <p class="hinweis">Bitte einen Screenshot machen oder den Text kopieren und an Patricia schicken.</p>
+      <textarea id="text" rows="12" readonly></textarea>
+      <button type="button" id="kopieren">Text kopieren</button>
+    </div>
+  </section>
+</main>
+<div class="fehler" id="fehler" role="alert" hidden></div>
+<script src="/app/core/personen.js"></script>
+<script>
+(function(){
+  const liste = document.getElementById('liste');
+  const ergebnisse = [];
+
+  function eintrag(name, stufe, detail){
+    ergebnisse.push({ name: name, stufe: stufe, detail: detail || '' });
+    const li = document.createElement('li');
+    li.className = stufe;
+    li.innerHTML = '<span class="zeichen"></span><span><strong></strong><br><span class="detail"></span></span>';
+    li.querySelector('.zeichen').textContent = stufe === 'ok' ? '✓' : stufe === 'warn' ? '!' : '✗';
+    li.querySelector('strong').textContent = name;
+    li.querySelector('.detail').textContent = detail || '';
+    liste.appendChild(li);
+  }
+
+  function mitZeit(promise, ms){
+    return Promise.race([promise, new Promise((resolve, reject) => setTimeout(() => reject(new Error('dauert länger als ' + ms / 1000 + ' s')), ms))]);
+  }
+
+  function system(){
+    const ua = navigator.userAgent;
+    const m = /OS (\d+)_(\d+)/.exec(ua);
+    const version = m ? m[1] + '.' + m[2] : (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1 ? '13 oder neuer (iPadOS meldet sich als Mac)' : 'unbekannt');
+    const safari = /Version\/([\d.]+)/.exec(ua);
+    eintrag('iPadOS / Browser', 'ok', 'iPadOS ' + version + ', Safari ' + (safari ? safari[1] : '?') + (/CriOS/.test(ua) ? ' (Chrome)' : ''));
+    eintrag('Bildschirm', 'ok', screen.width + ' × ' + screen.height + ' px, Pixeldichte ' + (window.devicePixelRatio || 1));
+  }
+
+  function speicher(){
+    return new Promise(resolve => {
+      let req;
+      try{ req = indexedDB.open('geraetecheck', 1); }catch(err){ eintrag('Speicher auf dem iPad (IndexedDB)', 'fehlt', String(err)); return resolve(); }
+      req.onupgradeneeded = () => req.result.createObjectStore('t');
+      req.onerror = () => { eintrag('Speicher auf dem iPad (IndexedDB)', 'fehlt', 'gesperrt (privater Modus oder Verwaltung?)'); resolve(); };
+      req.onsuccess = () => {
+        const db = req.result;
+        const tx = db.transaction('t', 'readwrite');
+        tx.objectStore('t').put(new ArrayBuffer(1024 * 1024), 'probe');
+        tx.oncomplete = () => {
+          db.close();
+          indexedDB.deleteDatabase('geraetecheck');
+          eintrag('Speicher auf dem iPad (IndexedDB)', 'ok', '1 MB geschrieben und wieder gelöscht');
+          resolve();
+        };
+        tx.onerror = () => { eintrag('Speicher auf dem iPad (IndexedDB)', 'fehlt', 'Schreiben geht nicht'); resolve(); };
+      };
+    }).then(() => {
+      if(navigator.storage && navigator.storage.estimate){
+        return navigator.storage.estimate().then(e => {
+          const frei = e.quota ? Math.round((e.quota - (e.usage || 0)) / 1e6) : null;
+          eintrag('Freier Speicher für Websites', frei === null || frei > 200 ? 'ok' : 'warn', frei === null ? 'unbekannt' : 'ca. ' + frei + ' MB');
+        }).catch(() => {});
+      }
+    });
+  }
+
+  function funktionen(){
+    const input = document.createElement('input');
+    eintrag('Kamera-Feld (Foto aufnehmen)', 'capture' in input ? 'ok' : 'warn', 'capture' in input ? 'Kamera öffnet sich direkt' : 'nur Fotoauswahl, Kamera über „Foto aufnehmen“ im Menü');
+    const video = document.createElement('video');
+    const h264 = video.canPlayType('video/mp4; codecs="avc1.42E01E"');
+    const hevc = video.canPlayType('video/mp4; codecs="hvc1"');
+    eintrag('Videos abspielen (Körpererkennung)', h264 ? 'ok' : 'fehlt', 'H.264: ' + (h264 || 'nein') + ', HEVC: ' + (hevc || 'nein'));
+    const gl = document.createElement('canvas').getContext('webgl');
+    eintrag('Grafikchip (WebGL, für die KI)', gl ? 'ok' : 'fehlt', gl ? 'max. Texturgröße ' + gl.getParameter(gl.MAX_TEXTURE_SIZE) : 'nicht verfügbar: KI wäre sehr langsam');
+    eintrag('Bildschirm über der Tastatur (Code-Stationen)', window.visualViewport ? 'ok' : 'warn', window.visualViewport ? 'visualViewport vorhanden' : 'Editor rückt bei offener Tastatur nicht nach oben');
+    const css = window.CSS && CSS.supports;
+    eintrag('Darstellung (CSS)', css && CSS.supports('display', 'grid') ? 'ok' : 'warn', css ? 'Grid ' + (CSS.supports('display', 'grid') ? 'ja' : 'nein') + ', Flex-Abstände ' + (CSS.supports('gap', '1px') ? 'ja' : 'nein') : 'alt');
+    const c = document.createElement('canvas');
+    c.width = c.height = 1024;
+    c.getContext('2d').fillRect(0, 0, 10, 10);
+    const jpeg = c.toDataURL('image/jpeg', 0.85);
+    eintrag('Bilder verkleinern (Canvas 1024 px)', jpeg.length > 1000 ? 'ok' : 'fehlt', Math.round(jpeg.length / 1024) + ' KB');
+  }
+
+  function laptop(){
+    return mitZeit(fetch('/api/status', { cache: 'no-store' }).then(r => r.json()), 4000)
+      .then(d => eintrag('Verbindung zum Laptop', d.ok ? 'ok' : 'warn', d.ok ? 'Laptop antwortet' : 'unerwartete Antwort'))
+      .catch(() => eintrag('Verbindung zum Laptop', 'warn', location.protocol === 'https:' ? 'Seite kommt aus dem Internet (Netlify), der Laptop wird hier nicht geprüft' : 'Laptop antwortet nicht'));
+  }
+
+  function ki(){
+    const start = performance.now();
+    return mitZeit(Personen.netz('genau'), 60000)
+      .then(net => {
+        const laden = (performance.now() - start) / 1000;
+        return Personen.bildAusUrl('/docs/test-foto.jpg').then(img => {
+          const s2 = performance.now();
+          return net.segmentPerson(Personen.verkleinert(img, 1024), { internalResolution: 'medium', segmentationThreshold: 0.4 }).then(seg => {
+            const rechnen = (performance.now() - s2) / 1000;
+            let summe = 0;
+            for(let i = 0; i < seg.data.length; i++) summe += seg.data[i];
+            const gefunden = summe / seg.data.length > 0.02;
+            eintrag('KI Personenerkennung (Foto, Stempel)', !gefunden ? 'fehlt' : rechnen < 8 ? 'ok' : 'warn',
+              'Modell laden ' + laden.toFixed(1) + ' s, ein Foto ' + rechnen.toFixed(1) + ' s' + (gefunden ? '' : ', Person NICHT gefunden'));
+          });
+        });
+      })
+      .catch(err => eintrag('KI Personenerkennung (Foto, Stempel)', 'fehlt', String(err.message || err)));
+  }
+
+  function gesamt(){
+    const fehlt = ergebnisse.filter(e => e.stufe === 'fehlt').length;
+    const warn = ergebnisse.filter(e => e.stufe === 'warn').length;
+    const box = document.getElementById('gesamt');
+    box.className = 'gesamt ' + (fehlt ? 'fehlt' : warn ? 'warn' : 'ok');
+    box.textContent = fehlt ? '✗ ' + fehlt + ' Punkt(e) gehen nicht' : warn ? '! Läuft, mit ' + warn + ' Hinweis(en)' : '✓ Alles bereit für den Workshop';
+    const text = ['Gerätecheck stencil.me, ' + new Date().toLocaleString('de-DE'), navigator.userAgent, '']
+      .concat(ergebnisse.map(e => (e.stufe === 'ok' ? '[ok]   ' : e.stufe === 'warn' ? '[!]    ' : '[FEHLT]') + ' ' + e.name + ': ' + e.detail));
+    document.getElementById('text').value = text.join('\n');
+    document.getElementById('bericht').hidden = false;
+  }
+
+  document.getElementById('start').addEventListener('click', ev => {
+    ev.target.disabled = true;
+    ev.target.textContent = 'Check läuft …';
+    liste.innerHTML = '';
+    ergebnisse.length = 0;
+    system();
+    funktionen();
+    speicher()
+      .then(laptop)
+      .then(ki)
+      .then(gesamt)
+      .catch(err => { eintrag('Check abgebrochen', 'fehlt', String(err)); gesamt(); })
+      .then(() => { ev.target.textContent = 'Fertig'; });
+  });
+
+  document.getElementById('kopieren').addEventListener('click', () => {
+    const feld = document.getElementById('text');
+    feld.select();
+    try{ document.execCommand('copy'); }catch(err){ /* dann eben Screenshot */ }
+  });
+})();
+</script>
+</body>
+</html>
