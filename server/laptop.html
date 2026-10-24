@@ -28,6 +28,15 @@
   button { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.1em; border:3px solid var(--ink); background:#fff; padding:8px 14px; cursor:pointer; margin-top:16px; }
   button:hover { background:var(--neon); }
   .error { background:var(--neon); border:2px solid var(--ink); padding:10px; margin-top:12px; font-weight:700; }
+  .groups-panel { width:100%; }
+  .settings { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .settings input { font-size:1.2rem; width:80px; border:3px solid var(--ink); padding:6px; }
+  .settings button { margin-top:0; }
+  table { border-collapse:collapse; width:100%; margin-top:14px; }
+  th, td { border-bottom:2px solid var(--ink); padding:6px 8px; text-align:left; vertical-align:top; }
+  th { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.06em; }
+  td.station { font-weight:700; }
+  td img { height:56px; border:2px solid var(--ink); margin:0 4px 4px 0; }
 </style>
 </head>
 <body>
@@ -47,7 +56,22 @@
     <div class="folder" id="folder"></div>
     <div id="listError"></div>
     <div class="grid" id="grid"></div>
-    <button id="deleteAll" type="button">Alle Stempel löschen (nach dem Workshop)</button>
+  </div>
+  <div class="panel groups-panel">
+    <h2>Gruppen an den Stationen</h2>
+    <div class="settings">
+      <label for="pupils">Schüler:innen heute:</label>
+      <input id="pupils" type="number" min="1" max="60">
+      <button id="savePupils" type="button">Speichern</button>
+      <span class="hint" id="pupilsState"></span>
+    </div>
+    <div id="groupsError"></div>
+    <table>
+      <thead><tr><th>Namen</th><th>Gerade an</th><th>Geschafft</th><th>Fotos</th></tr></thead>
+      <tbody id="groups"></tbody>
+    </table>
+    <div class="hint">Ordner: <span class="folder" id="groupsFolder"></span></div>
+    <button id="deleteAll" type="button">Alle Daten löschen (nach dem Workshop)</button>
   </div>
 </div>
 <script>
@@ -117,14 +141,96 @@
       });
   }
 
+  var stationTitles = {}; // id -> Titel, aus /stationen
+  var stationCount = 0;
+
+  function loadStations() {
+    fetch("/stationen/index.json", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (index) {
+        stationCount = index.stationen.length;
+        return Promise.all(index.stationen.map(function (id) {
+          return fetch("/stationen/" + id + ".json", { cache: "no-store" }).then(function (r) { return r.json(); });
+        }));
+      })
+      .then(function (list) { list.forEach(function (s) { stationTitles[s.id] = s.titel; }); })
+      .catch(function () { /* dann eben die IDs anzeigen */ })
+      .then(loadGroups);
+  }
+
+  function cell(row, text, cls) {
+    var td = document.createElement("td");
+    td.textContent = text;
+    if (cls) td.className = cls;
+    row.appendChild(td);
+    return td;
+  }
+
+  function renderGroups(data) {
+    var body = document.getElementById("groups");
+    document.getElementById("groupsFolder").textContent = data.ordner;
+    body.innerHTML = "";
+    data.gruppen.forEach(function (g) {
+      var row = document.createElement("tr");
+      cell(row, g.personen.length ? g.personen.join(" & ") : "(noch ohne Namen)");
+      cell(row, g.aktuell ? (stationTitles[g.aktuell] || g.aktuell) : "–", "station");
+      cell(row, g.fertig.length + (stationCount ? " von " + stationCount : "") + ": " + g.fertig.map(function (id) { return stationTitles[id] || id; }).join(", "));
+      var photos = cell(row, "");
+      g.dateien.forEach(function (pfad) {
+        var img = document.createElement("img");
+        img.src = "/dateien/" + encodeURI(pfad);
+        img.alt = "";
+        photos.appendChild(img);
+      });
+      body.appendChild(row);
+    });
+    if (!data.gruppen.length) {
+      var empty = document.createElement("tr");
+      cell(empty, "Noch keine Gruppe angemeldet.").colSpan = 4;
+      body.appendChild(empty);
+    }
+  }
+
+  function loadGroups() {
+    fetch("/api/gruppen", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        document.getElementById("groupsError").innerHTML = "";
+        renderGroups(data);
+      })
+      .catch(function () {
+        document.getElementById("groupsError").innerHTML = '<div class="error">Gruppen konnten nicht geladen werden.</div>';
+      });
+  }
+
+  function loadSettings() {
+    fetch("/api/einstellungen", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (s) { document.getElementById("pupils").value = s.schueler; });
+  }
+
+  document.getElementById("savePupils").addEventListener("click", function () {
+    var state = document.getElementById("pupilsState");
+    fetch("/api/einstellungen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ schueler: document.getElementById("pupils").value })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (s) { state.textContent = s.ok === false ? "Bitte eine Zahl von 1 bis 60" : "✓ gespeichert"; })
+      .catch(function () { state.textContent = "Speichern hat nicht geklappt"; });
+  });
+
   document.getElementById("deleteAll").addEventListener("click", function () {
-    if (!confirm("Wirklich ALLE Stempel vom Laptop löschen? Das kann nicht rückgängig gemacht werden.")) return;
-    fetch("/api/alle-loeschen", { method: "POST" }).then(loadList);
+    if (!confirm("Wirklich ALLE Stempel, Antworten und Fotos vom Laptop löschen? Das kann nicht rückgängig gemacht werden.")) return;
+    fetch("/api/alle-loeschen", { method: "POST" }).then(function () { loadList(); loadGroups(); });
   });
 
   loadInfo();
+  loadStations();
+  loadSettings();
   loadList();
-  setInterval(loadList, 5000);
+  setInterval(function () { loadList(); loadGroups(); }, 5000);
 })();
 </script>
 </body>
