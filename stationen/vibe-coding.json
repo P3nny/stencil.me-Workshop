@@ -1,6 +1,7 @@
 {
   "id": "vibe-coding",
-  "titel": "Bild-App vibe coden",
+  "titel": "Optional: Bild-App vibe coden",
+  "optional": true,
   "typ": "generativ",
   "datenweg": "online",
   "schritte": [

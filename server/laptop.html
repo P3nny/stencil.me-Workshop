@@ -319,8 +319,8 @@
       })
       .then(function (list) {
         list.forEach(function (s) { stationTitles[s.id] = s.titel; });
-        stationCount = list.filter(function (s) { return !s.bonus; }).length; // Bonus zählt nicht mit
-        list.forEach(function (s) { if (s.bonus) bonusIds[s.id] = true; });
+        stationCount = list.filter(function (s) { return !s.bonus && !s.optional; }).length; // Bonus und optionale zählen nicht mit
+        list.forEach(function (s) { if (s.bonus || s.optional) bonusIds[s.id] = true; });
       })
       .catch(function () { /* dann eben die IDs anzeigen */ })
       .then(loadGroups);

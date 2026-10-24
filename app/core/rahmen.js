@@ -498,6 +498,7 @@
         return;
       }
       panel.appendChild(el('p', { klasse: 'gross-text' }, [el('span', { text: 'Weiter geht es an der Station ' }), el('strong', { text: naechste.titel })]));
+      if(naechste.optional) panel.appendChild(el('p', { text: 'Diese Station ist optional: Ihr müsst sie nicht machen.' }));
       panel.appendChild(el('p', { text: 'Geh hin und scanne dort den QR-Code.' }));
       if(TEST) panel.appendChild(el('a', { klasse: 'knopf-link', href: '?id=' + naechste.id + '&test', text: 'Test: direkt hin' }));
     });

@@ -1,6 +1,7 @@
 {
   "id": "ki-selbstportraet",
-  "titel": "Selbstporträts mit KI neu erschaffen",
+  "titel": "Optional: Selbstporträts mit KI neu erschaffen",
+  "optional": true,
   "typ": "generativ",
   "datenweg": "online",
   "schritte": [

@@ -8,7 +8,7 @@ Lang und genau: `Datenschutz.md`.
 
 💻 **Pennys Laptop:** Steht hier im Raum. Er sammelt deine Ergebnisse für eure Mappe: dein Foto, deinen Stempel, eure Antworten. Er schickt nichts ins Internet.
 
-🌍 **Internet:** Nur an zwei Stationen, an die KI Claude. Dorthin gehen nur Wörter aus dem Baukasten. Kein Foto, kein Name.
+🌍 **Internet:** Nur an zwei optionalen Stationen, an die KI Claude. Dorthin gehen nur Wörter aus dem Baukasten. Kein Foto, kein Name. Du musst diese Stationen nicht machen.
 
 ## Drei Regeln für dich
 

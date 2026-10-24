@@ -24,6 +24,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `hintergruende` | nein | nur Station Hintergrund: `{ "datei": "bilder/hintergruende/….jpg", "titel": "…" }`, Lizenzen in `bilder/hintergruende/README.md` |
 | `plaetze` | ja | wie viele Gruppen gleichzeitig an der Station sein können |
 | `bonus` | nein | `true`: zählt nicht zu „x von y“ und nicht fürs Puzzle |
+| `optional` | nein | `true`: freiwillig (z. B. Claude-Stationen, nur mit Einwilligung). Zählt nicht zu „x von y“, wird nur vorgeschlagen, wenn keine andere Station frei ist |
 | `mindestFertig` | nein | Bonus geht erst auf, wenn so viele Stationen geschafft sind |
 
 ## `check`

@@ -132,8 +132,8 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Selbstporträts mit KI neu erschaffen', 'Mit der Hand drucken: Linolplatten', 'Kunst-Quiz: Künstler:innen und Streetart', 'Bild-App vibe coden'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 13') >= 0, 'Zähler steht auf 1 von 13');
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Optional: Selbstporträts mit KI neu erschaffen', 'Mit der Hand drucken: Linolplatten', 'Kunst-Quiz: Künstler:innen und Streetart', 'Optional: Bild-App vibe coden'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 11') >= 0, 'Zähler steht auf 1 von 11');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
 
@@ -205,16 +205,16 @@ async function abschliessen(page, sterne){
   await page.locator('input[type=file]').setInputFiles(FOTO);
   await page.locator('.foto-vorschau').waitFor({ state: 'visible' });
   await abschliessen(page, 3);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 13') >= 0, 'Zähler steht auf 3 von 13');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 11') >= 0, 'Zähler steht auf 3 von 11');
 
   console.log('Neu laden: Fortschritt bleibt');
   await page.reload();
   await page.waitForSelector('text=schon erledigt');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 13') >= 0, 'Fortschritt nach Neuladen erhalten');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 11') >= 0, 'Fortschritt nach Neuladen erhalten');
 
   console.log('Startseite nach drei Stationen');
   await page.goto(BASE + '/');
-  await page.waitForSelector('text=3 von 13 Stationen geschafft');
+  await page.waitForSelector('text=3 von 11 Stationen geschafft');
   pruefe(true, 'Startseite zeigt den Stand');
   await page.goto(BASE + '/app/station.html?id=lasercutter');
 
@@ -258,7 +258,7 @@ async function abschliessen(page, sterne){
   await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild an den Laptop schicken")').click();
   await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist abgeschickt') >= 0).length === 2);
   await abschliessen(page, 4);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 13') >= 0, 'Zähler steht auf 5 von 13');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 11') >= 0, 'Zähler steht auf 5 von 11');
 
   console.log('Station Pixel vs. Vektor');
   await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
@@ -313,7 +313,7 @@ async function abschliessen(page, sterne){
   await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
   await page.waitForSelector('.ce-vorschau img');
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 13') >= 0, 'Zähler steht auf 6 von 13');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 11') >= 0, 'Zähler steht auf 6 von 11');
 
   console.log('Station Coding: HTML, CSS und JavaScript');
   await page.goto(BASE + '/app/station.html?id=coding-web&test');
@@ -358,7 +358,7 @@ async function abschliessen(page, sterne){
   await page.locator('button.stern').nth(4).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 13') >= 0, 'Zähler steht auf 7 von 13');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 11') >= 0, 'Zähler steht auf 7 von 11');
 
   console.log('Station Selbstporträts mit KI (Server im Testmodus, ohne Claude)');
   await page.goto(BASE + '/app/station.html?id=ki-selbstportraet&test');
@@ -386,7 +386,7 @@ async function abschliessen(page, sterne){
   await page.locator('button.stern').nth(4).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('8 von 13') >= 0, 'Zähler steht auf 8 von 13');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 11') >= 0, 'Optionale Station zählt nicht mit: weiter 7 von 11');
 
   console.log('Station Bild-App vibe coden (Server im Testmodus, ohne Claude)');
   await page.goto(BASE + '/app/station.html?id=vibe-coding&test');
@@ -409,7 +409,7 @@ async function abschliessen(page, sterne){
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne Ethik-Antwort');
   await page.fill('#eingabe-ethik', 'Schutz vor schlechten Inhalten');
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('9 von 13') >= 0, 'Zähler steht auf 9 von 13');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 11') >= 0, 'Optionale Station zählt nicht mit: weiter 7 von 11');
 
   for(const druck of [['druck-linol', 'Linolplatten'], ['druck-stempel', 'Lasercut-Stempel']]){
     console.log('Station Mit der Hand drucken: ' + druck[1]);
@@ -424,7 +424,7 @@ async function abschliessen(page, sterne){
     await abschliessen(page, 5);
     pruefe(true, 'Station abgeschlossen');
   }
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('11 von 13') >= 0, 'Zähler steht auf 11 von 13');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('9 von 11') >= 0, 'Zähler steht auf 9 von 11');
 
   // Quiz in der Station durchspielen: immer die obere Antwort, dann weiter
   async function quizSpielen(){
@@ -465,7 +465,7 @@ async function abschliessen(page, sterne){
   await lieblinge.nth(1).setInputFiles(FOTO);
   await page.waitForFunction(() => document.querySelectorAll('.foto-vorschau:not([hidden])').length === 2);
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('13 von 13') >= 0, 'Zähler steht auf 13 von 13');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('11 von 11') >= 0, 'Zähler steht auf 11 von 11');
   pruefe(await page.locator('text=Bonus: Sticker').count() === 1, 'danach wird der Bonus-Sticker vorgeschlagen');
 
   console.log('Bonus-Station Sticker');
@@ -479,7 +479,7 @@ async function abschliessen(page, sterne){
   await page.locator('button:has-text("Sticker an den Laptop schicken")').first().click();
   await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Sticker ist abgeschickt') >= 0).length === 2);
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('13 von 13') >= 0, 'Bonus zählt nicht mit: weiter 13 von 13');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('11 von 11') >= 0, 'Bonus zählt nicht mit: weiter 11 von 11');
   pruefe(await page.locator('text=Feedback zum Workshop').count() === 1, 'danach wird der Feedbackbogen vorgeschlagen');
 
   console.log('Feedbackbogen');

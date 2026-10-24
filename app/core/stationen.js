@@ -36,9 +36,10 @@
     return !!(f.stationen[id] && f.stationen[id].status === 'fertig');
   }
 
-  // Bonus-Stationen (z. B. Sticker) zählen nicht zu „x von y“ und nicht fürs Puzzle
+  // Bonus-Stationen (z. B. Sticker) und optionale Stationen (Claude: nur mit
+  // Einwilligung) zählen nicht zu „x von y“ und nicht fürs Puzzle
   function pflicht(liste){
-    return liste.filter(s => !s.bonus);
+    return liste.filter(s => !s.bonus && !s.optional);
   }
 
   function anzahlFertig(liste, f){
@@ -88,7 +89,10 @@
     if(!kandidaten.length) return null;
     const besetzt = s => (beleg && beleg[s.id]) || 0;
     const frei = kandidaten.filter(s => besetzt(s) < (s.plaetze || 1));
-    if(frei.length) return frei[Math.floor(Math.random() * frei.length)];
+    // Optionale Stationen nur vorschlagen, wenn keine andere frei ist
+    const freiOhneOptional = frei.filter(s => !s.optional);
+    const wahl = freiOhneOptional.length ? freiOhneOptional : frei;
+    if(wahl.length) return wahl[Math.floor(Math.random() * wahl.length)];
     return kandidaten.slice().sort((a, b) => besetzt(a) - besetzt(b))[0];
   }
 

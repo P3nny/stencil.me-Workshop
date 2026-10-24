@@ -8,7 +8,7 @@ Für Lehrkräfte und Eltern stehen die genauen Angaben ganz unten.
 
 - Deine Fotos bearbeitet das iPad. Kein Foto von dir geht ins Internet.
 - Deine Ergebnisse sammelt Pennys Laptop hier im Raum. Er schickt sie nicht ins Internet.
-- Nur an zwei Stationen geht etwas ins Internet: an eine KI namens Claude. Dorthin gehen nur Wörter aus einem Baukasten. Kein Foto, kein Name.
+- Nur an zwei Stationen geht etwas ins Internet: an eine KI namens Claude. Dorthin gehen nur Wörter aus einem Baukasten. Kein Foto, kein Name. Diese zwei Stationen sind optional: Du musst sie nicht machen.
 - Nach dem Workshop löscht Penny alles. Eure Ergebnis-Mappe bekommt eure Lehrkraft.
 
 ## Drei Orte für deine Daten
@@ -45,8 +45,8 @@ Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Fo
 | Hintergrund ändern                 | Das freigestellte Foto                           | Dein Bild mit dem neuen Hintergrund                       | –                                             |
 | Pixel vs. Vektor                   | –                                                | Eure Antworten, euer SVG-Code                             | –                                             |
 | Coding: HTML, CSS und JavaScript   | –                                                | Euer Code, eure Antwort                                   | –                                             |
-| Selbstporträts mit KI              | –                                                | Euer Prompt und die Bilder                                | **Claude:** nur euer Prompt aus dem Baukasten |
-| Bild-App vibe coden                | Euer Foto (es geht nur in eure App auf dem iPad) | Euer Auftrag und eure App                                 | **Claude:** nur euer ausgefüllter Auftrag     |
+| Optional: Selbstporträts mit KI    | –                                                | Euer Prompt und die Bilder                                | **Claude:** nur euer Prompt aus dem Baukasten |
+| Optional: Bild-App vibe coden      | Euer Foto (es geht nur in eure App auf dem iPad) | Euer Auftrag und eure App                                 | **Claude:** nur euer ausgefüllter Auftrag     |
 | Mit der Hand drucken (2 Stationen) | –                                                | Fotos eurer Postkarten                                    | –                                             |
 | Code-Quiz                          | –                                                | Wie viele Antworten richtig waren                         | –                                             |
 | Kunst-Quiz                         | –                                                | Quiz-Ergebnis, Foto eures Lieblingswerks, euer Satz       | –                                             |
@@ -59,7 +59,7 @@ Fotografiere an den Stationen nur die Sache, um die es geht: die Maschine, die P
 
 ## Die zwei Stationen mit Internet: Claude
 
-Claude ist eine generative KI der Firma Anthropic in den USA.
+Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen sind optional. Sie zählen nicht zu euren Stationen, und ihr verpasst nichts für euren Stempel.
 
 - **Was geht hin?** Nur der Satz aus dem Baukasten. Zum Beispiel: „Zeichne ein Selbstporträt im Stil von Frida Kahlo. Es zeigt ein 14-jähriges Mädchen mit braunen Augen und langen Haaren.“ Bei der Bild-App kommen der App-Name und der Knopf-Text dazu, die ihr selbst eintippt.
 - **Was geht nicht hin?** Kein Foto, kein Name, nichts, was zeigt, wer ihr seid. Schreibt deshalb auch in den App-Namen keinen echten Namen.
@@ -91,7 +91,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA.
 
 - Du darfst jederzeit fragen, was über dich gespeichert ist.
 - Du darfst sagen: Ich will nicht, dass mein Foto auf den Laptop geht. Dann findet Penny eine Lösung mit dir.
-- Du musst die Stationen mit Claude nicht machen, wenn du oder deine Eltern das nicht wollen.
+- Die Stationen mit Claude sind optional. Du machst sie nur, wenn du und deine Eltern einverstanden seid.
 
 ---
 
@@ -111,7 +111,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA.
 
 | Dienst                                      | Wann                                                           | Welche Daten                                                                                                                                                                                            |
 | ------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Anthropic (Claude-API), USA                 | Stationen „Selbstporträts mit KI“ und „Bild-App vibe coden“    | Ausgefüllter Baukasten-Text (Stil, Alter 11–18, Geschlecht, Augen- und Haarfarbe, Brille; bzw. Effekt, Farben, App-Name, Knopf-Text). Kein Foto, kein Name, keine Geräte-IP (Anfrage kommt vom Laptop). |
+| Anthropic (Claude-API), USA                 | Optionale Stationen „Selbstporträts mit KI“ und „Bild-App vibe coden“ | Ausgefüllter Baukasten-Text (Stil, Alter 11–18, Geschlecht, Augen- und Haarfarbe, Brille; bzw. Effekt, Farben, App-Name, Knopf-Text). Kein Foto, kein Name, keine Geräte-IP (Anfrage kommt vom Laptop). |
 | YouTube (Google), über youtube-nocookie.com | Nur nach Antippen von „Video laden“ an der Station Lasercutter | IP-Adresse des iPads, Geräte- und Browserdaten.                                                                                                                                                         |
 | Apple (Diktierfunktion)                     | Nur, wenn ein Kind die Mikrofon-Taste nutzt                    | Sprachaufnahme, je nach Gerät auf dem iPad oder bei Apple verarbeitet.                                                                                                                                  |
 | Netlify, USA                                | Nur Plan B (WLAN zum Laptop geht nicht)                        | IP-Adresse des iPads in den Server-Protokollen. Keine Fotos, keine Antworten.                                                                                                                           |
