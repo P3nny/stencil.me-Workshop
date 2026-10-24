@@ -458,7 +458,7 @@ async function abschliessen(page, sterne){
   if(g){
     pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor,coding-web,ki-selbstportraet,druck-linol,druck-stempel,code-quiz,kunst-quiz,sticker', 'fertige Stationen: ' + g.fertig.join(', '));
     const arten = g.dateien.map(d => d.split('/').pop().split('_')[0]).sort().join(',');
-    pruefe(arten === 'druck-linol,druck-linol,druck-stempel,druck-stempel,foto,foto,foto,foto,hintergrund,hintergrund,ki-selbstportraet,ki-selbstportraet,koerpererkennung,kunst-quiz,kunst-quiz,lasercutter', 'auf dem Laptop: alle Fotos inkl. Ausgangsfotos (auch verworfene Versuche), Laser-Foto, KI-Ansicht, Hintergrund-, KI-, Postkarten- und Streetart-Bilder (' + arten + ')');
+    pruefe(arten === 'druck-linol,druck-linol,druck-stempel,druck-stempel,foto,foto,hintergrund,hintergrund,ki-selbstportraet,ki-selbstportraet,koerpererkennung,kunst-quiz,kunst-quiz,lasercutter', 'auf dem Laptop: alle Fotos inkl. Ausgangsfotos (nur die letzten, keine verworfenen), Laser-Foto, KI-Ansicht, Hintergrund-, KI-, Postkarten- und Streetart-Bilder (' + arten + ')');
     pruefe(g.antworten.lasercutter && g.antworten.lasercutter.antworten.frage === 'Wie heiß wird der Laser?', 'Antwort angekommen');
     const svgCode = g.antworten['pixel-vektor'] && g.antworten['pixel-vektor'].antworten['svg-code'];
     pruefe(!!svgCode && svgCode.indexOf('polygon') > 0, 'SVG-Code auf dem Laptop gespeichert');

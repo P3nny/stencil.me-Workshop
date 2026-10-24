@@ -16,6 +16,8 @@
   - [ ] „Zum Home-Bildschirm“ erlaubt?
   - [ ] Kamera erlaubt?
   - [ ] Werden Website-Daten beim Abmelden oder über Nacht gelöscht?
+  - [ ] Ist Diktieren (Mikrofon-Taste auf der Tastatur) erlaubt?
+  - [ ] Blockiert ein Inhaltsfilter Adressen wie `http://192.168.…:8000`?
 - [ ] Wie viel freier Speicher ist auf den iPads?
 - [x] Tastaturen für die iPads? Nein (Patricia, 24.10.). Code-Stationen sind für die Bildschirm-Tastatur gebaut
 - [ ] Dürfen wir die iPads vor dem Workshop einrichten (Seite laden, auf den Home-Bildschirm legen)?

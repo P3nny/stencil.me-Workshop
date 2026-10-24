@@ -1,8 +1,8 @@
 // ---- Nachrichten vom Laptop („Euer Stempel wird gelasert“, „… ist fertig“) ----
-// Das iPad fragt alle 15 s beim Laptop nach Nachrichten für die eigene Gruppe und zeigt
+// Das iPad fragt einmal pro Minute beim Laptop nach Nachrichten für die eigene Gruppe und zeigt
 // neue oben als Hinweis. „OK“ merkt sich das iPad. Ohne Laptop passiert einfach nichts.
 (function(){
-  const ABFRAGE_MS = 15000;
+  const ABFRAGE_MS = 60000; // einmal pro Minute reicht (Patricia, 24.10.)
   const TIMEOUT_MS = 5000;
   let box = null;
   let gruppe = null;

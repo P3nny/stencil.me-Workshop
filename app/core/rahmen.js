@@ -146,13 +146,12 @@
             // Rohfoto der Foto-Station merken: brauchen spätere Stationen und das Puzzle
             .then(() => station.id === 'foto' ? Speicher.schreiben('foto-key:' + index, key) : null)
             .then(speichern)
-            .then(() => station.check.hochladen ? Outbox.datei(ctx.gruppe.id, station.id, key) : null)
             .then(() => Speicher.dateiAlsUrl(key));
         })
         .then(url => {
           vorschau.src = url;
           vorschau.hidden = false;
-          status.textContent = station.check.hochladen ? '✓ Foto gespeichert' : '✓ Foto gespeichert (bleibt auf dem iPad)';
+          status.textContent = station.check.hochladen ? '✓ Foto gespeichert (geht beim Beenden an den Laptop)' : '✓ Foto gespeichert (bleibt auf dem iPad)';
           knopf.textContent = 'Neues Foto';
           ctx.pruefen();
           if(station.check.personPruefen) return personPruefen(knopf.parentNode.querySelector('.ki-pruefung'), index, url);
@@ -279,7 +278,9 @@
     const eintrag = ctx.eintrag;
     eintrag.antworten = eintrag.antworten || {};
     let timer = null;
-    return el('div', { klasse: 'eingaben' }, (station.eingaben || []).map(e => {
+    if(!(station.eingaben || []).length) return null;
+    const diktat = el('p', { klasse: 'hinweis', text: '🎤 Tipp: Statt zu tippen könnt ihr auch die Mikrofon-Taste auf der Tastatur antippen und sprechen.' });
+    return el('div', { klasse: 'eingaben' }, [diktat].concat((station.eingaben || []).map(e => {
       const feld = el('textarea', { rows: '3', id: 'eingabe-' + e.id });
       feld.value = eintrag.antworten[e.id] || '';
       feld.addEventListener('input', () => {
@@ -289,7 +290,7 @@
         timer = setTimeout(speichern, 400);
       });
       return el('label', { klasse: 'eingabe', for: 'eingabe-' + e.id }, [el('span', { text: e.text + (e.pflicht ? '' : ' (freiwillig)') }), feld]);
-    }));
+    })));
   }
 
   function inputErfuellt(station){
@@ -434,6 +435,15 @@
     pruefen();
   }
 
+  // Fotos der Station erst jetzt an den Laptop: nur die letzten, keine verworfenen Versuche
+  function fotosSenden(station, eintrag){
+    const check = station.check || {};
+    const hochladen = check.hochladen || (check.foto && check.foto.hochladen);
+    if(!hochladen) return Promise.resolve();
+    const keys = Object.keys(eintrag.dateien || {}).map(i => eintrag.dateien[i]);
+    return keys.reduce((kette, key) => kette.then(() => Outbox.datei(ctx.gruppe.id, station.id, key)), Promise.resolve());
+  }
+
   function beenden(){
     const station = ctx.station;
     const eintrag = ctx.eintrag;
@@ -441,6 +451,7 @@
     eintrag.ende = new Date().toISOString();
     ctx.f.aktuell = null;
     speichern()
+      .then(() => fotosSenden(station, eintrag))
       .then(() => Outbox.ereignis(ctx.gruppe.id, 'beendet', station.id, { antworten: eintrag.antworten || {}, kiTyp: eintrag.kiTyp || '', sterne: eintrag.sterne || 0 }))
       .then(() => kopfleiste(ctx.gruppe, ctx.liste, ctx.f))
       .then(() => weiterZeigen(true))
