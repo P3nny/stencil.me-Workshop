@@ -28,7 +28,16 @@
   button { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.1em; border:3px solid var(--ink); background:#fff; padding:8px 14px; cursor:pointer; margin-top:16px; }
   button:hover { background:var(--neon); }
   .error { background:var(--neon); border:2px solid var(--ink); padding:10px; margin-top:12px; font-weight:700; }
-  .groups-panel { width:100%; }
+  .groups-panel, .plate-panel { width:100%; }
+  .stamp label { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px; cursor:pointer; }
+  .stamp input { width:20px; height:20px; accent-color:var(--neon); }
+  .stamp.placed { opacity:.45; }
+  .plate-layout { display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; margin-top:14px; }
+  .plate { width:420px; max-width:100%; aspect-ratio:210/297; border:3px dashed var(--muted); background:#e9dcc8; }
+  .plate svg { width:100%; height:100%; display:block; }
+  .plate-info { flex:1; min-width:260px; }
+  .plate-info ul { padding-left:1.2em; }
+  .plate-info .warn { background:var(--neon); border:2px solid var(--ink); padding:8px; font-weight:700; }
   .settings { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .settings input { font-size:1.2rem; width:80px; border:3px solid var(--ink); padding:6px; }
   .settings button { margin-top:0; }
@@ -57,6 +66,20 @@
     <div class="folder" id="folder"></div>
     <div id="listError"></div>
     <div class="grid" id="grid"></div>
+  </div>
+  <div class="panel plate-panel">
+    <h2>A4-Platte für den Mr Beam</h2>
+    <div class="hint">Angehakte Stempel oben kommen auf die Platte: 5 mm Rand, 3 mm Abstand. Stempel, die schon auf einer Platte waren, sind grau und nicht angehakt.</div>
+    <button id="buildPlate" type="button">Platte zusammenstellen</button>
+    <div class="plate-layout" id="plateLayout" hidden>
+      <div class="plate" id="platePreview"></div>
+      <div class="plate-info">
+        <div id="plateSummary"></div>
+        <button id="downloadPlate" type="button">Platte herunterladen (SVG)</button>
+        <div class="hint">In der Mr-Beam-Oberfläche: Datei öffnen, Gravur (Blau) mit <b>2 Durchgängen</b>, dann Schnitt (Rot). Danach sind die Stempel grau markiert.</div>
+        <button id="resetPlaced" type="button">Grau-Markierung zurücksetzen</button>
+      </div>
+    </div>
   </div>
   <div class="panel groups-panel">
     <h2>Gruppen an den Stationen</h2>
@@ -105,7 +128,124 @@
       .catch(function () { setTimeout(loadInfo, 5000); });
   }
 
+  // ---- A4-Platte: Stempel automatisch anordnen ----
+  var PLATE_W = 210, PLATE_H = 297, MARGIN = 5, GAP = 3; // mm
+  var PLACED_KEY = "stencilme-auf-platte";
+  var selection = {}; // pfad -> true/false (von Hand geändert)
+  var placed = loadPlaced();
+  var stampList = [];
+  var plateSvg = null;
+  var platePaths = [];
+
+  function loadPlaced() {
+    try { return JSON.parse(localStorage.getItem(PLACED_KEY) || "[]"); } catch (e) { return []; }
+  }
+  function savePlaced() {
+    try { localStorage.setItem(PLACED_KEY, JSON.stringify(placed)); } catch (e) { /* nur Komfort */ }
+  }
+  function isSelected(pfad) {
+    return pfad in selection ? selection[pfad] : placed.indexOf(pfad) < 0;
+  }
+
+  // Ein Stempel als Gruppe auf der Platte. IDs (z. B. cutClip) bekommen eine Vorsilbe,
+  // sonst würden sich die Stempel gegenseitig die Schnittkontur wegnehmen.
+  function stampGroup(text, n, x, y) {
+    var doc = new DOMParser().parseFromString(text, "image/svg+xml");
+    var inner = doc.documentElement.innerHTML
+      .replace(/id="([^"]+)"/g, 'id="s' + n + '-$1"')
+      .replace(/url\(#([^)]+)\)/g, "url(#s" + n + "-$1)");
+    return '<g transform="translate(' + x.toFixed(3) + "," + y.toFixed(3) + ')">' + inner + "</g>";
+  }
+
+  function stampSize(text) {
+    var root = new DOMParser().parseFromString(text, "image/svg+xml").documentElement;
+    var vb = (root.getAttribute("viewBox") || "").split(/[\s,]+/).map(parseFloat);
+    return { w: vb[2] || parseFloat(root.getAttribute("width")), h: vb[3] || parseFloat(root.getAttribute("height")) };
+  }
+
+  // Erst in Ankunftsreihenfolge prüfen, wer noch auf die Platte passt (ältester zuerst),
+  // dann diese Stempel platzsparend anordnen: höchste zuerst, sonst Reihenfolge behalten.
+  function layout(items) {
+    var probe = shelfPack(items);
+    var sorted = probe.fits
+      .map(function (it, i) { return { it: it, i: i }; })
+      .sort(function (a, b) { return (b.it.h - a.it.h) || (a.i - b.i); })
+      .map(function (p) { return p.it; });
+    var packed = shelfPack(sorted);
+    return { fits: packed.fits, rest: packed.rest.concat(probe.rest) };
+  }
+
+  // Regal-Packen: Reihe für Reihe von oben links. Nach dem ersten Stempel, der nicht
+  // mehr passt, ist Schluss, damit keiner von später vorrutscht.
+  function shelfPack(items) {
+    var x = MARGIN, y = MARGIN, rowH = 0, fits = [], rest = [];
+    items.forEach(function (it) {
+      if (rest.length) { rest.push(it); return; }
+      if (x + it.w > PLATE_W - MARGIN) { x = MARGIN; y += rowH + GAP; rowH = 0; }
+      if (it.w > PLATE_W - 2 * MARGIN || y + it.h > PLATE_H - MARGIN) { rest.push(it); return; }
+      it.x = x; it.y = y;
+      fits.push(it);
+      x += it.w + GAP;
+      rowH = Math.max(rowH, it.h);
+    });
+    return { fits: fits, rest: rest };
+  }
+
+  function buildPlate() {
+    // Älteste zuerst: Wer zuerst fertig war, kommt zuerst auf die Platte (die Liste ist neueste zuerst)
+    var chosen = stampList.filter(function (s) { return isSelected(s.pfad); }).reverse();
+    var summary = document.getElementById("plateSummary");
+    document.getElementById("plateLayout").hidden = false;
+    if (!chosen.length) {
+      summary.innerHTML = '<p class="warn">Keine Stempel angehakt.</p>';
+      document.getElementById("platePreview").innerHTML = "";
+      plateSvg = null;
+      return;
+    }
+    Promise.all(chosen.map(function (s) {
+      return fetch("/daten/" + encodeURI(s.pfad), { cache: "no-store" }).then(function (r) { return r.text(); })
+        .then(function (text) { var size = stampSize(text); return { s: s, text: text, w: size.w, h: size.h }; });
+    })).then(function (items) {
+      var result = layout(items);
+      var groups = result.fits.map(function (it, n) { return stampGroup(it.text, n, it.x, it.y); }).join("");
+      plateSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + PLATE_W + " " + PLATE_H + '" width="' + PLATE_W + 'mm" height="' + PLATE_H + 'mm">' + groups + "</svg>";
+      platePaths = result.fits.map(function (it) { return it.s.pfad; });
+      document.getElementById("platePreview").innerHTML = plateSvg;
+      var html = "<p><b>" + result.fits.length + " Stempel</b> auf der Platte: " +
+        result.fits.map(function (it) { return it.s.name; }).join(", ") + "</p>";
+      if (result.rest.length) {
+        html += '<p class="warn">Passen nicht mehr: ' + result.rest.map(function (it) { return it.s.name; }).join(", ") +
+          ". Die kommen auf die nächste Platte.</p>";
+      }
+      summary.innerHTML = html;
+    }).catch(function () {
+      summary.innerHTML = '<p class="warn">Stempel konnten nicht geladen werden.</p>';
+    });
+  }
+
+  document.getElementById("buildPlate").addEventListener("click", buildPlate);
+  document.getElementById("downloadPlate").addEventListener("click", function () {
+    if (!plateSvg) return;
+    var now = new Date();
+    var pad = function (v) { return ("0" + v).slice(-2); };
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([plateSvg], { type: "image/svg+xml" }));
+    a.download = "platte-" + now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) + "-" + pad(now.getHours()) + pad(now.getMinutes()) + ".svg";
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    platePaths.forEach(function (p) { if (placed.indexOf(p) < 0) placed.push(p); delete selection[p]; });
+    savePlaced();
+    loadList();
+  });
+  document.getElementById("resetPlaced").addEventListener("click", function () {
+    placed = [];
+    selection = {};
+    savePlaced();
+    loadList();
+  });
+
   function renderList(data) {
+    stampList = data.stempel;
     var grid = document.getElementById("grid");
     var count = data.stempel.length;
     document.getElementById("count").textContent = count + " Stempel";
@@ -122,9 +262,18 @@
       name.textContent = s.name;
       var time = document.createElement("div");
       time.textContent = s.tag + " " + s.zeit;
+      if (placed.indexOf(s.pfad) >= 0) box.className += " placed";
+      var label = document.createElement("label");
+      var check = document.createElement("input");
+      check.type = "checkbox";
+      check.checked = isSelected(s.pfad);
+      check.addEventListener("change", function () { selection[s.pfad] = check.checked; });
+      label.appendChild(check);
+      label.appendChild(document.createTextNode("auf die Platte"));
       box.appendChild(img);
       box.appendChild(name);
       box.appendChild(time);
+      box.appendChild(label);
       grid.appendChild(box);
     });
     seen = data.stempel.map(function (s) { return s.pfad; });

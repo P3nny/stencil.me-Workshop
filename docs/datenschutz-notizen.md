@@ -17,6 +17,8 @@ Sammlung, kein fertiger Text. Wird in einem eigenen Schritt zu einer kindgerecht
   → Input-Fotos können Kinder zeigen (z. B. am Laser). Hinweis in der App: „Fotografiere die Maschine, nicht die Leute“?
 - **Station Bild bearbeiten:** Foto, Schwarz-Weiß-Bild und Personenmaske bleiben auf dem iPad (Schwarz-Weiß-Porträt auch fürs Puzzle in IndexedDB). An den Laptop geht nur die Stempel-Datei (SVG) mit Vorname/Spitzname, wie bisher in `stencil.html`.
 - **Foto-Station:** BodyPix prüft auf dem iPad, ob eine Person auf dem Foto ist. Ergebnis (erkannt/nicht erkannt) bleibt auf dem iPad und geht nicht an den Laptop.
+- **Lasercutter:** Link zum Erklärvideo auf YouTube (`youtube.com/watch?v=alhusM1cpYw`, ohne Tracking-Parameter). Wer ihn öffnet, schickt die IP-Adresse des iPads an Google/YouTube (Online-Dienst, keine Kinderdaten). *Alternative: Video lokal abspielen, falls die Lizenz das erlaubt.*
+- **A4-Platte (Laptop):** Die Laptop-Seite setzt die Stempel zu einer Datei zusammen. Welche Stempel schon auf einer Platte waren, merkt sich nur der Browser am Laptop.
 - **Greenscreen:** Freistellen auf dem iPad. Ob das fertige Bild an den Laptop geht, ist offen.
 - **Gebaut (Gerüst):** Auf dem iPad liegt alles in IndexedDB `werkstatt` (Gruppe, Fortschritt, Antworten, Fotos, Outbox). Auf dem Laptop: `server/daten/gruppen/<Gruppen-ID>/ereignisse/*.json` (Anmeldung mit Vornamen, Check-in, Beendet mit Antworten, KI-Antwort und Sternen) und `…/dateien/` (nur Fotos aus Stationen mit `"hochladen": true`, z. B. Lasercutter).
 - **Wer sieht was:** Die iPads können nur abfragen, wie viele Gruppen an jeder Station sind (ohne Namen). Gruppen, Antworten und Fotos sieht nur die Laptop-Seite.

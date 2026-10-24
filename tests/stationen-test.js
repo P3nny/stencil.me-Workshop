@@ -205,6 +205,23 @@ async function abschliessen(page, sterne){
   await laptop.waitForSelector('td:has-text("Ada & Bo")');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-4-laptop.png'), fullPage: true });
 
+  console.log('A4-Platte');
+  await laptop.click('#buildPlate');
+  await laptop.waitForSelector('#platePreview svg g');
+  const platte = await laptop.evaluate(() => {
+    const svg = document.querySelector('#platePreview svg');
+    const ids = Array.prototype.map.call(svg.querySelectorAll('[id]'), e => e.id);
+    return { gruppen: svg.children.length, ids: ids.length, eindeutig: new Set(ids).size === ids.length, breite: svg.getAttribute('width') };
+  });
+  pruefe(platte.gruppen >= 2, 'Stempel auf der Platte: ' + platte.gruppen);
+  pruefe(platte.eindeutig && platte.ids === platte.gruppen, 'jede Schnittkontur hat eine eigene ID');
+  pruefe(platte.breite === '210mm', 'Platte ist A4 (210 mm breit)');
+  await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-8-platte.png'), fullPage: true });
+  const [download] = await Promise.all([laptop.waitForEvent('download'), laptop.click('#downloadPlate')]);
+  pruefe(/^platte-.*\.svg$/.test(download.suggestedFilename()), 'Download: ' + download.suggestedFilename());
+  await laptop.waitForSelector('.stamp.placed');
+  pruefe(true, 'Stempel danach grau markiert');
+
   pruefe(konsolenFehler.length === 0, 'keine JavaScript-Fehler' + (konsolenFehler.length ? ': ' + konsolenFehler.join(' | ') : ''));
   await browser.close();
   console.log(fehler ? fehler + ' Fehler' : 'Alles in Ordnung');

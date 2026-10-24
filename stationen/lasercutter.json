@@ -10,15 +10,35 @@
     "Stell Penny eine Frage zum Laser und schreib sie mit der Antwort auf."
   ],
   "links": [
-    { "text": "Erklärvideo Lasercutter", "url": "" }
+    {
+      "text": "Erklärvideo Lasercutter (YouTube)",
+      "url": "https://www.youtube.com/watch?v=alhusM1cpYw"
+    }
   ],
-  "check": { "art": "foto", "hochladen": true, "text": "Mach ein Foto vom Lasercutter. Nur die Maschine, keine Leute." },
+  "check": {
+    "art": "foto",
+    "hochladen": true,
+    "text": "Mach ein Foto vom Lasercutter. Nur die Maschine, keine Leute."
+  },
   "eingaben": [
-    { "id": "frage", "text": "Deine Frage", "pflicht": true },
-    { "id": "antwort", "text": "Die Antwort", "pflicht": true }
+    {
+      "id": "frage",
+      "text": "Deine Frage",
+      "pflicht": true
+    },
+    {
+      "id": "antwort",
+      "text": "Die Antwort",
+      "pflicht": true
+    }
   ],
-  "fragen": ["ki-typ", "sterne"],
-  "datenschutz": "Deine Frage, die Antwort und das Foto vom Laser gehen an den Laptop.",
-  "braucht": ["stencilme"],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Deine Frage, die Antwort und das Foto vom Laser gehen an den Laptop. Das Erklärvideo läuft bei YouTube: Google sieht dabei die Adresse des iPads.",
+  "braucht": [
+    "stencilme"
+  ],
   "plaetze": 2
 }

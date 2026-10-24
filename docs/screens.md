@@ -76,7 +76,16 @@ Beschreibung von Patricia:
 - Input: Der fertige Stempel geht an den Laptop
 - *Die Bildverarbeitung kommt nach `app/core/`. Die vorhandene Outbox aus `stencil.html` wird durch `app/core/outbox.js` ersetzt.*
 
-## Screen 4: Lasercutter
+## Screen 4: Lasercutter — gebaut, Branch `feature/screen-4`
+
+- Station: Schritte, Link zum Erklärvideo (YouTube, neuer Tab), Frage + Antwort an Penny, Foto vom Laser (geht an den Laptop)
+- Laptop-Seite, Bereich „A4-Platte für den Mr Beam“: Stempel anhaken → „Platte zusammenstellen“ → Vorschau → „Platte herunterladen (SVG)“
+  - 5 mm Rand, 3 mm Abstand (Patricia, 24.10.). Bei ca. 45 × 52 mm passen 20 Stempel auf eine Platte
+  - Wer zuerst fertig war, kommt zuerst auf die Platte. Was nicht passt, steht als „nächste Platte“ da
+  - Nach dem Download sind die Stempel grau und nicht mehr angehakt. Einzelne Stempel: nur diesen anhaken
+  - In der Mr-Beam-Oberfläche: Gravur (Blau) 2 Durchgänge, Schnitt (Rot). *Am 02.11. testen, ob BeamOS die zusammengesetzte Datei richtig liest*
+
+Beschreibung von Patricia:
 
 - „Geht zu Penny am Lasercutter“. Zusehen beim Positionieren, den Laser anschauen, Erklärvideo (Link)
 - Eingabe: eine Frage an die Person am Laser, dazu die Antwort
