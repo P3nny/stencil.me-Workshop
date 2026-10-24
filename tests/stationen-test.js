@@ -130,11 +130,14 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
   pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Selbstporträts mit KI neu erschaffen', 'Mit der Hand drucken: Linolplatten'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 10') >= 0, 'Zähler steht auf 1 von 10');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 12') >= 0, 'Zähler steht auf 1 von 12');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
 
   console.log('Reihenfolge');
+  await page.goto(BASE + '/app/station.html?id=sticker&test');
+  await page.waitForSelector('text=Bonus-Station');
+  pruefe(/noch 7/.test(await page.locator('#inhalt').textContent()), 'Bonus-Sticker gesperrt: „noch 7“');
   await page.goto(BASE + '/app/station.html?id=lasercutter&test');
   await page.waitForSelector('text=noch nicht');
   pruefe(await page.locator('text=Bild bearbeiten').count() > 0, 'Lasercutter verlangt zuerst „Bild bearbeiten“');
@@ -189,16 +192,16 @@ async function abschliessen(page, sterne){
   await page.locator('input[type=file]').setInputFiles(FOTO);
   await page.locator('.foto-vorschau').waitFor({ state: 'visible' });
   await abschliessen(page, 3);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 10') >= 0, 'Zähler steht auf 3 von 10');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 12') >= 0, 'Zähler steht auf 3 von 12');
 
   console.log('Neu laden: Fortschritt bleibt');
   await page.reload();
   await page.waitForSelector('text=schon erledigt');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 10') >= 0, 'Fortschritt nach Neuladen erhalten');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 12') >= 0, 'Fortschritt nach Neuladen erhalten');
 
   console.log('Startseite nach drei Stationen');
   await page.goto(BASE + '/');
-  await page.waitForSelector('text=3 von 10 Stationen geschafft');
+  await page.waitForSelector('text=3 von 12 Stationen geschafft');
   pruefe(true, 'Startseite zeigt den Stand');
   await page.goto(BASE + '/app/station.html?id=lasercutter');
 
@@ -242,7 +245,7 @@ async function abschliessen(page, sterne){
   await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild an den Laptop schicken")').click();
   await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist abgeschickt') >= 0).length === 2);
   await abschliessen(page, 4);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 10') >= 0, 'Zähler steht auf 5 von 10');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 12') >= 0, 'Zähler steht auf 5 von 12');
 
   console.log('Station Pixel vs. Vektor');
   await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
@@ -297,7 +300,7 @@ async function abschliessen(page, sterne){
   await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
   await page.waitForSelector('.ce-vorschau img');
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 10') >= 0, 'Zähler steht auf 6 von 10');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 12') >= 0, 'Zähler steht auf 6 von 12');
 
   console.log('Station Coding: HTML, CSS und JavaScript');
   await page.goto(BASE + '/app/station.html?id=coding-web&test');
@@ -342,7 +345,7 @@ async function abschliessen(page, sterne){
   await page.locator('button.stern').nth(4).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 10') >= 0, 'Zähler steht auf 7 von 10');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 12') >= 0, 'Zähler steht auf 7 von 12');
 
   console.log('Station Selbstporträts mit KI (Server im Testmodus, ohne Claude)');
   await page.goto(BASE + '/app/station.html?id=ki-selbstportraet&test');
@@ -354,11 +357,12 @@ async function abschliessen(page, sterne){
   await page.click('button:has-text("Bild erzeugen")');
   await page.waitForSelector('.ki-karte img');
   pruefe(await page.locator('.ki-karte').count() === 1, 'erstes Bild in der Galerie');
-  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt: zweiter Kunststil fehlt');
-  await page.click('.ki-baustein:has-text("Kunststil") button:has-text("Pop-Art")');
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt nach einem Bild');
+  pruefe(/Noch 1 Bild/.test(await page.locator('text=Ihr habt').textContent()), 'Hinweis „Noch 1 Bild“');
+  // Zweites Bild im selben Stil reicht (Patricia, 24.10.)
   await page.click('button:has-text("Bild erzeugen")');
   await page.waitForFunction(() => document.querySelectorAll('.ki-karte').length === 2);
-  pruefe(/2 von 6/.test(await page.locator('text=Ihr habt').textContent()), 'Zähler „2 von 6 Bildern“');
+  pruefe(/2 von höchstens 6/.test(await page.locator('text=Ihr habt').textContent()), 'Zähler „2 von höchstens 6 Bildern“');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-13-ki-selbstportraet.png'), fullPage: true });
   await page.fill('#eingabe-unterschied', 'stencil.me verändert nur mein Foto');
   await page.fill('#eingabe-ethik', 'Schwierig');
@@ -369,7 +373,7 @@ async function abschliessen(page, sterne){
   await page.locator('button.stern').nth(4).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('8 von 10') >= 0, 'Zähler steht auf 8 von 10');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('8 von 12') >= 0, 'Zähler steht auf 8 von 12');
 
   for(const druck of [['druck-linol', 'Linolplatten'], ['druck-stempel', 'Lasercut-Stempel']]){
     console.log('Station Mit der Hand drucken: ' + druck[1]);
@@ -384,8 +388,66 @@ async function abschliessen(page, sterne){
     await abschliessen(page, 5);
     pruefe(true, 'Station abgeschlossen');
   }
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('10 von 10') >= 0, 'Zähler steht auf 10 von 10');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('10 von 12') >= 0, 'Zähler steht auf 10 von 12');
+
+  // Quiz in der Station durchspielen: immer die obere Antwort, dann weiter
+  async function quizSpielen(){
+    const quiz = page.frameLocator('.quiz-rahmen');
+    await quiz.locator('.startbtn:has-text("Los geht")').click();
+    for(let i = 0; i < 20; i++){
+      if(await page.locator('.quiz-status.fertig').count()) break;
+      await quiz.locator('#choiceA').click();
+      await quiz.locator('#nextBtn:not([disabled])').click();
+      await page.waitForTimeout(150);
+    }
+  }
+
+  console.log('Station Code-Erklärung interaktiv');
+  await page.goto(BASE + '/app/station.html?id=code-quiz&test');
+  await page.waitForSelector('.quiz-rahmen');
+  await page.frameLocator('.quiz-rahmen').locator('.startbtn:has-text("Los geht")').waitFor();
+  // Direkt im Rahmen nachsehen (frameLocator wertet das in Chromium nicht verlässlich aus)
+  const quizRahmen = page.frames().filter(fr => /code-quiz\.html/.test(fr.url()))[0];
+  await quizRahmen.waitForFunction(() => typeof buildDots === 'function');
+  const zurueck = await quizRahmen.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.backlink'), a => a.hidden));
+  pruefe(zurueck.length > 0 && zurueck.every(Boolean), 'eingebettetes Quiz ohne „Zurück zum Workshop“');
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor das Quiz fertig ist');
+  await quizSpielen();
+  const codeErgebnis = await page.locator('.quiz-status').textContent();
+  pruefe(/von 9 richtig/.test(codeErgebnis), 'Quiz meldet Ergebnis: ' + codeErgebnis);
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-14-code-quiz.png'), fullPage: true });
+  await abschliessen(page, 4);
+
+  console.log('Station Kunst-Quiz');
+  await page.goto(BASE + '/app/station.html?id=kunst-quiz&test');
+  await page.waitForSelector('.quiz-rahmen');
+  await quizSpielen();
+  pruefe(/richtig/.test(await page.locator('.quiz-status').textContent()), 'Kunst-Quiz abgehakt');
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne Fotos vom Lieblings-Streetart');
+  const lieblinge = page.locator('input[type=file]');
+  await lieblinge.nth(0).setInputFiles(FOTO);
+  await lieblinge.nth(1).setInputFiles(FOTO);
+  await page.waitForFunction(() => document.querySelectorAll('.foto-vorschau:not([hidden])').length === 2);
+  await abschliessen(page, 5);
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('12 von 12') >= 0, 'Zähler steht auf 12 von 12');
+  pruefe(await page.locator('text=Bonus: Sticker').count() === 1, 'danach wird der Bonus-Sticker vorgeschlagen');
+
+  console.log('Bonus-Station Sticker');
+  await page.goto(BASE + '/app/station.html?id=sticker&test');
+  await page.waitForFunction(() => document.querySelectorAll('.stempel-person .schritt-bild svg').length === 2, null, { timeout: 120000 });
+  pruefe(await page.locator('.legende').textContent().then(t => /Plotter/.test(t)), 'Sticker-Legende: Schwarz und Rot');
+  pruefe(/nicht gespiegelt/.test(await page.locator('.schritt-notiz').nth(4).textContent()), 'Sticker ist nicht gespiegelt');
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-15-sticker.png'), fullPage: true });
+  await page.locator('button:has-text("Sticker an den Laptop schicken")').first().click();
+  await page.waitForSelector('button:has-text("Sticker ist abgeschickt")');
+  await page.locator('button:has-text("Sticker an den Laptop schicken")').first().click();
+  await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Sticker ist abgeschickt') >= 0).length === 2);
+  await abschliessen(page, 5);
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('12 von 12') >= 0, 'Bonus zählt nicht mit: weiter 12 von 12');
   pruefe(await page.locator('text=alle Stationen geschafft').count() === 1, '„Du hast alle Stationen geschafft!“');
+  await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
+  const sticker = (await (await page.request.get(BASE + '/api/sticker')).json()).stempel.map(x => x.name).sort().join(',');
+  pruefe(sticker === 'Ada,Bo', 'zwei Sticker im Sticker-Ordner des Laptops: ' + sticker);
 
   console.log('Laptop');
   await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
@@ -394,9 +456,9 @@ async function abschliessen(page, sterne){
   const g = gruppen.gruppen.filter(x => x.personen.join() === 'Ada,Bo').pop();
   pruefe(!!g, 'Gruppe Ada & Bo auf dem Laptop');
   if(g){
-    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor,coding-web,ki-selbstportraet,druck-linol,druck-stempel', 'fertige Stationen: ' + g.fertig.join(', '));
+    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor,coding-web,ki-selbstportraet,druck-linol,druck-stempel,code-quiz,kunst-quiz,sticker', 'fertige Stationen: ' + g.fertig.join(', '));
     const arten = g.dateien.map(d => d.split('/').pop().split('_')[0]).sort().join(',');
-    pruefe(arten === 'druck-linol,druck-linol,druck-stempel,druck-stempel,hintergrund,hintergrund,ki-selbstportraet,ki-selbstportraet,koerpererkennung,lasercutter', 'auf dem Laptop: Laser-Foto, KI-Ansicht, je zwei Hintergrund-, KI- und Postkarten-Bilder, keine Rohfotos (' + arten + ')');
+    pruefe(arten === 'druck-linol,druck-linol,druck-stempel,druck-stempel,hintergrund,hintergrund,ki-selbstportraet,ki-selbstportraet,koerpererkennung,kunst-quiz,kunst-quiz,lasercutter', 'auf dem Laptop: Laser-Foto, KI-Ansicht, je zwei Hintergrund-, KI-, Postkarten- und Streetart-Bilder, keine Rohfotos (' + arten + ')');
     pruefe(g.antworten.lasercutter && g.antworten.lasercutter.antworten.frage === 'Wie heiß wird der Laser?', 'Antwort angekommen');
     const svgCode = g.antworten['pixel-vektor'] && g.antworten['pixel-vektor'].antworten['svg-code'];
     pruefe(!!svgCode && svgCode.indexOf('polygon') > 0, 'SVG-Code auf dem Laptop gespeichert');

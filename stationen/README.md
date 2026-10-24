@@ -23,6 +23,8 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `braucht` | ja | Stationen, die vorher fertig sein müssen, z. B. `["foto"]`. Gibt es eine davon (noch) nicht, zählt sie nicht |
 | `hintergruende` | nein | nur Station Hintergrund: `{ "datei": "bilder/hintergruende/….jpg", "titel": "…" }`, Lizenzen in `bilder/hintergruende/README.md` |
 | `plaetze` | ja | wie viele Gruppen gleichzeitig an der Station sein können |
+| `bonus` | nein | `true`: zählt nicht zu „x von y“ und nicht fürs Puzzle |
+| `mindestFertig` | nein | Bonus geht erst auf, wenn so viele Stationen geschafft sind |
 
 ## `check`
 
@@ -30,7 +32,8 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | --- | --- |
 | `foto` | Foto aufnehmen. `proPerson: true`: ein Foto pro Person. `hochladen: false`: bleibt auf dem iPad. `personPruefen: true`: KI (BodyPix) prüft, ob eine Person zu sehen ist. `text`: Hinweis |
 | `text` | nur die `eingaben` müssen ausgefüllt sein |
-| `quiz` | Quiz öffnen (`url`), danach „Quiz geschafft“ antippen |
+| `quiz` | Quiz-Seite (`url`, z. B. `/code-quiz.html`) eingebettet, sie meldet am Ende ihr Ergebnis. Mit `foto` (wie bei `art: foto`) zusätzlich Fotos, z. B. Lieblingswerk |
+| `sticker` | wie `stempel`, aber Sticker für den Schneideplotter (nicht gespiegelt), landet auf dem Laptop im Ordner `sticker` |
 | `bestaetigung` | „Erledigt“ antippen |
 | `stempel` | stencil.me: Schritte pro Person, Schnittrand, Stempel an den Laptop (`app/stationen/stencilme.js`) |
 | `koerpererkennung` | Video aufnehmen, BodyPix rechnet live auf dem Video, Regler, Aufgaben (`aufgaben`, mindestens `mindestAufgaben` abhaken), Bild der KI-Ansicht an den Laptop (`app/stationen/koerpererkennung.js`) |

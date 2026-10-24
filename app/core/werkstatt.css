@@ -82,9 +82,10 @@ textarea{width:100%;font:inherit;border:3px solid var(--ink);padding:8px;border-
 .rand{margin:14px 0 4px;max-width:520px;}
 .rand input[type=range]{width:100%;accent-color:#d6291e;height:32px;}
 .rand-warnung{background:var(--neon);border:3px solid var(--ink);padding:8px 10px;font-weight:700;}
-.legende{display:flex;flex-wrap:wrap;align-items:center;gap:4px;}
-.farbe{display:inline-block;width:18px;height:18px;border:2px solid var(--ink);margin-left:6px;}
-.farbe.rot{background:#d6291e;}.farbe.blau{background:#1e4fd6;}.farbe.weiss{background:#fff;}
+.legende{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;}
+.legende-eintrag{display:inline-flex;align-items:center;gap:6px;}
+.farbe{display:inline-block;width:18px;height:18px;border:2px solid var(--ink);flex:none;}
+.farbe.rot{background:#d6291e;}.farbe.blau{background:#1e4fd6;}.farbe.weiss{background:#fff;}.farbe.schwarz{background:#1a1c1a;}
 /* Station „Hintergrund ändern“ */
 .hintergrund-person{border-top:3px solid var(--ink);padding-top:14px;margin-top:18px;}
 .hintergrund-reihe{display:flex;flex-wrap:wrap;gap:16px;}
@@ -186,6 +187,10 @@ body.ce-kompakt .test-leiste{display:none;}
 .ki-karte img{width:220px;height:275px;object-fit:contain;border:3px solid var(--ink);background:#fff;display:block;}
 .ki-karte.beispiel img{border-style:dashed;}
 .ki-karte figcaption{margin-top:4px;line-height:1.3;}
+/* Quiz eingebettet */
+.quiz-rahmen{width:100%;height:760px;border:3px solid var(--ink);display:block;margin:8px 0 16px;background:#fff;}
+.quiz-status{font-weight:700;padding:6px 10px;border:3px solid var(--ink);background:#f4f4f4;}
+.quiz-status.fertig{background:#e6f7ea;}
 .video{margin:16px 0;max-width:640px;}
 .video iframe{width:100%;aspect-ratio:16/9;height:auto;min-height:200px;border:3px solid var(--ink);display:block;}
 .video-platzhalter{border:3px dashed var(--ink);background:#f4f4f4;padding:16px;text-align:center;}

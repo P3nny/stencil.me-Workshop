@@ -393,6 +393,21 @@ function buildStampSvg(mask, offsetMm){
   return { svg: svg, cutLoops: off.cutLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
 }
 
+// Sticker für den Schneideplotter, wie buildPlotterSvg in stencil.html ohne Schraffur:
+// schwarze Silhouette (Kiss-Cut, nur die Folie) und roter Stanzschnitt um alles herum.
+// Nicht gespiegelt: Ein Sticker zeigt das Motiv so, wie es ist.
+function buildStickerSvg(mask, offsetMm){
+  const scale = STEMPEL_MM / WORK_SIZE;
+  const off = computeOffsetCutPath(mask, WORK_SIZE, scale, offsetMm);
+  const w = off.widthMm.toFixed(3), h = off.heightMm.toFixed(3);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}mm" height="${h}mm">` +
+    `<g transform="translate(${off.dxMm.toFixed(3)},${off.dyMm.toFixed(3)})">` +
+    `<g id="cut-outline"><path d="${off.cutPathD}" fill="none" stroke="${CUT_COLOR}" stroke-width="0.3" stroke-linejoin="round"/></g>` +
+    `<g id="kiss-cut-silhouette"><path d="${off.motifPathD}" fill="#1a1c1a" fill-rule="evenodd" stroke="#1a1c1a" stroke-width="0.05"/></g>` +
+    `</g></svg>`;
+  return { svg: svg, cutLoops: off.cutLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
+}
+
 // Kleinster Schnittrand (ganze mm), bei dem der rote Rand in einem Stück außen herumläuft.
 // Gesucht wird durch Halbieren (4 statt bis zu 12 Rechnungen): Ein größerer Rand
 // verbindet höchstens mehr Teile, nie weniger.
@@ -461,6 +476,7 @@ window.Stempel = {
   OFFSET_MAX: OFFSET_MAX,
   berechnen: berechnen,
   svg: buildStampSvg,
+  stickerSvg: buildStickerSvg,
   autoOffset: autoOffset,
   bilder: {
     roh: squareCanvas,

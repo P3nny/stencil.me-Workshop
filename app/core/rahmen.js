@@ -71,9 +71,10 @@
     const fertig = Stationen.anzahlFertig(liste, f);
     return Promise.all(gruppe.personen.map((p, i) => portraetUrl(i))).then(urls => {
       kopf.innerHTML = '';
-      kopf.appendChild(el('div', { klasse: 'puzzles' }, gruppe.personen.map((name, i) => puzzle(name, urls[i], liste.length, fertig))));
+      const gesamt = Stationen.anzahlPflicht(liste);
+      kopf.appendChild(el('div', { klasse: 'puzzles' }, gruppe.personen.map((name, i) => puzzle(name, urls[i], gesamt, fertig))));
       kopf.appendChild(el('div', { klasse: 'zaehler' }, [
-        el('strong', { text: fertig + ' von ' + liste.length }),
+        el('strong', { text: fertig + ' von ' + gesamt }),
         el('span', { text: ' Stationen geschafft' })
       ]));
       kopf.appendChild(el('div', { klasse: 'sync', id: 'sync' }));
@@ -221,11 +222,8 @@
     if(check.art === 'text') return null; // nur Eingaben
     let text = 'Erledigt';
     let link = null;
-    if(check.art === 'quiz'){
-      text = 'Quiz geschafft';
-      link = check.url ? el('a', { href: check.url, target: '_blank', klasse: 'knopf-link', text: 'Quiz öffnen' }) : null;
-    }
-    const bekannt = ['bestaetigung', 'quiz'].indexOf(check.art) >= 0;
+    if(check.art === 'quiz') return quizBereich(station, check);
+    const bekannt = check.art === 'bestaetigung';
     const hinweis = bekannt ? null : el('p', { klasse: 'hinweis', text: 'Diese Seite wird noch gebaut. Bis dahin: wie bisher an der Station arbeiten und dann „Erledigt“ antippen.' });
     const box = el('input', { type: 'checkbox', id: 'erledigt' });
     box.checked = !!eintrag.bestaetigt;
@@ -235,6 +233,38 @@
       ctx.pruefen();
     });
     return el('div', { klasse: 'check' }, [hinweis, link, el('label', { klasse: 'haken', for: 'erledigt' }, [box, el('span', { text: text })])]);
+  }
+
+  // Quiz-Seite (code-quiz.html, kunst-quiz.html) eingebettet. Sie meldet am Ende ihr
+  // Ergebnis per postMessage. Optional zusätzlich Fotos (check.foto wie bei art 'foto').
+  function quizBereich(station, check){
+    const eintrag = ctx.eintrag;
+    const status = el('p', { klasse: 'quiz-status' });
+    function statusZeigen(){
+      const e = eintrag.quizErgebnis;
+      status.className = 'quiz-status' + (e ? ' fertig' : '');
+      status.textContent = e ? '✓ Quiz geschafft: ' + e.richtig + ' von ' + e.gesamt + ' richtig' : 'Spielt das Quiz bis zum Ende, dann wird es hier abgehakt.';
+    }
+    const rahmen = el('iframe', { src: check.url, klasse: 'quiz-rahmen', title: 'Quiz' });
+    window.addEventListener('message', ev => {
+      if(ev.source !== rahmen.contentWindow || ev.origin !== location.origin || !ev.data || !ev.data.stencilQuiz) return;
+      const e = ev.data.stencilQuiz;
+      eintrag.quizErgebnis = { richtig: Number(e.richtig) || 0, gesamt: Number(e.gesamt) || 0 };
+      eintrag.antworten = eintrag.antworten || {};
+      eintrag.antworten.quiz = eintrag.quizErgebnis.richtig + ' von ' + eintrag.quizErgebnis.gesamt + ' richtig';
+      statusZeigen();
+      speichern();
+      ctx.pruefen();
+    });
+    statusZeigen();
+    const teile = [status, rahmen];
+    if(check.foto){
+      // fotoFeld liest station.check: hier die Foto-Angaben des Quiz-Checks
+      const fotoStation = { id: station.id, check: check.foto };
+      const personen = check.foto.proPerson ? ctx.gruppe.personen : [''];
+      personen.forEach((name, i) => teile.push(fotoFeld(fotoStation, i, name)));
+    }
+    return el('div', { klasse: 'check' }, teile);
   }
 
   function eingabenBereich(station){
@@ -269,6 +299,13 @@
       return true;
     }
     if(check.art === 'text') return true;
+    if(check.art === 'quiz'){
+      if(!eintrag.quizErgebnis) return false;
+      if(!check.foto) return true;
+      const fotos = check.foto.proPerson ? ctx.gruppe.personen.length : 1;
+      for(let i = 0; i < fotos; i++) if(!(eintrag.dateien || {})[i]) return false;
+      return true;
+    }
     if(eigeneArten[check.art]) return eigeneArten[check.art].erfuellt(eintrag, ctx.gruppe, station);
     return !!eintrag.bestaetigt;
   }
@@ -439,12 +476,12 @@
     ]));
   }
 
-  function nochNichtDran(fehlend){
+  function nochNichtDran(fehlend, text){
     const inhalt = document.getElementById('inhalt');
     inhalt.innerHTML = '';
     inhalt.appendChild(el('section', { klasse: 'panel' }, [
       el('h1', { text: ctx.station.titel + ': noch nicht' }),
-      el('p', {}, [el('span', { text: 'Diese Station kommt später. Mach zuerst: ' }), el('strong', { text: fehlend.map(s => s.titel).join(', ') })])
+      text ? el('p', { text: text }) : el('p', {}, [el('span', { text: 'Diese Station kommt später. Mach zuerst: ' }), el('strong', { text: fehlend.map(s => s.titel).join(', ') })])
     ]));
   }
 
@@ -484,6 +521,12 @@
         return kopfleiste(gruppe, liste, f).then(() => {
           if(ctx.eintrag.status === 'fertig') return weiterZeigen(false);
           const fehlend = Stationen.voraussetzungen(liste, st).filter(b => !Stationen.istFertig(f, b)).map(b => liste.filter(s => s.id === b)[0]);
+          const bonusFehlen = Stationen.fehlenBisBonus(liste, f, st);
+          if(st.bonus && (bonusFehlen || fehlend.length)){
+            return nochNichtDran([], 'Das ist eine Bonus-Station. Sie geht auf, wenn ihr ' + st.mindestFertig + ' Stationen geschafft habt' +
+              (bonusFehlen ? ' (noch ' + bonusFehlen + ')' : '') +
+              (fehlend.length ? ', darunter: ' + fehlend.map(x => x.titel).join(', ') : '') + '.');
+          }
           if(fehlend.length) return nochNichtDran(fehlend);
           if(ctx.eintrag.status !== 'begonnen'){
             // Check-in: Station ist ab jetzt für diese Gruppe besetzt

@@ -36,8 +36,18 @@
     return !!(f.stationen[id] && f.stationen[id].status === 'fertig');
   }
 
+  // Bonus-Stationen (z. B. Sticker) zählen nicht zu „x von y“ und nicht fürs Puzzle
+  function pflicht(liste){
+    return liste.filter(s => !s.bonus);
+  }
+
   function anzahlFertig(liste, f){
-    return liste.filter(s => istFertig(f, s.id)).length;
+    return pflicht(liste).filter(s => istFertig(f, s.id)).length;
+  }
+
+  // Wie viele Stationen müssen geschafft sein, bevor eine Bonus-Station frei ist?
+  function fehlenBisBonus(liste, f, station){
+    return Math.max(0, (station.mindestFertig || 0) - anzahlFertig(liste, f));
   }
 
   // Voraussetzungen, die es als Station (noch) nicht gibt, zählen nicht.
@@ -47,7 +57,7 @@
   }
 
   function moeglich(liste, f){
-    return liste.filter(s => !istFertig(f, s.id) && voraussetzungen(liste, s).every(b => istFertig(f, b)));
+    return liste.filter(s => !istFertig(f, s.id) && voraussetzungen(liste, s).every(b => istFertig(f, b)) && !fehlenBisBonus(liste, f, s));
   }
 
   // Belegung vom Laptop: { <id>: Anzahl Gruppen }. Ohne Laptop: null
@@ -72,6 +82,8 @@
     fortschrittSpeichern: f => Speicher.schreiben('fortschritt', f),
     istFertig: istFertig,
     anzahlFertig: anzahlFertig,
+    anzahlPflicht: liste => pflicht(liste).length,
+    fehlenBisBonus: fehlenBisBonus,
     moeglich: moeglich,
     voraussetzungen: voraussetzungen,
     belegung: belegung,

@@ -1,0 +1,26 @@
+{
+  "id": "code-quiz",
+  "titel": "Code-Erklärung interaktiv",
+  "typ": "programm",
+  "datenweg": "laptop",
+  "schritte": [
+    "Ihr werft einen Blick in den Code der stencil.me-Station, die ihr schon kennt.",
+    "Lest jedes Code-Häppchen gemeinsam.",
+    "Einigt euch zu zweit auf eine Antwort, bevor ihr tippt: nicht raten, kurz diskutieren.",
+    "Lest nach der Auflösung den Bezug zu stencil.me.",
+    "Am Ende: Wie viele der 9 Häppchen habt ihr richtig?"
+  ],
+  "check": {
+    "art": "quiz",
+    "url": "/code-quiz.html"
+  },
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Nur euer Ergebnis (wie viele richtig) geht an den Laptop.",
+  "braucht": [
+    "stencilme"
+  ],
+  "plaetze": 4
+}

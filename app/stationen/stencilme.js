@@ -1,7 +1,8 @@
-// ---- Station „Bild bearbeiten“ (stencil.me) ----
-// Für jede Person nacheinander: Rohbild → Schwarz-Weiß → KI: Person → Otsu → Stempel.
-// Jeder Schritt erscheint als eigenes Bild, damit die Kinder sehen, was passiert.
-// Einstellbar ist nur der rote Schnittrand. Der Stempel geht über die Outbox an den Laptop.
+// ---- Station „Bild bearbeiten“ (stencil.me) und Bonus-Station „Sticker“ ----
+// Für jede Person nacheinander: Rohbild → Schwarz-Weiß → KI: Person → Otsu → Stempel
+// (bzw. Sticker). Jeder Schritt erscheint als eigenes Bild, damit die Kinder sehen,
+// was passiert. Einstellbar ist nur der rote Schnittrand. Das Ergebnis geht über die
+// Outbox an den Laptop. Was Stempel und Sticker unterscheidet, steht in ARTEN unten.
 (function(){
   const PAUSE_MS = 400; // kurze Pause zwischen den Schritten, damit man sie sieht
   const SCHRITTE = [
@@ -9,13 +10,13 @@
     { titel: '2 Schwarz-Weiß', typ: 'programm' },
     { titel: '3 KI findet dich', typ: 'ki' },
     { titel: '4 Otsu-Schwelle', typ: 'programm' },
-    { titel: '5 Dein Stempel', typ: 'programm' }
+    { titel: '5 Ergebnis', typ: 'programm' }
   ];
   const TYP_KURZ = { programm: 'Programm', ki: 'KI' };
 
   function warten(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
 
-  function person(station, api, index, name){
+  function person(station, api, index, name, art){
     const el = api.el;
     const eintrag = api.eintrag;
     eintrag.stempel = eintrag.stempel || {};
@@ -36,18 +37,18 @@
     const reglerWert = el('strong');
     const warnung = el('p', { klasse: 'rand-warnung' });
     warnung.hidden = true;
-    const sendenKnopf = el('button', { type: 'button', text: 'Stempel an den Laptop schicken', disabled: 'disabled' });
+    const sendenKnopf = el('button', { type: 'button', text: art.name + ' an den Laptop schicken', disabled: 'disabled' });
     const sendStatus = el('p', { klasse: 'hinweis' });
     const randBox = el('div', { klasse: 'rand' }, [
       el('label', { for: 'rand-' + index }, [el('span', { text: 'Roter Schnittrand: ' }), reglerWert]),
       regler,
-      el('p', { klasse: 'hinweis', text: 'Der rote Rand muss in einem Stück außen um alles herumlaufen. Sonst fällt der Stempel auseinander.' }),
+      el('p', { klasse: 'hinweis', text: 'Der rote Rand muss in einem Stück außen um alles herumlaufen. Sonst fällt der ' + art.name + ' auseinander.' }),
       warnung
     ]);
     randBox.hidden = true;
 
     const box = el('section', { klasse: 'stempel-person' }, [
-      el('h2', { text: 'Stempel von ' + name }),
+      el('h2', { text: art.name + ' von ' + name }),
       el('div', { klasse: 'schritte-reihe' }, felder.map(f => f.fig)),
       randBox,
       sendenKnopf,
@@ -66,17 +67,17 @@
     function stempelZeichnen(){
       const mm = parseFloat(regler.value);
       reglerWert.textContent = mm.toFixed(1).replace('.', ',') + ' mm';
-      const st = Stempel.svg(ergebnis.mask, mm);
+      const st = art.svg(ergebnis.mask, mm);
       svgAktuell = st.svg;
       felder[4].bild.classList.remove('leer');
       felder[4].bild.innerHTML = st.svg;
-      felder[4].notiz.textContent = Math.round(st.widthMm) + ' × ' + Math.round(st.heightMm) + ' mm, gespiegelt';
+      felder[4].notiz.textContent = Math.round(st.widthMm) + ' × ' + Math.round(st.heightMm) + ' mm, ' + art.notiz;
       warnung.hidden = st.cutLoops <= 1;
-      warnung.textContent = '⚠ Der rote Rand hat Lücken: Dein Stempel würde in ' + st.cutLoops + ' Teile zerfallen. Schieb den Regler nach rechts.';
+      warnung.textContent = '⚠ Der rote Rand hat Lücken: ' + art.dein + ' würde in ' + st.cutLoops + ' Teile zerfallen. Schieb den Regler nach rechts.';
       const gesendet = stand.gesendetMm !== undefined;
       const geaendert = gesendet && stand.gesendetMm !== mm;
       sendenKnopf.disabled = st.cutLoops > 1 || (gesendet && !geaendert);
-      sendenKnopf.textContent = geaendert ? 'Geänderten Stempel neu schicken' : gesendet ? '✓ Stempel ist abgeschickt' : 'Stempel an den Laptop schicken';
+      sendenKnopf.textContent = geaendert ? 'Geänderten ' + art.name + ' neu schicken' : gesendet ? '✓ ' + art.name + ' ist abgeschickt' : art.name + ' an den Laptop schicken';
     }
 
     let reglerTimer = null;
@@ -96,7 +97,7 @@
       if(!svgAktuell) return;
       sendenKnopf.disabled = true;
       const mm = parseFloat(regler.value);
-      Outbox.stempel(api.gruppe.id, name, svgAktuell)
+      art.senden(api.gruppe.id, name, svgAktuell)
         .then(() => {
           stand.gesendetMm = mm;
           eintrag.stempel[index] = stand;
@@ -109,7 +110,7 @@
         })
         .catch(err => {
           sendenKnopf.disabled = false;
-          api.fehler('Der Stempel ließ sich nicht speichern. Bitte nochmal antippen.', err);
+          api.fehler('Der ' + art.name + ' ließ sich nicht speichern. Bitte nochmal antippen.', err);
         });
     });
 
@@ -151,7 +152,7 @@
           zeigeCanvas(3, Stempel.bilder.maske(ergebnis.mask));
           felder[3].notiz.textContent = 'Heller als ' + ergebnis.schwelle + ' wird weiß, dunkler wird schwarz';
           // Stempel-Porträt fürs Puzzle in der Kopfleiste
-          return Speicher.dateiSchreiben('portraet:' + index, Bild.alsPng(Stempel.bilder.maske(ergebnis.mask)));
+          return art.puzzle ? Speicher.dateiSchreiben('portraet:' + index, Bild.alsPng(Stempel.bilder.maske(ergebnis.mask))) : null;
         })
         .then(() => warten(PAUSE_MS))
         .then(() => {
@@ -160,7 +161,7 @@
           eintrag.stempel[index] = stand;
           randBox.hidden = false;
           stempelZeichnen();
-          if(stand.gesendetMm !== undefined) sendStatus.textContent = '✓ Dieser Stempel ist schon abgeschickt.';
+          if(stand.gesendetMm !== undefined) sendStatus.textContent = '✓ ' + art.dieser + ' ist schon abgeschickt.';
           return api.speichern();
         })
         .catch(err => {
@@ -173,19 +174,32 @@
     return { box: box, rechnen: rechnen };
   }
 
-  Rahmen.eigeneArt('stempel', {
+  const ARTEN = {
+    stempel: {
+      name: 'Stempel', dein: 'Dein Stempel', dieser: 'Dieser Stempel', notiz: 'gespiegelt', puzzle: true,
+      legende: [['rot', 'Rot'], ['blau', 'Blau'], ['weiss', 'Weiß: Was bedeuten die Farben? Die Frage steht unten.']],
+      svg: (mask, mm) => Stempel.svg(mask, mm),
+      senden: (gruppe, name, svg) => Outbox.stempel(gruppe, name, svg)
+    },
+    sticker: {
+      name: 'Sticker', dein: 'Dein Sticker', dieser: 'Dieser Sticker', notiz: 'nicht gespiegelt', puzzle: false,
+      legende: [['schwarz', 'Schwarz: Hier schneidet der Plotter nur die Folie.'], ['rot', 'Rot: Hier schneidet er ganz durch, das ist der Rand des Stickers.']],
+      svg: (mask, mm) => Stempel.stickerSvg(mask, mm),
+      senden: (gruppe, name, svg) => Outbox.sticker(gruppe, name, svg)
+    }
+  };
+
+  Object.keys(ARTEN).forEach(id => Rahmen.eigeneArt(id, {
     anzeigen: (station, api) => {
-      const personen = api.gruppe.personen.map((name, i) => person(station, api, i, name));
+      const personen = api.gruppe.personen.map((name, i) => person(station, api, i, name, ARTEN[id]));
       // Nacheinander rechnen: zwei Fotos gleichzeitig wären zu viel für alte iPads
       personen.reduce((kette, p) => kette.then(p.rechnen), Promise.resolve());
       return api.el('div', { klasse: 'stempel-station' }, [
-        api.el('p', { klasse: 'legende' }, [
-          api.el('span', { klasse: 'farbe rot' }), api.el('span', { text: ' Rot ' }),
-          api.el('span', { klasse: 'farbe blau' }), api.el('span', { text: ' Blau ' }),
-          api.el('span', { klasse: 'farbe weiss' }), api.el('span', { text: ' Weiß: Was bedeuten die Farben? Die Frage steht unten.' })
-        ])
+        api.el('p', { klasse: 'legende' }, ARTEN[id].legende.map(l => api.el('span', { klasse: 'legende-eintrag' }, [
+          api.el('span', { klasse: 'farbe ' + l[0] }), api.el('span', { text: l[1] })
+        ])))
       ].concat(personen.map(p => p.box)));
     },
     erfuellt: (eintrag, gruppe) => gruppe.personen.every((n, i) => eintrag.stempel && eintrag.stempel[i] && eintrag.stempel[i].gesendetMm !== undefined)
-  });
+  }));
 })();

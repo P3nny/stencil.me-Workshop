@@ -1,0 +1,38 @@
+{
+  "id": "sticker",
+  "titel": "Bonus: Sticker für den Schneideplotter",
+  "typ": "ki",
+  "datenweg": "laptop",
+  "bonus": true,
+  "mindestFertig": 8,
+  "schritte": [
+    "Bonus, weil ihr schon so viel geschafft habt!",
+    "Die App rechnet euer Foto noch einmal, diesmal für den Schneideplotter.",
+    "Prüft den roten Rand: Er muss in einem Stück um alles herumlaufen.",
+    "Schickt euren Sticker an den Laptop. Penny schneidet ihn mit dem Plotter aus.",
+    "Vergleicht mit eurem Stempel: Was ist anders, warum ist der Sticker nicht gespiegelt?"
+  ],
+  "check": {
+    "art": "sticker"
+  },
+  "eingaben": [
+    {
+      "id": "unterschied",
+      "text": "Warum ist der Sticker nicht gespiegelt, der Stempel aber schon?",
+      "pflicht": false,
+      "aufloesung": "Ein Stempel druckt sein Spiegelbild, darum muss er spiegelverkehrt sein. Ein Sticker wird nicht gedruckt, sondern aufgeklebt: Er zeigt das Motiv so, wie es ist."
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Die Bearbeitung passiert auf dem iPad. Nur der fertige Sticker und dein Name gehen an den Laptop.",
+  "braucht": [
+    "foto",
+    "stencilme",
+    "lasercutter",
+    "druck-stempel"
+  ],
+  "plaetze": 3
+}

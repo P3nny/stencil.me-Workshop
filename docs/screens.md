@@ -172,6 +172,13 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Beide: ein Foto der Postkarte pro Person (Rückkamera), geht an den Laptop. Freiwillige Frage „Warum spiegelverkehrt?“ mit Auflösung
 - *Die App weiß nicht, ob der Stempel schon gelasert ist (keine Laser-Queue). Kommen Kinder zu früh, schickt Penny sie zu einer anderen Station*
 
+## Screen 13, 14, 15 — gebaut, Branch `feature/screen-13-15`
+
+- **13 Code-Erklärung interaktiv** (`code-quiz`): `code-quiz.html` eingebettet, erst nach „Bild bearbeiten“. Das Quiz meldet am Ende „x von 9 richtig“, dann ist die Station abgehakt. Vier Häppchen an den heutigen Code angepasst: Foto (verkleinern statt FileReader), BodyPix laden (`.then`, Modell vom Laptop statt aus dem Internet), Maske (Schwelle 0.4), Spiegeln (immer gespiegelt, kein Haken mehr), evenodd (Stempel statt Positiv-Modus). Grauwert, Otsu, despeckle, Konturen stimmen weiter
+- **14 Kunst-Quiz** (`kunst-quiz`): `kunst-quiz.html` eingebettet, dazu ein Foto pro Person vom Lieblings-Streetart-Werk (geht an den Laptop), freiwillig „Warum?“. QR-Code der Station neben die Künstler:innen-Bilder kleben
+- **15 Bonus: Sticker** (`sticker`): einzige Bonus-Station. Geht auf ab 8 geschafften Stationen, darunter Foto, Bild bearbeiten, Lasercutter, Stempel drucken. Zählt nicht zu „x von y“. Gleiche fünf Schritte wie „Bild bearbeiten“, am Ende Sticker für den Schneideplotter (schwarze Silhouette = Folie, roter Schnitt, nicht gespiegelt, wie `buildPlotterSvg` in `stencil.html` ohne Schraffur). Landet auf dem Laptop im eigenen Ordner `server/daten/sticker`, Laptop-Seite zeigt sie mit „Herunterladen“
+- Station 9 geändert (Patricia, 24.10.): nach 2 Bildern weiter, egal welcher Stil. Hinweis „Noch 1 Bild …“
+
 ## Weitere Screens
 
 - *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …

@@ -28,7 +28,8 @@
   button { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.1em; border:3px solid var(--ink); background:#fff; padding:8px 14px; cursor:pointer; margin-top:16px; }
   button:hover { background:var(--neon); }
   .error { background:var(--neon); border:2px solid var(--ink); padding:10px; margin-top:12px; font-weight:700; }
-  .groups-panel, .plate-panel { width:100%; }
+  .groups-panel, .plate-panel, .sticker-panel { width:100%; }
+  .stamp a.download { display:inline-block; margin-top:4px; font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:.8rem; color:var(--ink); }
   .stamp label { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px; cursor:pointer; }
   .stamp input { width:20px; height:20px; accent-color:var(--neon); }
   .stamp.placed { opacity:.45; }
@@ -66,6 +67,12 @@
     <div class="folder" id="folder"></div>
     <div id="listError"></div>
     <div class="grid" id="grid"></div>
+  </div>
+  <div class="panel sticker-panel">
+    <h2>Sticker für den Schneideplotter (Bonus)</h2>
+    <div class="count" id="stickerCount">–</div>
+    <div class="hint">Ordner: <span class="folder" id="stickerFolder"></span></div>
+    <div class="grid" id="stickerGrid"></div>
   </div>
   <div class="panel plate-panel">
     <h2>A4-Platte für den Mr Beam</h2>
@@ -299,12 +306,14 @@
     fetch("/stationen/index.json", { cache: "no-store" })
       .then(function (r) { return r.json(); })
       .then(function (index) {
-        stationCount = index.stationen.length;
         return Promise.all(index.stationen.map(function (id) {
           return fetch("/stationen/" + id + ".json", { cache: "no-store" }).then(function (r) { return r.json(); });
         }));
       })
-      .then(function (list) { list.forEach(function (s) { stationTitles[s.id] = s.titel; }); })
+      .then(function (list) {
+        list.forEach(function (s) { stationTitles[s.id] = s.titel; });
+        stationCount = list.filter(function (s) { return !s.bonus; }).length; // Bonus zählt nicht mit
+      })
       .catch(function () { /* dann eben die IDs anzeigen */ })
       .then(loadGroups);
   }
@@ -354,6 +363,37 @@
       });
   }
 
+  function loadSticker() {
+    fetch("/api/sticker", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var grid = document.getElementById("stickerGrid");
+        document.getElementById("stickerCount").textContent = data.stempel.length + " Sticker";
+        document.getElementById("stickerFolder").textContent = data.ordner;
+        grid.innerHTML = "";
+        data.stempel.forEach(function (s) {
+          var box = document.createElement("div");
+          box.className = "stamp";
+          var img = document.createElement("img");
+          img.src = "/sticker/" + encodeURI(s.pfad);
+          img.alt = "Sticker von " + s.name;
+          var name = document.createElement("div");
+          name.className = "name";
+          name.textContent = s.name + " · " + s.zeit;
+          var link = document.createElement("a");
+          link.className = "download";
+          link.href = "/sticker/" + encodeURI(s.pfad);
+          link.download = s.datei;
+          link.textContent = "Herunterladen";
+          box.appendChild(img);
+          box.appendChild(name);
+          box.appendChild(link);
+          grid.appendChild(box);
+        });
+      })
+      .catch(function () { /* egal */ });
+  }
+
   function loadKi() {
     fetch("/api/ki-status", { cache: "no-store" })
       .then(function (r) { return r.json(); })
@@ -393,7 +433,8 @@
   loadSettings();
   loadList();
   loadKi();
-  setInterval(function () { loadList(); loadGroups(); loadKi(); }, 5000);
+  loadSticker();
+  setInterval(function () { loadList(); loadGroups(); loadKi(); loadSticker(); }, 5000);
 })();
 </script>
 </body>

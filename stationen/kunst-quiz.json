@@ -1,0 +1,37 @@
+{
+  "id": "kunst-quiz",
+  "titel": "Kunst-Quiz: Künstler:innen und Streetart",
+  "typ": "analog",
+  "datenweg": "laptop",
+  "schritte": [
+    "Schaut euch die Bilder der Künstler:innen an der Wand an.",
+    "Spielt das Kunst-Quiz bis zum Ende.",
+    "Jede Person sucht sich das Streetart-Werk aus, das ihr am besten gefällt.",
+    "Fotografiert es: nur das Bild, keine Leute."
+  ],
+  "check": {
+    "art": "quiz",
+    "url": "/kunst-quiz.html",
+    "foto": {
+      "proPerson": true,
+      "hochladen": true,
+      "text": "Lieblings-Streetart von"
+    }
+  },
+  "eingaben": [
+    {
+      "id": "warum",
+      "text": "Warum gefällt euch dieses Werk? (ein Satz)",
+      "pflicht": false
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Euer Quiz-Ergebnis und die Fotos eurer Lieblingswerke gehen an den Laptop, für eure Ergebnis-Mappe.",
+  "braucht": [
+    "foto"
+  ],
+  "plaetze": 4
+}

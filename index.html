@@ -125,7 +125,7 @@
       link.href = '/app/station.html?id=' + f.aktuell;
       knopf.textContent = 'Zurück zur Station';
     }else if(fertig > 0){
-      document.getElementById('auftrag').textContent = fertig + ' von ' + liste.length + ' Stationen geschafft. Scanne den QR-Code an der nächsten Station.';
+      document.getElementById('auftrag').textContent = fertig + ' von ' + Stationen.anzahlPflicht(liste) + ' Stationen geschafft. Scanne den QR-Code an der nächsten Station.';
       link.href = '/app/station.html?id=' + liste.filter(s => Stationen.istFertig(f, s.id)).pop().id;
       knopf.textContent = 'Nächste Station zeigen';
     }else{

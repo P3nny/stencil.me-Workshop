@@ -33,6 +33,7 @@ REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # STENCILME_DATEN: anderer Datenordner, z. B. für automatische Tests (echte Stempel bleiben unberührt)
 DATA_ROOT = os.path.abspath(os.environ.get("STENCILME_DATEN") or os.path.join(REPO_DIR, "server", "daten"))
 DATA_DIR = os.path.join(DATA_ROOT, "stempel")
+STICKER_DIR = os.path.join(DATA_ROOT, "sticker")  # für den Schneideplotter (Bonus-Station)
 GROUPS_DIR = os.path.join(DATA_ROOT, "gruppen")
 SETTINGS_FILE = os.path.join(DATA_ROOT, "einstellungen.json")
 KI_LOG_FILE = os.path.join(DATA_ROOT, "ki-protokoll.jsonl")
@@ -59,13 +60,13 @@ def clean_name(name):
     return name or "ohne-Name"
 
 
-def find_stamp(stamp_id):
+def find_stamp(stamp_id, base=DATA_DIR):
     """Return the stored file name for an upload id, or None."""
-    if not os.path.isdir(DATA_DIR):
+    if not os.path.isdir(base):
         return None
     suffix = "_" + stamp_id + ".svg"
-    for day in os.listdir(DATA_DIR):
-        day_dir = os.path.join(DATA_DIR, day)
+    for day in os.listdir(base):
+        day_dir = os.path.join(base, day)
         if os.path.isdir(day_dir):
             for f in os.listdir(day_dir):
                 if f.endswith(suffix):
@@ -73,12 +74,12 @@ def find_stamp(stamp_id):
     return None
 
 
-def list_stamps():
+def list_stamps(base=DATA_DIR):
     result = []
-    if not os.path.isdir(DATA_DIR):
+    if not os.path.isdir(base):
         return result
-    for day in sorted(os.listdir(DATA_DIR), reverse=True):
-        day_dir = os.path.join(DATA_DIR, day)
+    for day in sorted(os.listdir(base), reverse=True):
+        day_dir = os.path.join(base, day)
         if not os.path.isdir(day_dir):
             continue
         for f in sorted(os.listdir(day_dir), reverse=True):
@@ -229,7 +230,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path == "/api/ki-bereit":
             return self.send_json({"eingerichtet": ki_bild.eingerichtet()})
 
-        if path in ("/laptop", "/qr", "/api/liste", "/api/info", "/api/gruppen", "/api/ki-status") or path.startswith(("/daten/", "/dateien/")):
+        if path in ("/laptop", "/qr", "/api/liste", "/api/sticker", "/api/info", "/api/gruppen", "/api/ki-status") or path.startswith(("/daten/", "/dateien/", "/sticker/")):
             if not self.is_local():
                 return self.send_error(403, "Nur am Laptop")
             if path in ("/laptop", "/qr"):
@@ -237,6 +238,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return super().do_GET()
             if path == "/api/liste":
                 return self.send_json({"stempel": list_stamps(), "ordner": DATA_DIR})
+            if path == "/api/sticker":
+                return self.send_json({"stempel": list_stamps(STICKER_DIR), "ordner": STICKER_DIR})
+            if path.startswith("/sticker/"):
+                return self.send_data_file(STICKER_DIR, path[len("/sticker/"):])
             if path == "/api/info":
                 port = self.server.server_address[1]
                 return self.send_json({"adressen": ["http://%s:%d/" % (ip, port) for ip in local_ips()]})
@@ -289,7 +294,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if parsed.path == "/api/einstellungen":
             return self.save_settings()
         if parsed.path == "/api/alle-loeschen":
-            for d in (DATA_DIR, GROUPS_DIR):
+            for d in (DATA_DIR, STICKER_DIR, GROUPS_DIR):
                 if os.path.isdir(d):
                     shutil.rmtree(d)
             if os.path.exists(KI_LOG_FILE):
@@ -401,20 +406,21 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not text.startswith("<svg") or "<script" in text.lower():
             return self.send_json({"ok": False, "fehler": "keine Stempel-Datei"}, 400)
 
-        existing = find_stamp(stamp_id)
+        base = STICKER_DIR if (query.get("art") or [""])[0] == "sticker" else DATA_DIR
+        existing = find_stamp(stamp_id, base)
         if existing:
             # Same upload sent again (retry): accept, but store only once
             return self.send_json({"ok": True, "datei": existing, "doppelt": True})
 
         now = datetime.datetime.now()
-        day_dir = os.path.join(DATA_DIR, now.strftime("%Y-%m-%d"))
+        day_dir = os.path.join(base, now.strftime("%Y-%m-%d"))
         os.makedirs(day_dir, exist_ok=True)
         filename = "%s_%s_%s.svg" % (now.strftime("%H%M%S"), name, stamp_id)
         tmp = os.path.join(day_dir, filename + ".tmp")
         with open(tmp, "wb") as fh:
             fh.write(body)
         os.replace(tmp, os.path.join(day_dir, filename))
-        print("Stempel empfangen: %s" % filename)
+        print("%s empfangen: %s" % ("Sticker" if base == STICKER_DIR else "Stempel", filename))
         return self.send_json({"ok": True, "datei": now.strftime("%Y-%m-%d") + "/" + filename, "doppelt": False})
 
     def log_message(self, fmt, *args):

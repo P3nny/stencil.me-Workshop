@@ -24,7 +24,7 @@
   function senden(eintrag){
     if(eintrag.art === 'stempel'){
       // Gleicher Weg wie in stencil.html: Der Laptop legt den Stempel zu den anderen für den Mr Beam
-      const url = '/api/stempel?id=' + eintrag.id + '&name=' + encodeURIComponent(eintrag.name);
+      const url = '/api/stempel?id=' + eintrag.id + '&name=' + encodeURIComponent(eintrag.name) + (eintrag.sorte ? '&art=' + eintrag.sorte : '');
       return mitZeitlimit(fetch(url, { method: 'POST', headers: { 'Content-Type': 'image/svg+xml' }, body: eintrag.svg }).then(antwortPruefen));
     }
     if(eintrag.art === 'datei'){
@@ -96,6 +96,9 @@
     // Stempel-Datei (SVG) für den Lasercutter, mit Vorname oder Spitzname
     stempel: (gruppe, name, svg) =>
       hinzufuegen({ art: 'stempel', gruppe: gruppe, name: name, svg: svg }),
+    // Sticker für den Schneideplotter: gleicher Weg, eigener Ordner auf dem Laptop
+    sticker: (gruppe, name, svg) =>
+      hinzufuegen({ art: 'stempel', sorte: 'sticker', gruppe: gruppe, name: name, svg: svg }),
     beobachten: fn => { beobachter.push(fn); meldeStand(); },
     abarbeiten: abarbeiten,
     starten: () => {
