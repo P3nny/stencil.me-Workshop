@@ -30,14 +30,16 @@ Was nur du erledigen kannst. Abhaken, wenn erledigt. Die Aufbau-Schritte am Work
 ## Datenschutz und Einwilligung
 
 - [ ] Klären, wer die Einwilligung der Erziehungsberechtigten einholt (KOMEZ, Schule oder du), siehe [fragen-medienzentrum.md](fragen-medienzentrum.md)
-- [ ] Einwilligungsformular (Fotos auf dem Laptop, optionale Claude-Stationen): Claude kann einen Entwurf schreiben
+- [ ] Elternbrief mit Einwilligung (Fotos: ankreuzen) und Opt-out (generative KI): Entwurf in [elternbrief-einwilligung.md](elternbrief-einwilligung.md). Platzhalter ausfüllen, von Schule/KOMEZ prüfen lassen, verschicken
+- [ ] Am Workshop-Tag: Liste, welche Kinder ohne Foto-Einwilligung bzw. mit KI-Opt-out sind
 - [ ] `Datenschutz.md` vorab an Lehrkraft und Eltern schicken
 - [ ] `docs/datenschutz-kurz.md` als Aushang ausdrucken
 - [ ] Laptop: Festplattenverschlüsselung an? (Fotos von Kindern liegen dort bis zu einer Woche)
 
 ## KOMEZ
 
-- [ ] Fragen aus [fragen-medienzentrum.md](fragen-medienzentrum.md) schicken, vor allem: WLAN verschlüsselt? Geräte erreichen sich? Laptop ins Internet? iPad-Modell und iPadOS-Version?
+- [x] WLAN ist passwortgeschützt (Patricia, 25.10.)
+- [ ] Fragen aus [fragen-medienzentrum.md](fragen-medienzentrum.md) schicken, vor allem: Geräte erreichen sich? Laptop ins Internet? iPad-Modell und iPadOS-Version?
 - [ ] Gerätecheck auf einem KOMEZ-iPad: `https://stencilme-workshop.netlify.app/app/geraetecheck.html`
 
 ## Vor dem Test

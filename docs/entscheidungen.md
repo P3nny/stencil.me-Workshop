@@ -132,6 +132,13 @@ Freier Ablauf: Die App schlägt die nächste Station vor (Voraussetzungen `brauc
 - **Alle Fotos an den Laptop**, auch das Ausgangsfoto, damit die Dokumentation lückenlos ist (muss in `Datenschutz.md`)
 - Reihenfolge der nächsten Schritte: Abschluss jeder Station → alle Fotos → Nachrichten an Gruppen → Sticker-Folie + Plotter → Bonus 2 Positiv → ZIP + „Meine Daten“ → Berufe → Kunst-Quiz-Bilder
 
+## 10. Entscheidungen vom 25.10.2026
+
+- **Betreuung:** An der Linol-Station ist eine zweite Person
+- **Laser:** erste Platte früh starten (ab ca. 6 Stempeln)
+- **WLAN** im KOMEZ ist passwortgeschützt. HTTP im WLAN gilt damit als vertretbar (steht offen in `Datenschutz.md`)
+- **Elternbrief:** Fotos mit aktiver Einwilligung, generative KI als Opt-out (`docs/elternbrief-einwilligung.md`, Entwurf, noch rechtlich prüfen lassen)
+
 ## 9. Entscheidungen vom 24.10.2026, spät
 
 - **Fotos an den Laptop** erst bei „Station beendet“, nur das letzte pro Person, keine verworfenen Versuche
