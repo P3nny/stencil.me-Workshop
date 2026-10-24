@@ -1,0 +1,24 @@
+{
+  "id": "lasercutter",
+  "titel": "Lasercutter",
+  "typ": "programm",
+  "datenweg": "laptop",
+  "schritte": [
+    "Geh zu Penny am Lasercutter.",
+    "Schau zu, wie Penny deinen Stempel auf der Platte anordnet.",
+    "Schau dir den Laser an: Röhre, Spiegel, Motoren.",
+    "Stell Penny eine Frage zum Laser und schreib sie mit der Antwort auf."
+  ],
+  "links": [
+    { "text": "Erklärvideo Lasercutter", "url": "" }
+  ],
+  "check": { "art": "foto", "hochladen": true, "text": "Mach ein Foto vom Lasercutter. Nur die Maschine, keine Leute." },
+  "eingaben": [
+    { "id": "frage", "text": "Deine Frage", "pflicht": true },
+    { "id": "antwort", "text": "Die Antwort", "pflicht": true }
+  ],
+  "fragen": ["ki-typ", "sterne"],
+  "datenschutz": "Deine Frage, die Antwort und das Foto vom Laser gehen an den Laptop.",
+  "braucht": ["stencilme"],
+  "plaetze": 2
+}

@@ -1,0 +1,20 @@
+{
+  "id": "stencilme",
+  "titel": "Bild bearbeiten",
+  "typ": "ki",
+  "datenweg": "laptop",
+  "schritte": [
+    "Die App nimmt dein Foto von der Foto-Station.",
+    "Schau zu: Schwarz-Weiß, Person erkennen, Stempel.",
+    "Beantworte die Frage zu den Farben.",
+    "Schick deinen Stempel an den Laptop."
+  ],
+  "check": { "art": "stempel" },
+  "eingaben": [
+    { "id": "farben", "text": "Was bedeuten die Farben?", "pflicht": true }
+  ],
+  "fragen": ["ki-typ", "sterne"],
+  "datenschutz": "Die Bearbeitung passiert auf dem iPad. Nur der fertige Stempel und dein Name gehen an den Laptop.",
+  "braucht": ["foto"],
+  "plaetze": 13
+}

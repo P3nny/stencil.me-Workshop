@@ -1,0 +1,17 @@
+{
+  "id": "foto",
+  "titel": "Foto machen",
+  "typ": "programm",
+  "datenweg": "ipad",
+  "schritte": [
+    "Stell dich vor das Packpapier, das Ringlicht leuchtet dich an.",
+    "Nur Kopf oder Kopf mit Schultern kommt aufs Bild.",
+    "Überleg dir einen Ausdruck und eine Pose: Was soll dein Porträt sagen?",
+    "Mach das Foto. Zu zweit: nacheinander, jede Person ein Foto."
+  ],
+  "check": { "art": "foto", "proPerson": true, "hochladen": false, "text": "Foto von" },
+  "fragen": ["ki-typ", "sterne"],
+  "datenschutz": "Dein Foto bleibt auf diesem iPad. Es geht nicht an den Laptop.",
+  "braucht": [],
+  "plaetze": 13
+}

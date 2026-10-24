@@ -1,0 +1,16 @@
+{
+  "id": "greenscreen",
+  "titel": "Greenscreen",
+  "typ": "ki",
+  "datenweg": "ipad",
+  "schritte": [
+    "Die KI stellt dein Foto frei: Der Hintergrund verschwindet.",
+    "Such dir einen neuen Hintergrund aus.",
+    "Schau dir dein Bild an: Wo passt es, wo nicht?"
+  ],
+  "check": { "art": "greenscreen" },
+  "fragen": ["ki-typ", "sterne"],
+  "datenschutz": "Freistellen und neuer Hintergrund passieren auf dem iPad. Nichts geht an den Laptop.",
+  "braucht": ["foto"],
+  "plaetze": 3
+}
