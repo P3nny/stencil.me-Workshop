@@ -1,6 +1,6 @@
 # Entscheidungen
 
-Stand: 23.10.2026, Schritt 0 (Infrastruktur, überarbeitet)
+Stand: 24.10.2026 (Schritt 0 vom 23.10., danach Stationen-App)
 
 Status-Werte: **entschieden** · **vorgeschlagen** (Test ausstehend) · **zurückgestellt** · **offen**
 
@@ -22,7 +22,7 @@ Wir bauen mit diesen Annahmen weiter. Stellt sich eine als falsch heraus, greift
 | Safari auf den iPads ist nutzbar | Pairdrop lief im Browser | Plan C (Karten) |
 | iPads sind älter, wenig Arbeitsspeicher (2–3 GB) | Abstürze bei der Bildverarbeitung im letzten Workshop | — darum: Bilder klein rechnen, Fehler abfangen |
 | iPadOS-Version unbekannt | — | vorsichtige Syntax (kein `?.`, `??`), keine neuen Web-APIs voraussetzen |
-| „Zum Home-Bildschirm“ evtl. gesperrt | MDM unbekannt | App muss auch im normalen Safari-Tab laufen |
+| ~~„Zum Home-Bildschirm“ evtl. gesperrt~~ | entschieden 24.10.: wird nicht benutzt | App läuft im normalen Safari-Tab |
 | Mr Beam ist vom Ubuntu-Laptop erreichbar | laut Patricia möglich, Test am 02.11. | Pairdrop vom Laptop an das KOMEZ-MacBook am Mr Beam |
 
 Tests laufen mit Patricias Ubuntu-Laptop und ihrem eigenen iPad. Das ist eine Annäherung: Die KOMEZ-iPads können älter und langsamer sein.
@@ -93,8 +93,8 @@ Umschalten zwischen den Plänen heißt: einen anderen QR-Code zeigen. Was bei Pr
 
 ## Entscheidungen vom 24.10.2026 (Stationen-App)
 
-- **Ablauf:** Check-in, danach immer zuerst das Foto, dann stencil.me, dann Laser. Wie es danach weitergeht, ist noch offen (siehe [screens.md](screens.md)).
-- **Rohfoto bleibt auf dem iPad** (IndexedDB). Das Paar behält sein iPad für alle Stationen.
+- **Ablauf:** Check-in, danach immer zuerst das Foto, dann stencil.me, dann Laser. Danach verteilt die App die Gruppen über `braucht` und `plaetze` (siehe Punkt 7).
+- ~~**Rohfoto bleibt auf dem iPad**~~ (überholt durch Punkt 8: alle Fotos an den Laptop). Das Paar behält sein iPad für alle Stationen.
 - **Laser:** Der Laptop ordnet die Stempel auf einer A4-SVG an, Patricia lädt sie in die Mr-Beam-Oberfläche. Einzelne Stempel bleiben möglich. Keine Mr-Beam-Schnittstelle.
 - **Anzahl Schüler:innen** gibt Patricia auf der Laptop-Seite ein.
 - **Safari statt Home-Bildschirm-App:** Die QR-Codes an den Stationen öffnen Safari. Eine Home-Bildschirm-App hat einen eigenen Speicher. Alle Stationen unter derselben Adresse teilen auf einem iPad einen Speicher, andere iPads sehen ihn nicht. Die Fotos liegen in den Website-Daten von Safari (IndexedDB), nicht in der Fotos-App. Die Adresse darf während des Workshops nicht wechseln. Nach dem Workshop werden die Website-Daten auf jedem iPad gelöscht.
@@ -103,23 +103,26 @@ Umschalten zwischen den Plänen heißt: einen anderen QR-Code zeigen. Was bei Pr
 
 ---
 
-## 4. Ergebnisse an die Kinder — offen
+## 4. Ergebnisse an die Kinder — entschieden (24.10.2026)
 
-Aktueller Plan: ZIP auf USB-Stick an die Lehrkraft.
+ZIP pro Paar auf USB-Stick an die Lehrkraft, Verteilung über die Schulplattform (siehe Punkt 8). Der ZIP-Export ist noch nicht gebaut.
 
-## 5. Claude-Station — teilweise entschieden (24.10.2026)
+## 5. Claude-Stationen — entschieden (24.10.2026)
 
 - Für das KI-Selbstporträt: **Claude-API mit eigenem Schlüssel**, nicht das Pro-Abo. Laut Anthropic dürfen Anfragen für andere Nutzer:innen nicht über Pro/Max-Zugänge laufen, Pro-Kontingente gelten für „ordinary, individual usage“ (code.claude.com/docs/en/legal-and-compliance)
 - Schlüssel nur auf dem Laptop (`~/.config/stencilme/anthropic-key`, nicht im Repo), Guthaben vorab ohne automatisches Nachladen, Ausgabenlimit im Workspace `stencilme-workshop`, zusätzlich Grenzen im Server (6 pro Gruppe, 150 pro Tag)
 - Modell: **Claude Sonnet 5.5** (Vergleich 24.10. mit demselben Prompt: Haiku 17 s / 0,2 Cent, sehr grob; Sonnet 52 s / 7 Cent, deutlich besser; Opus 71 s / 15 Cent, kaum besser als Sonnet). Ca. 2–6 € pro Workshop. Mit Rückfall-Modell bei Ablehnung (`fallbacks: "default"`). Umstellbar mit `STENCILME_KI_MODELL`
-- Die Code-Erklär-Station mit Claude ist weiter offen
+- Zweite Claude-Station: **Bild-App vibe coden** (Lückentext, Streaming, App läuft abgeschottet, 3 pro Gruppe, 60 pro Tag). Die Code-Erklärung bleibt ein Quiz ohne Claude
+- **Beide Claude-Stationen sind optional** (Patricia, 24.10. spät): zählen nicht zu „x von 11“, nur mit Einwilligung. Erklärung zu den Anthropic-Vorgaben für Minderjährige steht in `Datenschutz.md`
 
 ## 6. Ersatz für Canva und KI-Selbstporträt — entschieden (24.10.2026)
 
 - Hintergrund ändern: eigene Station mit BodyPix (Screen 5)
 - KI-Selbstporträt: Claude zeichnet SVG aus einem Prompt-Baukasten (Screen 9). Kein Foto der Kinder, kein freier Text, nur die ausgewählten Merkmale gehen an Anthropic
 
-## 7. Erklärer-/Macher-Rotation oder freier Ablauf — offen
+## 7. Erklärer-/Macher-Rotation oder freier Ablauf — entschieden (24.10.2026)
+
+Freier Ablauf: Die App schlägt die nächste Station vor (Voraussetzungen `braucht`, freie `plaetze`). Keine feste Rotation.
 
 ## 8. Entscheidungen vom 24.10.2026, abends
 
@@ -128,6 +131,15 @@ Aktueller Plan: ZIP auf USB-Stick an die Lehrkraft.
 - **Daten an die Kinder:** ZIP pro Paar auf USB-Stick an die Lehrkraft, Verteilung über die Schulplattform. Am Ende sieht jedes Paar auf dem iPad, was auf dem Laptop gespeichert war
 - **Alle Fotos an den Laptop**, auch das Ausgangsfoto, damit die Dokumentation lückenlos ist (muss in `Datenschutz.md`)
 - Reihenfolge der nächsten Schritte: Abschluss jeder Station → alle Fotos → Nachrichten an Gruppen → Sticker-Folie + Plotter → Bonus 2 Positiv → ZIP + „Meine Daten“ → Berufe → Kunst-Quiz-Bilder
+
+## 9. Entscheidungen vom 24.10.2026, spät
+
+- **Fotos an den Laptop** erst bei „Station beendet“, nur das letzte pro Person, keine verworfenen Versuche
+- **Feedbackbogen** nach Bonus 1 oder über den Laptop-Knopf „für alle freigeben“, jede Person einzeln. **Bonus 2 Lasercut-Porträt** nach Sticker + Feedbackbogen, blau = gravieren, rot = schneiden
+- **Bonus 1 (Sticker)** bleibt bei 8 geschafften Stationen (jetzt 8 von 11)
+- **Nachrichten-Abfrage** einmal pro Minute. **Diktieren** nur als Hinweis auf die Mikrofon-Taste, keine eigene Spracherkennung
+- **Datenschutz:** `Datenschutz.md` im Stil der Stationstexte, Kontakt patricia.ennenbach@bildung.koeln.de, Löschung auf dem Laptop spätestens eine Woche nach dem Workshop
+- **Android-Tablets:** nicht getestet. Wahrscheinlich lauffähig (Tests laufen auch in Chromium), Risiko: QR-Scan öffnet einen anderen Browser mit eigenem Speicher
 
 ---
 

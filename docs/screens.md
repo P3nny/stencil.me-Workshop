@@ -22,8 +22,9 @@ Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Cl
 ## Reihenfolge der Stationen
 
 - Fest: Check-in → Foto → stencil.me → Laser.
-- **Offen:** 26 Jugendliche gleichzeitig am Laser sind zu viel. Sie sollen nacheinander ankommen. Auch andere Stationen bauen aufeinander auf.
-- *Vorschlag:* Jede Station bekommt in den Daten `braucht: [...]` (Voraussetzungen) und `plaetze` (wie viele Paare gleichzeitig). Die App weist nur Stationen zu, deren Voraussetzungen erfüllt sind und die noch Platz haben.
+- 26 Jugendliche gleichzeitig am Laser sind zu viel. Sie sollen nacheinander ankommen. Auch andere Stationen bauen aufeinander auf.
+- **Gebaut:** Jede Station hat in den Daten `braucht: [...]` (Voraussetzungen) und `plaetze` (wie viele Paare gleichzeitig). Die App schlägt nur Stationen vor, deren Voraussetzungen erfüllt sind und die noch Platz haben. Optionale Stationen nur, wenn keine andere frei ist.
+- **Zählung (Stand 24.10. spät):** 11 Pflichtstationen für „x von 11“ und das Puzzle. Dazu 2 optionale Stationen (Claude: KI-Selbstporträt, vibe coding) und 3 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen, Lasercut-Porträt), die nicht mitzählen.
 
 ## Gerüst (gebaut, Branch `feature/geruest`)
 
@@ -154,16 +155,16 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Pflichtfrage „Welcher Baustein sorgt dafür, dass ein Regler sofort das Bild verändert?“, Auflösung (JavaScript) im Abschluss
 - Code geht beim Beenden an den Laptop (`antworten.html-code`)
 
-## Screen 9: Selbstporträts mit KI neu erschaffen — gebaut, Branch `feature/screen-9`
+## Screen 9: Selbstporträts mit KI neu erschaffen — gebaut, Branch `feature/screen-9`, seit 24.10. optional
 
 - Ersetzt Canva AI. Prompt-Baukasten (keine freie Eingabe): Kunststil (Frida Kahlo, van Gogh, Pop-Art, Streetart, Comic, Aquarell), Person, Alter, Augen, Haarfarbe, Haare, Brille, Hintergrund. Der fertige Satz steht groß darüber
-- „Bild erzeugen“: Das iPad schickt nur die Auswahl an den Laptop, der Laptop baut den Prompt und fragt Claude (Haiku 5.5). Claude zeichnet ein SVG (ca. 15 s, ca. 0,2 Cent pro Bild)
-- Höchstens 6 Bilder pro Gruppe, 150 pro Tag. Pflicht: 2 Bilder in 2 Kunststilen
+- „Bild erzeugen“: Das iPad schickt nur die Auswahl an den Laptop, der Laptop baut den Prompt und fragt Claude (Sonnet 5.5, anfangs Haiku). Claude zeichnet ein SVG (ca. 50 s, ca. 7 Cent pro Bild)
+- Höchstens 6 Bilder pro Gruppe, 150 pro Tag. Zum Abhaken: 2 Bilder, egal welcher Stil
 - Pflichtfragen von den Karten (Seite 16, 17): Unterschied zu stencil.me (mit Auflösung) und KI-Ethik
 - Ohne Laptop, Internet oder Schlüssel: drei vorher erzeugte Beispiele (`stationen/bilder/ki-beispiele/`), Station lässt sich trotzdem beenden
 - Laptop-Seite zeigt Modell, Anzahl Bilder heute und Kosten bisher
 - Einrichtung: `./server/einrichten.sh` (einmalig, installiert das Anthropic-SDK und fragt den API-Schlüssel ab), `./server/start.sh` nutzt es dann automatisch
-- Modell wechseln: `STENCILME_KI_MODELL=claude-sonnet-5-5 ./server/start.sh`
+- Modell wechseln: `STENCILME_KI_MODELL=claude-haiku-5-5 ./server/start.sh` (Standard: `claude-sonnet-5-5`)
 
 ## Screen 10 und 11: Mit der Hand drucken — gebaut, Branch `feature/screen-10-11`
 
@@ -183,15 +184,15 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 
 - KI-Selbstporträt mit Sonnet 5.5 (siehe `docs/entscheidungen.md` Punkt 5)
 - Abschluss jeder Station: erst Auflösungen, dann „Was hast du genutzt?“ (neu: „Ohne Computer“), dann Sterne
-- Alle Fotos gehen an den Laptop, auch das Ausgangsfoto und verworfene Versuche
+- Alle Fotos gehen an den Laptop, auch das Ausgangsfoto (später geändert: nur die letzten, keine verworfenen Versuche)
 - **Laptop-Seite neu gegliedert** (`server/bogen.js`): zwei gleich aufgebaute Bereiche
   - „Stempel → A4-Holzplatte für den Mr Beam“: anhaken, „Platte zusammenstellen“, „Platte herunterladen (SVG)“ (5 mm Rand, 3 mm Abstand)
   - „Sticker → A4-Stickerfolie für die Cameo“: anhaken, „Folie zusammenstellen“ (8 mm Rand, 4 mm Abstand), „An den Plotter schicken“ oder „Nur herunterladen“
   - je ein Verlauf mit Nachrichten-Knöpfen
 - **Plotter** (`server/plotter.py`, Vorbild `archiv/00_fotobox-karte/fotobox-queue.py`): Sticker im Fotobox-Format (Gruppe `zeichnen-stift`: Schraffur 1,2 mm + Umriss; Gruppe `schneiden-rot`: Messer). Laptop-Seite führt durch die Schritte: Folie + Stift einlegen → „Zeichnen starten“ → „Stift raus, Messer rein“ → „Schneiden starten“ → „FERTIG“. Gleiche Einstellungen wie die Fotobox (Stift Druck 5/Tempo 5, Messer Autoblade Tiefe 4, Druck 14, Tempo 3, 2 Durchgänge), änderbar per Umgebungsvariable. `STENCILME_PLOTTER_TEST=1`: Testlauf ohne Plotter. *Mit echter Cameo noch nicht getestet*
-- **Nachrichten an die Gruppen:** Stempel und Sticker tragen die Gruppen-ID im Dateinamen. Laptop-Seite → „Letzte Platten“: pro Platte „📣 Wird gelasert“ und „📣 Fertig, abholen“. Jede Gruppe bekommt eine eigene Nachricht mit ihren Namen, die iPads zeigen sie oben an (Abfrage alle 15 s), „OK“ blendet sie aus
+- **Nachrichten an die Gruppen:** Stempel und Sticker tragen die Gruppen-ID im Dateinamen. Laptop-Seite → „Letzte Platten“: pro Platte „📣 Wird gelasert“ und „📣 Fertig, abholen“. Jede Gruppe bekommt eine eigene Nachricht mit ihren Namen, die iPads zeigen sie oben an (Abfrage einmal pro Minute), „OK“ blendet sie aus
 
-## Station 12: Bild-App vibe coden — gebaut, Branch `feature/vibe-coding`
+## Station 12: Bild-App vibe coden — gebaut, Branch `feature/vibe-coding`, seit 24.10. optional
 
 - Ersetzt die Betreuungsperson: Lückentext statt freiem Auftrag. Auswahl: Effekt (Warhol, Pixel-Art, Farben verrückt, Comic, Schablone), Farben, Regler. Frei nur App-Name und Knopf-Text (höchstens 24 Zeichen, nur Buchstaben, Zahlen, Satzzeichen, Laptop prüft nochmal und setzt sie in Anführungszeichen)
 - Laptop baut den Auftrag, Claude (Sonnet) schreibt eine HTML-App, der Code erscheint live auf dem iPad (`server/ki_app.py`, Streaming). Test 24.10.: 41 s, ca. 6 Cent
@@ -214,6 +215,16 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - `app/geraetecheck.html`: prüft auf dem iPad iPadOS/Safari, Speicher (IndexedDB, freier Platz), Kamera-Feld, Video (H.264/HEVC), WebGL, Darstellung, Canvas, Verbindung zum Laptop und BodyPix mit Zeitmessung. Ergebnis als Ampel und Text zum Weiterschicken. Speichert nichts dauerhaft
 - Aller JavaScript-Code (23 Dateien/Blöcke) ist ES2017-tauglich (geprüft mit `es-check`), also lesbar ab Safari/iOS 11
 
-## Weitere Screens
+## Texte, Tabs, Datenschutz (24.10. spät)
 
-- *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …
+- Texte geprüft: Fachwörter erklärt (Otsu, Prompt, SVG, vibe coding, Schneideplotter), aufklappbares „Was ist der Unterschied?“ an der KI-Frage, Lasercutter spricht Paare mit „ihr“ an
+- Mehrere Safari-Tabs (jeder QR-Scan öffnet einen): Die App speichert nur die eigene Station und liest den Rest frisch, beim Zurückwechseln zeichnet sie Puzzle und Zähler neu (`tests/tabs-test.js`)
+- Claude-Stationen optional (Feld `optional`), Etikett „Geht an den Laptop · Video: YouTube“ am Lasercutter (`laptop-video`)
+- `Datenschutz.md` (kindgerecht, Teil für Erwachsene), `docs/datenschutz-kurz.md`, `docs/canva-folie-datenschutz.md`
+- Laptop-Seite zeigt einen Neustart-Hinweis, wenn sich die Server-Dateien geändert haben
+
+## Noch offen
+
+- ZIP-Export pro Paar und gesamt, „Auf USB-Stick kopieren“, Seite „Meine Daten“ für die Kinder
+- Station Berufe: 3 Berufsbilder aus `04_stencil.me-Berufe.pdf`, Quizfrage, „Welchen Beruf wünschst du dir?“
+- Kunst-Quiz mit Bildern aus `03_stencil.me-Künstlerinnen_A4.pdf`, nur über den Laptop ausgeliefert, nicht im Repo

@@ -4,6 +4,7 @@
 
 - [ ] KOMEZ bitten, `https://stencilme-workshop.netlify.app/app/geraetecheck.html` auf einem ihrer iPads zu öffnen und das Ergebnis zu schicken
 - [ ] Vor Ort über den Laptop: `http://<IP>:8000/app/geraetecheck.html` (prüft zusätzlich die Verbindung zum Laptop)
+- [ ] Falls Android-Tablets dazukommen: nicht getestet. Gerätecheck machen, Chrome als Standardbrowser, prüfen, dass der QR-Scan in Chrome öffnet (nicht in Samsung Internet o. Ä.)
 
 ## 1. 5-Minuten-Test im KOMEZ (Plan A möglich?)
 
@@ -27,7 +28,9 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] [notfallkarte.md](notfallkarte.md) ausgedruckt, laminierte Karten dabei (Plan C)
 - [ ] QR-Codes für die Stationen: Server starten, `http://localhost:8000/qr` öffnen, Adresse wählen, drucken. Nur gültig für diese Adresse: Bekommt der Laptop im KOMEZ eine andere IP, dort neu drucken (oder Netlify-Version für Plan B mitnehmen)
 - [ ] USB-Stick dabei
-- [ ] KI-Selbstporträt: Guthaben in der Claude Console prüfen, Laptop-Seite zeigt „KI-Selbstporträt: claude-haiku-5-5 …“ (sonst `./server/einrichten.sh`). Braucht Internet im KOMEZ-WLAN
+- [ ] Claude-Stationen (optional): Guthaben in der Claude Console prüfen, Laptop-Seite zeigt „KI (claude-sonnet-5-5): heute …“ (sonst `./server/einrichten.sh`). Braucht Internet im KOMEZ-WLAN. Ohne KI zeigen die Stationen Beispiele
+- [ ] Einwilligungen der Erziehungsberechtigten liegen vor (Fotos auf dem Laptop, Claude-Stationen), `Datenschutz.md` ist vorab verschickt
+- [ ] `docs/datenschutz-kurz.md` ausgedruckt (Aushang)
 
 ## 3. Aufbau im Raum
 
@@ -35,21 +38,26 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Terminal im Repo-Ordner öffnen: `./server/start.sh`
   - Der Browser öffnet die Laptop-Seite mit QR-Code und Stempel-Liste.
   - Der Laptop geht nicht in den Ruhezustand, solange das Terminal-Fenster offen ist.
+  - Nach jedem Update den Server neu starten. Die Laptop-Seite zeigt sonst einen pinken Hinweis.
+- [ ] Laptop-Seite: Anzahl Schüler:innen eintragen
 - [ ] Laptop-Bildschirm mit dem QR-Code zu den iPads drehen
 - [ ] Pro iPad: Einstellungen → Safari → Erweitert → Website-Daten: alte Daten der Workshop-Adresse löschen (Fotos der letzten Gruppe)
-- [ ] Pro iPad: QR-Code in **Safari** öffnen (nicht „Zum Home-Bildschirm“), ein Testfoto machen, danach mit `?test` → „Alles zurücksetzen“
+- [ ] Pro iPad: alle alten Safari-Tabs schließen, QR-Code in **Safari** öffnen (nicht „Zum Home-Bildschirm“), ein Testfoto machen, danach mit `?test` → „Alles zurücksetzen“
 - [ ] App offen lassen, nicht neu laden
 
 ## 4. Während des Workshops
 
-- [ ] Die Kinder tippen beim Negativ-Stempel ihren Vornamen oder ein Kürzel ein und dann „Stempel abschicken“.
-- [ ] Neue Stempel erscheinen auf der Laptop-Seite (pink markiert).
-- [ ] In der Mr-Beam-Oberfläche die Dateien aus dem angezeigten Ordner hochladen.
+- [ ] Die Gruppen melden sich auf der Startseite an (Vornamen) und scannen an jeder Station den QR-Code.
+- [ ] Neue Stempel erscheinen auf der Laptop-Seite unter „Stempel → A4-Holzplatte“: anhaken, „Platte zusammenstellen“, „Platte herunterladen (SVG)“, in der Mr-Beam-Oberfläche hochladen, 2× gravieren.
+- [ ] Unter „Letzte Platten“: „📣 Wird gelasert“ und „📣 Fertig, abholen“ an die Gruppen schicken.
+- [ ] Sticker (Bonus): „Folie zusammenstellen“, dann die Plotter-Schritte auf der Laptop-Seite.
+- [ ] Gegen Ende: „Feedbackbogen für alle freigeben“.
 - [ ] Steht auf dem iPad „Noch nicht beim Laptop“: nichts tun, die App versucht es alle 15 Sekunden erneut.
 
 ## 5. Nach dem Workshop
 
-- [ ] Stempel auf USB-Stick sichern, falls sie noch gebraucht werden
-- [ ] Laptop-Seite: „Alle Daten löschen“
-- [ ] Pro iPad: Website-Daten in Safari löschen (bis es in der App einen Knopf dafür gibt)
+- [ ] Auswertung ansehen: `/auswertung` (Sterne, KI-Frage, Feedbackbögen)
+- [ ] Ergebnis-Mappen auf USB-Stick für die Lehrkraft. *ZIP-Export ist noch nicht gebaut: bis dahin den Ordner `server/daten/gruppen` kopieren*
+- [ ] Spätestens eine Woche nach dem Workshop (steht so in `Datenschutz.md`): Laptop-Seite „Alle Daten löschen“
+- [ ] Pro iPad: Startseite → „Andere Gruppe? Neu anmelden“ (löscht alles auf dem iPad), oder Website-Daten in Safari löschen. Alle Safari-Tabs schließen
 - [ ] Terminal-Fenster schließen (Server aus)

@@ -17,14 +17,19 @@
 - [ ] Welche iPadOS-Version? (Einstellungen → Allgemein → Info → Softwareversion)
 - [ ] Werden die iPads per MDM verwaltet? Wenn ja, welche Einschränkungen gibt es bei:
   - [ ] Safari erlaubt?
-  - [ ] „Zum Home-Bildschirm“ erlaubt?
   - [ ] Kamera erlaubt?
   - [ ] Werden Website-Daten beim Abmelden oder über Nacht gelöscht?
   - [ ] Ist Diktieren (Mikrofon-Taste auf der Tastatur) erlaubt?
   - [ ] Blockiert ein Inhaltsfilter Adressen wie `http://192.168.…:8000`?
 - [ ] Wie viel freier Speicher ist auf den iPads?
 - [x] Tastaturen für die iPads? Nein (Patricia, 24.10.). Code-Stationen sind für die Bildschirm-Tastatur gebaut
-- [ ] Dürfen wir die iPads vor dem Workshop einrichten (Seite laden, auf den Home-Bildschirm legen)?
+- [ ] Dürfen wir die iPads vor dem Workshop einrichten (Seite in Safari laden, Kamera freigeben)?
+- [ ] Öffnet die Kamera-App QR-Codes in Safari?
+
+## Internet und Datenschutz
+
+- [ ] Darf der Laptop im KOMEZ-WLAN ins Internet (`api.anthropic.com`, für die zwei optionalen Claude-Stationen)?
+- [ ] Wer holt die Einwilligungen der Erziehungsberechtigten ein (KOMEZ, Schule oder Patricia)? `Datenschutz.md` liegt bei.
 
 ## Mr Beam
 

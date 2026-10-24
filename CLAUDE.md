@@ -45,26 +45,31 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 ## Ist-Zustand des Repos
 
 - `index.html`: Startseite der Workshop-App (Anmeldung allein/zu zweit, dann Foto-Station).
-- `app/station.html?id=<station>`: eine Seite für alle Stationen, Inhalte aus `stationen/*.json`. Gemeinsamer Code in `app/core/`.
+- `app/station.html?id=<station>`: eine Seite für alle Stationen, Inhalte aus `stationen/*.json` (Format: `stationen/README.md`). Gemeinsamer Code in `app/core/`, eigene Stationsteile in `app/stationen/`. Gerätecheck: `app/geraetecheck.html`.
+- Stationen (Stand 24.10.2026): 11 Pflichtstationen (zählen für „x von 11“ und das Puzzle), 2 optionale Claude-Stationen (KI-Selbstporträt, Bild-App vibe coden), 3 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen, Lasercut-Porträt). Reihenfolge über `braucht` und `plaetze`, Überblick und Verlauf in `docs/screens.md`.
+- `server/`: Workshop-Server (Python, nur Standardbibliothek; Ausnahme: Anthropic-SDK im venv für die Claude-Stationen, `server/einrichten.sh`). Laptop-Seite `/laptop` (Holzplatte, Stickerfolie mit Plotter, Nachrichten, Freigaben), `/qr`, `/auswertung`.
+- `tests/`: Playwright-Tests (`stationen-test.js` kompletter Durchlauf, `tabs-test.js`, `leistung-test.js`), laufen in WebKit und Chromium.
+- `Datenschutz.md`: kindgerechte Datenschutzinformation (dazu `docs/datenschutz-kurz.md`, `docs/canva-folie-datenschutz.md`).
 - `stencil.html` (bis 24.10.2026 `index.html`): stencil.me-Workshop-App (Foto → BodyPix → Schwarz-Weiß → SVG), eine Datei (ca. 100 KB). Startet im Pflichtweg Negativ-Stempel. `?extras` zeigt Bild (Positiv) und Sticker, `?test` den Knopf für `docs/test-foto.jpg`. Code für Schraffur, Raster, Sticker ist noch drin (Löschen in Roadmap 1).
 - `code-quiz.html`, `kunst-quiz.html`: eigenständige Quizseiten.
 - PDFs: Startpräsentation, Stationenkarten, Künstler:innen, Berufe, Abschluss, QR-Code Kunstquiz.
 - `/archiv/` ist in `.gitignore`: dort liegt lokal die `fotobox-karte` (Flask-Queue `fotobox-queue.py`, Plotter-Anbindung) als Vorbild für Foto-Übertragung und Server-Queue. **Nicht ins Repo committen.** Wenn du dort lesen musst, frag nach dem Pfad.
-- TF.js, BodyPix-Modell und Schriften liegen lokal in `vendor/` (Versionen und Lizenzen: `vendor/README.md`). Die App lädt nichts aus dem Internet.
+- TF.js, BodyPix-Modell und Schriften liegen lokal in `vendor/` (Versionen und Lizenzen: `vendor/README.md`). Die App lädt nichts aus dem Internet. Einzige Ausnahme: das YouTube-Video am Lasercutter, erst nach Antippen von „Video laden“.
 
-## Repo-Struktur (Zielbild, bei Bedarf anpassen)
+## Repo-Struktur
 
 ```
-index.html            Einstieg der Workshop-App (Anmeldung, Stationsübersicht)
-app/core/             gemeinsamer Kern (Foto, Personenerkennung, Schwarz-Weiß, SVG)
-app/lasercut-stempel/ Pflichtweg: Negativ-Stempel für den Mr Beam
-app/lasercut-portraet/ optional
-app/schneideplotter/  optional (Sticker)
-stationen/            eine Datei pro Station (Inhalt als Daten, nicht im Code)
-vendor/               lokale Kopien aller Bibliotheken und Modelle (BodyPix, TF.js, Schriften)
-server/               lokaler Workshop-Server (Python/Flask), siehe unten
-docs/                 Entscheidungen, Testprotokolle, Aufbau-Checkliste
-Datenschutz.md        Datenschutzinformation für Lehrkräfte, Eltern und Kinder
+index.html            Einstieg der Workshop-App (Anmeldung)
+stencil.html          alte stencil.me-App, Rückfallebene
+app/station.html      eine Seite für alle Stationen (?id=<station>)
+app/core/             gemeinsamer Kern (Speicher, Outbox, Bild, Personenerkennung, Stempel/Sticker/Porträt-SVG, Rahmen, Code-Editor)
+app/stationen/        eigene Teile einzelner Stationen (stencil.me, Hintergrund, Körpererkennung, Coding, Claude …)
+stationen/            eine Datei pro Station (Inhalt als Daten, nicht im Code), Bilder in stationen/bilder/
+vendor/               lokale Kopien aller Bibliotheken und Modelle (BodyPix, TF.js, Schriften, QR-Code)
+server/               lokaler Workshop-Server (Python), Laptop-Seite, Plotter, Claude
+tests/                Playwright-Tests
+docs/                 Entscheidungen, Screens, Aufbau-Checkliste, Notfallkarte, Datenschutz-Kurzversion
+Datenschutz.md        Datenschutzinformation für Kinder, Lehrkräfte und Eltern
 ```
 
 ## Aufbau einer Station
@@ -89,7 +94,8 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 ## Webapp-Regeln
 
 - Reines HTML/CSS/JS, keine Frameworks, kein Build-Tool, **keine externen CDNs, Schriften oder Tracker**. Alles liegt lokal in `vendor/`.
-- Muss mit Touch auf älteren Schul-iPads laufen (TODO: iOS-/iPadOS-Version und Modell klären). Bis dahin vorsichtig mit neuer Syntax (`?.`, `??`, Top-Level-await) und neuen Web-APIs.
+- Muss mit Touch auf älteren Schul-iPads laufen (TODO: iOS-/iPadOS-Version und Modell klären). JavaScript bleibt bei **ES2017** (kein `?.`, `??`, Top-Level-await), geprüft mit `es-check es2017`. Vorsichtig mit neuen Web-APIs.
+- Jeder QR-Scan öffnet einen neuen Safari-Tab. Mehrere Tabs teilen sich einen Speicher: nie den ganzen Fortschritt aus einem alten Stand zurückschreiben, nur die eigene Station (siehe `speichern()` in `app/core/rahmen.js`).
 - **Stabilität vor Funktion:** Die App ist auf den iPads im Medienzentrum mehrfach abgestürzt, u. a. bei einem Foto ohne Person (0 % erkannt). Maßnahmen: Bilder vor der Verarbeitung auf höchstens 1024 px verkleinern, BodyPix mit `internalResolution: "medium"`, leere Maske abfangen (Fallback aufs ganze Bild), Fehler anzeigen statt abstürzen.
 - **Offline-first:** Jeder Zwischenstand (Anmeldung, Antworten, Fotos, Ergebnisse) wird sofort lokal in IndexedDB gespeichert. Der Upload zum Server läuft über eine Warteschlange („Outbox“) mit Wiederholung und eindeutiger ID pro Eintrag, damit nichts verloren geht und nichts doppelt ankommt. Die App zeigt klar: „gesichert auf dem iPad / gesichert auf dem Server“.
 - Die App muss auch ohne Server benutzbar bleiben (Server-Ausfall darf den Workshop nicht stoppen).
@@ -101,20 +107,21 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 
 - Fotos von Jugendlichen werden zuerst nur auf dem Gerät verarbeitet. Zum lokalen Server geht nur, was für Laser und Ergebnis-Mappe nötig ist (Stempel-Datei, vom Kind hochgeladene Ergebnisse).
 - **Kein Foto und kein Prompt eines Kindes geht an einen Online-Dienst**, ohne dass es in `Datenschutz.md` steht und Einwilligungen vorliegen. Das gilt auch für KI-Funktionen.
-- Der Workshop-Server ist Patricias Laptop im KOMEZ-WLAN und nimmt nur Stempel-Dateien an. Er gibt nichts an Online-Dienste weiter.
-- Daten werden nach dem Workshop gelöscht. Abgabe der Ergebnisse als ZIP (USB-Stick an die Lehrkraft, Weg noch zu prüfen).
-- `/archiv/Datenschutz.md` ist ein Pflicht-Ergebnis: kindgerecht verständlich, geht vorab an Lehrkräfte und Erziehungsberechtigte, Kinder sollen es selbst lesen, verstehen und hinterfragen können. Es erklärt den Datenweg pro Station und den Unterschied Programm / KI / generative KI. Bei jeder Änderung an Datenflüssen aktualisieren. Bis zum eigenen Datenschutz-Schritt (Roadmap 7) werden die Punkte in `docs/datenschutz-notizen.md` gesammelt, `Datenschutz.md` bleibt solange unverändert.
+- Der Workshop-Server ist Patricias Laptop im KOMEZ-WLAN. Er nimmt die Ergebnisse der Kinder an (Fotos, Stempel, Antworten). An einen Online-Dienst gibt er nur die Baukasten-Texte der zwei **optionalen** Claude-Stationen weiter (Anthropic), nie Fotos oder Namen.
+- Daten werden nach dem Workshop gelöscht, auf dem Laptop spätestens eine Woche danach. Abgabe der Ergebnisse als ZIP pro Paar (USB-Stick an die Lehrkraft, Verteilung über die Schulplattform).
+- `Datenschutz.md` ist ein Pflicht-Ergebnis: im Stil der Stationstexte, kindgerecht, geht vorab an Lehrkräfte und Erziehungsberechtigte, Kinder sollen es selbst lesen, verstehen und hinterfragen können. Es erklärt den Datenweg pro Station und den Unterschied Programm / KI / generative KI. **Bei jeder Änderung an Datenflüssen `Datenschutz.md` mit ändern** (und das Etikett `datenweg` der Station). `archiv/Datenschutz.md` ist der Schriftwechsel mit dem KOMEZ, nicht die Datenschutzinformation.
 - Beim Bau neuer Funktionen immer fragen: Wohin gehen die Daten? Wie lange bleiben sie? Wer kann sie sehen?
 
 ## Lokaler Server und Lasercut
 
-- Der Server sammelt die Werke der Kinder (Foto-Ergebnis, Stempel-Datei, Antworten) pro Paar und nimmt sie auch nachträglich entgegen. Am Ende entsteht ein ZIP pro Paar bzw. gesamt.
-- Lasercut-Warteschlange: Stempel werden automatisch auf einer A4-Pappelsperrholz-Platte angeordnet (Ziel: Platte möglichst schnell füllen), dann als ein Auftrag an den Mr Beam geschickt, 2× gravieren.
-- Statusmeldungen an die Paare: „Laser startet“, „Laser fertig“, „Bitte Stempel abholen“.
-- Als mögliches Vorbild für Upload und Queue dient `archiv/00_fotobox-karte` (lokal).
-- Ob der Server auf dem Windows-Rechner (verbunden über find.mrbeam) oder dem Ubuntu-Rechner läuft, ist **offen** (siehe unten).
+- Der Server sammelt die Werke der Kinder (Fotos, Stempel-Datei, Antworten) pro Paar und nimmt sie auch nachträglich entgegen (Outbox). Am Ende soll ein ZIP pro Paar bzw. gesamt entstehen (**noch nicht gebaut**).
+- Holzplatte: Die Laptop-Seite ordnet die Stempel (älteste zuerst) auf einer A4-Pappelsperrholz-Platte an (5 mm Rand, 3 mm Abstand). Patricia lädt die SVG in die Mr-Beam-Oberfläche, 2× gravieren. Keine Mr-Beam-Schnittstelle.
+- Stickerfolie: Die Laptop-Seite ordnet Sticker auf A4 an und schickt sie an die Silhouette Cameo 4 (Stift + Messer, `server/plotter.py`, Vorbild `archiv/00_fotobox-karte`).
+- Statusmeldungen an die Paare über „📣 Wird gelasert“ / „📣 Fertig, abholen“, die iPads fragen einmal pro Minute nach.
+- Server läuft auf dem **Ubuntu-Laptop** (entschieden). Nach Updates neu starten, die Laptop-Seite zeigt dann einen Hinweis.
+- Claude-API: Schlüssel nur in `~/.config/stencilme/anthropic-key` (chmod 600), legt Patricia selbst an. **Claude liest den Schlüssel nie aus und er kommt nie in den Chat oder ins Repo.** `~/.config/stencilme/token` gehört zu `00_fotobox-karte`: nicht anfassen.
 
-## Entscheidungen (Stand: Schritt 0)
+## Entscheidungen (Stand: 24.10.2026)
 
 Details, Netzplan und Testprotokoll stehen in `docs/entscheidungen.md`. Neue Entscheidungen dort festhalten.
 
@@ -129,12 +136,12 @@ Grundsatz: **Jede Ausbaustufe muss den Workshop allein tragen**, die alte Stufe 
 
 Zurückgestellt (nach dem Workshop, nur bei Bedarf): eigener Router, HTTPS mit `workshop.datenhandlung.de` (`docs/https-einrichten.md`, INWX-Zugangsdaten nie ins Repo), Laser-Queue.
 
-Noch offen:
+4. Dateien an die Kinder: ZIP pro Paar auf USB-Stick an die Lehrkraft (entschieden, Export noch nicht gebaut).
+5. Claude-Stationen: Claude-API mit eigenem Schlüssel und Ausgabenlimit (nicht das Pro-Abo), Modell Sonnet 5.5, nur Baukasten/Lückentext, **optional** (entschieden).
+6. Canva ersetzt: „Hintergrund ändern“ lokal mit BodyPix, KI-Selbstporträt über Claude ohne Foto (entschieden).
+7. Freier Ablauf: Die App schlägt Stationen nach `braucht` und `plaetze` vor, keine Rotation (entschieden).
 
-4. Wie kommen die Dateien zu den Kindern? ZIP auf USB-Stick an die Lehrkraft ist der aktuelle Plan, Alternativen prüfen.
-5. Claude-Station in der App: API-Zugang hinterlegen, Interaktion auf die vorgegebene Aufgabe begrenzen. Eigenes Unterprojekt. Ein API-Schlüssel mit Ausgabenlimit ist etwas anderes als das Claude-Konto der CLI. Nutzungsbedingungen prüfen.
-6. Canva und KI-Selbstporträt: ersetzen, ohne das private Canva-Konto. Hintergrund-Tausch lokal mit BodyPix. Generative Bilder nur mit geprüftem Datenschutz, möglichst ohne Foto der Kinder (nur Prompt aus Baukasten).
-7. Gilt die frühere Idee mit Erklärer-/Macher-Rotation noch, oder durchlaufen Paare die Stationen frei?
+Noch offen: Einwilligung (wer holt sie ein?), Test vor Ort am 02.11.2026, iPad-Modelle und iPadOS-Version im KOMEZ.
 
 ## Roadmap (Schritt für Schritt, ein Schritt pro Branch)
 
@@ -160,7 +167,7 @@ Patricia möchte durch die Entwicklung geführt werden. Immer nur den aktuellen 
 - c) **Minimaler Upload**: Server + Startskript mit QR-Code. In der App: „Stempel speichern“, „An Laptop senden“, „Teilen“.
 - d) Testlauf im KOMEZ spätestens eine Woche vorher.
 
-**Stand 24.10.2026:** b) und c) sind erledigt. Jetzt wird die Stationen-App **Screen für Screen** gebaut, nach Patricias Beschreibung in `docs/screens.md`. Nicht auf Tests warten. Gesamttest vor Ort am **02.11.2026**. Funktionen aus `index.html` wandern erst dann in Stationen bzw. `app/core/`, wenn ein Screen sie braucht.
+**Stand 24.10.2026:** b) und c) sind erledigt. Die Stationen-App ist bis auf die Punkte unten gebaut: Stationen, Offline-Gerüst, Laptop-Seite mit Platte, Folie, Plotter, Nachrichten, Feedback, Auswertung, Claude-Stationen, Texte geprüft, `Datenschutz.md`. **Offen:** ZIP-Export und „Meine Daten“, Station Berufe, Kunst-Quiz mit Bildern (nur über den Laptop), Test vor Ort am 02.11.2026. Das große Aufräumen von `stencil.html` (Roadmap 1) ist zurückgestellt. Jetzt wird die Stationen-App **Screen für Screen** gebaut, nach Patricias Beschreibung in `docs/screens.md`. Nicht auf Tests warten. Gesamttest vor Ort am **02.11.2026**. Funktionen aus `index.html` wandern erst dann in Stationen bzw. `app/core/`, wenn ein Screen sie braucht.
 
 0. **Infrastruktur klären**: erledigt, siehe `docs/entscheidungen.md`.
 1. **`index.html` reviewen, aufräumen, aufteilen** (siehe Ziel ganz oben): Funktionsliste mit Empfehlung, Freigabe, dann in Stationen `lasercut-stempel`, `lasercut-portraet`, `schneideplotter` plus gemeinsamem Kern zerlegen.
