@@ -1,0 +1,63 @@
+/* Gemeinsames Aussehen der Stationen, angelehnt an index.html */
+:root{
+  --ink:#111; --paper:#fff; --panel:#fff; --neon:#ff2d95; --kraft:#b89b74; --muted:#4a4a4a;
+  --head:'Oswald','Arial Narrow',sans-serif;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;padding:16px 16px 80px;font-size:1.1rem;line-height:1.4;}
+h1,h2{font-family:var(--head);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px;}
+h1{font-size:1.8rem;}
+h2{font-size:1.15rem;margin-top:22px;}
+.panel{background:var(--panel);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--neon);padding:20px;margin:0 auto 24px;max-width:760px;}
+
+button,.knopf-link{font-family:var(--head);font-size:1rem;text-transform:uppercase;letter-spacing:.1em;border:3px solid var(--ink);background:var(--ink);color:#fff;padding:12px 18px;cursor:pointer;display:inline-block;text-decoration:none;margin:6px 6px 6px 0;-webkit-appearance:none;border-radius:0;}
+button:hover,.knopf-link:hover{background:var(--neon);color:var(--ink);}
+button.secondary,.knopf-link{background:#fff;color:var(--ink);}
+button.gross{font-size:1.25rem;padding:16px 26px;margin-top:20px;}
+button:disabled{opacity:.35;cursor:not-allowed;background:#888;}
+
+/* Kopfleiste mit Puzzle */
+#kopf{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;max-width:760px;margin:0 auto 20px;}
+.puzzles{display:flex;gap:14px;}
+.puzzle{width:96px;text-align:center;}
+.puzzle-feld{display:grid;gap:2px;aspect-ratio:1/1;width:96px;height:96px;}
+.puzzle-teil{border:2px dashed #bbb;background:#f4f4f4;}
+.puzzle-teil.da{border:2px solid var(--ink);background-color:var(--neon);}
+.puzzle-name{font-family:var(--head);text-transform:uppercase;font-size:.85rem;margin-top:4px;word-break:break-all;}
+.zaehler{font-family:var(--head);font-size:1.3rem;text-transform:uppercase;}
+.sync{width:100%;font-size:.85rem;color:var(--muted);}
+
+/* Etiketten: Typ und Datenweg */
+.etiketten{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.etikett{font-family:var(--head);text-transform:uppercase;font-size:.8rem;letter-spacing:.08em;border:2px solid var(--ink);padding:3px 8px;}
+.etikett.typ-ki{background:var(--neon);}
+.etikett.typ-generativ{background:var(--ink);color:#fff;}
+.etikett.typ-analog{background:var(--kraft);}
+
+.schritte{padding-left:1.4em;}
+.schritte li{margin-bottom:8px;}
+.check,.eingaben{margin:18px 0;}
+.foto-feld{margin-bottom:16px;}
+.foto-vorschau{display:block;max-width:220px;max-height:220px;border:3px solid var(--ink);margin-top:8px;}
+.eingabe{display:block;margin-bottom:12px;}
+.eingabe span{display:block;font-weight:700;margin-bottom:4px;}
+textarea{width:100%;font:inherit;border:3px solid var(--ink);padding:8px;border-radius:0;}
+.haken{display:flex;align-items:center;gap:10px;font-family:var(--head);text-transform:uppercase;font-size:1.1rem;}
+.haken input{width:28px;height:28px;accent-color:var(--neon);}
+.hinweis{color:var(--muted);font-size:.95rem;}
+.datenschutz{font-size:.9rem;background:#f4f4f4;padding:8px 10px;border-left:4px solid var(--ink);}
+.gross-text{font-size:1.4rem;}
+
+/* Abschlussfragen */
+.auswahl{display:flex;flex-wrap:wrap;}
+button.wahl{background:#fff;color:var(--ink);text-transform:none;letter-spacing:0;font-family:inherit;}
+button.wahl.an{background:var(--neon);}
+.aufloesung{margin-top:8px;}
+.aufloesung .etikett{margin-left:6px;}
+.sterne{display:flex;gap:4px;}
+button.stern{background:#fff;color:#ccc;font-size:2rem;padding:4px 10px;line-height:1;margin:0;}
+button.stern.an{color:var(--neon);}
+
+.fehler{position:fixed;left:16px;right:16px;bottom:16px;background:var(--neon);border:3px solid var(--ink);padding:12px;font-weight:700;z-index:10;}
+.test-leiste{position:fixed;right:8px;top:8px;background:#ffe;border:2px dashed var(--ink);padding:4px 8px;font-size:.8rem;z-index:5;}
+.test-leiste button{font-size:.7rem;padding:4px 8px;margin:0;}

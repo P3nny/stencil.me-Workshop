@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Station · stencil.me</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="stencil.me">
+<link href="/vendor/fonts/fonts.css" rel="stylesheet">
+<link href="/app/core/werkstatt.css" rel="stylesheet">
+</head>
+<body>
+<!-- Allgemeine Stationsseite: station.html?id=<station>. Inhalte aus /stationen/<id>.json -->
+<header id="kopf"></header>
+<main id="inhalt"><section class="panel"><p>Station wird geladen …</p></section></main>
+<div class="fehler" id="fehler" role="alert" hidden></div>
+<script src="/app/core/speicher.js"></script>
+<script src="/app/core/outbox.js"></script>
+<script src="/app/core/bild.js"></script>
+<script src="/app/core/stationen.js"></script>
+<script src="/app/core/rahmen.js"></script>
+<script>
+  const treffer = /[?&]id=([a-z0-9-]+)/.exec(location.search);
+  if(treffer) Rahmen.station(treffer[1]);
+  else Rahmen.fehler('Keine Station angegeben. Bitte den QR-Code an der Station scannen.');
+</script>
+</body>
+</html>
