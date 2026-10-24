@@ -79,7 +79,9 @@
         galerie.innerHTML = '';
         eintrag.bilder.slice().reverse().forEach(b => galerie.appendChild(karte(b, false)));
         const genutzt = eintrag.bilder.length;
-        rest.textContent = genutzt ? 'Ihr habt ' + genutzt + ' von ' + ki.proGruppe + ' Bildern erzeugt.' : 'Ihr könnt bis zu ' + ki.proGruppe + ' Bilder erzeugen.';
+        const fehlen = Math.max(0, (ki.mindestBilder || 1) - genutzt);
+        rest.textContent = (genutzt ? 'Ihr habt ' + genutzt + ' von höchstens ' + ki.proGruppe + ' Bildern erzeugt. ' : 'Ihr könnt bis zu ' + ki.proGruppe + ' Bilder erzeugen. ') +
+          (fehlen ? 'Noch ' + fehlen + (fehlen === 1 ? ' Bild' : ' Bilder') + ', dann könnt ihr die Station beenden.' : '✓ Genug Bilder: Ihr könnt die Station beenden oder weiter ausprobieren.');
         erzeugenKnopf.disabled = genutzt >= ki.proGruppe || eintrag.ohneKi;
       }
 
