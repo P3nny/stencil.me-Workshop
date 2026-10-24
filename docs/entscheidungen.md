@@ -97,6 +97,7 @@ Umschalten zwischen den Plänen heißt: einen anderen QR-Code zeigen. Was bei Pr
 - **Rohfoto bleibt auf dem iPad** (IndexedDB). Das Paar behält sein iPad für alle Stationen.
 - **Laser:** Der Laptop ordnet die Stempel auf einer A4-SVG an, Patricia lädt sie in die Mr-Beam-Oberfläche. Einzelne Stempel bleiben möglich. Keine Mr-Beam-Schnittstelle.
 - **Anzahl Schüler:innen** gibt Patricia auf der Laptop-Seite ein.
+- **Safari statt Home-Bildschirm-App:** Die QR-Codes an den Stationen öffnen Safari. Eine Home-Bildschirm-App hat einen eigenen Speicher. Alle Stationen unter derselben Adresse teilen auf einem iPad einen Speicher, andere iPads sehen ihn nicht. Die Fotos liegen in den Website-Daten von Safari (IndexedDB), nicht in der Fotos-App. Die Adresse darf während des Workshops nicht wechseln. Nach dem Workshop werden die Website-Daten auf jedem iPad gelöscht.
 - **Canva fällt weg**, die Greenscreen-Station wird eine eigene Seite mit festen, gemeinfreien Hintergründen.
 - **Test am Rechner** mit Playwright-WebKit (dieselbe Engine wie Safari). Kamera, Speicher und Tempo alter iPads prüft nur das echte iPad.
 

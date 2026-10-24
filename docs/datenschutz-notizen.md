@@ -20,6 +20,8 @@ Sammlung, kein fertiger Text. Wird in einem eigenen Schritt zu einer kindgerecht
 - **Wer sieht was:** Die iPads können nur abfragen, wie viele Gruppen an jeder Station sind (ohne Namen). Gruppen, Antworten und Fotos sieht nur die Laptop-Seite.
 - **Löschen:** „Alle Daten löschen“ auf der Laptop-Seite löscht Stempel, Antworten und Fotos. Auf dem iPad: noch offen (Roadmap 8), zum Testen `?test` → „Alles zurücksetzen“.
 
+- **Speicher auf dem iPad:** Fotos liegen in den Website-Daten von Safari (IndexedDB `werkstatt`), nicht in der Fotos-App. Alle Stationen derselben Adresse auf diesem iPad sehen sie, andere iPads nicht. **Bleiben, bis sie gelöscht werden:** Nach dem Workshop Website-Daten löschen, sonst sieht die nächste Gruppe am iPad die Fotos.
+
 ## Was an den Laptop geht (Plan A)
 
 - **Stempel-Datei (SVG)** und **Vorname oder Kürzel**, mehr nicht. Kein Foto.

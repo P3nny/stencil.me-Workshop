@@ -28,7 +28,8 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
   - Der Browser öffnet die Laptop-Seite mit QR-Code und Stempel-Liste.
   - Der Laptop geht nicht in den Ruhezustand, solange das Terminal-Fenster offen ist.
 - [ ] Laptop-Bildschirm mit dem QR-Code zu den iPads drehen
-- [ ] Pro iPad: QR-Code scannen, Seite öffnen, Teilen → „Zum Home-Bildschirm“, App vom Home-Bildschirm starten, ein Testfoto machen
+- [ ] Pro iPad: Einstellungen → Safari → Erweitert → Website-Daten: alte Daten der Workshop-Adresse löschen (Fotos der letzten Gruppe)
+- [ ] Pro iPad: QR-Code in **Safari** öffnen (nicht „Zum Home-Bildschirm“), ein Testfoto machen, danach mit `?test` → „Alles zurücksetzen“
 - [ ] App offen lassen, nicht neu laden
 
 ## 4. Während des Workshops
@@ -41,5 +42,6 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 ## 5. Nach dem Workshop
 
 - [ ] Stempel auf USB-Stick sichern, falls sie noch gebraucht werden
-- [ ] Laptop-Seite: „Alle Stempel löschen“
+- [ ] Laptop-Seite: „Alle Daten löschen“
+- [ ] Pro iPad: Website-Daten in Safari löschen (bis es in der App einen Knopf dafür gibt)
 - [ ] Terminal-Fenster schließen (Server aus)

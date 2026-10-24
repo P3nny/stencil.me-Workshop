@@ -26,7 +26,7 @@ Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Cl
   - Danach: Vorschlag für die nächste Station (Voraussetzungen + freie Plätze)
 - Laptop-Seite: Anzahl Schüler:innen, Tabelle der Gruppen (gerade an, geschafft, Fotos), „Alle Daten löschen“
 - Zum Ausprobieren ohne Anmeldung: `?test` an die Adresse hängen → „Test-Gruppe anlegen“, „Alles zurücksetzen“
-- *Offen: Der QR-Code öffnet die Seite im Safari-Tab. Eine App auf dem Home-Bildschirm hat auf dem iPad einen eigenen Speicher → siehe Frage vor Screen 1.*
+- Alles läuft im normalen Safari, ohne Home-Bildschirm (entschieden 24.10.). Start: ein QR-Code in der Startpräsentation. An jeder Station: QR-Code öffnet einen neuen Safari-Tab mit demselben Speicher.
 
 ## Screen 1: Check-in (Startseite)
 
