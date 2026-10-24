@@ -487,6 +487,21 @@ async function abschliessen(page, sterne){
   await laptop.waitForSelector('.stamp.placed');
   pruefe(true, 'Stempel danach grau markiert');
 
+  console.log('Nachricht vom Laptop an die Gruppe');
+  await laptop.waitForSelector('.history-row');
+  await laptop.click('.history-row button:has-text("Wird gelasert")');
+  await laptop.waitForSelector('.history-row .sent');
+  await page.goto(BASE + '/app/station.html?id=lasercutter');
+  await page.waitForSelector('.nachricht', { timeout: 20000 });
+  const nachricht = await page.locator('.nachricht p').first().textContent();
+  pruefe(/Der Stempel von Ada und Bo wird jetzt gelasert/.test(nachricht), 'iPad zeigt: ' + nachricht);
+  await page.click('.nachricht button:has-text("OK")');
+  await page.waitForFunction(() => !document.querySelector('.nachricht'));
+  await page.reload();
+  await page.waitForSelector('h1');
+  await page.waitForTimeout(1500);
+  pruefe(await page.locator('.nachricht').count() === 0, 'nach OK bleibt die Nachricht weg');
+
   pruefe(konsolenFehler.length === 0, 'keine JavaScript-Fehler' + (konsolenFehler.length ? ': ' + konsolenFehler.join(' | ') : ''));
   await browser.close();
   console.log(fehler ? fehler + ' Fehler' : 'Alles in Ordnung');

@@ -79,6 +79,12 @@
         el('span', { text: ' Stationen geschafft' })
       ]));
       kopf.appendChild(el('div', { klasse: 'sync', id: 'sync' }));
+      // Nachrichten vom Laptop (einmal pro Seite starten, der Kopf wird öfter neu gezeichnet)
+      if(window.Nachrichten && !nachrichtenBox){
+        nachrichtenBox = el('div');
+        kopf.parentNode.insertBefore(nachrichtenBox, kopf);
+        Nachrichten.starten(nachrichtenBox, gruppe.id);
+      }
       if(!syncBeobachtet){
         syncBeobachtet = true;
         Outbox.beobachten(syncAnzeigen);
@@ -88,6 +94,7 @@
   }
 
   let syncBeobachtet = false;
+  let nachrichtenBox = null;
   function syncAnzeigen(stand){
     const box = document.getElementById('sync');
     if(!box) return;

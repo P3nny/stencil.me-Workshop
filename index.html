@@ -75,6 +75,7 @@
 <!-- 4. Angemeldet: weiter zum Foto (oder zur aktuellen Station) -->
 <section class="screen" id="s-weiter" hidden>
   <div class="inner">
+    <div id="nachrichten"></div>
     <h2 class="frage" id="gruss">Hallo!</h2>
     <p class="gruss" id="auftrag"></p>
     <a class="start" id="weiterLink" href="/app/station.html?id=foto">📸 Zur Foto-Station</a>
@@ -86,6 +87,7 @@
 <script src="/app/core/speicher.js"></script>
 <script src="/app/core/outbox.js"></script>
 <script src="/app/core/stationen.js"></script>
+<script src="/app/core/nachrichten.js"></script>
 <script src="/app/core/rahmen.js"></script>
 <script>
 (function(){
@@ -163,7 +165,10 @@
     Speicher.schreiben('gruppe', gruppe)
       .then(() => Stationen.fortschrittSpeichern(f))
       .then(() => Outbox.ereignis(gruppe.id, 'anmeldung', '', { personen: personen }))
-      .then(() => weiterZeigen(gruppe, f, null))
+      .then(() => {
+        weiterZeigen(gruppe, f, null);
+        Nachrichten.starten(document.getElementById('nachrichten'), gruppe.id);
+      })
       .catch(err => Rahmen.fehler('Anmelden hat nicht geklappt. Bitte nochmal versuchen.', err));
   });
 
@@ -181,7 +186,11 @@
 
   // Schon angemeldet (QR-Code nochmal gescannt, Seite neu geladen)? Dann direkt weiter
   Promise.all([Speicher.lesen('gruppe'), Stationen.fortschritt(), stationenGeladen])
-    .then(werte => { if(werte[0]) weiterZeigen(werte[0], werte[1], werte[2]); })
+    .then(werte => {
+      if(!werte[0]) return;
+      weiterZeigen(werte[0], werte[1], werte[2]);
+      Nachrichten.starten(document.getElementById('nachrichten'), werte[0].id);
+    })
     .catch(err => console.error(err));
 })();
 </script>

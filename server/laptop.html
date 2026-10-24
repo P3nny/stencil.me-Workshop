@@ -39,6 +39,9 @@
   .plate-info { flex:1; min-width:260px; }
   .plate-info ul { padding-left:1.2em; }
   .plate-info .warn { background:var(--neon); border:2px solid var(--ink); padding:8px; font-weight:700; }
+  .history-row { display:flex; flex-wrap:wrap; align-items:center; gap:10px; border-bottom:2px solid var(--ink); padding:8px 0; }
+  .history-row button { margin-top:0; }
+  .history-row .sent { color:#1e7a3c; font-weight:700; }
   .settings { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .settings input { font-size:1.2rem; width:80px; border:3px solid var(--ink); padding:6px; }
   .settings button { margin-top:0; }
@@ -87,6 +90,9 @@
         <button id="resetPlaced" type="button">Grau-Markierung zurücksetzen</button>
       </div>
     </div>
+    <h2 style="margin-top:20px">Letzte Platten: Nachricht an die Kinder</h2>
+    <div class="hint">Die Nachricht erscheint auf den iPads der Gruppen, deren Stempel auf der Platte sind.</div>
+    <div id="plateHistory"></div>
   </div>
   <div class="panel groups-panel">
     <h2>Gruppen an den Stationen</h2>
@@ -139,11 +145,14 @@
   // ---- A4-Platte: Stempel automatisch anordnen ----
   var PLATE_W = 210, PLATE_H = 297, MARGIN = 5, GAP = 3; // mm
   var PLACED_KEY = "stencilme-auf-platte";
+  var HISTORY_KEY = "stencilme-platten";
+  var HISTORY_MAX = 10;
   var selection = {}; // pfad -> true/false (von Hand geändert)
   var placed = loadPlaced();
   var stampList = [];
   var plateSvg = null;
   var platePaths = [];
+  var plateStamps = [];
 
   function loadPlaced() {
     try { return JSON.parse(localStorage.getItem(PLACED_KEY) || "[]"); } catch (e) { return []; }
@@ -218,6 +227,7 @@
       var groups = result.fits.map(function (it, n) { return stampGroup(it.text, n, it.x, it.y); }).join("");
       plateSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + PLATE_W + " " + PLATE_H + '" width="' + PLATE_W + 'mm" height="' + PLATE_H + 'mm">' + groups + "</svg>";
       platePaths = result.fits.map(function (it) { return it.s.pfad; });
+      plateStamps = result.fits.map(function (it) { return { name: it.s.name, gruppe: it.s.gruppe }; });
       document.getElementById("platePreview").innerHTML = plateSvg;
       var html = "<p><b>" + result.fits.length + " Stempel</b> auf der Platte: " +
         result.fits.map(function (it) { return it.s.name; }).join(", ") + "</p>";
@@ -229,6 +239,83 @@
     }).catch(function () {
       summary.innerHTML = '<p class="warn">Stempel konnten nicht geladen werden.</p>';
     });
+  }
+
+  // ---- Nachrichten an die Gruppen einer Platte ----
+  var MESSAGES = {
+    laser: { knopf: "📣 Wird gelasert", text: function (namen) { return "Der Stempel von " + namen + " wird jetzt gelasert. Kommt gern zum Zuschauen!"; } },
+    fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { return "Der Stempel von " + namen + " ist fertig! Holt ihn bei Penny am Lasercutter ab."; } }
+  };
+
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch (e) { return []; }
+  }
+  function saveHistory(h) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h.slice(0, HISTORY_MAX))); } catch (e) { /* nur Komfort */ }
+  }
+
+  function namenListe(namen) {
+    return namen.length > 1 ? namen.slice(0, -1).join(", ") + " und " + namen[namen.length - 1] : namen[0];
+  }
+
+  // Pro Gruppe eine eigene Nachricht mit den Namen ihrer Stempel auf dieser Platte
+  function notify(plate, art, feedback) {
+    var proGruppe = {};
+    plate.stempel.forEach(function (s) {
+      if (!s.gruppe) return;
+      (proGruppe[s.gruppe] = proGruppe[s.gruppe] || []).push(s.name);
+    });
+    var gruppen = Object.keys(proGruppe);
+    if (!gruppen.length) {
+      feedback.textContent = "Keine Gruppe bekannt (alte Stempel ohne Gruppe).";
+      return;
+    }
+    Promise.all(gruppen.map(function (g) {
+      return fetch("/api/nachricht", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gruppen: [g], text: MESSAGES[art].text(namenListe(proGruppe[g])) })
+      }).then(function (r) { if (!r.ok) throw new Error(r.status); });
+    })).then(function () {
+      plate.gesendet = plate.gesendet || {};
+      plate.gesendet[art] = new Date().toTimeString().slice(0, 5);
+      var h = loadHistory().map(function (p) { return p.datei === plate.datei ? plate : p; });
+      saveHistory(h);
+      renderHistory();
+    }).catch(function () {
+      feedback.textContent = "Senden hat nicht geklappt.";
+    });
+  }
+
+  function renderHistory() {
+    var box = document.getElementById("plateHistory");
+    box.innerHTML = "";
+    loadHistory().forEach(function (plate) {
+      var row = document.createElement("div");
+      row.className = "history-row";
+      var label = document.createElement("span");
+      label.innerHTML = "<b></b> ";
+      label.firstChild.textContent = plate.datei;
+      label.appendChild(document.createTextNode(plate.stempel.map(function (s) { return s.name; }).join(", ")));
+      row.appendChild(label);
+      var feedback = document.createElement("span");
+      Object.keys(MESSAGES).forEach(function (art) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = MESSAGES[art].knopf;
+        b.addEventListener("click", function () { notify(plate, art, feedback); });
+        row.appendChild(b);
+        if (plate.gesendet && plate.gesendet[art]) {
+          var ok = document.createElement("span");
+          ok.className = "sent";
+          ok.textContent = "✓ " + plate.gesendet[art];
+          row.appendChild(ok);
+        }
+      });
+      row.appendChild(feedback);
+      box.appendChild(row);
+    });
+    if (!box.children.length) box.innerHTML = '<div class="hint">Noch keine Platte heruntergeladen.</div>';
   }
 
   document.getElementById("buildPlate").addEventListener("click", buildPlate);
@@ -243,6 +330,10 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
     platePaths.forEach(function (p) { if (placed.indexOf(p) < 0) placed.push(p); delete selection[p]; });
     savePlaced();
+    var history = loadHistory();
+    history.unshift({ datei: a.download, stempel: plateStamps });
+    saveHistory(history);
+    renderHistory();
     loadList();
   });
   document.getElementById("resetPlaced").addEventListener("click", function () {
@@ -434,6 +525,7 @@
   loadList();
   loadKi();
   loadSticker();
+  renderHistory();
   setInterval(function () { loadList(); loadGroups(); loadKi(); loadSticker(); }, 5000);
 })();
 </script>

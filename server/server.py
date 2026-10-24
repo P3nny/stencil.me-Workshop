@@ -25,6 +25,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import threading
 import urllib.parse
 
 import ki_bild
@@ -37,6 +38,9 @@ STICKER_DIR = os.path.join(DATA_ROOT, "sticker")  # für den Schneideplotter (Bo
 GROUPS_DIR = os.path.join(DATA_ROOT, "gruppen")
 SETTINGS_FILE = os.path.join(DATA_ROOT, "einstellungen.json")
 KI_LOG_FILE = os.path.join(DATA_ROOT, "ki-protokoll.jsonl")
+MESSAGES_FILE = os.path.join(DATA_ROOT, "nachrichten.json")  # Laptop -> Gruppen („wird gelasert“, „fertig“)
+MAX_MESSAGE_LEN = 300
+messages_lock = threading.Lock()
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MAX_EVENT_BYTES = 64 * 1024
 DEFAULT_SETTINGS = {"schueler": 26}
@@ -64,12 +68,12 @@ def find_stamp(stamp_id, base=DATA_DIR):
     """Return the stored file name for an upload id, or None."""
     if not os.path.isdir(base):
         return None
-    suffix = "_" + stamp_id + ".svg"
     for day in os.listdir(base):
         day_dir = os.path.join(base, day)
         if os.path.isdir(day_dir):
             for f in os.listdir(day_dir):
-                if f.endswith(suffix):
+                # Zeit_Name_ID.svg (alt) oder Zeit_Name_ID_Gruppe.svg
+                if f.endswith(".svg") and f[:-4].split("_")[2:3] == [stamp_id]:
                     return day + "/" + f
     return None
 
@@ -91,8 +95,30 @@ def list_stamps(base=DATA_DIR):
                     "tag": day,
                     "zeit": parts[0][:2] + ":" + parts[0][2:4] if parts and len(parts[0]) >= 4 else "",
                     "name": parts[1] if len(parts) > 1 else "",
+                    "gruppe": parts[3] if len(parts) > 3 and ID_RE.match(parts[3]) else "",
                 })
     return result
+
+
+def read_messages():
+    try:
+        with open(MESSAGES_FILE, encoding="utf-8") as fh:
+            data = json.load(fh)
+        return data if isinstance(data, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def add_message(groups, text):
+    """Nachricht an mehrere Gruppen. Jede Gruppe sieht nur ihre eigenen."""
+    entry = {"id": os.urandom(6).hex(), "zeit": datetime.datetime.now().isoformat(timespec="seconds"), "text": text}
+    with messages_lock:
+        data = read_messages()
+        for g in groups:
+            data.setdefault(g, []).append(entry)
+        os.makedirs(DATA_ROOT, exist_ok=True)
+        write_atomic(MESSAGES_FILE, json.dumps(data, ensure_ascii=False).encode("utf-8"))
+    return entry
 
 
 def write_atomic(path, data):
@@ -229,6 +255,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json(read_settings())
         if path == "/api/ki-bereit":
             return self.send_json({"eingerichtet": ki_bild.eingerichtet()})
+        if path == "/api/nachrichten":
+            # Nur die eigene Gruppe: Die ID ist zufällig und nur dem eigenen iPad bekannt
+            group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
+            if not ID_RE.match(group_id):
+                return self.send_json({"nachrichten": []})
+            return self.send_json({"nachrichten": read_messages().get(group_id, [])})
 
         if path in ("/laptop", "/qr", "/api/liste", "/api/sticker", "/api/info", "/api/gruppen", "/api/ki-status") or path.startswith(("/daten/", "/dateien/", "/sticker/")):
             if not self.is_local():
@@ -289,16 +321,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.receive_file(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/ki-bild":
             return self.ki_bild()
-        if parsed.path in ("/api/alle-loeschen", "/api/einstellungen") and not self.is_local():
+        if parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht") and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
         if parsed.path == "/api/einstellungen":
             return self.save_settings()
+        if parsed.path == "/api/nachricht":
+            return self.send_message()
         if parsed.path == "/api/alle-loeschen":
             for d in (DATA_DIR, STICKER_DIR, GROUPS_DIR):
                 if os.path.isdir(d):
                     shutil.rmtree(d)
-            if os.path.exists(KI_LOG_FILE):
-                os.remove(KI_LOG_FILE)
+            for f in (KI_LOG_FILE, MESSAGES_FILE):
+                if os.path.exists(f):
+                    os.remove(f)
             print("Alle Stempel, Antworten, Fotos und KI-Bilder gelöscht.")
             return self.send_json({"ok": True})
         return self.send_error(404)
@@ -379,6 +414,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except ki_bild.KiFehler as err:
             return self.send_json({"ok": False, "fehler": err.text}, err.status)
 
+    def send_message(self):
+        body = self.read_body(MAX_EVENT_BYTES)
+        try:
+            data = json.loads(body.decode("utf-8")) if body else {}
+        except ValueError:
+            data = {}
+        groups = [g for g in data.get("gruppen", []) if isinstance(g, str) and ID_RE.match(g)]
+        text = str(data.get("text", "")).strip()[:MAX_MESSAGE_LEN]
+        if not groups or not text:
+            return self.send_json({"ok": False, "fehler": "Gruppen oder Text fehlen"}, 400)
+        add_message(sorted(set(groups)), text)
+        print("Nachricht an %d Gruppe(n): %s" % (len(set(groups)), text))
+        return self.send_json({"ok": True, "gruppen": len(set(groups))})
+
     def save_settings(self):
         body = self.read_body(MAX_EVENT_BYTES)
         try:
@@ -397,6 +446,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def receive_stamp(self, query):
         stamp_id = (query.get("id") or [""])[0]
         name = clean_name((query.get("name") or [""])[0])
+        group_id = (query.get("gruppe") or [""])[0]
+        group_id = group_id if ID_RE.match(group_id) else ""
         if not ID_RE.match(stamp_id):
             return self.send_json({"ok": False, "fehler": "ungültige ID"}, 400)
         body = self.read_body(MAX_UPLOAD_BYTES)
@@ -415,7 +466,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         now = datetime.datetime.now()
         day_dir = os.path.join(base, now.strftime("%Y-%m-%d"))
         os.makedirs(day_dir, exist_ok=True)
-        filename = "%s_%s_%s.svg" % (now.strftime("%H%M%S"), name, stamp_id)
+        filename = "%s_%s_%s%s.svg" % (now.strftime("%H%M%S"), name.replace("_", "-"), stamp_id, "_" + group_id if group_id else "")
         tmp = os.path.join(day_dir, filename + ".tmp")
         with open(tmp, "wb") as fh:
             fh.write(body)

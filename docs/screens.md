@@ -179,6 +179,13 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - **15 Bonus: Sticker** (`sticker`): einzige Bonus-Station. Geht auf ab 8 geschafften Stationen, darunter Foto, Bild bearbeiten, Lasercutter, Stempel drucken. Zählt nicht zu „x von y“. Gleiche fünf Schritte wie „Bild bearbeiten“, am Ende Sticker für den Schneideplotter (schwarze Silhouette = Folie, roter Schnitt, nicht gespiegelt, wie `buildPlotterSvg` in `stencil.html` ohne Schraffur). Landet auf dem Laptop im eigenen Ordner `server/daten/sticker`, Laptop-Seite zeigt sie mit „Herunterladen“
 - Station 9 geändert (Patricia, 24.10.): nach 2 Bildern weiter, egal welcher Stil. Hinweis „Noch 1 Bild …“
 
+## Laptop-Ausbau (ab 24.10. abends, Branches `feature/laptop-ausbau`, `feature/nachrichten`, …)
+
+- KI-Selbstporträt mit Sonnet 5.5 (siehe `docs/entscheidungen.md` Punkt 5)
+- Abschluss jeder Station: erst Auflösungen, dann „Was hast du genutzt?“ (neu: „Ohne Computer“), dann Sterne
+- Alle Fotos gehen an den Laptop, auch das Ausgangsfoto und verworfene Versuche
+- **Nachrichten an die Gruppen:** Stempel und Sticker tragen die Gruppen-ID im Dateinamen. Laptop-Seite → „Letzte Platten“: pro Platte „📣 Wird gelasert“ und „📣 Fertig, abholen“. Jede Gruppe bekommt eine eigene Nachricht mit ihren Namen, die iPads zeigen sie oben an (Abfrage alle 15 s), „OK“ blendet sie aus
+
 ## Weitere Screens
 
 - *Patricia beschreibt sie noch:* BodyPix live, Pixel vs. Vektor, Coding, Mit der Hand drucken, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz …
