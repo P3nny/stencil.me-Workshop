@@ -107,8 +107,24 @@
   // ---- Station ----
   let ctx = null; // { gruppe, liste, f, station, eintrag, pruefen }
 
+  // Andere Tabs (jeder QR-Scan öffnet einen neuen) speichern ihre Stationen ebenfalls.
+  // Darum frisch lesen und nur die eigene Station einsetzen, nie den alten Stand
+  // der ganzen Gruppe zurückschreiben.
+  function frischUebernehmen(){
+    return Stationen.fortschritt().then(frisch => {
+      Object.keys(frisch.stationen).forEach(id => {
+        if(id !== ctx.station.id) ctx.f.stationen[id] = frisch.stationen[id];
+      });
+      ctx.f.aktuell = frisch.aktuell;
+    });
+  }
+
   function speichern(){
-    return Stationen.fortschrittSpeichern(ctx.f);
+    const aktuell = ctx.f.aktuell;
+    return frischUebernehmen().then(() => {
+      ctx.f.aktuell = aktuell;
+      return Stationen.fortschrittSpeichern(ctx.f);
+    });
   }
 
   function etiketten(station, mitTyp){
@@ -525,10 +541,20 @@
     ]));
   }
 
+  // Zurück in einen älteren Tab: Puzzle und Vorschläge mit dem Stand der anderen Tabs neu zeichnen
+  function beiRueckkehr(){
+    if(document.hidden || !ctx || !ctx.eintrag.status) return;
+    frischUebernehmen()
+      .then(() => kopfleiste(ctx.gruppe, ctx.liste, ctx.f))
+      .then(() => { if(ctx.eintrag.status === 'fertig') weiterZeigen(false); })
+      .catch(err => console.error(err));
+  }
+
   // Einstieg: station.html?id=<station>. Der QR-Code an der Station zeigt auf diese Adresse.
   function station(id){
     testWerkzeuge();
     Outbox.starten();
+    document.addEventListener('visibilitychange', beiRueckkehr);
     return Promise.all([Speicher.lesen('gruppe'), Stationen.laden(), Stationen.fortschritt(), Stationen.freigabenLaden()])
       .then(werte => {
         const gruppe = werte[0];

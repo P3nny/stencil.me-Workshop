@@ -192,6 +192,14 @@
       Nachrichten.starten(document.getElementById('nachrichten'), werte[0].id);
     })
     .catch(err => console.error(err));
+
+  // Zurück in diesen Tab: Fortschritt aus den Stationen-Tabs neu lesen
+  document.addEventListener('visibilitychange', () => {
+    if(document.hidden) return;
+    Promise.all([Speicher.lesen('gruppe'), Stationen.fortschritt(), stationenGeladen])
+      .then(werte => { if(werte[0]) weiterZeigen(werte[0], werte[1], werte[2]); })
+      .catch(err => console.error(err));
+  });
 })();
 </script>
 </body>
