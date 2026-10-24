@@ -1,6 +1,6 @@
 # Datenschutz: Notizen für die spätere `Datenschutz.md`
 
-Sammlung, kein fertiger Text. Wird in einem eigenen Schritt zu einer kindgerechten `Datenschutz.md` ausgearbeitet. Bei jeder Änderung am Datenweg hier einen Punkt ergänzen.
+Sammlung, kein fertiger Text. Seit 24.10.2026 gibt es die kindgerechte `Datenschutz.md` (dazu `docs/datenschutz-kurz.md` und `docs/canva-folie-datenschutz.md`). Bei jeder Änderung am Datenweg `Datenschutz.md` mit ändern.
 
 ## Was bleibt auf dem iPad
 
