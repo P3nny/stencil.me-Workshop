@@ -112,6 +112,7 @@
     // Fotos als ArrayBuffer + Typ: Blobs in IndexedDB sind auf alten iPads unzuverlässig
     dateiLesen: key => lesen('dateien', key),
     dateiSchreiben: (key, datei) => schreiben('dateien', key, datei),
+    dateienAlle: () => alleWerte('dateien'),
     outboxSchreiben: (key, eintrag) => schreiben('outbox', key, eintrag),
     outboxAlle: () => alleWerte('outbox'),
     dateiAlsUrl: key => lesen('dateien', key).then(d => d ? URL.createObjectURL(new Blob([d.daten], { type: d.typ })) : null)

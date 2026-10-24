@@ -57,7 +57,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 ## 5. Nach dem Workshop
 
 - [ ] Auswertung ansehen: `/auswertung` (Sterne, KI-Frage, Feedbackbögen)
-- [ ] Ergebnis-Mappen auf USB-Stick für die Lehrkraft. *ZIP-Export ist noch nicht gebaut: bis dahin den Ordner `server/daten/gruppen` kopieren*
+- [ ] Ergebnis-Mappen für die Lehrkraft: USB-Stick einstecken, Laptop-Seite „Auf USB-Stick kopieren“ (oder „Alle Mappen als ZIP herunterladen“ und selbst auf den Stick ziehen). Stick erst nach „Auswerfen“ abziehen. Einzelne Mappe: „ZIP“ in der Gruppen-Tabelle
 - [ ] Spätestens eine Woche nach dem Workshop (steht so in `Datenschutz.md`): Laptop-Seite „Alle Daten löschen“
 - [ ] Pro iPad: Startseite → „Andere Gruppe? Neu anmelden“ (löscht alles auf dem iPad), oder Website-Daten in Safari löschen. Alle Safari-Tabs schließen
 - [ ] Terminal-Fenster schließen (Server aus)

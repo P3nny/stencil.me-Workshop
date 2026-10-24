@@ -8,8 +8,9 @@ Only the Python standard library is used, nothing needs to be installed.
     python3 server/server.py            # port 8000
     python3 server/server.py --port 8080
 
-iPads may only load the app files, upload their own data and read how many
-groups are at each station (no names). The overview page (/laptop), the lists
+iPads may only load the app files, upload their own data, read how many
+groups are at each station (no names) and read their own group's data
+(„Meine Daten“, only with the group's random id). The overview page (/laptop), the lists
 and all uploaded files are only reachable from the laptop itself (localhost),
 so the children cannot see each other's data.
 """
@@ -30,6 +31,7 @@ import urllib.parse
 
 import ki_app
 import ki_bild
+import mappe
 import plotter
 
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -245,7 +247,7 @@ def evaluation():
 # Stand der Server-Dateien beim Start. Ändern sie sich danach (neue Version), zeigt die
 # Laptop-Seite „bitte neu starten“: Seiten kommen frisch von der Festplatte, der
 # Server-Code aber nur beim Start.
-SERVER_DATEIEN = [os.path.join(REPO_DIR, "server", f) for f in ("server.py", "ki_bild.py", "ki_app.py", "plotter.py")]
+SERVER_DATEIEN = [os.path.join(REPO_DIR, "server", f) for f in ("server.py", "ki_bild.py", "ki_app.py", "plotter.py", "mappe.py")]
 
 
 def server_stand():
@@ -325,8 +327,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not ID_RE.match(group_id):
                 return self.send_json({"nachrichten": []})
             return self.send_json({"nachrichten": read_messages().get(group_id, [])})
+        if path in ("/api/meine-daten", "/api/meine-datei"):
+            # „Meine Daten“: wie bei den Nachrichten nur mit der zufälligen ID der eigenen Gruppe
+            query = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            group_id = (query.get("gruppe") or [""])[0]
+            if not ID_RE.match(group_id) or not os.path.isdir(os.path.join(GROUPS_DIR, group_id)):
+                return self.send_json({"fehler": "Gruppe nicht gefunden"}, 404)
+            if path == "/api/meine-daten":
+                return self.send_json(mappe.meine_daten(group_state(group_id), GROUPS_DIR, DATA_DIR, STICKER_DIR))
+            full = mappe.datei_pfad(group_id, (query.get("datei") or [""])[0], GROUPS_DIR, DATA_DIR, STICKER_DIR)
+            return self.send_file(full) if full else self.send_error(404)
 
-        if path in ("/laptop", "/laptop/bogen.js", "/qr", "/auswertung", "/api/auswertung", "/api/liste", "/api/sticker", "/api/info", "/api/gruppen", "/api/ki-status", "/api/plotter/status") or path.startswith(("/daten/", "/dateien/", "/sticker/")):
+        if path in ("/laptop", "/laptop/bogen.js", "/qr", "/auswertung", "/api/auswertung", "/api/liste", "/api/sticker", "/api/info", "/api/gruppen", "/api/ki-status", "/api/plotter/status", "/api/mappe", "/api/mappe-alle", "/api/usb") or path.startswith(("/daten/", "/dateien/", "/sticker/")):
             if not self.is_local():
                 return self.send_error(403, "Nur am Laptop")
             if path in ("/laptop", "/laptop/bogen.js", "/qr", "/auswertung"):
@@ -351,6 +363,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json(ki_bild.status(KI_LOG_FILE))
             if path == "/api/plotter/status":
                 return self.send_json(plotter.status())
+            if path == "/api/usb":
+                return self.send_json({"sticks": mappe.usb_sticks()})
+            if path == "/api/mappe-alle":
+                return self.send_zip(self.alle_mappen(), "stencilme-mappen_%s.zip" % datetime.date.today().isoformat())
+            if path == "/api/mappe":
+                group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
+                if not ID_RE.match(group_id) or not os.path.isdir(os.path.join(GROUPS_DIR, group_id)):
+                    return self.send_error(404)
+                state = group_state(group_id)
+                return self.send_zip(mappe.zip_bauen([state], GROUPS_DIR, DATA_DIR, STICKER_DIR), mappe.ordnername(state) + ".zip")
             if path.startswith("/dateien/"):
                 return self.send_data_file(GROUPS_DIR, path[len("/dateien/"):])
             return self.send_data_file(DATA_DIR, path[len("/daten/"):])
@@ -359,10 +381,25 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return super().do_GET()
         return self.send_error(404)
 
+    def alle_mappen(self):
+        return mappe.zip_bauen([g for g in list_groups() if g["personen"]], GROUPS_DIR, DATA_DIR, STICKER_DIR)
+
+    def send_zip(self, body, filename):
+        self.send_response(200)
+        self.send_header("Content-Type", "application/zip")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Content-Disposition", 'attachment; filename="%s"' % filename.encode("ascii", "replace").decode("ascii").replace('"', ""))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
     def send_data_file(self, base, rel):
         full = os.path.abspath(os.path.join(base, rel))
         if not full.startswith(base + os.sep) or not os.path.isfile(full):
             return self.send_error(404)
+        return self.send_file(full)
+
+    def send_file(self, full):
         types = {".svg": "image/svg+xml", ".jpg": "image/jpeg", ".png": "image/png", ".html": "text/html; charset=utf-8"}
         ctype = types.get(os.path.splitext(full)[1])
         if not ctype:
@@ -393,7 +430,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.ki_bild()
         if parsed.path == "/api/ki-app":
             return self.ki_app()
-        if (parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
+        if (parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht", "/api/mappe-usb") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
         if parsed.path == "/api/einstellungen":
             return self.save_settings()
@@ -403,6 +440,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.plotter_folie()
         if parsed.path == "/api/plotter/schritt":
             return self.plotter_schritt()
+        if parsed.path == "/api/mappe-usb":
+            return self.mappe_auf_usb()
         if parsed.path == "/api/alle-loeschen":
             for d in (DATA_DIR, STICKER_DIR, PLOTTER_DIR, GROUPS_DIR):
                 if os.path.isdir(d):
@@ -590,6 +629,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         os.makedirs(DATA_ROOT, exist_ok=True)
         write_atomic(SETTINGS_FILE, json.dumps(settings).encode("utf-8"))
         return self.send_json(settings)
+
+    def mappe_auf_usb(self):
+        sticks = mappe.usb_sticks()
+        if not sticks:
+            return self.send_json({"ok": False, "fehler": "Kein USB-Stick gefunden. Stick einstecken und nochmal versuchen."}, 404)
+        name = "stencilme-mappen_%s.zip" % datetime.datetime.now().strftime("%Y-%m-%d_%H%M")
+        ziel = os.path.join(sticks[0], name)
+        try:
+            with open(ziel + ".tmp", "wb") as fh:
+                fh.write(self.alle_mappen())
+                fh.flush()
+                os.fsync(fh.fileno())
+            os.replace(ziel + ".tmp", ziel)
+        except OSError as err:
+            print("USB-Stick: %s" % err)
+            return self.send_json({"ok": False, "fehler": "Kopieren hat nicht geklappt: %s" % err.strerror}, 500)
+        print("Mappen auf USB-Stick: %s" % ziel)
+        return self.send_json({"ok": True, "datei": ziel})
 
     def receive_stamp(self, query):
         stamp_id = (query.get("id") or [""])[0]

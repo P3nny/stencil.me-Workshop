@@ -223,8 +223,13 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - `Datenschutz.md` (kindgerecht, Teil für Erwachsene), `docs/datenschutz-kurz.md`, `docs/canva-folie-datenschutz.md`
 - Laptop-Seite zeigt einen Neustart-Hinweis, wenn sich die Server-Dateien geändert haben
 
+## Ergebnis-Mappe und Meine Daten (24.10. spät, Branch `feature/zip-meine-daten`)
+
+- **Mappe** (`server/mappe.py`): ZIP pro Paar (Laptop-Seite, Spalte „Mappe“) und alle zusammen, je ein Ordner „Ada-und-Bo_<ID>“. Nur Werke (Patricia): Fotos, Stempel, Porträts, Sticker, KI-Bilder, Apps (mit CSP ohne Netz), eigener SVG- und HTML-Code als HTML-Datei. Keine Antworten, Sterne, Feedback
+- **USB-Stick:** Steckt einer unter `/media/<user>/`, zeigt die Laptop-Seite „Auf USB-Stick kopieren“. *Mit echtem Stick noch nicht getestet*
+- **Meine Daten** (`app/meine-daten.html`, Link auf der Startseite): was auf dem iPad liegt (auch verworfene Fotos) und was auf dem Laptop liegt (Bilder, Antworten, KI-Frage, Sterne, Feedback). Der Laptop gibt nur die Daten der eigenen Gruppen-ID heraus
+
 ## Noch offen
 
-- ZIP-Export pro Paar und gesamt, „Auf USB-Stick kopieren“, Seite „Meine Daten“ für die Kinder
 - Station Berufe: 3 Berufsbilder aus `04_stencil.me-Berufe.pdf`, Quizfrage, „Welchen Beruf wünschst du dir?“
 - Kunst-Quiz mit Bildern aus `03_stencil.me-Künstlerinnen_A4.pdf`, nur über den Laptop ausgeliefert, nicht im Repo

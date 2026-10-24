@@ -84,12 +84,12 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 ## Wie lange bleiben die Daten?
 
 - **Auf dem iPad:** bis Penny das iPad nach dem Workshop zurücksetzt. Dann ist alles weg. Die nächste Gruppe sieht nichts von euch.
-- **Auf Pennys Laptop:** bis zum Ende des Workshops. Penny macht daraus eine Ergebnis-Mappe für jedes Paar und gibt sie eurer Lehrkraft. Danach löscht Penny alles auf dem Laptop.
+- **Auf Pennys Laptop:** bis zum Ende des Workshops. Penny macht daraus eine Ergebnis-Mappe für jedes Paar und gibt sie eurer Lehrkraft. In der Mappe sind nur eure Werke: Fotos, Stempel, Bilder, Apps und euer Code. Eure Antworten, Sterne und euer Feedback sind nicht dabei. Danach löscht Penny alles auf dem Laptop.
 - **Bei Claude:** höchstens 30 Tage (siehe oben).
 
 ## Deine Rechte
 
-- Du darfst jederzeit fragen, was über dich gespeichert ist.
+- Du darfst jederzeit nachsehen, was über dich gespeichert ist: Auf der Startseite tippst du auf „🔒 Meine Daten“. Dort steht alles, was auf dem iPad und auf Pennys Laptop liegt.
 - Du darfst sagen: Ich will nicht, dass mein Foto auf den Laptop geht. Dann findet Penny eine Lösung mit dir.
 - Die Stationen mit Claude sind optional. Du machst sie nur, wenn du und deine Eltern einverstanden seid.
 
@@ -105,7 +105,8 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 - Bildverarbeitung und Personenerkennung (BodyPix, TensorFlow.js) laufen vollständig im Browser des iPads. Modell und Programm liegen lokal auf dem Laptop, es gibt keine Abrufe bei Google oder anderen CDNs.
 - Speicherung auf dem iPad: Website-Daten von Safari (IndexedDB), nicht die Fotos-App.
-- Speicherung auf dem Laptop: lokaler Python-Server im KOMEZ-WLAN (HTTP, unverschlüsselt). Der Laptop gibt keine Fotos weiter.
+- Speicherung auf dem Laptop: lokaler Python-Server im KOMEZ-WLAN (HTTP, unverschlüsselt). Der Laptop gibt keine Fotos weiter. Übersicht und Mappen sind nur am Laptop selbst abrufbar. „Meine Daten“ zeigt jedem iPad nur die Daten der eigenen Gruppe (zufällige 12-stellige Gruppen-ID, nur diesem iPad bekannt).
+- Ergebnis-Mappe für die Lehrkraft (ZIP pro Paar): nur Werke (Fotos, Stempel-, Sticker- und Porträtdateien, KI-Bilder, Apps, eigener Code), keine Textantworten, Bewertungen oder Feedbackbögen.
 
 **Online-Dienste:**
 

@@ -56,6 +56,7 @@
   .settings { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .settings input { font-size:1.2rem; width:80px; border:3px solid var(--ink); padding:6px; }
   .settings button { margin-top:0; }
+  a.knopf { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.1em; border:3px solid var(--ink); background:#fff; padding:8px 14px; color:var(--ink); text-decoration:none; }
   table { border-collapse:collapse; width:100%; margin-top:14px; }
   th, td { border-bottom:2px solid var(--ink); padding:6px 8px; text-align:left; vertical-align:top; }
   th { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.06em; }
@@ -133,10 +134,15 @@
       <span class="hint" id="freigabeState"></span>
       <a href="/auswertung" style="margin-left:auto">Auswertung: Sterne, KI-Frage, Feedback →</a>
     </div>
+    <div class="settings" style="margin-top:10px">
+      <a class="knopf" id="mappenAlle" href="/api/mappe-alle">Alle Mappen als ZIP herunterladen</a>
+      <button id="mappenUsb" type="button" hidden>Auf USB-Stick kopieren</button>
+      <span class="hint" id="mappenState">Mappe = nur die Werke (Fotos, Stempel, Bilder, Apps, Code), keine Antworten und kein Feedback.</span>
+    </div>
     <div class="hint" id="kiStatus"></div>
     <div id="groupsError"></div>
     <table>
-      <thead><tr><th>Namen</th><th>Gerade an</th><th>Geschafft</th><th>Fotos</th></tr></thead>
+      <thead><tr><th>Namen</th><th>Gerade an</th><th>Geschafft</th><th>Fotos</th><th>Mappe</th></tr></thead>
       <tbody id="groups"></tbody>
     </table>
     <div class="hint">Ordner: <span class="folder" id="groupsFolder"></span></div>
@@ -345,17 +351,21 @@
       var pflicht = g.fertig.filter(function (id) { return !bonusIds[id]; }).length;
       cell(row, pflicht + (stationCount ? " von " + stationCount : "") + ": " + g.fertig.map(function (id) { return stationTitles[id] || id; }).join(", "));
       var photos = cell(row, "");
-      g.dateien.forEach(function (pfad) {
+      g.dateien.filter(function (pfad) { return /\.(jpg|png|svg)$/.test(pfad); }).forEach(function (pfad) {
         var img = document.createElement("img");
         img.src = "/dateien/" + encodeURI(pfad);
         img.alt = "";
         photos.appendChild(img);
       });
+      var zip = document.createElement("a");
+      zip.href = "/api/mappe?gruppe=" + g.gruppe;
+      zip.textContent = "ZIP";
+      cell(row, "").appendChild(zip);
       body.appendChild(row);
     });
     if (!data.gruppen.length) {
       var empty = document.createElement("tr");
-      cell(empty, "Noch keine Gruppe angemeldet.").colSpan = 4;
+      cell(empty, "Noch keine Gruppe angemeldet.").colSpan = 5;
       body.appendChild(empty);
     }
   }
@@ -371,6 +381,23 @@
         document.getElementById("groupsError").innerHTML = '<div class="error">Gruppen konnten nicht geladen werden.</div>';
       });
   }
+
+  // USB-Stick: Knopf nur zeigen, wenn einer steckt
+  function loadUsb() {
+    fetch("/api/usb", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { document.getElementById("mappenUsb").hidden = !d.sticks.length; })
+      .catch(function () {});
+  }
+
+  document.getElementById("mappenUsb").addEventListener("click", function () {
+    var state = document.getElementById("mappenState");
+    state.textContent = "Kopiere …";
+    fetch("/api/mappe-usb", { method: "POST" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { state.textContent = d.ok ? "✓ Gespeichert: " + d.datei + ". Stick erst nach „Auswerfen“ abziehen." : "⚠ " + d.fehler; })
+      .catch(function () { state.textContent = "⚠ Kopieren hat nicht geklappt."; });
+  });
 
   function loadKi() {
     fetch("/api/ki-status", { cache: "no-store" })
@@ -430,7 +457,8 @@
   loadSettings();
   loadKi();
   plotterLaden();
-  setInterval(function () { loadGroups(); loadKi(); }, 5000);
+  loadUsb();
+  setInterval(function () { loadGroups(); loadKi(); loadUsb(); }, 5000);
   setInterval(loadInfo, 30000); // u. a. „bitte neu starten“ nach einer Aktualisierung
   setInterval(plotterLaden, 2000);
 })();

@@ -11,6 +11,9 @@
 // Legt im Testordner eine Test-Gruppe und Test-Stempel an (archiv/testdaten, nicht im Repo).
 const path = require('path');
 const pw = require('playwright');
+const fs = require('fs');
+const os = require('os');
+const { execFileSync } = require('child_process');
 
 const BROWSER = process.argv[2] || 'webkit';
 const SHOTS = process.argv[3] || path.join(__dirname, '..', 'archiv', 'screenshots');
@@ -527,6 +530,34 @@ async function abschliessen(page, sterne){
     pruefe(!!svgCode && svgCode.indexOf('polygon') > 0, 'SVG-Code auf dem Laptop gespeichert');
     const htmlCode = g.antworten['coding-web'] && g.antworten['coding-web'].antworten['html-code'];
     pruefe(!!htmlCode && htmlCode.indexOf("alert('Wir sind da!')") > 0, 'HTML-Code auf dem Laptop gespeichert');
+
+    console.log('Ergebnis-Mappe (ZIP, nur Werke)');
+    const zipAntwort = await page.request.get(BASE + '/api/mappe?gruppe=' + g.gruppe);
+    const zipDatei = path.join(os.tmpdir(), 'stencilme-mappe-test.zip');
+    fs.writeFileSync(zipDatei, await zipAntwort.body());
+    const namen = execFileSync('python3', ['-c', 'import sys,zipfile;print("\\n".join(zipfile.ZipFile(sys.argv[1]).namelist()))', zipDatei]).toString().trim().split('\n');
+    fs.unlinkSync(zipDatei);
+    const ohneOrdner = namen.map(n => n.split('/').slice(1).join('/'));
+    pruefe(namen.every(n => n.indexOf('Ada-und-Bo_' + g.gruppe.slice(0, 6) + '/') === 0), 'Mappe: ein Ordner „Ada-und-Bo_…“');
+    const art = n => ohneOrdner.filter(x => x.indexOf(n) === 0).length;
+    pruefe(art('stempel_') === 2 && art('portraet_') === 2 && art('sticker_') === 2, 'Mappe: 2 Stempel, 2 Porträts, 2 Sticker');
+    pruefe(art('foto_') === 2 && art('ki-selbstportraet_') === 2 && art('vibe-coding_') === 1, 'Mappe: Fotos, KI-Bilder, App');
+    pruefe(ohneOrdner.indexOf('coding-web_eure-webseite.html') >= 0 && ohneOrdner.indexOf('pixel-vektor_euer-svg-code.html') >= 0, 'Mappe: eigener Code als HTML');
+    pruefe(!namen.some(n => /ereignisse|\.json$|feedback/.test(n)), 'Mappe: keine Antworten, kein Feedback');
+    pruefe((await page.request.get(BASE + '/api/mappe-alle')).headers()['content-type'] === 'application/zip', 'Alle Mappen als ZIP');
+    pruefe((await (await page.request.get(BASE + '/api/usb')).json()).sticks !== undefined, 'USB-Abfrage antwortet');
+
+    console.log('Meine Daten');
+    pruefe((await page.request.get(BASE + '/api/meine-daten?gruppe=000000000000')).status() === 404, 'fremde ID: nichts');
+    pruefe((await page.request.get(BASE + '/api/meine-datei?gruppe=' + g.gruppe + '&datei=' + encodeURIComponent('dateien/../ereignisse'))).status() === 404, 'kein Zugriff außerhalb der eigenen Dateien');
+    await page.goto(BASE + '/');
+    await page.click('a:has-text("Meine Daten")');
+    await page.waitForSelector('text=Auf Pennys Laptop');
+    await page.waitForSelector('text=Feedbackbogen');
+    await page.waitForFunction(() => document.querySelectorAll('.panel')[2].querySelectorAll('.daten-bilder img').length > 10);
+    pruefe(await page.locator('text=Wie heiß wird der Laser?').count() === 1, 'Meine Daten: Antworten vom Laptop');
+    pruefe(await page.locator('.panel').nth(1).locator('.daten-bilder img').count() >= 2, 'Meine Daten: Fotos auf dem iPad');
+    await page.screenshot({ path: path.join(SHOTS, BROWSER + '-20-meine-daten.png'), fullPage: true });
   }
   const laptop = await browser.newPage({ viewport: { width: 1400, height: 900 } });
   await laptop.goto(BASE + '/laptop');

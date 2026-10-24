@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Meine Daten · stencil.me</title>
+<link href="/vendor/fonts/fonts.css" rel="stylesheet">
+<link href="/app/core/werkstatt.css" rel="stylesheet">
+<style>
+  .daten-bilder { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 12px; }
+  .daten-bilder img { height:110px; border:2px solid var(--ink); background:#fff; }
+  .daten-station { border-top:2px solid var(--ink); padding-top:10px; margin-top:14px; }
+  .daten-station h3 { margin:0 0 6px; font-size:1rem; }
+  .daten-station p { margin:4px 0; }
+  .daten-station pre { white-space:pre-wrap; font-size:.8rem; max-height:240px; overflow:auto; background:#fff; border:1px solid var(--ink); padding:6px; }
+</style>
+</head>
+<body>
+<!-- „Meine Daten“: was auf diesem iPad und auf Pennys Laptop über die eigene Gruppe gespeichert ist.
+     Der Laptop gibt nur die Daten der Gruppe heraus, deren zufällige ID dieses iPad kennt. -->
+<main id="inhalt"><section class="panel"><p>Wird geladen …</p></section></main>
+<div class="fehler" id="fehler" role="alert" hidden></div>
+<script src="/app/core/speicher.js"></script>
+<script src="/app/core/stationen.js"></script>
+<script src="/app/core/rahmen.js"></script>
+<script>
+(function(){
+  const el = Rahmen.el;
+  const KI_TEXT = { generativ: 'Generative KI', ki: 'Bildbearbeitungs-KI', programm: 'Keine KI, nur ein Programm', analog: 'Ohne Computer', 'weiss-nicht': 'Weiß nicht' };
+  const FELDER = { 'svg-code': 'Euer SVG-Code', 'html-code': 'Euer HTML-Code', quiz: 'Quiz', auftraege: 'Eure Aufträge an Claude', feedback: 'Feedbackbogen' };
+  const inhalt = document.getElementById('inhalt');
+
+  function bilder(urls){
+    return el('div', { klasse: 'daten-bilder' }, urls.map(u => el('img', { src: u, alt: '' })));
+  }
+
+  function wert(liste, station, key, w){
+    if(key === 'feedback' && Array.isArray(w)){
+      const fragen = (station && station.feedback) || [];
+      return el('div', {}, w.map(person => el('p', {}, [el('strong', { text: person.name + ': ' }),
+        el('span', { text: fragen.filter(f => person[f.id]).map(f => f.text + ' ' + (f.art === 'station' ? titel(liste, person[f.id]) : person[f.id])).join(' · ') })])));
+    }
+    if(Array.isArray(w)) w = w.join(' · ');
+    if(key === 'svg-code' || key === 'html-code') return el('details', {}, [el('summary', { text: 'Code ansehen' }), el('pre', { text: String(w) })]);
+    return el('span', { text: String(w) });
+  }
+
+  function titel(liste, id){
+    const st = liste.filter(s => s.id === id)[0];
+    return st ? st.titel : id;
+  }
+
+  function stationZeigen(liste, id, daten){
+    const st = liste.filter(s => s.id === id)[0];
+    const teile = [el('h3', { text: titel(liste, id) })];
+    const antworten = daten.antworten || {};
+    Object.keys(antworten).forEach(key => {
+      if(antworten[key] === '' || antworten[key] == null) return;
+      const eingabe = ((st && st.eingaben) || []).filter(e => e.id === key)[0];
+      teile.push(el('p', {}, [el('strong', { text: (eingabe ? eingabe.text : (FELDER[key] || key)) + ' ' }), wert(liste, st, key, antworten[key])]));
+    });
+    if(daten.kiTyp) teile.push(el('p', { text: 'Eure Antwort auf die KI-Frage: ' + (KI_TEXT[daten.kiTyp] || daten.kiTyp) }));
+    if(daten.sterne) teile.push(el('p', { text: 'Sterne: ' + '★★★★★'.slice(0, daten.sterne) + '☆☆☆☆☆'.slice(0, 5 - daten.sterne) }));
+    return el('div', { klasse: 'daten-station' }, teile);
+  }
+
+  function laptopTeil(gruppe, liste){
+    const box = el('section', { klasse: 'panel' }, [
+      el('h1', { text: '💻 Auf Pennys Laptop' }),
+      el('p', { klasse: 'hinweis', text: 'Das hat dein iPad an den Laptop geschickt. Nur Penny sieht es. Spätestens eine Woche nach dem Workshop wird alles gelöscht.' })
+    ]);
+    const warte = el('p', { text: 'Frage den Laptop …' });
+    box.appendChild(warte);
+    fetch('/api/meine-daten?gruppe=' + gruppe.id, { cache: 'no-store' })
+      .then(r => { if(!r.ok) throw new Error('Status ' + r.status); return r.json(); })
+      .then(d => {
+        box.removeChild(warte);
+        box.appendChild(el('p', {}, [el('strong', { text: 'Eure Namen: ' }), el('span', { text: d.personen.join(' und ') || '–' })]));
+        const url = datei => '/api/meine-datei?gruppe=' + gruppe.id + '&datei=' + encodeURIComponent(datei);
+        const bildDateien = d.dateien.filter(f => /\.(jpg|png|svg)$/.test(f));
+        const apps = d.dateien.filter(f => /\.html$/.test(f));
+        box.appendChild(el('h2', { text: 'Fotos, Stempel und Bilder (' + bildDateien.length + ')' }));
+        box.appendChild(bildDateien.length ? bilder(bildDateien.map(url)) : el('p', { text: 'Noch keine.' }));
+        if(apps.length) box.appendChild(el('p', { text: 'Dazu ' + apps.length + (apps.length === 1 ? ' App' : ' Apps') + ' aus „Bild-App vibe coden“.' }));
+        box.appendChild(el('h2', { text: 'Eure Antworten' }));
+        if(!Object.keys(d.antworten).length) box.appendChild(el('p', { text: 'Noch keine.' }));
+        d.fertig.forEach(id => box.appendChild(stationZeigen(liste, id, d.antworten[id] || {})));
+      })
+      .catch(err => {
+        console.error(err);
+        warte.textContent = 'Der Laptop ist gerade nicht erreichbar. Was noch nicht angekommen ist, liegt sicher auf dem iPad.';
+      });
+    return box;
+  }
+
+  function ipadTeil(gruppe, liste, f){
+    const box = el('section', { klasse: 'panel' }, [
+      el('h1', { text: '📱 Auf diesem iPad' }),
+      el('p', { klasse: 'hinweis', text: 'Das bleibt auf dem iPad, bis Penny es nach dem Workshop zurücksetzt. Andere iPads sehen es nicht.' }),
+      el('p', {}, [el('strong', { text: 'Eure Namen: ' }), el('span', { text: gruppe.personen.join(' und ') })]),
+      el('p', { text: Stationen.anzahlFertig(liste, f) + ' von ' + Stationen.anzahlPflicht(liste) + ' Stationen geschafft.' })
+    ]);
+    Speicher.dateienAlle().then(dateien => {
+      const fotos = dateien.filter(d => d && /^image\//.test(d.typ));
+      box.appendChild(el('h2', { text: 'Fotos und Bilder (' + fotos.length + ')' }));
+      box.appendChild(el('p', { klasse: 'hinweis', text: 'Hier sind auch Fotos dabei, die ihr verworfen habt. Die gehen nicht an den Laptop.' }));
+      box.appendChild(bilder(fotos.map(d => URL.createObjectURL(new Blob([d.daten], { type: d.typ })))));
+    }).catch(err => console.error(err));
+    return box;
+  }
+
+  Promise.all([Speicher.lesen('gruppe'), Stationen.laden().catch(() => []), Stationen.fortschritt()])
+    .then(werte => {
+      const gruppe = werte[0];
+      inhalt.innerHTML = '';
+      if(!gruppe){
+        inhalt.appendChild(el('section', { klasse: 'panel' }, [el('h1', { text: 'Meine Daten' }),
+          el('p', { text: 'Auf diesem iPad ist niemand angemeldet. Darum ist hier auch nichts gespeichert.' }),
+          el('a', { klasse: 'knopf-link', href: '/', text: 'Zur Startseite' })]));
+        return;
+      }
+      inhalt.appendChild(el('section', { klasse: 'panel' }, [
+        el('h1', { text: '🔒 Meine Daten' }),
+        el('p', { text: 'Hier siehst du alles, was über ' + (gruppe.personen.length === 2 ? 'euch' : 'dich') + ' gespeichert ist. Wenn dir etwas komisch vorkommt: Frag Penny.' }),
+        el('a', { klasse: 'knopf-link', href: '/', text: '← Zurück' })
+      ]));
+      inhalt.appendChild(ipadTeil(gruppe, werte[1], werte[2]));
+      inhalt.appendChild(laptopTeil(gruppe, werte[1]));
+    })
+    .catch(err => Rahmen.fehler('Meine Daten konnten nicht geladen werden.', err));
+})();
+</script>
+</body>
+</html>

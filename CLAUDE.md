@@ -114,7 +114,7 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 
 ## Lokaler Server und Lasercut
 
-- Der Server sammelt die Werke der Kinder (Fotos, Stempel-Datei, Antworten) pro Paar und nimmt sie auch nachträglich entgegen (Outbox). Am Ende soll ein ZIP pro Paar bzw. gesamt entstehen (**noch nicht gebaut**).
+- Der Server sammelt die Werke der Kinder (Fotos, Stempel-Datei, Antworten) pro Paar und nimmt sie auch nachträglich entgegen (Outbox). Am Ende gibt es ein ZIP pro Paar bzw. gesamt, nur mit den Werken (`server/mappe.py`, Laptop-Seite, auch direkt auf einen USB-Stick). Die Kinder sehen unter „Meine Daten“ alles, was über sie gespeichert ist.
 - Holzplatte: Die Laptop-Seite ordnet die Stempel (älteste zuerst) auf einer A4-Pappelsperrholz-Platte an (5 mm Rand, 3 mm Abstand). Patricia lädt die SVG in die Mr-Beam-Oberfläche, 2× gravieren. Keine Mr-Beam-Schnittstelle.
 - Stickerfolie: Die Laptop-Seite ordnet Sticker auf A4 an und schickt sie an die Silhouette Cameo 4 (Stift + Messer, `server/plotter.py`, Vorbild `archiv/00_fotobox-karte`).
 - Statusmeldungen an die Paare über „📣 Wird gelasert“ / „📣 Fertig, abholen“, die iPads fragen einmal pro Minute nach.
@@ -136,7 +136,7 @@ Grundsatz: **Jede Ausbaustufe muss den Workshop allein tragen**, die alte Stufe 
 
 Zurückgestellt (nach dem Workshop, nur bei Bedarf): eigener Router, HTTPS mit `workshop.datenhandlung.de` (`docs/https-einrichten.md`, INWX-Zugangsdaten nie ins Repo), Laser-Queue.
 
-4. Dateien an die Kinder: ZIP pro Paar auf USB-Stick an die Lehrkraft (entschieden, Export noch nicht gebaut).
+4. Dateien an die Kinder: ZIP pro Paar (nur Werke) auf USB-Stick an die Lehrkraft (entschieden, gebaut).
 5. Claude-Stationen: Claude-API mit eigenem Schlüssel und Ausgabenlimit (nicht das Pro-Abo), Modell Sonnet 5.5, nur Baukasten/Lückentext, **optional** (entschieden).
 6. Canva ersetzt: „Hintergrund ändern“ lokal mit BodyPix, KI-Selbstporträt über Claude ohne Foto (entschieden).
 7. Freier Ablauf: Die App schlägt Stationen nach `braucht` und `plaetze` vor, keine Rotation (entschieden).
@@ -167,7 +167,7 @@ Patricia möchte durch die Entwicklung geführt werden. Immer nur den aktuellen 
 - c) **Minimaler Upload**: Server + Startskript mit QR-Code. In der App: „Stempel speichern“, „An Laptop senden“, „Teilen“.
 - d) Testlauf im KOMEZ spätestens eine Woche vorher.
 
-**Stand 24.10.2026:** b) und c) sind erledigt. Die Stationen-App ist bis auf die Punkte unten gebaut: Stationen, Offline-Gerüst, Laptop-Seite mit Platte, Folie, Plotter, Nachrichten, Feedback, Auswertung, Claude-Stationen, Texte geprüft, `Datenschutz.md`. **Offen:** ZIP-Export und „Meine Daten“, Station Berufe, Kunst-Quiz mit Bildern (nur über den Laptop), Test vor Ort am 02.11.2026. Das große Aufräumen von `stencil.html` (Roadmap 1) ist zurückgestellt. Jetzt wird die Stationen-App **Screen für Screen** gebaut, nach Patricias Beschreibung in `docs/screens.md`. Nicht auf Tests warten. Gesamttest vor Ort am **02.11.2026**. Funktionen aus `index.html` wandern erst dann in Stationen bzw. `app/core/`, wenn ein Screen sie braucht.
+**Stand 24.10.2026:** b) und c) sind erledigt. Die Stationen-App ist bis auf die Punkte unten gebaut: Stationen, Offline-Gerüst, Laptop-Seite mit Platte, Folie, Plotter, Nachrichten, Feedback, Auswertung, Claude-Stationen, Texte geprüft, `Datenschutz.md`. **Offen:** Station Berufe, Kunst-Quiz mit Bildern (nur über den Laptop), Test vor Ort am 02.11.2026. Das große Aufräumen von `stencil.html` (Roadmap 1) ist zurückgestellt. Jetzt wird die Stationen-App **Screen für Screen** gebaut, nach Patricias Beschreibung in `docs/screens.md`. Nicht auf Tests warten. Gesamttest vor Ort am **02.11.2026**. Funktionen aus `index.html` wandern erst dann in Stationen bzw. `app/core/`, wenn ein Screen sie braucht.
 
 0. **Infrastruktur klären**: erledigt, siehe `docs/entscheidungen.md`.
 1. **`index.html` reviewen, aufräumen, aufteilen** (siehe Ziel ganz oben): Funktionsliste mit Empfehlung, Freigabe, dann in Stationen `lasercut-stempel`, `lasercut-portraet`, `schneideplotter` plus gemeinsamem Kern zerlegen.

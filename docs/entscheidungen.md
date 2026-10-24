@@ -105,7 +105,7 @@ Umschalten zwischen den Plänen heißt: einen anderen QR-Code zeigen. Was bei Pr
 
 ## 4. Ergebnisse an die Kinder — entschieden (24.10.2026)
 
-ZIP pro Paar auf USB-Stick an die Lehrkraft, Verteilung über die Schulplattform (siehe Punkt 8). Der ZIP-Export ist noch nicht gebaut.
+ZIP pro Paar auf USB-Stick an die Lehrkraft, Verteilung über die Schulplattform (siehe Punkt 8). **Inhalt: nur Werke**, keine Antworten, Sterne, Feedback (Patricia, 24.10. spät). Gebaut: Laptop-Seite mit Download und „Auf USB-Stick kopieren“. „Meine Daten“ jederzeit über die Startseite.
 
 ## 5. Claude-Stationen — entschieden (24.10.2026)
 
