@@ -44,6 +44,7 @@ _TR = re.compile(r"translate\(\s*([-\d.]+)[ ,]+([-\d.]+)\s*\)")
 
 _sperre = threading.Lock()
 _auftrag = None   # aktueller Auftrag (dict), nur einer gleichzeitig
+MELDEN = None     # server.py setzt hier eine Funktion: Plotzeiten ins Werkstatt-Protokoll
 
 
 class PlotterFehler(Exception):
@@ -255,6 +256,9 @@ def _lauf(schritt):
             _auftrag["meldung"] = fehler
         with open(os.path.join(ordner, "auftrag.json"), "w", encoding="utf-8") as fh:
             json.dump(_auftrag, fh, ensure_ascii=False)
+        eintrag = {"bogen": "folie", "aktion": schritt, "name": _auftrag["name"], "sekunden": round(time.time() - start, 1), "ok": ok}
+    if MELDEN:
+        MELDEN(eintrag)
 
 
 def schritt(was):

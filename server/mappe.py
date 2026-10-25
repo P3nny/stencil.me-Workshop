@@ -102,8 +102,8 @@ def usb_sticks():
     return sticks
 
 
-def meine_daten(state, groups_dir, stempel_dir, sticker_dir):
-    """Alles, was auf dem Laptop zu dieser Gruppe liegt."""
+def meine_daten(state, groups_dir, stempel_dir, sticker_dir, zeiten=None):
+    """Alles, was auf dem Laptop zu dieser Gruppe liegt, auch wann ihr wo wart (zeiten)."""
     group_id = state["gruppe"]
     dateien_dir = os.path.join(groups_dir, group_id, "dateien")
     dateien = []
@@ -111,7 +111,8 @@ def meine_daten(state, groups_dir, stempel_dir, sticker_dir):
         dateien = ["dateien/" + f for f in sorted(os.listdir(dateien_dir)) if not f.endswith(".tmp")]
     dateien += ["stempel/" + rel for rel, _ in eigene_svgs(stempel_dir, group_id)]
     dateien += ["sticker/" + rel for rel, _ in eigene_svgs(sticker_dir, group_id)]
-    return {"personen": state["personen"], "fertig": state["fertig"], "antworten": state["antworten"], "dateien": dateien}
+    return {"personen": state["personen"], "fertig": state["fertig"], "antworten": state["antworten"], "dateien": dateien,
+            "zeiten": zeiten or {}}
 
 
 def datei_pfad(group_id, rel, groups_dir, stempel_dir, sticker_dir):

@@ -48,6 +48,8 @@ KUNST_DIR = os.path.abspath(os.environ.get("STENCILME_KUNST_BILDER") or os.path.
 KUNST_RE = re.compile(r"^[a-z0-9-]{1,60}\.jpg$")
 SETTINGS_FILE = os.path.join(DATA_ROOT, "einstellungen.json")
 KI_LOG_FILE = os.path.join(DATA_ROOT, "ki-protokoll.jsonl")
+WERKSTATT_LOG = os.path.join(DATA_ROOT, "werkstatt-protokoll.jsonl")  # Platten, Folien, Laser- und Plotzeiten (ohne Namen)
+werkstatt_lock = threading.Lock()
 MESSAGES_FILE = os.path.join(DATA_ROOT, "nachrichten.json")  # Laptop -> Gruppen („wird gelasert“, „fertig“)
 MAX_MESSAGE_LEN = 300
 messages_lock = threading.Lock()
@@ -203,6 +205,64 @@ def frei_beenden(group_id):
         frei_bis.pop(group_id, None)
 
 
+def werkstatt_melden(eintrag):
+    """Eine Zeile ins Werkstatt-Protokoll: {bogen: platte|folie, aktion, name, …}. Keine Namen von Kindern."""
+    eintrag = dict(eintrag, zeit=datetime.datetime.now().isoformat(timespec="seconds"))
+    with werkstatt_lock:
+        os.makedirs(DATA_ROOT, exist_ok=True)
+        with open(WERKSTATT_LOG, "a", encoding="utf-8") as fh:
+            fh.write(json.dumps(eintrag, ensure_ascii=False) + "\n")
+
+
+plotter.MELDEN = werkstatt_melden
+
+
+def werkstatt_auswertung():
+    """Wie viele Platten gelasert, Folien geplottet, wie lange: Laser von „Wird gelasert“ bis „Fertig“
+    (Nachrichten an die Kinder), Plotter aus den gemessenen Zeiten von plotter.py."""
+    eintraege = ki_bild.protokoll_lesen(WERKSTATT_LOG)
+    ergebnis = {}
+    for bogen in ("platte", "folie"):
+        e = [x for x in eintraege if x.get("bogen") == bogen]
+        boegen = {}
+        for x in e:
+            b = boegen.setdefault(x.get("name", ""), {"stuecke": 0, "start": None, "ende": None, "minuten": 0.0})
+            t = event_time(x)
+            if x.get("aktion") == "erstellt":
+                b["stuecke"] = x.get("stuecke", 0)
+            elif x.get("aktion") == "laser" and t and not b["start"]:
+                b["start"] = t
+            elif x.get("aktion") == "fertig" and t:
+                b["ende"] = t
+            elif x.get("aktion") in ("zeichnen", "schneiden") and x.get("ok"):
+                b["minuten"] += x.get("sekunden", 0) / 60
+        if bogen == "platte":
+            dauern = [(b["ende"] - b["start"]).total_seconds() / 60 for b in boegen.values() if b["start"] and b["ende"] and b["ende"] > b["start"]]
+        else:
+            dauern = [b["minuten"] for b in boegen.values() if b["minuten"] > 0]
+        ergebnis[bogen] = dict(dauer_stats(dauern), anzahl=sum(1 for x in e if x.get("aktion") == "erstellt"),
+                               stuecke=sum(b["stuecke"] for b in boegen.values()), summeMin=round(sum(dauern), 1))
+    return ergebnis
+
+
+def station_zeiten(group_id):
+    """Für „Meine Daten“: wann die Gruppe an welcher Station war (erster Check-in, letztes Fertig)."""
+    zeiten = {}
+    for e in read_events(group_id):
+        sid, t = e.get("station"), event_time(e)
+        if not sid or not t:
+            continue
+        z = zeiten.setdefault(sid, {})
+        if e.get("art") == "checkin" and "start" not in z:
+            z["start"] = t
+        elif e.get("art") == "beendet":
+            z["ende"] = t
+    return {sid: {"start": z["start"].isoformat(timespec="seconds") if "start" in z else None,
+                  "ende": z["ende"].isoformat(timespec="seconds") if "ende" in z else None,
+                  "minuten": round((z["ende"] - z["start"]).total_seconds() / 60, 1) if "start" in z and "ende" in z else None}
+            for sid, z in zeiten.items()}
+
+
 def read_events(group_id):
     """All events of one group, oldest first."""
     events = []
@@ -352,7 +412,7 @@ def evaluation():
         werte.update(dauer_stats(werte.pop("dauern")))
         stats.append(werte)
     return {"gruppen": len(groups), "stationen": stats, "feedback": feedback, "gesamt": dauer_stats(gesamt),
-            "ki": ki_bild.status(KI_LOG_FILE)}
+            "ki": ki_bild.status(KI_LOG_FILE), "werkstatt": werkstatt_auswertung()}
 
 
 # Stand der Server-Dateien beim Start. Ändern sie sich danach (neue Version), zeigt die
@@ -468,7 +528,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not ID_RE.match(group_id) or not os.path.isdir(os.path.join(GROUPS_DIR, group_id)):
                 return self.send_json({"fehler": "Gruppe nicht gefunden"}, 404)
             if path == "/api/meine-daten":
-                return self.send_json(mappe.meine_daten(group_state(group_id), GROUPS_DIR, DATA_DIR, STICKER_DIR))
+                return self.send_json(mappe.meine_daten(group_state(group_id), GROUPS_DIR, DATA_DIR, STICKER_DIR, station_zeiten(group_id)))
             full = mappe.datei_pfad(group_id, (query.get("datei") or [""])[0], GROUPS_DIR, DATA_DIR, STICKER_DIR)
             return self.send_file(full) if full else self.send_error(404)
 
@@ -566,10 +626,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.ki_app()
         if parsed.path == "/api/ki-freigabe":
             return self.ki_freigabe()
-        if (parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht", "/api/mappe-usb") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
+        if (parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht", "/api/mappe-usb", "/api/werkstatt") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
         if parsed.path == "/api/einstellungen":
             return self.save_settings()
+        if parsed.path == "/api/werkstatt":
+            return self.werkstatt_eintrag()
         if parsed.path == "/api/nachricht":
             return self.send_message()
         if parsed.path == "/api/plotter/folie":
@@ -582,7 +644,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             for d in (DATA_DIR, STICKER_DIR, PLOTTER_DIR, GROUPS_DIR):
                 if os.path.isdir(d):
                     shutil.rmtree(d)
-            for f in (KI_LOG_FILE, MESSAGES_FILE):
+            for f in (KI_LOG_FILE, MESSAGES_FILE, WERKSTATT_LOG):
                 if os.path.exists(f):
                     os.remove(f)
             with frei_lock:
@@ -797,6 +859,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         add_message(sorted(set(groups)), text)
         print("Nachricht an %d Gruppe(n): %s" % (len(set(groups)), text))
         return self.send_json({"ok": True, "gruppen": len(set(groups))})
+
+    def werkstatt_eintrag(self):
+        """Laptop-Seite meldet: Platte/Folie erstellt (Anzahl Stücke), „Wird gelasert“, „Fertig“."""
+        body = self.read_body(MAX_EVENT_BYTES)
+        try:
+            data = json.loads(body.decode("utf-8")) if body else {}
+        except ValueError:
+            data = {}
+        if not isinstance(data, dict) or data.get("bogen") not in ("platte", "folie") or data.get("aktion") not in ("erstellt", "laser", "fertig"):
+            return self.send_json({"ok": False, "fehler": "ungültig"}, 400)
+        try:
+            stuecke = int(data.get("stuecke") or 0)
+        except (ValueError, TypeError):
+            stuecke = 0
+        werkstatt_melden({"bogen": data["bogen"], "aktion": data["aktion"], "name": str(data.get("name", ""))[:80], "stuecke": stuecke})
+        return self.send_json({"ok": True})
 
     def save_settings(self):
         """Ändert nur, was mitgeschickt wird: schueler (Zahl), freigaben, ohneFoto, ohneKi (Listen), vibePin."""
