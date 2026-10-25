@@ -25,7 +25,13 @@ PREISE = {
     "claude-haiku-5-5": (0.10, 0.50),
     "claude-sonnet-5-5": (2.00, 10.00),
     "claude-opus-5-5": (4.00, 20.00),
+    "Test": (2.00, 10.00),  # Testmodus: rechnet wie Sonnet, damit die Anzeige etwas zeigt
 }
+TEST_TOKEN = (300, 2000)  # Testmodus: so tun, als hätte Claude so viele Token gebraucht
+# Strom: Anthropic veröffentlicht keine Zahlen. Grobe Spanne aus öffentlichen Schätzungen für große
+# Sprachmodelle (ca. 0,3 bis 3 Wh für eine Antwort mit ~500 Token): 0,5 bis 5 Wh pro 1000 Ausgabe-Token.
+# Eingabe-Token kosten viel weniger Rechenzeit, sie zählen hier ein Zehntel. Nur zum Nachdenken, keine Messung.
+STROM_WH_PRO_1000 = (0.5, 5.0)
 PRO_TAG = int(os.environ.get("STENCILME_KI_PRO_TAG", "150"))  # Obergrenze für alle Gruppen zusammen
 TEST = os.environ.get("STENCILME_KI_TEST") == "1"
 TIMEOUT_S = 150  # Sonnet braucht ca. 50 s pro Bild
@@ -122,7 +128,7 @@ def erzeugen(prompt):
     """Ruft Claude auf. Rückgabe: (svg, eingabe_token, ausgabe_token, modell). Das Modell
     kann bei einer Ablehnung ein anderes sein als MODELL (Rückfall der API)."""
     if TEST:
-        return TEST_SVG, 0, 0, "Test"
+        return TEST_SVG, TEST_TOKEN[0], TEST_TOKEN[1], "Test"
     try:
         import anthropic
     except ImportError:
@@ -161,6 +167,16 @@ def kosten_usd(modell, ein, aus):
     return (ein * preis[0] + aus * preis[1]) / 1_000_000
 
 
+def strom_wh(ein, aus):
+    gewichtet = (aus + ein / 10) / 1000
+    return [round(gewichtet * STROM_WH_PRO_1000[0], 2), round(gewichtet * STROM_WH_PRO_1000[1], 2)]
+
+
+def verbrauch(modell, ein, aus):
+    """Was eine Anfrage verbraucht hat: für die Anzeige an der Station."""
+    return {"eingabe": ein, "ausgabe": aus, "kostenUsd": round(kosten_usd(modell, ein, aus), 5), "stromWh": strom_wh(ein, aus)}
+
+
 def protokoll_lesen(protokoll_datei):
     eintraege = []
     try:
@@ -189,7 +205,17 @@ def status(protokoll_datei):
         "appsGesamt": len(apps),
         "kostenGesamtUsd": round(sum(e.get("kostenUsd", 0) for e in eintraege), 4),
         "proTag": PRO_TAG,
+        # Für die Auswertung: Token, Kosten und Strom-Schätzung je Station
+        "arten": {art: summe(liste) for art, liste in (("bild", bilder), ("app", apps))},
+        "gesamt": summe(eintraege),
     }
+
+
+def summe(eintraege):
+    ein = sum(e.get("eingabe", 0) for e in eintraege)
+    aus = sum(e.get("ausgabe", 0) for e in eintraege)
+    return {"anfragen": len(eintraege), "eingabe": ein, "ausgabe": aus,
+            "kostenUsd": round(sum(e.get("kostenUsd", 0) for e in eintraege), 4), "stromWh": strom_wh(ein, aus)}
 
 
 def bild_fuer_gruppe(gruppe_dir, protokoll_datei, auswahl, gruppe):
@@ -216,4 +242,5 @@ def bild_fuer_gruppe(gruppe_dir, protokoll_datei, auswahl, gruppe):
                                  "modell": modell, "eingabe": ein, "ausgabe": aus, "kostenUsd": round(kosten, 5)},
                                 ensure_ascii=False) + "\n")
     print("KI-Bild für %s: %d + %d Token, ca. %.4f $" % (gruppe, ein, aus, kosten))
-    return {"ok": True, "svg": svg, "prompt": prompt, "nr": bisher + 1, "rest": ki["proGruppe"] - bisher - 1}
+    return {"ok": True, "svg": svg, "prompt": prompt, "nr": bisher + 1, "rest": ki["proGruppe"] - bisher - 1,
+            "verbrauch": verbrauch(modell, ein, aus)}

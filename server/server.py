@@ -351,7 +351,8 @@ def evaluation():
                      kiRichtig=richtig, kiAntworten=antworten)
         werte.update(dauer_stats(werte.pop("dauern")))
         stats.append(werte)
-    return {"gruppen": len(groups), "stationen": stats, "feedback": feedback, "gesamt": dauer_stats(gesamt)}
+    return {"gruppen": len(groups), "stationen": stats, "feedback": feedback, "gesamt": dauer_stats(gesamt),
+            "ki": ki_bild.status(KI_LOG_FILE)}
 
 
 # Stand der Server-Dateien beim Start. Ändern sie sich danach (neue Version), zeigt die
@@ -716,6 +717,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         try:
             text, ein, aus, modell = ki_app.streamen(auftrag, schreiben)
             ki_app.speichern(gruppe_dir, KI_LOG_FILE, gruppe, auftrag, text, ein, aus, modell)
+            schreiben(ki_app.info(modell, ein, aus))
         except ki_bild.KiFehler as err:
             schreiben(ki_app.FEHLER_MARKE + err.text)
         except (BrokenPipeError, ConnectionResetError):

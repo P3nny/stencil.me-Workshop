@@ -41,6 +41,15 @@
 </div>
 
 <div class="panel">
+  <h2>Generative KI: Verbrauch</h2>
+  <p class="hint">Token und Kosten aus den Antworten von Claude (genau). Strom: nur grob geschätzt (0,5–5 Wh pro 1000 Ausgabe-Token, Eingabe zählt ein Zehntel), Anthropic veröffentlicht keine Zahlen.</p>
+  <table>
+    <thead><tr><th>Station</th><th>Anfragen</th><th>Token rein</th><th>Token raus</th><th>Kosten</th><th>Strom (Schätzung)</th></tr></thead>
+    <tbody id="ki"></tbody>
+  </table>
+</div>
+
+<div class="panel">
   <h2>Feedbackbogen</h2>
   <p class="hint" id="fbAnzahl"></p>
   <h2 style="font-size:1rem">Welche Station hat am besten gefallen?</h2>
@@ -84,7 +93,27 @@
     return minuten(s.dauerMedian) + (s.dauerAnzahl > 1 ? " (" + minuten(s.dauerMin) + "–" + minuten(s.dauerMax) + ")" : "");
   }
 
+  function tausender(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+  function komma(n, stellen) { return n.toFixed(stellen).replace(".", ","); }
+
+  function kiZeigen(ki) {
+    var body = document.getElementById("ki");
+    body.innerHTML = "";
+    if (!ki) return;
+    [["KI-Selbstporträt", ki.arten.bild], ["Bild-App vibe coden", ki.arten.app], ["Zusammen", ki.gesamt]].forEach(function (z) {
+      var s = z[1], row = document.createElement("tr");
+      td(row, z[0]);
+      td(row, String(s.anfragen));
+      td(row, tausender(s.eingabe));
+      td(row, tausender(s.ausgabe));
+      td(row, komma(s.kostenUsd, 2) + " $");
+      td(row, komma(s.stromWh[0], 1) + "–" + komma(s.stromWh[1], 1) + " Wh");
+      body.appendChild(row);
+    });
+  }
+
   function zeigen(d) {
+    kiZeigen(d.ki);
     var g = d.gesamt;
     document.getElementById("gesamt").innerHTML = "<b>Workshop-Dauer:</b> " + (g.dauerAnzahl
       ? "Anmeldung bis letzte Pflichtstation typisch " + minuten(g.dauerMedian) + " Min." + (g.dauerAnzahl > 1 ? " (" + minuten(g.dauerMin) + "–" + minuten(g.dauerMax) + ")" : "") + ", " + g.dauerAnzahl + (g.dauerAnzahl === 1 ? " Gruppe" : " Gruppen") + " mit allen Pflichtstationen"
