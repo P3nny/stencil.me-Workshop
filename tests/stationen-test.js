@@ -28,6 +28,15 @@ function pruefe(ok, text){
   if(!ok) fehler++;
 }
 
+// „✓ Stempel ist fertig“ für beide Personen (geht erst beim Beenden an den Laptop)
+async function fertigMarkieren(page, art){
+  for(let i = 0; i < 2; i++){
+    const knopf = page.locator('.stempel-person').nth(i).locator('button:has-text("' + art + ' ist fertig")');
+    await knopf.click();
+    await page.waitForFunction(i => document.querySelectorAll('.stempel-person')[i].querySelector('button').disabled, i);
+  }
+}
+
 async function abschliessen(page, sterne){
   await page.click('button:has-text("Station beendet")');
   // Stationen ohne Computer (Berufe, Linoldruck) fragen nicht „Was hast du gerade genutzt?“
@@ -111,7 +120,9 @@ async function abschliessen(page, sterne){
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-1a-keine-person.png'), fullPage: true });
   await inputs.nth(0).setInputFiles(FOTO);
   await page.waitForSelector('.foto-feld:nth-child(1) .ki-pruefung.ok', { timeout: 60000 });
-  pruefe(true, 'Foto mit Person: „Die KI hat dich erkannt“');
+  const erkannt = await page.locator('.foto-feld:nth-child(1) .ki-pruefung').textContent();
+  pruefe(/BodyPix/.test(erkannt) && /\d+ % des Bildes/.test(erkannt), 'Foto mit Person: ' + erkannt);
+  pruefe(/Personenerkennungs-KI von Google/.test(await page.locator('.ankuendigung').textContent()), 'Ankündigung: BodyPix, Personenerkennungs-KI von Google');
   pruefe(await beenden.isDisabled(), 'nach einem Foto noch gesperrt');
   await inputs.nth(1).setInputFiles({ name: 'leer.jpg', mimeType: 'image/jpeg', buffer: leerJpeg });
   await page.waitForSelector('.foto-feld:nth-child(2) .ki-pruefung.keine', { timeout: 60000 });
@@ -177,17 +188,20 @@ async function abschliessen(page, sterne){
   pruefe(/mm/.test(randText), 'Schnittrand automatisch gewählt: ' + randText);
   pruefe(await page.locator('.rand-warnung:visible').count() === 0, 'roter Rand in einem Stück');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-6-stencilme.png'), fullPage: true });
-  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor die Stempel abgeschickt sind');
-  await page.locator('button:has-text("Stempel an den Laptop schicken")').first().click();
-  await page.waitForSelector('button:has-text("Stempel ist abgeschickt")');
-  // Regler ändern: Stempel kann neu geschickt werden
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor die Stempel fertig sind');
+  await page.locator('.stempel-person').first().locator('button:has-text("Stempel ist fertig")').click();
+  await page.waitForSelector('text=geht an den Laptop, wenn ihr unten auf');
+  // Regler ändern: geänderten Stempel nochmal als fertig nehmen
   await page.locator('.rand input').first().fill('12');
-  await page.waitForSelector('button:has-text("Geänderten Stempel neu schicken")');
-  pruefe(true, 'nach Änderung am Rand: „neu schicken“');
+  await page.waitForSelector('button:has-text("Geänderten Stempel als fertig nehmen")');
+  pruefe(true, 'nach Änderung am Rand: „Geänderten Stempel als fertig nehmen“');
   await page.locator('.rand input').first().fill(String(parseFloat(randText.replace(',', '.'))));
-  await page.waitForFunction(() => document.querySelectorAll('button').length && Array.prototype.some.call(document.querySelectorAll('.stempel-person:first-of-type button'), b => b.textContent.indexOf('abgeschickt') >= 0));
-  await page.locator('button:has-text("Stempel an den Laptop schicken")').first().click();
-  await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Stempel ist abgeschickt') >= 0).length === 2);
+  await page.waitForFunction(() => document.querySelector('.stempel-person button').disabled);
+  await page.locator('.stempel-person').nth(1).locator('button:has-text("Stempel ist fertig")').click();
+  await page.waitForFunction(() => document.querySelectorAll('.stempel-person')[1].querySelector('button').disabled);
+  await page.waitForTimeout(1500);
+  const vorher = (await (await page.request.get(BASE + '/api/liste')).json()).stempel.length;
+  pruefe(vorher === 0, 'Stempel noch nicht auf dem Laptop, solange die Station läuft (' + vorher + ')');
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne Antwort zu den Farben');
   await page.fill('#eingabe-farben', 'Rot schneidet, Blau graviert');
   await page.click('button:has-text("Station beendet")');
@@ -197,6 +211,9 @@ async function abschliessen(page, sterne){
   await page.locator('button.stern').nth(4).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
+  await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
+  const nachher = (await (await page.request.get(BASE + '/api/liste')).json()).stempel.map(x => x.name).sort().join(',');
+  pruefe(nachher === 'Ada,Bo', 'nach „Fertig“: genau ein Stempel pro Person auf dem Laptop (' + nachher + ')');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 2, 'Puzzle: zwei Teile mit Stempel-Porträt');
   await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
   const stempelNachher = (await (await page.request.get(BASE + '/api/liste')).json()).stempel;
@@ -517,10 +534,7 @@ async function abschliessen(page, sterne){
   pruefe(await page.locator('.legende').textContent().then(t => /Plotter/.test(t)), 'Sticker-Legende: Schwarz und Rot');
   pruefe(/nicht gespiegelt/.test(await page.locator('.schritt-notiz').nth(4).textContent()), 'Sticker ist nicht gespiegelt');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-15-sticker.png'), fullPage: true });
-  await page.locator('button:has-text("Sticker an den Laptop schicken")').first().click();
-  await page.waitForSelector('button:has-text("Sticker ist abgeschickt")');
-  await page.locator('button:has-text("Sticker an den Laptop schicken")').first().click();
-  await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Sticker ist abgeschickt') >= 0).length === 2);
+  await fertigMarkieren(page, 'Sticker');
   await abschliessen(page, 5);
   pruefe((await page.locator('.zaehler').textContent()).indexOf('12 von 12') >= 0, 'Bonus zählt nicht mit: weiter 12 von 12');
   pruefe(await page.locator('text=Feedback zum Workshop').count() === 1, 'danach wird der Feedbackbogen vorgeschlagen');
@@ -545,10 +559,7 @@ async function abschliessen(page, sterne){
   await page.waitForFunction(() => document.querySelectorAll('.stempel-person .schritt-bild svg').length === 2, null, { timeout: 120000 });
   pruefe(/nicht gespiegelt/.test(await page.locator('.schritt-notiz').nth(4).textContent()), 'Porträt ist nicht gespiegelt');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-17-portraet.png'), fullPage: true });
-  await page.locator('button:has-text("Porträt an den Laptop schicken")').first().click();
-  await page.waitForSelector('button:has-text("Porträt ist abgeschickt")');
-  await page.locator('button:has-text("Porträt an den Laptop schicken")').first().click();
-  await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Porträt ist abgeschickt') >= 0).length === 2);
+  await fertigMarkieren(page, 'Porträt');
   await abschliessen(page, 5);
   pruefe(await page.locator('text=alle Stationen geschafft').count() === 1, '„Du hast alle Stationen geschafft!“');
   await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
