@@ -2,7 +2,7 @@
   "id": "kunst-quiz",
   "titel": "Kunst-Quiz: Künstler:innen und Streetart",
   "typ": "analog",
-  "datenweg": "laptop",
+  "datenweg": "foto-ipad",
   "schritte": [
     "Schaut euch die Bilder der Künstler:innen an der Wand an.",
     "Spielt das Kunst-Quiz bis zum Ende.",
@@ -14,7 +14,6 @@
     "url": "/kunst-quiz.html",
     "foto": {
       "proPerson": true,
-      "hochladen": true,
       "text": "Lieblings-Streetart von"
     }
   },
@@ -28,7 +27,7 @@
   "fragen": [
     "sterne"
   ],
-  "datenschutz": "Euer Quiz-Ergebnis und die Fotos eurer Lieblingswerke gehen an den Laptop. Am Ende des Workshops wird alles gelöscht.",
+  "datenschutz": "Die Fotos eurer Lieblingswerke bleiben auf dem iPad. An den Laptop geht nur euer Quiz-Ergebnis. Am Ende des Workshops wird alles gelöscht.",
   "braucht": [
     "foto"
   ],

@@ -2,7 +2,7 @@
   "id": "lasercutter",
   "titel": "Lasercutter",
   "typ": "programm",
-  "datenweg": "laptop-video",
+  "datenweg": "foto-ipad-video",
   "schritte": [
     "Geht zu Penny am Lasercutter.",
     "Schaut zu, wie Penny eure Stempel auf der Holzplatte anordnet.",
@@ -17,7 +17,6 @@
   },
   "check": {
     "art": "foto",
-    "hochladen": true,
     "text": "Mach ein Foto vom Lasercutter. Nur die Maschine, keine Leute."
   },
   "eingaben": [
@@ -36,7 +35,7 @@
     "ki-typ",
     "sterne"
   ],
-  "datenschutz": "Deine Frage, die Antwort und das Foto vom Laser gehen an den Laptop. Das Video kommt von YouTube: Erst wenn du „Video laden“ antippst, sieht YouTube die Adresse des iPads.",
+  "datenschutz": "Das Foto vom Laser bleibt auf dem iPad. Deine Frage und die Antwort gehen an den Laptop. Das Video kommt von YouTube: Erst wenn du „Video laden“ antippst, sieht YouTube die Adresse des iPads.",
   "braucht": [
     "stencilme"
   ],

@@ -2,7 +2,7 @@
   "id": "feedback",
   "titel": "Feedback zum Workshop",
   "typ": "analog",
-  "datenweg": "laptop",
+  "datenweg": "antworten",
   "bonus": true,
   "freigabe": "feedback",
   "schritte": [

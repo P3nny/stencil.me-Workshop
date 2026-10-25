@@ -2,12 +2,12 @@
   "id": "hintergrund",
   "titel": "Hintergrund ändern",
   "typ": "ki",
-  "datenweg": "laptop",
+  "datenweg": "foto-ipad",
   "schritte": [
     "Die KI stellt dein Foto frei: Sie erkennt, welche Pixel zu dir gehören, und lässt den Rest weg.",
     "Such dir einen neuen Hintergrund aus. Schieb dich mit dem Finger an die richtige Stelle und stell deine Größe ein.",
     "Schau genau hin: Wo hat die KI sauber gearbeitet, wo nicht (Haare, Hände, Ränder)?",
-    "Schick dein Bild an den Laptop."
+    "Speichere dein Bild."
   ],
   "hintergruende": [
     {
@@ -69,7 +69,7 @@
     "ki-typ",
     "sterne"
   ],
-  "datenschutz": "Das Freistellen passiert auf dem iPad. Dein fertiges Bild mit dem neuen Hintergrund geht an den Laptop. Am Ende des Workshops wird alles gelöscht.",
+  "datenschutz": "Das Freistellen passiert auf dem iPad. Dein fertiges Bild mit dem neuen Hintergrund bleibt auch auf dem iPad. Am Ende löscht ihr es selbst.",
   "braucht": [
     "foto",
     "koerpererkennung"

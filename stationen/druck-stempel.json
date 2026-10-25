@@ -2,7 +2,7 @@
   "id": "druck-stempel",
   "titel": "Stempeldruck",
   "typ": "analog",
-  "datenweg": "laptop",
+  "datenweg": "foto-ipad",
   "schritte": [
     "Holt euch euren fertigen Stempel bei Penny am Lasercutter ab.",
     "Rollt die Druckfarbe dünn und gleichmäßig auf den Stempel.",
@@ -20,7 +20,6 @@
   "check": {
     "art": "foto",
     "proPerson": true,
-    "hochladen": true,
     "text": "Foto von der Postkarte von"
   },
   "eingaben": [
@@ -40,7 +39,7 @@
   "fragen": [
     "sterne"
   ],
-  "datenschutz": "Das Foto eurer Postkarte geht an den Laptop. Fotografiert nur die Karte, keine Leute. Am Ende des Workshops wird alles gelöscht. Die Postkarte nehmt ihr mit.",
+  "datenschutz": "Das Foto eurer Postkarte bleibt auf dem iPad. Fotografiert nur die Karte, keine Leute. Die Postkarte nehmt ihr mit.",
   "braucht": [
     "lasercutter"
   ],

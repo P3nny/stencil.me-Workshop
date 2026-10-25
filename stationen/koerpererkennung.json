@@ -2,13 +2,13 @@
   "id": "koerpererkennung",
   "titel": "Körpererkennung testen",
   "typ": "ki",
-  "datenweg": "laptop",
+  "datenweg": "foto-ipad",
   "schritte": [
     "Lest die Aufgaben unten. Nehmt dann ein kurzes Video auf (5 bis 10 Sekunden) und probiert dabei die Aufgaben aus. Wer nicht ins Video will, filmt ein Foto einer Person.",
     "Schaut zu, wie die KI Bild für Bild entscheidet: Person oder Hintergrund?",
     "Spielt mit den Reglern und den Ansichten.",
     "Sucht euch 3 der 6 Aufgaben aus und hakt sie ab.",
-    "Speichert ein Bild der KI-Ansicht und schickt es an den Laptop."
+    "Speichert ein Bild der KI-Ansicht."
   ],
   "aufgaben": [
     "Halte einen Gegenstand vor dich (Buch, Tasche). Gehört er für die KI zu dir?",
@@ -39,7 +39,7 @@
     "ki-typ",
     "sterne"
   ],
-  "datenschutz": "Das Video bleibt auf dem iPad, nur solange die Seite offen ist. Das Bild der KI-Ansicht (mit dir darauf) geht an den Laptop.",
+  "datenschutz": "Das Video bleibt auf dem iPad, nur solange die Seite offen ist. Das Bild der KI-Ansicht bleibt auch auf dem iPad. An den Laptop gehen nur eure Antworten.",
   "braucht": [
     "foto"
   ],
