@@ -194,7 +194,7 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 
 ## Station 12: Bild-App vibe coden — gebaut, Branch `feature/vibe-coding`, seit 24.10. optional
 
-- Ersetzt die Betreuungsperson: Lückentext statt freiem Auftrag. Auswahl: Effekt (Warhol, Pixel-Art, Farben verrückt, Comic, Schablone), Farben, Regler. Frei nur App-Name und Knopf-Text (höchstens 24 Zeichen, nur Buchstaben, Zahlen, Satzzeichen, Laptop prüft nochmal und setzt sie in Anführungszeichen)
+- Ersetzt die Betreuungsperson: Lückentext statt freiem Auftrag. Auswahl: Effekt (Warhol, Pixel-Art, Farben verrückt, Comic, Schablone), Farben, Regler. Frei nur der App-Name (Knopf-Text seit 25.10. weg, das Foto kommt automatisch in die App) (höchstens 24 Zeichen, nur Buchstaben, Zahlen, Satzzeichen, Laptop prüft nochmal und setzt sie in Anführungszeichen)
 - Laptop baut den Auftrag, Claude (Sonnet) schreibt eine HTML-App, der Code erscheint live auf dem iPad (`server/ki_app.py`, Streaming). Test 24.10.: 41 s, ca. 6 Cent
 - Die App läuft abgeschottet: `sandbox="allow-scripts"` (eigener Ursprung, kein Zugriff auf App-Daten, keine Navigation), CSP ohne Netz, vorher werden alle Adressen nach außen entfernt. Geprüft: fetch, Navigation, Speicher werden blockiert
 - „📷 Euer Foto in die App schicken“: Ausgangsfoto geht nur per postMessage in die abgeschottete App, nicht zu Claude

@@ -401,20 +401,23 @@ async function abschliessen(page, sterne){
   console.log('Station Bild-App vibe coden (Server im Testmodus, ohne Claude)');
   await page.goto(BASE + '/app/station.html?id=vibe-coding&test');
   await page.waitForSelector('.vibe-auftrag select');
-  pruefe(await page.locator('.vibe-auftrag select').count() === 3 && await page.locator('.vibe-auftrag input').count() === 2, 'Lückentext: 3 Auswahlfelder, 2 kurze Textfelder');
+  pruefe(await page.locator('.vibe-auftrag select').count() === 3 && await page.locator('.vibe-auftrag input').count() === 1, 'Lückentext: 3 Auswahlfelder, 1 kurzes Textfeld (App-Name)');
+  pruefe((await page.locator('.vibe-auftrag').textContent()).indexOf('Baue eine App, die unser Foto') === 0, 'Lückentext in lesbarem Deutsch');
   await page.locator('.vibe-auftrag input').first().fill('Ada<script>');
   await page.click('button:has-text("App bauen lassen")');
   await page.waitForSelector('text=Buchstaben, Zahlen und Satzzeichen');
   pruefe(true, 'verbotene Zeichen im Freitext: Laptop lehnt ab');
   await page.locator('.vibe-auftrag input').first().fill('Pop-Maschine');
   await page.click('button:has-text("App bauen lassen")');
+  await page.waitForSelector('.vibe-phasen');
+  pruefe(true, 'Fortschritt mit Schritten');
   await page.waitForSelector('.vibe-karte iframe');
   pruefe(true, 'App gebaut und angezeigt');
+  pruefe(/Token rein/.test(await page.locator('.vibe-karte .ki-verbrauch').textContent()), 'Token, Kosten und Strom unter der App');
   pruefe(await page.locator('.vibe-karte iframe').getAttribute('sandbox') === 'allow-scripts', 'App läuft abgeschottet (sandbox ohne same-origin)');
-  await page.click('button:has-text("Euer Foto in die App schicken")');
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(1200);
   const appRahmen = page.frames().filter(fr => fr !== page.mainFrame() && fr.parentFrame() === page.mainFrame()).pop();
-  pruefe(await appRahmen.title() === 'Foto da', 'Foto per Knopf in die App geschickt');
+  pruefe(await appRahmen.locator('#s').textContent() === 'Foto da', 'Foto kommt von selbst in die App (ohne Datei-Feld)');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-19-vibe-coding.png'), fullPage: true });
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne Ethik-Antwort');
   await page.fill('#eingabe-ethik', 'Schutz vor schlechten Inhalten');
@@ -671,6 +674,8 @@ async function abschliessen(page, sterne){
   pruefe(/1 Gruppe mit allen Pflichtstationen/.test(await laptop.locator('#gesamt').textContent()), 'Auswertung: Workshop-Dauer der Gruppe');
   pruefe(/2 Bögen/.test(await laptop.locator('#fbAnzahl').textContent()), 'Auswertung: 2 Feedbackbögen');
   pruefe(await laptop.locator('#woerter span').count() === 2, 'Auswertung: zwei Wörter');
+  const kiZusammen = await laptop.locator('#ki tr').last().textContent();
+  pruefe(await laptop.locator('#ki tr').count() === 3 && /Wh/.test(kiZusammen) && /\$/.test(kiZusammen), 'Auswertung: Token, Kosten, Strom der KI-Stationen (' + kiZusammen + ')');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-18-auswertung.png'), fullPage: true });
 
   pruefe(konsolenFehler.length === 0, 'keine JavaScript-Fehler' + (konsolenFehler.length ? ': ' + konsolenFehler.join(' | ') : ''));

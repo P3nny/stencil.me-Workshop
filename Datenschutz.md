@@ -64,7 +64,7 @@ Fotografiere an den Stationen nur die Sache, um die es geht: die Maschine, die P
 
 Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen sind optional. Sie zählen nicht zu euren Stationen, und ihr verpasst nichts für euren Stempel.
 
-- **Was geht hin?** Nur der Satz aus dem Baukasten. Zum Beispiel: „Zeichne ein Selbstporträt im Stil von Frida Kahlo. Es zeigt ein 14-jähriges Mädchen mit braunen Augen und langen Haaren.“ Bei der Bild-App kommen der App-Name und der Knopf-Text dazu, die ihr selbst eintippt.
+- **Was geht hin?** Nur der Satz aus dem Baukasten. Zum Beispiel: „Zeichne ein Selbstporträt im Stil von Frida Kahlo. Es zeigt ein 14-jähriges Mädchen mit braunen Augen und langen Haaren.“ Bei der Bild-App kommt der App-Name dazu, den ihr selbst eintippt.
 - **Frei vibe coden:** Bei der Bild-App dürft ihr eure Idee auch frei beschreiben und eure App weiterbauen lassen. Das geht nur, wenn eine erwachsene Person dabei ist: Sie schaltet euer iPad mit einer PIN frei (15 Minuten, oder bis ihr die Station beendet) und tippt eure Idee ein. Sie achtet darauf, dass nichts über euch im Auftrag steht.
 - **Was geht nicht hin?** Kein Foto, kein Name, nichts, was zeigt, wer ihr seid. Schreibt deshalb auch in den App-Namen keinen echten Namen.
 - **Wer schickt es?** Nicht das iPad, sondern Pennys Laptop. Anthropic sieht also nicht, von welchem iPad der Auftrag kommt.
@@ -75,6 +75,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
   - Jede Gruppe kann nur wenige Bilder und Apps erzeugen.
   - Eure App läuft abgeschottet: Sie kommt nicht ins Internet und nicht an eure Daten.
   - Die App sagt euch immer: Hier arbeitet eine KI, kein Mensch.
+- **Was kostet das?** Nach jeder Anfrage zeigt die App, wie viele Token (Wortstücke) Claude gelesen und geschrieben hat, was das gekostet hat und grob geschätzt, wie viel Strom das Rechenzentrum dafür gebraucht hat.
 - **Ohne Internet?** Wenn Claude nicht erreichbar ist, zeigt die App Beispiele, die vorher mit derselben KI erzeugt wurden.
 
 ## Was du sonst noch wissen solltest
@@ -117,7 +118,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 | Dienst                                      | Wann                                                           | Welche Daten                                                                                                                                                                                            |
 | ------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Anthropic (Claude-API), USA                 | Optionale Stationen „Selbstporträts mit KI“ und „Bild-App vibe coden“ | Ausgefüllter Baukasten-Text (Stil, Alter 11–18, Geschlecht, Augen- und Haarfarbe, Brille; bzw. Effekt, Farben, App-Name, Knopf-Text). Bei „Bild-App vibe coden“ zusätzlich freier Auftrag (höchstens 1000 Zeichen) und ggf. der Code der bisherigen App, nur nach PIN-Freigabe durch eine erwachsene Person. Kein Foto, kein Name, keine Geräte-IP (Anfrage kommt vom Laptop). |
+| Anthropic (Claude-API), USA                 | Optionale Stationen „Selbstporträts mit KI“ und „Bild-App vibe coden“ | Ausgefüllter Baukasten-Text (Stil, Alter 11–18, Geschlecht, Augen- und Haarfarbe, Brille; bzw. Effekt, Farben, App-Name). Bei „Bild-App vibe coden“ zusätzlich freier Auftrag (höchstens 1000 Zeichen) und ggf. der Code der bisherigen App, nur nach PIN-Freigabe durch eine erwachsene Person. Kein Foto, kein Name, keine Geräte-IP (Anfrage kommt vom Laptop). |
 | YouTube (Google), über youtube-nocookie.com | Nur nach Antippen von „Video laden“ an der Station Lasercutter | IP-Adresse des iPads, Geräte- und Browserdaten.                                                                                                                                                         |
 | Apple (Diktierfunktion)                     | Nur, wenn ein Kind die Mikrofon-Taste nutzt                    | Sprachaufnahme, je nach Gerät auf dem iPad oder bei Apple verarbeitet.                                                                                                                                  |
 | Netlify, USA                                | Nur Plan B (WLAN zum Laptop geht nicht)                        | IP-Adresse des iPads in den Server-Protokollen. Keine Fotos, keine Antworten.                                                                                                                           |
