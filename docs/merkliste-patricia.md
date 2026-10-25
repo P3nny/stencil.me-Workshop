@@ -48,7 +48,8 @@ Was nur du erledigen kannst. Abhaken, wenn erledigt. Die Aufbau-Schritte am Work
 - [ ] Cameo mit echtem Plotter testen (bisher nur Testmodus)
 - [ ] USB-Stick: „Auf USB-Stick kopieren“ ausprobieren
 - [ ] Mr Beam: wie lange dauert eine volle A4-Platte, 2× graviert? (entscheidet, wann die erste Platte starten muss)
-- [ ] Claude Console: Guthaben und Ausgabenlimit prüfen
+- [ ] Claude Console: Guthaben und Ausgabenlimit prüfen (freie Apps sind größer: ca. 3–4× so teuer wie eine Baukasten-App)
+- [ ] Frei vibe coden: Wer betreut die KI-Ecke (Empfehlung: die Lehrkraft)? PIN auf der Laptop-Seite festlegen, Regelkärtchen [vibe-coding-regeln.md](vibe-coding-regeln.md) ausdrucken und mit der Person durchgehen
 - [ ] QR-Codes drucken (`/qr`, 4 pro Blatt), sobald die Laptop-Adresse im KOMEZ feststeht
 - [ ] Laminierte Stationenkarten (`02_stencil.me-Stationen.pdf`) als Plan C: passen sie noch zur App?
 - [ ] Kunst-Quiz-Bilder: Ist das Zeigen im Workshop rechtlich in Ordnung (Bildungseinrichtung)? Im Zweifel beim KOMEZ fragen

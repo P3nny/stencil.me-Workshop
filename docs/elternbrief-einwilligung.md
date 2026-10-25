@@ -26,8 +26,8 @@ Die genaue Beschreibung jeder Station steht in der beiliegenden Datenschutzinfor
 
 Zwei Stationen sind freiwillig: Dort erzeugt eine generative KI (Claude, Firma Anthropic, USA) ein Bild bzw. eine kleine App.
 
-- **Was an die KI geht:** nur Wörter, die Ihr Kind aus einem Baukasten auswählt, zum Beispiel „Selbstporträt im Stil von Frida Kahlo, 14-jähriges Mädchen, braune Augen“. **Kein Foto, kein Name.** Die Anfrage schickt der Laptop, nicht das iPad.
-- **Sicherheitsregeln:** Auswahl statt freier Texteingabe, Vorgaben für kindgerechte Inhalte, eine Obergrenze pro Gruppe, Begleitung durch die Workshopleitung. Die App sagt immer, dass hier eine KI arbeitet.
+- **Was an die KI geht:** Wörter, die Ihr Kind aus einem Baukasten auswählt, zum Beispiel „Selbstporträt im Stil von Frida Kahlo, 14-jähriges Mädchen, braune Augen“. Bei der Bild-App kann Ihr Kind seine Idee auch frei beschreiben, aber nur zusammen mit einer erwachsenen Person, die das iPad dafür mit einer PIN freischaltet und den Auftrag eintippt. **Kein Foto, kein Name.** Die Anfrage schickt der Laptop, nicht das iPad.
+- **Sicherheitsregeln:** Baukasten statt freier Texteingabe, freier Text nur mit erwachsener Person, Vorgaben für kindgerechte Inhalte, eine Obergrenze pro Gruppe, Begleitung durch die Workshopleitung. Die App sagt immer, dass hier eine KI arbeitet.
 - **Speicherung bei Anthropic:** in der Regel höchstens 30 Tage, keine Nutzung zum Training der KI.
 - Wer diese Stationen nicht macht, verpasst nichts für Stempel und Postkarte.
 

@@ -139,6 +139,7 @@ Freier Ablauf: Die App schlägt die nächste Station vor (Voraussetzungen `brauc
 - **WLAN** im KOMEZ ist passwortgeschützt. HTTP im WLAN gilt damit als vertretbar (steht offen in `Datenschutz.md`)
 - **Elternbrief:** Fotos mit aktiver Einwilligung, generative KI als Opt-out (`docs/elternbrief-einwilligung.md`, Entwurf, noch rechtlich prüfen lassen)
 - **Ohne Foto-Einwilligung:** Die Person wählt in der Foto-Station ein Porträt einer bekannten Person (9 Stück, gemeinfrei oder CC BY / CC BY-SA, mit Namensnennung; Auswahl `stationen/bilder/ersatz/README.md`). Batman-Cosplay verworfen (schlechter Stempel)
+- **Frei vibe coden mit PIN:** Zusätzlich zum Baukasten darf eine erwachsene Person eine Gruppe mit einer PIN 15 Minuten freischalten (freier Auftrag, letzte App ändern, höchstens 6 Apps). Die Freigabe endet sofort, wenn die Gruppe die Station beendet. Opt-out geht vor. Betreuung durch eine zweite erwachsene Person (Lehrkraft), Patricia schafft es neben dem Laser nicht. Lokales Bildmodell verworfen, KI-Selbstporträt bleibt wie es ist
 - **Zwei Schalter auf der Laptop-Seite:** „ohne Foto“ pro Person, „ohne generative KI“ pro Paar. Patricia trägt die Vornamen vorab ein, in der Gruppen-Tabelle zusätzlich pro Person umschaltbar. Die Kinder sehen die Listen nicht
 
 ## 9. Entscheidungen vom 24.10.2026, spät
