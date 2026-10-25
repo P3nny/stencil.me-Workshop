@@ -1,6 +1,6 @@
 # Elternbrief mit Einwilligung (Entwurf)
 
-*Entwurf vom 25.10.2026, Rückmeldeteil nach dem Vorbild des zdi-Foto-Formulars. Vor dem Versand von der Schule oder dem KOMEZ prüfen lassen (Datenschutz). Platzhalter in [eckigen Klammern] ausfüllen. Dazu `Datenschutz.md` beilegen.*
+_Entwurf vom 25.10.2026, Rückmeldeteil nach dem Vorbild des zdi-Foto-Formulars. Vor dem Versand von der Schule oder dem KOMEZ prüfen lassen (Datenschutz). Platzhalter in [eckigen Klammern] ausfüllen. Dazu `Datenschutz.md` beilegen._
 
 ---
 
@@ -14,7 +14,7 @@ Ihr Kind nimmt an einem Workshop teil, in dem die Jugendlichen erfahren, wie Com
 ## Was mit den Daten Ihres Kindes passiert
 
 - **Name:** nur Vorname oder Spitzname, keine Nachnamen, keine E-Mail-Adresse.
-- **Fotos:** Ihr Kind macht ein Porträtfoto auf einem iPad des KOMEZ. Das Foto wird auf dem iPad bearbeitet. Auch die KI, die die Person auf dem Foto erkennt, rechnet auf dem iPad.
+- **Fotos:** Ihr Kind macht ein Porträtfoto auf einem iPad des KOMEZ. Das Foto wird auf dem iPad bearbeitet. Auch die Bilderkennungs-KI, die die Person auf dem Foto freistellt, rechnet auf dem iPad.
 - **Ergebnisse:** Das Foto, der Stempel und weitere Werke gehen über das passwortgeschützte WLAN des KOMEZ an den Laptop der Workshopleitung im selben Raum. Die Verbindung im WLAN ist nicht zusätzlich verschlüsselt. Der Laptop gibt keine Fotos ins Internet weiter.
 - **Ergebnis-Mappe:** Die Werke (Fotos, Stempel, Bilder) bekommt Ihr Kind als Mappe über die Lehrkraft, über [Schulplattform]. Antworten und Feedback kommen nicht in die Mappe.
 - **Löschen:** Auf den iPads löschen die Jugendlichen ihre Daten am Ende selbst. Auf dem Laptop wird alles spätestens eine Woche nach dem Workshop gelöscht.
@@ -33,7 +33,7 @@ Zwei Stationen sind freiwillig: Dort erzeugt eine generative KI (Claude, Firma A
 
 ## Einwilligung (bitte bis zum [Datum] an [Lehrkraft] zurückgeben)
 
-*Aufbau wie das Foto-Formular des zdi-Zentrums Köln. Dieses Blatt gilt nur für die Arbeit im Workshop. Die Einwilligung des zdi für Website, Social Media und Presse ist ein eigenes Blatt und bleibt davon unberührt.*
+_Aufbau wie das Foto-Formular des zdi-Zentrums Köln. Dieses Blatt gilt nur für die Arbeit im Workshop. Die Einwilligung des zdi für Website, Social Media und Presse ist ein eigenes Blatt und bleibt davon unberührt._
 
 **Einwilligung zur Verarbeitung von Fotos im Workshop „Vom Selfie zum Lasercut-Stempel“**
 am [Datum] im Kommunalen Medienzentrum (KOMEZ), Klasse [ ]
@@ -49,28 +49,30 @@ Im Workshop macht Ihr Kind ein Porträtfoto von sich. Daraus entstehen ein Stemp
 
 Die Einwilligung ist freiwillig. Ohne sie entsteht Ihrem Kind kein Nachteil: Es macht ganz normal mit und gestaltet seinen Stempel aus dem Porträt einer bekannten Person (z. B. Taylor Swift, Frida Kahlo, Albert Einstein; frei lizenzierte Fotos mit Quellenangabe). Sie können die Einwilligung jederzeit für die Zukunft widerrufen, auch am Workshop-Tag: Nachricht an [Lehrkraft] oder patricia.ennenbach@bildung.koeln.de genügt.
 
-Vorname des Kindes: ______________________  Klasse: ______
+Vorname des Kindes: **********\_\_********** Klasse: **\_\_**
 
 **Fotos (bitte ankreuzen):**
 
 ☐ Ich bin / wir sind einverstanden, dass im Workshop Fotos von meinem / unserem Kind gemacht und wie oben unter 1. bis 4. beschrieben verarbeitet werden.
 
-*Ohne dieses Kreuz macht Ihr Kind mit einem Porträt einer bekannten Person mit.*
+_Ohne dieses Kreuz macht Ihr Kind mit einem Porträt einer bekannten Person mit._
 
 **Generative KI (nur ankreuzen, wenn Sie das nicht möchten):**
 
 ☐ Ich möchte nicht, dass mein Kind die zwei freiwilligen, abgesicherten Stationen mit generativer KI nutzt.
 
-*Ohne dieses Kreuz darf Ihr Kind die Stationen nutzen, wenn es möchte. Mit Kreuz sieht es dort nur vorher erzeugte Beispiele.*
-
-______________________________  ______________________________
-Ort, Datum                         Unterschrift des Kindes
-
-______________________________  ______________________________
-Namen aller Erziehungsberechtigten  Unterschriften der Erziehungsberechtigten
-
-*Hinweis wie beim zdi: Bei Minderjährigen unterschreiben das Kind und die Erziehungsberechtigten.*
+_Ohne dieses Kreuz darf Ihr Kind die Stationen nutzen, wenn es möchte. Mit Kreuz sieht es dort nur vorher erzeugte Beispiele._
 
 ---
 
-*Fragen zum Workshop oder zum Datenschutz: Patricia Ennenbach, patricia.ennenbach@bildung.koeln.de*
+Ort, Datum Unterschrift des Kindes
+
+---
+
+Namen aller Erziehungsberechtigten Unterschriften der Erziehungsberechtigten
+
+_Hinweis wie beim zdi: Bei Minderjährigen unterschreiben das Kind und die Erziehungsberechtigten._
+
+---
+
+_Fragen zum Workshop oder zum Datenschutz: Patricia Ennenbach, patricia.ennenbach@bildung.koeln.de_

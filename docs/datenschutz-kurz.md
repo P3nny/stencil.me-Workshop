@@ -4,11 +4,11 @@ Lang und genau: `Datenschutz.md`.
 
 ## Wohin gehen deine Daten?
 
-📱 **iPad:** Hier werden deine Fotos bearbeitet. Auch die KI, die dich auf dem Foto findet, rechnet hier.
+📱 **iPad:** Hier werden deine Fotos bearbeitet. Auch die Bildbearbeitungs-KI, die dich auf dem Foto freistellt, rechnet hier.
 
 💻 **Pennys Laptop:** Steht hier im Raum. Er sammelt deine Ergebnisse für eure Mappe: dein Foto, deinen Stempel, eure Antworten. Er schickt nichts ins Internet.
 
-🌍 **Internet:** Nur an zwei optionalen Stationen, an die KI Claude. Dorthin gehen nur Wörter aus dem Baukasten. Kein Foto, kein Name. Du musst diese Stationen nicht machen.
+🌍 **Internet:** Nur an zwei optionalen Stationen, an die generative KI Claude. Dorthin gehen nur Wörter aus dem Baukasten. Kein Foto, kein Name. Du musst diese Stationen nicht machen.
 
 ## Drei Regeln für dich
 
