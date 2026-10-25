@@ -73,8 +73,28 @@
     return (station.braucht || []).filter(b => liste.some(s => s.id === b));
   }
 
+  // Nachrichten vom Laptop, auf die eine Station wartet (wartetAuf.meldung), z. B. „platte-fertig“:
+  // Den Stempel drucken geht erst, wenn er gelasert und abgeholt ist.
+  let meldungen = [];
+  function meldungenMerken(nachrichten){
+    const arten = nachrichten.map(n => n.art).filter(Boolean);
+    return Speicher.schreiben('meldungen', arten).then(() => { meldungen = arten; return arten; });
+  }
+  function meldungenLaden(gruppeId){
+    const anfrage = jsonHolen('/api/nachrichten?gruppe=' + encodeURIComponent(gruppeId || '')).then(d => d.nachrichten || []);
+    const limit = new Promise(resolve => setTimeout(() => resolve(null), BELEGUNG_TIMEOUT_MS));
+    return Promise.race([anfrage, limit]).catch(() => null)
+      .then(n => n ? meldungenMerken(n) : Speicher.lesen('meldungen'))
+      .then(m => { meldungen = m || []; return meldungen; });
+  }
+  // Wartet die Station noch auf eine Nachricht? Dann: { meldung, text, trotzdem }, sonst null
+  function wartet(station){
+    const w = station.wartetAuf;
+    return w && meldungen.indexOf(w.meldung) < 0 ? w : null;
+  }
+
   function moeglich(liste, f){
-    return liste.filter(s => !istFertig(f, s.id) && voraussetzungen(liste, s).every(b => istFertig(f, b)) && !fehlenBisBonus(liste, f, s));
+    return liste.filter(s => !istFertig(f, s.id) && voraussetzungen(liste, s).every(b => istFertig(f, b)) && !fehlenBisBonus(liste, f, s) && !wartet(s));
   }
 
   // Belegung vom Laptop: { <id>: Anzahl Gruppen, eingecheckt oder unterwegs }. Ohne Laptop: null.
@@ -103,8 +123,9 @@
     if(!kandidaten.length) return null;
     const besetzt = s => (beleg && beleg[s.id]) || 0;
     const frei = kandidaten.filter(s => besetzt(s) < (s.plaetze || 1));
-    // Vorrang (stencil.me, Lasercutter): Alle fangen damit an, damit die Holzplatte schnell voll ist
-    const vorrang = frei.filter(s => s.vorrang);
+    // Vorrang (stencil.me, Lasercutter): Alle fangen damit an, damit die Holzplatte schnell voll ist.
+    // vorrangNach: Vorrang erst nach einer Nachricht vom Laptop (Vibe Coding, sobald „Wird gelasert“ kam)
+    const vorrang = frei.filter(s => s.vorrang || (s.vorrangNach || []).some(m => meldungen.indexOf(m) >= 0));
     if(vorrang.length) return vorrang[0];
     // Optionale Stationen nur vorschlagen, wenn keine andere frei ist
     const freiOhneOptional = frei.filter(s => !s.optional);
@@ -115,7 +136,8 @@
 
   // Belegung holen, Station aussuchen und dem Laptop melden
   function vorschlagen(liste, f, gruppeId, ohne){
-    return belegung(gruppeId).then(beleg => {
+    return Promise.all([belegung(gruppeId), meldungenLaden(gruppeId)]).then(werte => {
+      const beleg = werte[0];
       const st = naechste(liste, f, beleg, ohne);
       return st ? unterwegs(gruppeId, st.id).then(() => st) : null;
     });
@@ -134,6 +156,9 @@
     freigabenLaden: freigabenLaden,
     belegung: belegung,
     naechste: naechste,
+    meldungenLaden: meldungenLaden,
+    meldungenMerken: meldungenMerken,
+    wartet: wartet,
     vorschlagen: vorschlagen
   };
 })();

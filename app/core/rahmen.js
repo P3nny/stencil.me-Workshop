@@ -670,6 +670,27 @@
     return stattdessen(panel, 'Geht stattdessen jetzt zu: ');
   }
 
+  // Station wartet auf eine Nachricht vom Laptop (Stempel fertig). Weiter mit „trotzdem“,
+  // falls der Laptop ausfällt oder Penny die Nachricht vergessen hat.
+  function wartenAuf(w){
+    if(!w) return Promise.resolve();
+    return new Promise(weiter => {
+      const inhalt = document.getElementById('inhalt');
+      inhalt.innerHTML = '';
+      const panel = el('section', { klasse: 'panel' }, [
+        el('h1', { text: ctx.station.titel + ': noch nicht' }),
+        el('p', { text: w.text })
+      ]);
+      inhalt.appendChild(panel);
+      stattdessen(panel, 'Geht so lange zu: ').then(() => {
+        panel.appendChild(el('button', { type: 'button', klasse: 'secondary', text: w.trotzdem || 'Trotzdem weiter', onclick: () => {
+          inhalt.innerHTML = '';
+          weiter();
+        } }));
+      });
+    });
+  }
+
   // Station schon voll (andere Gruppen eingecheckt oder unterwegs)? Nur ein Hinweis, keine Sperre:
   // Hängt der Laptop oder ist ein Tab vergessen, geht es mit „Wir sind trotzdem dran“ weiter.
   function platzPruefen(){
@@ -722,6 +743,8 @@
     Outbox.starten();
     document.addEventListener('visibilitychange', beiRueckkehr);
     return Promise.all([Speicher.lesen('gruppe'), Stationen.laden(), Stationen.fortschritt(), Stationen.freigabenLaden()])
+      // Nur Stationen mit wartetAuf fragen nach den Nachrichten (sonst wartet das iPad ohne Laptop unnötig)
+      .then(werte => werte[0] && werte[1].some(s => s.id === id && s.wartetAuf) ? Stationen.meldungenLaden(werte[0].id).then(() => werte) : werte)
       .then(werte => {
         const gruppe = werte[0];
         const liste = werte[1];
@@ -751,7 +774,7 @@
           if(fehlend.length) return nochNichtDran(fehlend);
           if(ctx.eintrag.status !== 'begonnen'){
             // Check-in: Station ist ab jetzt für diese Gruppe besetzt
-            return platzPruefen().then(() => {
+            return wartenAuf(Stationen.wartet(st)).then(platzPruefen).then(() => {
               ctx.eintrag.status = 'begonnen';
               ctx.eintrag.start = new Date().toISOString();
               ctx.f.aktuell = id;

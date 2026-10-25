@@ -14,6 +14,7 @@
     return Promise.all([Promise.race([anfrage, limit]), Speicher.lesen('nachrichten-gelesen')])
       .then(werte => {
         const gelesen = werte[1] || [];
+        if(window.Stationen) Stationen.meldungenMerken(werte[0].nachrichten || []);
         const neu = (werte[0].nachrichten || []).filter(n => gelesen.indexOf(n.id) < 0);
         zeigen(neu, gelesen, !!werte[0].loeschen);
       })

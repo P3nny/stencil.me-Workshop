@@ -44,5 +44,10 @@
   "braucht": [
     "lasercutter"
   ],
+  "wartetAuf": {
+    "meldung": "platte-fertig",
+    "text": "Euer Stempel ist noch nicht fertig. Diese Station geht auf, wenn oben die Nachricht kommt: „… ist fertig! Bitte bei Penny am Lasercutter abholen.“",
+    "trotzdem": "Penny hat uns den Stempel schon gegeben"
+  },
   "plaetze": 1
 }
