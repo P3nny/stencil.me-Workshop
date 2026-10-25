@@ -155,7 +155,7 @@ function vorschlagAbwarten(page){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Optional: Selbstporträts mit KI neu erschaffen', 'Mit der Hand drucken: Linolplatten', 'Kunst-Quiz: Künstler:innen und Streetart', 'Berufe: Wer macht das in echt?', 'Optional: Bild-App vibe coden'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Optional: Selbstporträts mit KI neu erschaffen', 'Linoldruck', 'Kunst-Quiz: Künstler:innen und Streetart', 'Berufe: Wer macht das in echt?', 'Optional: Bild-App vibe coden'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
   pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 12') >= 0, 'Zähler steht auf 1 von 12');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
@@ -165,7 +165,7 @@ function vorschlagAbwarten(page){
   await page.waitForSelector('text=Bonus-Station');
   const sperre = await page.locator('#inhalt').textContent();
   pruefe(/Euch fehlen noch 7\./.test(sperre), 'Bonus-Sticker gesperrt: „Euch fehlen noch 7.“');
-  pruefe(/Vorher müsst ihr noch machen: Bild bearbeiten, Lasercutter, Mit der Hand drucken: euer Lasercut-Stempel\./.test(sperre), 'Sperre nennt die fehlenden Stationen');
+  pruefe(/Vorher müsst ihr noch machen: Bild bearbeiten, Lasercutter, Stempeldruck\. Stempeldruck geht auf, sobald euer Stempel fertig ist \(Nachricht „Fertig, abholen“\)\./.test(sperre), 'Sperre nennt die fehlenden Stationen');
   await page.goto(BASE + '/app/station.html?id=lasercutter&test');
   await page.waitForSelector('text=noch nicht');
   pruefe(await page.locator('text=Bild bearbeiten').count() > 0, 'Lasercutter verlangt zuerst „Bild bearbeiten“');
@@ -465,8 +465,8 @@ function vorschlagAbwarten(page){
   await abschliessen(page, 5);
   pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 12') >= 0, 'Optionale Station zählt nicht mit: weiter 7 von 12');
 
-  for(const druck of [['druck-linol', 'Linolplatten'], ['druck-stempel', 'Lasercut-Stempel']]){
-    console.log('Station Mit der Hand drucken: ' + druck[1]);
+  for(const druck of [['druck-linol', 'Linoldruck'], ['druck-stempel', 'Stempeldruck']]){
+    console.log('Station ' + druck[1]);
     if(druck[0] === 'druck-stempel'){
       // Erst wenn „Fertig, abholen“ für die Platte gekommen ist
       await page.goto(BASE + '/app/station.html?id=druck-stempel&test');
@@ -481,7 +481,7 @@ function vorschlagAbwarten(page){
       await page.click('.nachricht button:has-text("OK")');
       await page.waitForFunction(() => !document.querySelector('.nachricht'));
     }
-    await page.waitForSelector('h1:has-text("Mit der Hand drucken")');
+    await page.waitForSelector('h1:has-text("' + druck[1] + '")');
     pruefe(await page.locator('.beispiele img').evaluate(img => img.complete && img.naturalWidth > 0), 'Beispiel-Postkarte von der Karte geladen');
     const karten = page.locator('input[type=file]');
     pruefe(await karten.count() === 2, 'ein Postkarten-Foto pro Person');
