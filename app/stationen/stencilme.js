@@ -191,7 +191,7 @@
     },
     sticker: {
       name: 'Sticker', dein: 'Dein Sticker', dieser: 'Dieser Sticker', notiz: 'nicht gespiegelt', puzzle: false,
-      legende: [['schwarz', 'Schwarz: Diese Linien zeichnet der Plotter mit einem Stift.'], ['rot', 'Rot: Hier schneidet das Messer, das ist der Rand des Stickers.']],
+      legende: [['schwarz', 'Schwarz: Diese Fläche malt der Plotter mit einem Marker aus, Linie für Linie.'], ['rot', 'Rot: Hier schneidet das Messer, das ist der Rand des Stickers.']],
       svg: (mask, mm) => Stempel.stickerSvg(mask, mm),
       senden: (gruppe, name, svg) => Outbox.sticker(gruppe, name, svg)
     }

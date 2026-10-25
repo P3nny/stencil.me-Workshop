@@ -460,25 +460,100 @@ function buildHatchLinesD(mask, size, scale, spacingMm, angleDeg){
   return { d: d.trim(), count };
 }
 
-const STICKER_SCHRAFFUR_MM = 1.2; // Linienabstand (wie in stencil.html), Stift 1,0 mm
-const STICKER_WINKEL = 45;
+// Sticker wie in archiv/00_fotobox-karte (public/index.html, Patricia 25.10.: ausgefüllt statt
+// schraffiert, 0,8-mm-Marker): dichte waagerechte Linien (Abstand 0,7 × Stiftbreite), Fläche um
+// einen Teil der halben Stiftbreite nach innen versetzt (die Tinte läuft breiter).
+const STICKER_STIFT_MM = 0.8;      // Marker der Cameo. Neuer Stift: hier ändern
+const STICKER_FUELL_FAKTOR = 0.7;  // Linienabstand = Faktor × Stiftbreite (wie FILL_FACTOR in der Fotobox)
+const STICKER_STIFT_AUSGLEICH = 0.6; // wie PEN_COMP in der Fotobox
+// Schnittlinie wie in der Fotobox: geglättet (Chaikin) und vereinfacht, nur außen herum.
+// Eine Pixel-Treppe hätte Hunderte kleine Ecken: Das Messer ruckelt und ritzt die Matte.
+const STICKER_SCHNITT_GENAU_MM = 0.15; // wie CUT_SIMPLIFY_MM in der Fotobox
+
+function chaikin(pts, runden){
+  for(let k = 0; k < runden; k++){
+    const out = [], n = pts.length;
+    for(let i = 0; i < n; i++){
+      const p = pts[i], q = pts[(i + 1) % n];
+      out.push([0.75 * p[0] + 0.25 * q[0], 0.75 * p[1] + 0.25 * q[1]], [0.25 * p[0] + 0.75 * q[0], 0.25 * p[1] + 0.75 * q[1]]);
+    }
+    pts = out;
+  }
+  return pts;
+}
+
+// Ramer-Douglas-Peucker: behält nur Punkte, die die Form um mehr als eps (mm) verändern
+function rdpOffen(pts, eps){
+  if(pts.length < 3) return pts;
+  const ax = pts[0][0], ay = pts[0][1], bx = pts[pts.length - 1][0], by = pts[pts.length - 1][1];
+  const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1e-9;
+  let maxD = -1, idx = -1;
+  for(let i = 1; i < pts.length - 1; i++){
+    const d = Math.abs((pts[i][0] - ax) * dy - (pts[i][1] - ay) * dx) / len;
+    if(d > maxD){ maxD = d; idx = i; }
+  }
+  if(maxD <= eps) return [pts[0], pts[pts.length - 1]];
+  return rdpOffen(pts.slice(0, idx + 1), eps).slice(0, -1).concat(rdpOffen(pts.slice(idx), eps));
+}
+
+function rdpGeschlossen(pts, eps){
+  if(pts.length < 6) return pts;
+  const weitester = (liste) => {
+    let beste = -1, idx = 0;
+    for(let i = 1; i < liste.length; i++){
+      const d = Math.hypot(liste[i][0] - liste[0][0], liste[i][1] - liste[0][1]);
+      if(d > beste){ beste = d; idx = i; }
+    }
+    return idx;
+  };
+  const i0 = weitester(pts);
+  const rot = pts.slice(i0).concat(pts.slice(0, i0));
+  const i1 = weitester(rot);
+  const a = rdpOffen(rot.slice(0, i1 + 1), eps), b = rdpOffen(rot.slice(i1).concat([rot[0]]), eps);
+  const out = a.slice(0, -1).concat(b.slice(0, -1));
+  return out.length >= 3 ? out : pts;
+}
+
+function glattePfadeD(loops, scale, epsMm){
+  return loops.map(loop => {
+    const pts = rdpGeschlossen(chaikin(simplifyLoop(loop), 2).map(p => [p[0] * scale, p[1] * scale]), epsMm);
+    return 'M' + pts.map(p => p[0].toFixed(2) + ',' + p[1].toFixed(2)).join('L') + 'Z';
+  }).join(' ');
+}
+
+// Maske um r Pixel nach innen schrumpfen (Abstand zum Hintergrund)
+function einziehen(mask, size, rPx){
+  if(rPx < 0.5) return mask;
+  const hintergrund = new Uint8Array(mask.length);
+  for(let i = 0; i < mask.length; i++) hintergrund[i] = mask[i] ? 0 : 1;
+  const d2 = distanceTransform2D(hintergrund, size), r2 = rPx * rPx;
+  const out = new Uint8Array(mask.length);
+  for(let i = 0; i < mask.length; i++) out[i] = mask[i] && d2[i] >= r2 ? 1 : 0;
+  return out;
+}
 
 // Sticker für die Cameo 4, gleiches Format wie archiv/00_fotobox-karte (fotobox-queue.py):
-// Alles außerhalb der Gruppe „schneiden-rot“ zeichnet der Stift (Schraffur und Umriss),
+// Alles außerhalb der Gruppe „schneiden-rot“ zeichnet der Stift (Füllung und Umriss),
 // die Gruppe „schneiden-rot“ schneidet das Messer. Nicht gespiegelt: Ein Sticker zeigt
 // das Motiv so, wie es ist.
 function buildStickerSvg(mask, offsetMm){
   const scale = STEMPEL_MM / WORK_SIZE;
   const off = computeOffsetCutPath(mask, WORK_SIZE, scale, offsetMm);
-  const schraffur = buildHatchLinesD(off.paddedMask, off.paddedSize, scale, STICKER_SCHRAFFUR_MM, STICKER_WINKEL);
+  const stift = STICKER_STIFT_MM;
+  const stiftMaske = einziehen(off.paddedMask, off.paddedSize, (stift / 2) * STICKER_STIFT_AUSGLEICH / scale);
+  const fuellung = buildHatchLinesD(stiftMaske, off.paddedSize, scale, Math.max(0.3, stift * STICKER_FUELL_FAKTOR), 0);
+  const umriss = loopsToPathD(traceContours(stiftMaske, off.paddedSize), scale);
+  // Keine Innenlöcher: nur eine Schnittlinie außen herum
+  const schnittLoops = traceContours(fillHoles(off.dilatedMask, off.paddedSize), off.paddedSize);
+  const schnittD = glattePfadeD(schnittLoops, scale, STICKER_SCHNITT_GENAU_MM);
   const w = off.widthMm.toFixed(3), h = off.heightMm.toFixed(3);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}mm" height="${h}mm">` +
     `<g transform="translate(${off.dxMm.toFixed(3)},${off.dyMm.toFixed(3)})">` +
-    `<g id="zeichnen-stift" fill="none" stroke="#1a1c1a" stroke-width="0.35" stroke-linecap="round" stroke-linejoin="round">` +
-    `<path d="${schraffur.d}"/><path d="${off.motifPathD}"/></g>` +
-    `<g id="schneiden-rot"><path d="${off.cutPathD}" fill="none" stroke="${CUT_COLOR}" stroke-width="0.3" stroke-linejoin="round"/></g>` +
+    `<g id="zeichnen-stift" fill="none" stroke="#1a1c1a" stroke-width="${stift}" stroke-linecap="round" stroke-linejoin="round">` +
+    `<path d="${fuellung.d}"/><path d="${umriss}"/></g>` +
+    `<g id="schneiden-rot"><path d="${schnittD}" fill="none" stroke="${CUT_COLOR}" stroke-width="0.3" stroke-linejoin="round"/></g>` +
     `</g></svg>`;
-  return { svg: svg, cutLoops: off.cutLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
+  return { svg: svg, cutLoops: schnittLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
 }
 
 // Kleinster Schnittrand (ganze mm), bei dem der rote Rand in einem Stück außen herumläuft.
