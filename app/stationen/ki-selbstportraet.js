@@ -73,6 +73,7 @@
           el('strong', { text: beispiel ? 'Beispiel (vorher erzeugt)' : 'Bild ' + bild.nr }),
           el('span', { text: ' „' + bild.prompt + '“' })
         ]));
+        if(!beispiel && bild.verbrauch) fig.appendChild(KiVerbrauch.zeile(el, bild.verbrauch));
         return fig;
       }
       function galerieZeigen(){
@@ -115,7 +116,7 @@
               status.textContent = '⚠ ' + (antwort.daten.fehler || 'Das hat nicht geklappt.');
               return;
             }
-            eintrag.bilder.push({ nr: antwort.daten.nr, prompt: antwort.daten.prompt, stil: eintrag.auswahl.stil, svg: antwort.daten.svg });
+            eintrag.bilder.push({ nr: antwort.daten.nr, prompt: antwort.daten.prompt, stil: eintrag.auswahl.stil, svg: antwort.daten.svg, verbrauch: antwort.daten.verbrauch });
             status.textContent = '✓ Fertig nach ' + Math.round((Date.now() - start) / 1000) + ' Sekunden.';
             return api.speichern().then(() => api.pruefen());
           })
