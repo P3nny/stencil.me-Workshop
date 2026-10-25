@@ -39,7 +39,7 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 | **Generative KI**            | Erzeugt neue Inhalte, gleicher Prompt gibt jedes Mal etwas anderes                 | KI-Selbstporträt, Claude (Code)                  |
 
 - Deterministisch heißt nicht „keine KI“: BodyPix ist KI und liefert bei gleichem Foto das gleiche Ergebnis.
-- An jeder Station steht ein Etikett: Typ (Programm / KI / generativ) und Datenweg („Bleibt auf dem iPad“ / „Foto/Daten an den Laptop“ / „Nutzt generative KI“, keine Befehlsform).
+- An jeder Station steht ein Etikett: Typ (Programm / KI / generativ) und Datenweg („Bleibt auf dem iPad“ / „Antworten an den Laptop“ / „Foto bleibt auf dem iPad · Antworten an den Laptop“ / „Datei für Laser/Plotter an den Laptop“ / „Nutzt generative KI“, keine Befehlsform, Liste in `DATENWEG_TEXT`).
 - Fragen an die Kinder: „Was hast du gerade genutzt?“ (Programm, Bildbearbeitungs-KI, generative KI …; nicht bei Berufe, Linol- und Stempeldruck, Kunst- und Code-Quiz) und „Wie gut hat dir die Station gefallen?“
 
 ## Ist-Zustand des Repos
@@ -105,7 +105,7 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 
 ## Datenschutz (nicht verhandelbar)
 
-- Fotos von Jugendlichen werden zuerst nur auf dem Gerät verarbeitet. Zum lokalen Server geht nur, was für Laser, Plotter und den Ablauf im Workshop nötig ist (Stempel-Datei, vom Kind hochgeladene Ergebnisse).
+- Fotos von Jugendlichen bleiben auf dem iPad (seit 25.10.2026 kein Foto-Upload mehr). Zum lokalen Server geht nur, was für Laser, Plotter und den Ablauf im Workshop nötig ist (Stempel-, Sticker-, Porträt-SVG, Antworten).
 - **Kein Foto und kein Prompt eines Kindes geht an einen Online-Dienst**, ohne dass es in `Datenschutz.md` steht und Einwilligungen vorliegen. Das gilt auch für KI-Funktionen.
 - Der Workshop-Server ist Patricias Laptop im KOMEZ-WLAN. Er nimmt die Ergebnisse der Kinder an (Fotos, Stempel, Antworten). An einen Online-Dienst gibt er nur die Baukasten-Texte der zwei **optionalen** Claude-Stationen weiter (Anthropic), nie Fotos oder Namen.
 - Alle Daten werden am Ende des Workshops gelöscht, auf den iPads und auf dem Laptop. Keine digitale Mappe, kein USB-Stick (entschieden 25.10.2026): Die Kinder nehmen Stempel, Postkarte und Sticker mit. Vorher sichert der Laptop ohne Namen und ohne Fotos Vibe-Coding-Apps, KI-Prompts, Auswertung und Ablauf nach `archiv/workshops/` (`server/archiv.py`).

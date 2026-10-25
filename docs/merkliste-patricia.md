@@ -30,8 +30,8 @@ Was nur du erledigen kannst. Abhaken, wenn erledigt. Die Aufbau-Schritte am Work
 ## Datenschutz und Einwilligung
 
 - [x] Einwilligung der Erziehungsberechtigten: läuft über zdi (Patricia, 25.10.)
-- [ ] Elternbrief mit Einwilligung (Fotos: ankreuzen, nur für den Workshop, keine Veröffentlichung, Aufbau wie das zdi-Formular) und Opt-out (generative KI): Entwurf in [elternbrief-einwilligung.md](elternbrief-einwilligung.md). Platzhalter ausfüllen, bei zdi prüfen lassen, zusammen mit dem zdi-Foto-Formular (Website/Presse) verschicken
-- [ ] Vor dem Workshop: Vornamen ohne Foto-Einwilligung bzw. mit KI-Opt-out auf der Laptop-Seite eintragen („Rückmeldezettel der Eltern“). Nach der Anmeldung in der Gruppen-Tabelle prüfen: Stimmen die gelben Schalter? (Spitznamen!)
+- [ ] Elternbrief mit Einwilligung (Fotos: ankreuzen, nur für den Workshop, keine Veröffentlichung, Aufbau wie das zdi-Formular) und Einwilligung generative KI (Ankreuzen = einverstanden): Entwurf in [elternbrief-einwilligung.md](elternbrief-einwilligung.md). Platzhalter ausfüllen, bei zdi prüfen lassen, zusammen mit dem zdi-Foto-Formular (Website/Presse) verschicken
+- [ ] Vor dem Workshop: Vornamen ohne Foto-Einwilligung bzw. ohne Kreuz bei generativer KI auf der Laptop-Seite eintragen („Rückmeldezettel der Eltern“). Nach der Anmeldung in der Gruppen-Tabelle prüfen: Stimmen die gelben Schalter? (Spitznamen!)
 - [ ] `Datenschutz.md` vorab an Lehrkraft und Eltern schicken
 - [ ] `docs/datenschutz-kurz.md` als Aushang ausdrucken
 - [ ] Laptop: Festplattenverschlüsselung an? (Fotos von Kindern liegen dort bis zum Ende des Workshops)

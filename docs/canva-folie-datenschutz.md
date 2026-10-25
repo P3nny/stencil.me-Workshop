@@ -15,7 +15,7 @@ Dein Gesicht gehört dir.
 
 ## Fußzeile
 
-Darum bleibt dein Foto heute auf dem iPad und auf Pennys Laptop. Die KI Claude bekommt nur Wörter, kein Foto.
+Darum bleibt dein Foto heute auf dem iPad. Pennys Laptop bekommt nur deinen Stempel für den Laser. Die KI Claude bekommt nur Wörter, kein Foto.
 
 ## Frage an die Gruppe (mündlich)
 

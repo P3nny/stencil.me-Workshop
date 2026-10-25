@@ -8,8 +8,8 @@ Für Lehrkräfte und Eltern stehen die genauen Angaben ganz unten.
 
 ## Kurz gesagt
 
-- Deine Fotos bearbeitet das iPad. Kein Foto von dir geht ins Internet.
-- Deine Ergebnisse sammelt Pennys Laptop hier im Raum. Er schickt sie nicht ins Internet.
+- Deine Fotos bleiben auf dem iPad. Dort werden sie auch bearbeitet. Kein Foto von dir geht an den Laptop oder ins Internet.
+- Pennys Laptop hier im Raum bekommt nur, was er für Laser und Plotter braucht (deinen Stempel, Sticker, Porträt), und eure Antworten. Er schickt nichts davon ins Internet.
 - Nur an zwei Stationen geht etwas ins Internet: an eine KI namens Claude. Dorthin gehen nur Wörter aus einem Baukasten, bei der Bild-App auch eine freie Idee, die eine erwachsene Person mit euch eintippt. Kein Foto, kein Name. Diese zwei Stationen sind optional: Du musst sie nicht machen.
 - Am Ende des Workshops löscht Penny alles. Mit nach Hause nehmt ihr Stempel, Postkarte und Sticker.
 
@@ -18,7 +18,7 @@ Für Lehrkräfte und Eltern stehen die genauen Angaben ganz unten.
 | Ort                  | Was ist das?                                                              | Wer sieht es?                       |
 | -------------------- | ------------------------------------------------------------------------- | ----------------------------------- |
 | 📱 **iPad**          | Das iPad, mit dem ihr arbeitet.                                           | Nur ihr, an diesem iPad.            |
-| 💻 **Pennys Laptop** | Steht hier im Raum. Die iPads schicken ihm eure Ergebnisse über das WLAN. | Nur Penny.                          |
+| 💻 **Pennys Laptop** | Steht hier im Raum. Die iPads schicken ihm Stempel und Antworten über das WLAN. | Nur Penny.                          |
 | 🌍 **Online-Dienst** | Ein Computer einer Firma im Internet.                                     | Die Firma, die den Dienst betreibt. |
 
 An jeder Station steht ein Etikett. Es sagt dir, wohin deine Daten gehen.
@@ -40,25 +40,25 @@ Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Fo
 | Station                            | Bleibt auf dem iPad                              | Geht an Pennys Laptop                                     | Geht ins Internet                             |
 | ---------------------------------- | ------------------------------------------------ | --------------------------------------------------------- | --------------------------------------------- |
 | Anmeldung                          | Eure Vornamen oder Spitznamen                    | Eure Vornamen oder Spitznamen                             | –                                             |
-| Foto machen                        | Alle Fotos, auch die verworfenen                 | Nur dein letztes Foto                                     | –                                             |
+| Foto machen                        | Alle Fotos, auch die verworfenen                 | –                                                         | –                                             |
 | Bild bearbeiten                    | Schwarz-Weiß-Bild, Zwischenschritte              | Dein Stempel, dein Name, deine Antwort                    | –                                             |
-| Lasercutter                        | –                                                | Deine Frage, die Antwort, Foto vom Laser                  | Erst wenn du „Video laden“ antippst: YouTube  |
-| Körpererkennung testen             | Euer Video (nur solange die Seite offen ist)     | Ein Bild der KI-Ansicht (mit euch darauf), eure Antworten | –                                             |
-| Hintergrund ändern                 | Das freigestellte Foto                           | Dein Bild mit dem neuen Hintergrund                       | –                                             |
+| Lasercutter                        | Foto vom Laser                                   | Deine Frage, die Antwort                                  | Erst wenn du „Video laden“ antippst: YouTube  |
+| Körpererkennung testen             | Euer Video (solange die Seite offen ist), Bild der KI-Ansicht | Eure Antworten                               | –                                             |
+| Hintergrund ändern                 | Das freigestellte Foto, dein Bild mit dem neuen Hintergrund | –                                              | –                                             |
 | Pixel vs. Vektor                   | –                                                | Eure Antworten, euer SVG-Code                             | –                                             |
 | Coding: HTML, CSS und JavaScript   | –                                                | Euer Code, eure Antwort                                   | –                                             |
 | Optional: Selbstporträts mit KI    | –                                                | Euer Prompt und die Bilder                                | **Claude:** nur euer Prompt aus dem Baukasten |
 | Optional: Bild-App vibe coden      | Euer Foto (es geht nur in eure App auf dem iPad) | Euer Auftrag und eure App                                 | **Claude:** nur euer ausgefüllter Auftrag     |
-| Linoldruck und Stempeldruck        | –                                                | Fotos eurer Postkarten                                    | –                                             |
+| Linoldruck und Stempeldruck        | Fotos eurer Postkarten                           | –                                                         | –                                             |
 | Code-Quiz                          | –                                                | Wie viele Antworten richtig waren                         | –                                             |
-| Kunst-Quiz                         | –                                                | Quiz-Ergebnis, Foto eures Lieblingswerks, euer Satz       | –                                             |
+| Kunst-Quiz                         | Foto eures Lieblingswerks                        | Quiz-Ergebnis, euer Satz                                  | –                                             |
 | Berufe                             | –                                                | Euer Wunschberuf                                          | –                                             |
 | Bonus: Sticker                     | –                                                | Dein Sticker und dein Name                                | –                                             |
 | Feedback                           | –                                                | Dein Feedback mit deinem Vornamen                         | –                                             |
 | Bonus 2: Lasercut-Porträt          | –                                                | Dein Porträt und dein Name                                | –                                             |
 | Nach jeder Station                 | –                                                | Deine Sterne und deine Antwort auf die KI-Frage           | –                                             |
 
-Fotografiere an den Stationen nur die Sache, um die es geht: die Maschine, die Postkarte, das Kunstwerk. Keine anderen Leute.
+Fotografiere an den Stationen nur die Sache, um die es geht: die Maschine, die Postkarte, das Kunstwerk. Keine anderen Leute. Auch diese Fotos bleiben auf dem iPad.
 
 ## Die zwei Stationen mit Internet: Claude
 
@@ -82,7 +82,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 - **Diktieren:** Statt zu tippen, kannst du die Mikrofon-Taste der iPad-Tastatur benutzen. Das ist eine Funktion von Apple, nicht von dieser App. Je nach iPad wird deine Sprache auf dem iPad oder bei Apple in Text umgewandelt. Wenn du das nicht willst: einfach tippen.
 - **YouTube:** Das Video am Lasercutter kommt von YouTube. Erst wenn du „Video laden“ antippst, verbindet sich das iPad mit YouTube. Dann sieht YouTube die Adresse des iPads im Internet, aber nicht deinen Namen.
-- **WLAN:** Die iPads schicken eure Ergebnisse über das WLAN im Medienzentrum an den Laptop. Diese Verbindung ist nicht verschlüsselt.
+- **WLAN:** Die iPads schicken Stempel und Antworten über das WLAN im Medienzentrum an den Laptop. Diese Verbindung ist nicht verschlüsselt.
 - **Wenn das WLAN nicht geht (Plan B):** Dann kommt die App von der Webseite stencilme-workshop.netlify.app. Netlify ist eine Firma in den USA, die Webseiten ausliefert. Netlify sieht die Adresse des iPads, aber keine Fotos und keine Antworten. Den Stempel schickt ihr dann mit Pairdrop an den Rechner am Lasercutter. Pairdrop verbindet die Geräte über einen Dienst im Internet.
 - **Die App lädt nichts nach:** Keine Werbung, keine Tracker, keine Schriften aus dem Internet. Alles, was die App braucht, kommt vom Laptop.
 
@@ -95,9 +95,9 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 ## Deine Rechte
 
 - Du darfst jederzeit nachsehen, was über dich gespeichert ist: Auf der Startseite tippst du auf „🔒 Meine Daten“. Dort steht alles, was auf dem iPad und auf Pennys Laptop liegt, auch wann ihr an welcher Station wart und wie lange. Und was man aus diesen Daten alles ablesen könnte.
-- Du darfst sagen: Ich will nicht, dass mein Foto auf den Laptop geht. Dann findet Penny eine Lösung mit dir.
+- Du darfst sagen: Ich will nicht, dass mein Stempel auf den Laptop geht. Dann findet Penny eine Lösung mit dir.
 - **Ohne eigenes Foto:** Haben deine Eltern Nein zu Fotos gesagt, macht die App kein Foto von dir. Du suchst dir stattdessen das Porträt einer bekannten Person aus, zum Beispiel Taylor Swift oder Albert Einstein. Daraus machst du deinen Stempel und deine Postkarte, ganz normal. Unter dem Bild steht, wer das Foto gemacht hat.
-- Die Stationen mit Claude sind optional. Du machst sie nur, wenn du und deine Eltern einverstanden seid. Haben deine Eltern Nein gesagt, zeigt die App euch dort nur Beispiele. Claude bekommt dann nichts von euch.
+- Die Stationen mit Claude sind optional. Du machst sie nur, wenn du und deine Eltern einverstanden seid. Haben deine Eltern nicht zugestimmt, zeigt die App euch dort nur Beispiele. Claude bekommt dann nichts von euch.
 
 ---
 
@@ -105,13 +105,13 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 **Verantwortlich:** Patricia Ennenbach (im Workshop „Penny“), Workshop im Kommunalen Medienzentrum (KOMEZ). Kontakt: patricia.ennenbach@bildung.koeln.de
 
-**Welche Daten:** Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung), daraus erzeugte Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts), Fotos von Werkstücken, Textantworten, Bewertungen, Feedback, Zeitpunkte von Check-in und Abschluss jeder Station (daraus die Dauer). Die Auswertung (Laptop) zeigt Sterne, KI-Frage, Dauer und Feedback ohne Namen. Für Laser und Plotter protokolliert der Laptop nur Anzahl und Dauer der Platten und Folien, ohne Namen. Damit nicht zwei Gruppen gleichzeitig an eine volle Station geschickt werden, merkt sich der Laptop, zu welcher Station eine Gruppe gerade unterwegs ist (nur Gruppen-ID und Station, nur im Arbeitsspeicher, höchstens 10 Minuten).
+**Welche Daten:** Auf dem iPad: Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung) und Fotos von Werkstücken. Fotos gehen seit 25.10.2026 nicht mehr an den Laptop. Auf dem Laptop: Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), die aus dem Foto erzeugten Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts, nötig für Laser und Plotter), KI-Selbstporträts (von Claude gezeichnet, kein Foto), Vibe-Coding-Apps, Textantworten, Bewertungen, Feedback, Zeitpunkte von Check-in und Abschluss jeder Station (daraus die Dauer). Die Auswertung (Laptop) zeigt Sterne, KI-Frage, Dauer und Feedback ohne Namen. Für Laser und Plotter protokolliert der Laptop nur Anzahl und Dauer der Platten und Folien, ohne Namen. Damit nicht zwei Gruppen gleichzeitig an eine volle Station geschickt werden, merkt sich der Laptop, zu welcher Station eine Gruppe gerade unterwegs ist (nur Gruppen-ID und Station, nur im Arbeitsspeicher, höchstens 10 Minuten).
 
 **Wo verarbeitet:**
 
 - Bildverarbeitung und Personenerkennung (BodyPix, TensorFlow.js) laufen vollständig im Browser des iPads. Modell und Programm liegen lokal auf dem Laptop, es gibt keine Abrufe bei Google oder anderen CDNs.
 - Speicherung auf dem iPad: Website-Daten von Safari (IndexedDB), nicht die Fotos-App.
-- Speicherung auf dem Laptop: lokaler Python-Server im KOMEZ-WLAN (HTTP, unverschlüsselt). Der Laptop gibt keine Fotos weiter. Übersicht und Auswertung sind nur am Laptop selbst abrufbar. „Meine Daten“ zeigt jedem iPad nur die Daten der eigenen Gruppe (zufällige 12-stellige Gruppen-ID, nur diesem iPad bekannt).
+- Speicherung auf dem Laptop: lokaler Python-Server im KOMEZ-WLAN (HTTP, unverschlüsselt). Der Laptop nimmt keine Fotos an und gibt keine Daten weiter. Übersicht und Auswertung sind nur am Laptop selbst abrufbar. „Meine Daten“ zeigt jedem iPad nur die Daten der eigenen Gruppe (zufällige 12-stellige Gruppen-ID, nur diesem iPad bekannt).
 - Keine Ergebnis-Mappe, keine Weitergabe an Lehrkraft oder Schulplattform (entschieden 25.10.2026). Mitgenommen werden nur die analogen Ergebnisse (Stempel, Postkarte, Sticker).
 - Aufbewahrt zur Verbesserung des Workshops (vor dem Löschen gesichert, im Ordner `archiv/workshops/` auf dem Laptop, nicht veröffentlicht): Vibe-Coding-Apps mit Aufträgen, Baukasten-Prompts der KI-Selbstporträts, Auswertung (Sterne, KI-Frage, Dauer, Feedback), Ablauf der Stationen mit Uhrzeiten. Ohne Namen (Gruppen als Nummer, Vornamen in Freitexten automatisch ersetzt), ohne Gruppen-ID, ohne Fotos, Stempel- oder Bilddateien, ohne sonstige Textantworten.
 
@@ -127,9 +127,9 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 **Anthropic und Minderjährige:** Die Claude-API wird über einen Workshop-Zugang mit Ausgabenlimit genutzt (kommerzielle Bedingungen, nicht das Verbraucherangebot claude.ai mit Altersgrenze 18). Anthropic erlaubt Organisationen den Einsatz für Minderjährige, wenn sie Schutzmaßnahmen umsetzen und offenlegen, dass eine KI im Einsatz ist ([Richtlinie von Anthropic](https://support.claude.com/en/articles/9307344-responsible-use-of-anthropic-s-models-guidelines-for-organizations-serving-minors)). **Erklärung:** Dieser Workshop hält die Vorgaben von Anthropic für Angebote mit minderjährigen Nutzer:innen und die geltenden Datenschutzvorgaben ein. Umgesetzte Maßnahmen: Eingabe über einen Baukasten mit geprüften kurzen Freifeldern; freier Auftrag beim Vibe Coding nur nach PIN-Freigabe durch eine anwesende erwachsene Person (15 Minuten, endet mit Abschluss der Station, Sperre nach 5 falschen PINs, Mailadressen und Telefonnummern werden abgelehnt), Systemvorgaben für kindgerechte Inhalte, Begrenzung pro Gruppe und Tag, Protokoll aller Aufträge auf dem Laptop, abgeschottete Ausführung erzeugter Apps ohne Netzzugriff, sichtbarer Hinweis, dass eine KI (Claude) arbeitet, Begleitung durch die Workshopleitung vor Ort. Anthropic löscht API-Ein- und Ausgaben in der Regel nach 30 Tagen und nutzt sie nicht zum Training ([Speicherdauer bei Anthropic](https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data)). Ausnahme: Inhalte, die gegen die Nutzungsrichtlinie verstoßen, können länger gespeichert werden.
 
-**Einwilligung und Opt-out:** Die Workshopleitung trägt vor dem Workshop auf dem Laptop die Vornamen der Kinder ein, für die keine Foto-Einwilligung vorliegt bzw. die Eltern die generative KI abgewählt haben (Rückmeldebogen, `docs/elternbrief-einwilligung.md`). Die Listen liegen nur auf dem Laptop, die iPads erfahren nur „diese Person ohne Foto“ bzw. „diese Gruppe ohne KI“ für die eigene Gruppe.
+**Einwilligungen:** Die Workshopleitung trägt vor dem Workshop auf dem Laptop die Vornamen der Kinder ein, für die keine Foto-Einwilligung vorliegt bzw. keine Einwilligung für die Stationen mit generativer KI (Rückmeldebogen, `docs/elternbrief-einwilligung.md`). Die Listen liegen nur auf dem Laptop, die iPads erfahren nur „diese Person ohne Foto“ bzw. „diese Gruppe ohne KI“ für die eigene Gruppe.
 
 - Ohne Foto-Einwilligung: Die Foto-Station zeigt statt der Kamera eine Auswahl von Porträts bekannter Personen (Wikimedia Commons, gemeinfrei oder CC BY / CC BY-SA, Quelle in `stationen/bilder/ersatz/README.md`). Das gewählte Porträt ersetzt das eigene Foto auf allen Stationen, die Quellenangabe steht unter „Meine Daten“. An der Station Körpererkennung kann statt der eigenen Person ein Foto einer Person gefilmt werden. Ohne Laptop-Verbindung kennt das iPad die Liste nicht: Dann achtet die Workshopleitung selbst darauf.
-- Opt-out generative KI: Die zwei Claude-Stationen zeigen nur vorher erzeugte Beispiele und zählen trotzdem als erledigt. Der Laptop lehnt Claude-Anfragen dieser Gruppe ab. Bei Paaren gilt das für beide, weil sie die Station gemeinsam machen.
+- Ohne Einwilligung für generative KI: Die zwei Claude-Stationen zeigen nur vorher erzeugte Beispiele und zählen trotzdem als erledigt. Der Laptop lehnt Claude-Anfragen dieser Gruppe ab. Bei Paaren gilt das für beide, weil sie die Station gemeinsam machen.
 
-**Löschung:** Laptop: am Ende des Workshops „Für die Workshop-Verbesserung sichern (ohne Namen)“, danach „Alle Daten löschen“ auf der Laptop-Seite (löscht auch die Namenslisten zu Einwilligung und Opt-out). iPads: Abmelden in der App bzw. Website-Daten in Safari löschen, am Ende des Workshops. Anthropic: siehe oben.
+**Löschung:** Laptop: am Ende des Workshops „Für die Workshop-Verbesserung sichern (ohne Namen)“, danach „Alle Daten löschen“ auf der Laptop-Seite (löscht auch die Namenslisten zu den Einwilligungen). iPads: Abmelden in der App bzw. Website-Daten in Safari löschen, am Ende des Workshops. Anthropic: siehe oben.

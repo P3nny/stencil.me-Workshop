@@ -31,7 +31,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] QR-Codes für die Stationen: Server starten, `http://localhost:8000/qr` öffnen, Adresse wählen, drucken. Nur gültig für diese Adresse: Bekommt der Laptop im KOMEZ eine andere IP, dort neu drucken (oder Netlify-Version für Plan B mitnehmen)
 - [ ] USB-Stick dabei
 - [ ] Claude-Stationen (optional): Guthaben in der Claude Console prüfen, Laptop-Seite zeigt „KI (claude-sonnet-5-5): heute …“ (sonst `./server/einrichten.sh`). Braucht Internet im KOMEZ-WLAN. Ohne KI zeigen die Stationen Beispiele
-- [ ] Einwilligungen der Erziehungsberechtigten liegen vor (Fotos auf dem Laptop, Claude-Stationen), `Datenschutz.md` ist vorab verschickt
+- [ ] Einwilligungen der Erziehungsberechtigten liegen vor (Fotos im Workshop, Claude-Stationen), `Datenschutz.md` ist vorab verschickt
 - [ ] `docs/datenschutz-kurz.md` ausgedruckt (Aushang)
 
 ## 3. Aufbau im Raum
