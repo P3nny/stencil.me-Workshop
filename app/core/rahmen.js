@@ -659,12 +659,18 @@
     });
   }
 
+  // Fehlt eine Station, die selbst noch auf Penny wartet (Stempeldruck)? Dann den Grund nennen
+  function wartetGrund(fehlend){
+    return fehlend.filter(s => Stationen.wartet(s) && s.wartetAuf.grund)
+      .map(s => ' ' + s.titel + ' geht auf, ' + s.wartetAuf.grund + '.').join('');
+  }
+
   function nochNichtDran(fehlend, text){
     const inhalt = document.getElementById('inhalt');
     inhalt.innerHTML = '';
     const panel = el('section', { klasse: 'panel' }, [
       el('h1', { text: ctx.station.titel + ': noch nicht' }),
-      text ? el('p', { text: text }) : el('p', {}, [el('span', { text: 'Diese Station kommt später. Mach zuerst: ' }), el('strong', { text: fehlend.map(s => s.titel).join(', ') })])
+      text ? el('p', { text: text }) : el('p', {}, [el('span', { text: 'Diese Station kommt später. Mach zuerst: ' }), el('strong', { text: fehlend.map(s => s.titel).join(', ') }), el('span', { text: wartetGrund(fehlend) })])
     ]);
     inhalt.appendChild(panel);
     return stattdessen(panel, 'Geht stattdessen jetzt zu: ');
@@ -744,7 +750,7 @@
     document.addEventListener('visibilitychange', beiRueckkehr);
     return Promise.all([Speicher.lesen('gruppe'), Stationen.laden(), Stationen.fortschritt(), Stationen.freigabenLaden()])
       // Nur Stationen mit wartetAuf fragen nach den Nachrichten (sonst wartet das iPad ohne Laptop unnötig)
-      .then(werte => werte[0] && werte[1].some(s => s.id === id && s.wartetAuf) ? Stationen.meldungenLaden(werte[0].id).then(() => werte) : werte)
+      .then(werte => werte[0] && werte[1].some(s => s.id === id && (s.wartetAuf || s.bonus || (s.braucht || []).length)) ? Stationen.meldungenLaden(werte[0].id).then(() => werte) : werte)
       .then(werte => {
         const gruppe = werte[0];
         const liste = werte[1];
@@ -769,7 +775,7 @@
             // Klar sagen, was noch fehlt: Anzahl und/oder bestimmte Stationen
             return nochNichtDran([], 'Das ist eine Bonus-Station.' +
               (bonusFehlen ? ' Sie geht auf, wenn ihr ' + st.mindestFertig + ' Stationen geschafft habt. Euch fehlen noch ' + bonusFehlen + '.' : '') +
-              (fehlend.length ? ' Vorher müsst ihr noch machen: ' + fehlend.map(x => x.titel).join(', ') + '.' : ''));
+              (fehlend.length ? ' Vorher müsst ihr noch machen: ' + fehlend.map(x => x.titel).join(', ') + '.' + wartetGrund(fehlend) : ''));
           }
           if(fehlend.length) return nochNichtDran(fehlend);
           if(ctx.eintrag.status !== 'begonnen'){

@@ -27,7 +27,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `plaetze` | ja | wie viele Gruppen gleichzeitig an der Station sein können |
 | `vorrang` | nein | `true`: wird vor allen anderen vorgeschlagen, solange Platz ist (stencil.me, Lasercutter) |
 | `vorrangNach` | nein | Vorrang erst, wenn eine dieser Nachrichten vom Laptop kam, z. B. `["platte-laser", "platte-fertig"]` (Vibe Coding, sobald gelasert wird) |
-| `wartetAuf` | nein | `{ "meldung": "platte-fertig", "text": "…", "trotzdem": "…" }`: Station wird erst nach dieser Nachricht vorgeschlagen. Beim Scannen vorher: `text`, ein anderer Vorschlag und ein Knopf `trotzdem` (falls der Laptop ausfällt) |
+| `wartetAuf` | nein | `{ "meldung": "platte-fertig", "text": "…", "trotzdem": "…", "grund": "…" }`: Station wird erst nach dieser Nachricht vorgeschlagen. Beim Scannen vorher: `text`, ein anderer Vorschlag und ein Knopf `trotzdem` (falls der Laptop ausfällt). `grund` erklärt auf anderen Stationen, warum sie noch fehlt |
 | `bonus` | nein | `true`: zählt nicht zu „x von y“ und nicht fürs Puzzle |
 | `optional` | nein | `true`: freiwillig (z. B. Claude-Stationen, nur mit Einwilligung). Zählt nicht zu „x von y“, wird nur vorgeschlagen, wenn keine andere Station frei ist |
 | `mindestFertig` | nein | Bonus geht erst auf, wenn so viele Stationen geschafft sind |
