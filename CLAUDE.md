@@ -40,7 +40,7 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 
 - Deterministisch heißt nicht „keine KI“: BodyPix ist KI und liefert bei gleichem Foto das gleiche Ergebnis.
 - An jeder Station steht ein Etikett: Typ (Programm / KI / generativ) und Datenweg („Bleibt auf dem iPad“ / „Foto/Daten an den Laptop“ / „Nutzt generative KI“, keine Befehlsform).
-- Fragen an die Kinder: „Was hast du gerade genutzt?“ (Programm, Bildbearbeitungs-KI, generative KI …; nicht an Stationen ohne Computer wie Berufe und Linoldruck) und „Wie gut hat dir die Station gefallen?“
+- Fragen an die Kinder: „Was hast du gerade genutzt?“ (Programm, Bildbearbeitungs-KI, generative KI …; nicht bei Berufe, Linol- und Stempeldruck, Kunst- und Code-Quiz) und „Wie gut hat dir die Station gefallen?“
 
 ## Ist-Zustand des Repos
 
