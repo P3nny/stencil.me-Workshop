@@ -14,7 +14,7 @@
     {
       "id": "station",
       "art": "station",
-      "text": "Welche Station hat dir am meisten gebracht?",
+      "text": "Welche Station hat dir am besten gefallen?",
       "pflicht": true
     },
     {

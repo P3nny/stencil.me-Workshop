@@ -100,7 +100,8 @@
     const box = el('section', { klasse: 'panel' }, [
       el('h1', { text: '🗑 Alles auf diesem iPad löschen' }),
       el('p', { text: 'Der Workshop ist vorbei. Eure Werke sind auf Pennys Laptop und kommen in eure Mappe. Auf dem iPad braucht ihr nichts mehr.' }),
-      el('p', { text: 'Wenn ihr löscht, sind eure Namen, Fotos und Antworten auf diesem iPad weg. Die nächste Gruppe sieht nichts von euch.' })
+      el('p', { text: 'Wenn ihr löscht, sind eure Namen, Fotos und Antworten auf diesem iPad weg. Die nächste Gruppe sieht nichts von euch.' }),
+      el('p', { klasse: 'rand-warnung', text: 'Bitte schließt vorher in Safari alle anderen Tabs außer diesem (Tab-Übersicht: Symbol mit den zwei Kästchen, dann bei jedem Tab auf ✕).' })
     ]);
     const status = el('p', { klasse: 'hinweis' });
     const knopf = el('button', { type: 'button', klasse: 'gross', text: '🗑 Jetzt alles löschen' });

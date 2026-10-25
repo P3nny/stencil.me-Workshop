@@ -169,7 +169,7 @@ img.src = url;
     step:2,
     eyebrow:"Schritt 3 · Schwarz-Weiß",
     title:"Wie findet der Computer die beste Trennung?",
-    lede:"Otsu probiert IM KOPF alle möglichen Trennwerte von 0–255 durch:",
+    lede:"Otsu hat nichts „im Kopf“: Das Programm rechnet einfach alle möglichen Trennwerte von 0 bis 255 durch:",
     code:
 `<span class="kw">for</span>(<span class="kw">let</span> t=<span class="str">0</span>; t&lt;<span class="str">256</span>; t++){
   <span class="cm">// wie unterschiedlich sind "hell" und "dunkel" bei t?</span>
@@ -392,7 +392,7 @@ function finish(){
   // In der Workshop-App eingebettet: Ergebnis an die Station melden (gleiche Adresse)
   if(window.parent !== window) window.parent.postMessage({ stencilQuiz: { richtig: correctCount, gesamt: CARDS.length } }, location.origin);
   document.getElementById('scoreRow').innerHTML = `
-    <div class="badge">${correctCount} von ${CARDS.length} richtig geraten</div>
+    <div class="badge">${correctCount} von ${CARDS.length} richtig beantwortet</div>
     <div class="badge">Alle 5 Schritte durch</div>
   `;
 }
