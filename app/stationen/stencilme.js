@@ -49,6 +49,7 @@
 
     const box = el('section', { klasse: 'stempel-person' }, [
       el('h2', { text: art.name + ' von ' + name }),
+      art.info ? el('p', { text: art.info }) : null,
       el('div', { klasse: 'schritte-reihe' }, felder.map(f => f.fig)),
       randBox,
       sendenKnopf,
@@ -177,7 +178,8 @@
   const ARTEN = {
     stempel: {
       name: 'Stempel', dein: 'Dein Stempel', dieser: 'Dieser Stempel', notiz: 'gespiegelt', puzzle: true,
-      legende: [['rot', 'Rot'], ['blau', 'Blau'], ['weiss', 'Weiß: Was bedeuten die Farben? Die Frage steht unten.']],
+      info: 'Jetzt wird aus deinem Foto eine Datei, die der Lasercutter als Stempel ausschneiden kann.',
+      legende: [['rot', 'Rot: Hier schneidet der Laser durch. Das ist der Rand deines Stempels.'], ['blau', 'Blau: Hier graviert der Laser, das Holz wird abgetragen.'], ['weiss', 'Weiß: Hier bleibt das Holz stehen und nimmt beim Drucken die Farbe auf.']],
       svg: (mask, mm) => Stempel.svg(mask, mm),
       senden: (gruppe, name, svg) => Outbox.stempel(gruppe, name, svg)
     },

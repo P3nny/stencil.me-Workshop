@@ -4,21 +4,16 @@
 // Bild mit. Regler und Ansicht wirken sofort. Das Video bleibt nur im Arbeitsspeicher.
 (function(){
   // Schonend für alte iPads: kleines Arbeitsbild, leichtes Modell, höchstens
-  // MAX_BILDER_PRO_SEK und bei zu wenig Tempo automatisch auf „grob“
+  // MAX_BILDER_PRO_SEK, Auflösung immer „grob“ (Patricia, 25.10.: auch gute iPads kommen
+  // sonst nicht hinterher)
   const ARBEIT_PX = 320; // längere Seite, auf der BodyPix rechnet
   const MAX_BILDER_PRO_SEK = 6;
-  const MIN_TEMPO = 1.5; // darunter schaltet die App auf grob
   const PAUSE_PRUEF_MS = 250; // so oft schaut die App nach, ob das Video wieder läuft
   const VIDEO_TIMEOUT_MS = 30000; // so lange darf Laden + erstes KI-Bild dauern
   const ANSICHTEN = [
     { id: 'person', text: 'Person' },
     { id: 'teile', text: 'Körperteile' },
     { id: 'unscharf', text: 'Hintergrund unscharf' }
-  ];
-  const AUFLOESUNGEN = [
-    { id: 'low', text: 'grob' },
-    { id: 'medium', text: 'mittel' },
-    { id: 'high', text: 'genau' }
   ];
 
   Rahmen.eigeneArt('koerpererkennung', {
@@ -65,12 +60,9 @@
         });
         return el('label', { klasse: 'ki-regler' }, [el('span', {}, [el('span', { text: text + ': ' }), wert]), r, el('span', { klasse: 'hinweis', text: hinweis })]);
       }
-      const aufloesungKnoepfe = knopfGruppe(AUFLOESUNGEN, 'aufloesung');
       const regelung = el('div', { klasse: 'ki-regelung' }, [
         el('p', { klasse: 'regel-titel', text: 'Ansicht' }),
         knopfGruppe(ANSICHTEN, 'ansicht'),
-        el('p', { klasse: 'regel-titel', text: 'Auflösung' }),
-        aufloesungKnoepfe,
         regler('Schwelle', 'schwelle', 0.1, 0.9, 0.05, 'Wie sicher muss die KI sein, dass ein Pixel zu einer Person gehört?'),
         regler('Deckkraft der Farbe', 'deckkraft', 0, 1, 0.1, '0 = nur Video, 1 = nur KI-Farbe')
       ]);
@@ -111,12 +103,6 @@
       let bilder = 0;
       let tempoStart = 0;
 
-      function grobSchalten(){
-        einstellung.aufloesung = 'low';
-        Array.prototype.forEach.call(aufloesungKnoepfe.children, (b, i) => b.classList.toggle('an', AUFLOESUNGEN[i].id === 'low'));
-        status.textContent = 'Das iPad kommt nicht hinterher. Die App hat die Auflösung auf „grob“ gestellt.';
-      }
-
       function zeichnen(net){
         if(!laeuft) return;
         if(!document.body.contains(ausgabe)){ laeuft = false; return; } // Seite gewechselt
@@ -148,14 +134,12 @@
           if(sek > 2){
             const proSek = bilder / sek;
             tempo.textContent = proSek.toFixed(1).replace('.', ',') + ' Bilder pro Sekunde';
-            if(proSek < MIN_TEMPO && einstellung.aufloesung !== 'low') grobSchalten();
             bilder = 0;
             tempoStart = performance.now();
           }
           bildKnopf.disabled = false;
         }).catch(err => {
           console.error(err);
-          grobSchalten();
         }).then(() => {
           const warten = Math.max(0, 1000 / MAX_BILDER_PRO_SEK - (performance.now() - beginn));
           setTimeout(() => zeichnen(net), warten);
@@ -230,12 +214,14 @@
           .then(() => { bildKnopf.disabled = false; });
       });
 
+      // Aufgaben zuerst (Patricia, 25.10.): Die Kinder lesen sie, bevor sie das Video aufnehmen
       return el('div', { klasse: 'koerper-station' }, [
-        aufnehmen, input, status, video,
-        el('div', { klasse: 'ki-buehne' }, [el('div', {}, [ausgabe, tempo]), regelung]),
         el('h2', { text: 'Aufgaben zum Ausprobieren' }),
         aufgabenZaehler,
         aufgaben,
+        el('h2', { text: 'Video aufnehmen' }),
+        aufnehmen, input, status, video,
+        el('div', { klasse: 'ki-buehne' }, [el('div', {}, [ausgabe, tempo]), regelung]),
         el('h2', { text: 'Bild der KI-Ansicht' }),
         bildKnopf, bildStatus, bildVorschau
       ]);

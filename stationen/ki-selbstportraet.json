@@ -13,8 +13,8 @@
   ],
   "ki": {
     "satz": "Zeichne ein Selbstporträt {stil}. Es zeigt {person} mit {augen} Augen und {haarlaenge} {haarfarbe} Haaren{brille}. Hintergrund: {hintergrund}.",
-    "proGruppe": 6,
-    "mindestBilder": 2,
+    "proGruppe": 4,
+    "mindestBilder": 1,
     "mindestStile": 1,
     "baukasten": [
       {
@@ -288,8 +288,9 @@
     },
     {
       "id": "ethik",
-      "text": "KI und Ethik: Bilder „im Stil von …“ wirken oft täuschend echt. Wem gehört so ein Bild: euch, der KI-Firma oder der Künstlerin, deren Stil kopiert wurde? Ist das anders bei lebenden und verstorbenen Künstler:innen?",
-      "pflicht": true
+      "text": "Bilder „im Stil von …“ wirken oft täuschend echt. Wem gehört so ein Bild: euch, der KI-Firma oder der Künstlerin, deren Stil kopiert wurde? Ist das anders bei lebenden und verstorbenen Künstler:innen?",
+      "pflicht": true,
+      "ueberschrift": "KI und Ethik"
     }
   ],
   "fragen": [

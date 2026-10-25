@@ -4,7 +4,7 @@
   "typ": "ki",
   "datenweg": "laptop",
   "schritte": [
-    "Nehmt ein kurzes Video auf (5 bis 10 Sekunden): bewegt euch und probiert die Aufgaben unten aus. Wer nicht ins Video will, filmt ein Foto einer Person.",
+    "Lest die Aufgaben unten. Nehmt dann ein kurzes Video auf (5 bis 10 Sekunden) und probiert dabei die Aufgaben aus. Wer nicht ins Video will, filmt ein Foto einer Person.",
     "Schaut zu, wie die KI Bild für Bild entscheidet: Person oder Hintergrund?",
     "Spielt mit den Reglern und den Ansichten.",
     "Sucht euch 3 der 6 Aufgaben aus und hakt sie ab.",
@@ -15,7 +15,7 @@
     "Dreh dich zur Seite, setz dich hin, streck die Arme aus.",
     "Zeig ein Foto von einer Person (Handy, Buch). Hält die KI das für einen Menschen?",
     "Schieb die Schwelle ganz nach oben und ganz nach unten. Was passiert?",
-    "Stell die Auflösung auf grob und auf genau. Was ist schneller, was ist besser?",
+    "Bewegt euch schnell und dann ganz langsam. Kommt die KI hinterher? Wo wird sie ungenau?",
     "Ansicht Körperteile: Welche Farbe hat dein linker Arm? Stimmen links und rechts?"
   ],
   "check": {
@@ -31,7 +31,8 @@
     {
       "id": "folgen",
       "text": "Was könnte passieren, wenn so eine KI in einer Bewerbungs-Software oder Überwachungskamera bei manchen Menschen schlechter funktioniert als bei anderen?",
-      "pflicht": true
+      "pflicht": true,
+      "ueberschrift": "KI und Ethik"
     }
   ],
   "fragen": [

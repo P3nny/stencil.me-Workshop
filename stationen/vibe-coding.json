@@ -129,8 +129,9 @@
     },
     {
       "id": "ethik",
-      "text": "KI und Ethik: Claude.ai darf man erst ab 18 benutzen. Hier nutzt ihr Claude über Pennys Workshop-Zugang mit Sicherheitsregeln. Warum gibt es solche Altersgrenzen bei KI-Chatbots? Findet ihr das sinnvoll oder übertrieben?",
-      "pflicht": true
+      "text": "Claude.ai darf man erst ab 18 benutzen. Hier nutzt ihr Claude über Pennys Workshop-Zugang mit Sicherheitsregeln. Warum gibt es solche Altersgrenzen bei KI-Chatbots? Findet ihr das sinnvoll oder übertrieben?",
+      "pflicht": true,
+      "ueberschrift": "KI und Ethik"
     }
   ],
   "fragen": [

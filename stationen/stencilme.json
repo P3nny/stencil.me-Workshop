@@ -5,7 +5,7 @@
   "datenweg": "laptop",
   "schritte": [
     "Die App nimmt dein Foto von der Foto-Station.",
-    "Schau zu: Das Foto wird grau, die KI findet dich, ein Programm (Otsu) macht daraus reines Schwarz und Weiß.",
+    "Guck dir die Bilder an: Da siehst du den Prozess Schritt für Schritt. Das Foto wird grau, die KI findet dich, ein Programm (Otsu) macht daraus reines Schwarz und Weiß.",
     "Prüf den roten Rand: Er muss in einem Stück um alles herumlaufen.",
     "Schick deinen Stempel an den Laptop.",
     "Beantworte die Frage zu den Farben."
@@ -16,7 +16,7 @@
   "eingaben": [
     {
       "id": "farben",
-      "text": "Was bedeuten die Farben Rot, Blau und Weiß?",
+      "text": "Habt ihr oben gelesen, was die Farben bedeuten? Was macht der Laser an den blauen Stellen?",
       "pflicht": true,
       "aufloesung": "Rot: Hier schneidet der Laser durch, das ist der Rand deines Stempels. Blau: Hier graviert der Laser, das Holz wird abgetragen. Weiß: Hier bleibt das Holz stehen und nimmt beim Drucken die Farbe auf."
     }
