@@ -5,7 +5,8 @@
 // - Eine Aufgabe nach der anderen, mit Haken und Rückmeldung.
 // - Ist die Tastatur offen, rückt alles in den sichtbaren Bereich darüber:
 //   aktuelle Aufgabe und kleine Vorschau oben, Code in der Mitte, Zeichenleiste unten.
-// - Profi-Modus: den ganzen Code frei bearbeiten.
+// - Profi-Modus: den ganzen Code frei bearbeiten. Mit optionen.profiNachAufgaben erst,
+//   wenn alle Pflicht-Aufgaben geschafft sind (Pixel vs. Vektor, Patricia 25.10.).
 // Geprüft wird immer der fertige Code (auch im Profi-Modus), siehe optionen.pruefen.
 (function(){
   const PRUEF_PAUSE_MS = 300;
@@ -133,12 +134,14 @@
       })));
       aufgabeKarte.innerHTML = '';
       const pflichtFertig = aufgaben.every(a => a.freiwillig || erledigt[a.id]);
+      profiKnopf.hidden = !!opt.profiNachAufgaben && !pflichtFertig && !z.profi;
+      const profiFrei = opt.profiNachAufgaben && pflichtFertig && !z.profi ? ' Jetzt ist auch der Profi-Modus frei.' : '';
       if(!aktiv){
-        aufgabeKarte.appendChild(el('p', { klasse: 'ce-geschafft', text: '🎉 Alle Aufgaben geschafft! Ihr könnt weiter ausprobieren.' }));
+        aufgabeKarte.appendChild(el('p', { klasse: 'ce-geschafft', text: '🎉 Alle Aufgaben geschafft! Ihr könnt weiter ausprobieren.' + profiFrei }));
         return;
       }
       if(pflichtFertig && aktiv.freiwillig){
-        aufgabeKarte.appendChild(el('p', { klasse: 'ce-geschafft', text: '✓ Alle Pflicht-Aufgaben geschafft! Wenn ihr wollt: Bonus.' }));
+        aufgabeKarte.appendChild(el('p', { klasse: 'ce-geschafft', text: '✓ Alle Pflicht-Aufgaben geschafft! Wenn ihr wollt: Bonus.' + profiFrei }));
       }
       const nr = aufgaben.indexOf(aktiv) + 1;
       aufgabeKarte.appendChild(el('p', { klasse: 'ce-aufgabe-text' }, [

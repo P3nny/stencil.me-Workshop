@@ -144,6 +144,7 @@
         luecken: uebung.luecken,
         bausteine: uebung.bausteine,
         aufgaben: uebung.aufgaben,
+        profiNachAufgaben: true, // erst die Aufgaben, dann frei bearbeiten
         zustand: eintrag.editor,
         pruefen: pruefen,
         vorschau: (code, box) => {

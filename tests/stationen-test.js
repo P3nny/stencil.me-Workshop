@@ -317,6 +317,7 @@ async function abschliessen(page, sterne){
   const punktOk = async n => ((await page.locator('.ce-punkt').nth(n).getAttribute('class')) || '').indexOf('ok') >= 0;
   pruefe(await page.locator('.ce-punkt').count() === 5, 'fünf Aufgaben, eine nach der anderen');
   pruefe((await luecke('farbe').getAttribute('class')).indexOf('aktiv') >= 0, 'Aufgabe 1: Lücke für die Farbe ist markiert');
+  pruefe(await page.locator('button:has-text("Profi-Modus")').isHidden(), 'Profi-Modus erst nach den Aufgaben');
   await luecke('farbe').fill('gelbgrün');
   await page.waitForTimeout(500);
   pruefe(/kennt der Browser nicht/.test(await page.locator('.ce-hinweis').textContent()), 'ungültige Farbe: Hinweis');
@@ -334,6 +335,7 @@ async function abschliessen(page, sterne){
   await page.waitForTimeout(400);
   pruefe(await punktOk(3), 'Stern eingefügt: Haken');
   pruefe(await page.locator('.ce-geschafft').count() === 1, '„Alle Pflicht-Aufgaben geschafft“, Bonus angeboten');
+  pruefe(await page.locator('button:has-text("Profi-Modus")').isVisible() && /Profi-Modus frei/.test(await page.locator('.ce-geschafft').textContent()), 'Pflicht-Aufgaben geschafft: Profi-Modus frei');
   await page.click('.ce-aufgabe button:has-text("Baustein einfügen")');
   await luecke('stern2-farbe').fill('blue');
   await page.waitForTimeout(500);
