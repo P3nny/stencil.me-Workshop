@@ -146,9 +146,8 @@
       <span class="hint" id="loeschenState"></span>
     </div>
     <div class="settings" style="margin-top:10px">
-      <a class="knopf" id="mappenAlle" href="/api/mappe-alle">Alle Mappen als ZIP herunterladen</a>
-      <button id="mappenUsb" type="button" hidden>Auf USB-Stick kopieren</button>
-      <span class="hint" id="mappenState">Mappe = nur die Werke (Fotos, Stempel, Bilder, Apps, Code), keine Antworten und kein Feedback.</span>
+      <button id="sichern" type="button">Für die Workshop-Verbesserung sichern (ohne Namen)</button>
+      <span class="hint" id="sichernState">Vorher kurz in die Auswertung schauen: Stehen im Feedback Namen? Gesichert werden Apps, Auswertung, Ablauf und KI-Prompts, keine Fotos. Danach „Alle Daten löschen“ (unten).</span>
     </div>
     <div class="einwilligung">
       <h2>Rückmeldezettel der Eltern</h2>
@@ -169,11 +168,11 @@
     <div class="hint" id="kiStatus"></div>
     <div id="groupsError"></div>
     <table>
-      <thead><tr><th>Namen</th><th>Einwilligung</th><th>Gerade an</th><th>Geschafft</th><th>Fotos</th><th>Mappe</th></tr></thead>
+      <thead><tr><th>Namen</th><th>Einwilligung</th><th>Gerade an</th><th>Geschafft</th><th>Fotos</th></tr></thead>
       <tbody id="groups"></tbody>
     </table>
     <div class="hint">Ordner: <span class="folder" id="groupsFolder"></span></div>
-    <button id="deleteAll" type="button">Alle Daten löschen (nach dem Workshop)</button>
+    <button id="deleteAll" type="button">Alle Daten löschen (am Ende des Workshops)</button>
   </div>
 </div>
 <script>
@@ -385,10 +384,6 @@
         img.alt = "";
         photos.appendChild(img);
       });
-      var zip = document.createElement("a");
-      zip.href = "/api/mappe?gruppe=" + g.gruppe;
-      zip.textContent = "ZIP";
-      cell(row, "").appendChild(zip);
       body.appendChild(row);
     });
     if (!data.gruppen.length) {
@@ -461,21 +456,18 @@
       });
   }
 
-  // USB-Stick: Knopf nur zeigen, wenn einer steckt
-  function loadUsb() {
-    fetch("/api/usb", { cache: "no-store" })
+  // Am Ende: erst sichern (ohne Namen), dann alles löschen
+  var gesichert = false;
+  document.getElementById("sichern").addEventListener("click", function () {
+    var state = document.getElementById("sichernState");
+    state.textContent = "Sichere …";
+    fetch("/api/sichern", { method: "POST" })
       .then(function (r) { return r.json(); })
-      .then(function (d) { document.getElementById("mappenUsb").hidden = !d.sticks.length; })
-      .catch(function () {});
-  }
-
-  document.getElementById("mappenUsb").addEventListener("click", function () {
-    var state = document.getElementById("mappenState");
-    state.textContent = "Kopiere …";
-    fetch("/api/mappe-usb", { method: "POST" })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { state.textContent = d.ok ? "✓ Gespeichert: " + d.datei + ". Stick erst nach „Auswerfen“ abziehen." : "⚠ " + d.fehler; })
-      .catch(function () { state.textContent = "⚠ Kopieren hat nicht geklappt."; });
+      .then(function (d) {
+        gesichert = !!d.ok;
+        state.textContent = d.ok ? "✓ Gesichert in " + d.ordner + " (" + d.gruppen + " Gruppen, " + d.apps + " Apps). Jetzt „Alle Daten löschen“." : "⚠ " + d.fehler;
+      })
+      .catch(function () { state.textContent = "⚠ Sichern hat nicht geklappt."; });
   });
 
   function loadKi() {
@@ -497,7 +489,7 @@
     var loeschen = freigaben.indexOf("loeschen") >= 0;
     document.getElementById("loeschenFreigabe").textContent = loeschen ? "Löschen-Freigabe zurücknehmen" : "Abschluss: Löschen auf den iPads freigeben";
     document.getElementById("loeschenState").textContent = loeschen
-      ? "✓ Die iPads zeigen innerhalb einer Minute: „Workshop vorbei, Meine Daten ansehen und löschen“. Die Mappen bleiben auf dem Laptop."
+      ? "✓ Die iPads zeigen innerhalb einer Minute: „Workshop vorbei, Meine Daten ansehen und löschen“. Danach: sichern und alle Daten löschen."
       : "Am Ende des Workshops: Die Kinder sehen „Meine Daten“ an und löschen dann selbst alles auf ihrem iPad.";
   }
 
@@ -545,6 +537,7 @@
   });
 
   document.getElementById("deleteAll").addEventListener("click", function () {
+    if (!gesichert && !confirm("Noch nicht gesichert: Apps und Auswertung gehen verloren. Trotzdem weiter?")) return;
     if (!confirm("Wirklich ALLE Stempel, Antworten und Fotos vom Laptop löschen? Das kann nicht rückgängig gemacht werden.")) return;
     fetch("/api/alle-loeschen", { method: "POST" }).then(function () { platte.vergessen(); folie.vergessen(); loadGroups(); loadSettings(); });
   });
@@ -554,8 +547,7 @@
   loadSettings();
   loadKi();
   plotterLaden();
-  loadUsb();
-  setInterval(function () { loadGroups(); loadKi(); loadUsb(); }, 5000);
+  setInterval(function () { loadGroups(); loadKi(); }, 5000);
   setInterval(loadInfo, 30000); // u. a. „bitte neu starten“ nach einer Aktualisierung
   setInterval(plotterLaden, 2000);
 })();

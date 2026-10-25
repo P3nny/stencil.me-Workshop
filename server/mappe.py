@@ -1,30 +1,17 @@
-"""Ergebnis-Mappen (ZIP) und „Meine Daten“.
-
-Mappe für die Lehrkraft: nur die Werke einer Gruppe (Patricia, 24.10.2026), also
-Fotos, Stempel, Sticker, Porträt, KI-Bilder, Apps und der eigene Code. Keine
-Textantworten, keine Sterne, kein Feedback.
-
-„Meine Daten“ für die Kinder: alles, was auf dem Laptop über die eigene Gruppe
+"""„Meine Daten“ für die Kinder: alles, was auf dem Laptop über die eigene Gruppe
 liegt, auch Antworten, Sterne und Feedback (Datenschutz.md: „Du darfst jederzeit
 fragen, was über dich gespeichert ist“).
+
+Eine Ergebnis-Mappe (ZIP, USB-Stick) gibt es nicht mehr: Am Ende des Workshops
+wird alles gelöscht (Patricia, 25.10.2026). Vorher sichert server/archiv.py
+Apps und Auswertung ohne Namen.
 """
-import io
 import os
 import re
-import zipfile
 
-# Fremde Adressen in Apps sperren, wenn die Lehrkraft sie aus der Mappe öffnet
+# Fremde Adressen in Apps sperren, wenn jemand sie später aus dem Archiv öffnet
 CSP = ('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'unsafe-inline\'; '
        'style-src \'unsafe-inline\'; img-src data: blob:; connect-src \'none\'; form-action \'none\'">')
-CODE_DATEIEN = (("pixel-vektor", "svg-code", "pixel-vektor_euer-svg-code.html"),
-                ("coding-web", "html-code", "coding-web_eure-webseite.html"))
-NAME_RE = re.compile(r"[^A-Za-z0-9äöüÄÖÜß-]")
-USB_WURZELN = ("/media", "/run/media")
-
-
-def ordnername(state):
-    namen = "-und-".join(NAME_RE.sub("", p.replace(" ", "-")) for p in state["personen"]) or "ohne-Namen"
-    return "%s_%s" % (namen[:40], state["gruppe"][:6])
 
 
 def eigene_svgs(base, group_id):
@@ -43,63 +30,6 @@ def eigene_svgs(base, group_id):
 
 def abgeschottet(html):
     return re.sub(r"<head[^>]*>", lambda m: m.group(0) + CSP, html, count=1, flags=re.I) if re.search(r"<head[^>]*>", html, re.I) else CSP + html
-
-
-def werke(state, groups_dir, stempel_dir, sticker_dir):
-    """Liste (Name in der Mappe, Inhalt als bytes)."""
-    group_id = state["gruppe"]
-    liste = []
-    dateien_dir = os.path.join(groups_dir, group_id, "dateien")
-    if os.path.isdir(dateien_dir):
-        for f in sorted(os.listdir(dateien_dir)):
-            if f.endswith(".tmp"):
-                continue
-            with open(os.path.join(dateien_dir, f), "rb") as fh:
-                inhalt = fh.read()
-            if f.endswith(".html"):
-                inhalt = abgeschottet(inhalt.decode("utf-8", errors="replace")).encode("utf-8")
-            liste.append((f, inhalt))
-    for art, base in (("stempel", stempel_dir), ("sticker", sticker_dir)):
-        for rel, pfad in eigene_svgs(base, group_id):
-            teile = os.path.basename(rel)[:-4].split("_")
-            name = teile[1] if len(teile) > 1 else art
-            sorte = "portraet" if name.endswith("-Portraet") else art
-            with open(pfad, "rb") as fh:
-                liste.append(("%s_%s_%s.svg" % (sorte, name.replace("-Portraet", ""), teile[0]), fh.read()))
-    # Ersatz-Porträt statt eigenem Foto: Namensnennung (CC-Lizenz) gehört dazu
-    quelle = (state["antworten"].get("foto", {}).get("antworten") or {}).get("quelle")
-    if quelle:
-        liste.append(("foto_quelle.txt", ("Porträt-Vorlage\n" + str(quelle) + "\n").encode("utf-8")))
-    for station, feld, name in CODE_DATEIEN:
-        code = (state["antworten"].get(station, {}).get("antworten") or {}).get(feld)
-        if code:
-            liste.append((name, ('<!DOCTYPE html><meta charset="utf-8">\n' + code if station == "pixel-vektor" else code).encode("utf-8")))
-    return liste
-
-
-def zip_bauen(states, groups_dir, stempel_dir, sticker_dir):
-    puffer = io.BytesIO()
-    with zipfile.ZipFile(puffer, "w", zipfile.ZIP_DEFLATED) as z:
-        for state in states:
-            ordner = ordnername(state)
-            for name, inhalt in werke(state, groups_dir, stempel_dir, sticker_dir):
-                z.writestr(ordner + "/" + name, inhalt)
-    return puffer.getvalue()
-
-
-def usb_sticks():
-    """Eingehängte, beschreibbare USB-Sticks (Ubuntu hängt sie unter /media/<user>/ ein)."""
-    user = os.environ.get("USER") or ""
-    sticks = []
-    for wurzel in USB_WURZELN:
-        basis = os.path.join(wurzel, user)
-        if not user or not os.path.isdir(basis):
-            continue
-        for d in sorted(os.listdir(basis)):
-            pfad = os.path.join(basis, d)
-            if os.path.ismount(pfad) and os.access(pfad, os.W_OK):
-                sticks.append(pfad)
-    return sticks
 
 
 def meine_daten(state, groups_dir, stempel_dir, sticker_dir, zeiten=None):
