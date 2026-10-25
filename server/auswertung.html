@@ -184,8 +184,13 @@
   function laden() {
     fetch("/api/auswertung", { cache: "no-store" }).then(function (r) { return r.json(); }).then(zeigen).catch(function () {});
   }
-  laden();
-  setInterval(laden, 15000);
+  // Gesicherte Fassung (archiv/workshops/…): Daten stehen in der Datei, kein Server nötig
+  if (window.AUSWERTUNG) {
+    zeigen(window.AUSWERTUNG);
+  } else {
+    laden();
+    setInterval(laden, 15000);
+  }
 })();
 </script>
 </body>
