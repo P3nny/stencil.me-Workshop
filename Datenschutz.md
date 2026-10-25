@@ -4,6 +4,8 @@ Hier steht, was mit deinen Fotos und Antworten passiert. Lies es selbst. Wenn di
 
 Für Lehrkräfte und Eltern stehen die genauen Angaben ganz unten.
 
+**Alles offen:** Den ganzen Code der App und das komplette Workshop-Material kann jede Person ansehen: [github.com/P3nny/stencil.me-Workshop](https://github.com/P3nny/stencil.me-Workshop). Du kannst also selbst nachprüfen, ob hier stimmt, was wir schreiben.
+
 ## Kurz gesagt
 
 - Deine Fotos bearbeitet das iPad. Kein Foto von dir geht ins Internet.

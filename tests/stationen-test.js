@@ -30,7 +30,10 @@ function pruefe(ok, text){
 
 async function abschliessen(page, sterne){
   await page.click('button:has-text("Station beendet")');
-  await page.click('button.wahl:has-text("Bildbearbeitungs-KI")');
+  // Stationen ohne Computer (Berufe, Linoldruck) fragen nicht „Was hast du gerade genutzt?“
+  await page.waitForSelector('button.stern');
+  const kiFrage = page.locator('button.wahl:has-text("Bildbearbeitungs-KI")');
+  if(await kiFrage.count()) await kiFrage.click();
   await page.locator('button.stern').nth(sterne - 1).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
@@ -376,12 +379,11 @@ async function abschliessen(page, sterne){
   await page.click('button:has-text("Bild erzeugen")');
   await page.waitForSelector('.ki-karte img');
   pruefe(await page.locator('.ki-karte').count() === 1, 'erstes Bild in der Galerie');
-  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt nach einem Bild');
-  pruefe(/Noch 1 Bild/.test(await page.locator('text=Ihr habt').textContent()), 'Hinweis „Noch 1 Bild“');
-  // Zweites Bild im selben Stil reicht (Patricia, 24.10.)
+  // Ein Bild reicht, höchstens 4 (Patricia, 25.10.)
+  pruefe(/Genug Bilder/.test(await page.locator('text=Ihr habt').textContent()), 'nach einem Bild: „Genug Bilder“');
   await page.click('button:has-text("Bild erzeugen")');
   await page.waitForFunction(() => document.querySelectorAll('.ki-karte').length === 2);
-  pruefe(/2 von höchstens 6/.test(await page.locator('text=Ihr habt').textContent()), 'Zähler „2 von höchstens 6 Bildern“');
+  pruefe(/2 von höchstens 4/.test(await page.locator('text=Ihr habt').textContent()), 'Zähler „2 von höchstens 4 Bildern“');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-13-ki-selbstportraet.png'), fullPage: true });
   await page.fill('#eingabe-unterschied', 'stencil.me verändert nur mein Foto');
   await page.fill('#eingabe-ethik', 'Schwierig');

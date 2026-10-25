@@ -39,8 +39,8 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 | **Generative KI**            | Erzeugt neue Inhalte, gleicher Prompt gibt jedes Mal etwas anderes                 | KI-Selbstporträt, Claude (Code)                  |
 
 - Deterministisch heißt nicht „keine KI“: BodyPix ist KI und liefert bei gleichem Foto das gleiche Ergebnis.
-- An jeder Station steht ein Etikett: Typ (Programm / KI / generativ) und Datenweg (bleibt auf dem iPad / geht an den Workshop-Server / geht an einen Online-Dienst).
-- Fragen an die Kinder: „Hast du hier gerade generative KI oder Bildbearbeitungs-KI genutzt?“ und „Wie gut hat dir die Station gefallen?“
+- An jeder Station steht ein Etikett: Typ (Programm / KI / generativ) und Datenweg („Bleibt auf dem iPad“ / „Foto/Daten an den Laptop“ / „Nutzt generative KI“, keine Befehlsform).
+- Fragen an die Kinder: „Was hast du gerade genutzt?“ (Programm, Bildbearbeitungs-KI, generative KI …; nicht an Stationen ohne Computer wie Berufe und Linoldruck) und „Wie gut hat dir die Station gefallen?“
 
 ## Ist-Zustand des Repos
 

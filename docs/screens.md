@@ -219,7 +219,7 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 
 - Texte geprüft: Fachwörter erklärt (Otsu, Prompt, SVG, vibe coding, Schneideplotter), aufklappbares „Was ist der Unterschied?“ an der KI-Frage, Lasercutter spricht Paare mit „ihr“ an
 - Mehrere Safari-Tabs (jeder QR-Scan öffnet einen): Die App speichert nur die eigene Station und liest den Rest frisch, beim Zurückwechseln zeichnet sie Puzzle und Zähler neu (`tests/tabs-test.js`)
-- Claude-Stationen optional (Feld `optional`), Etikett „Geht an den Laptop · Video: YouTube“ am Lasercutter (`laptop-video`)
+- Claude-Stationen optional (Feld `optional`), Etikett „Foto/Daten an den Laptop · Video: YouTube“ am Lasercutter (`laptop-video`)
 - `Datenschutz.md` (kindgerecht, Teil für Erwachsene), `docs/datenschutz-kurz.md`, `docs/canva-folie-datenschutz.md`
 - Laptop-Seite zeigt einen Neustart-Hinweis, wenn sich die Server-Dateien geändert haben
 
