@@ -666,11 +666,11 @@ async function abschliessen(page, sterne){
   pruefe(folienSvg.schnitt === 2 && folienSvg.stift === 2, 'Folie: 2 Sticker mit Stift- und Messer-Gruppe');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-16-folie.png'), fullPage: true });
   await laptop.click('#folie-aktionen button:has-text("An den Plotter schicken")');
-  await laptop.waitForSelector('.plotter-schritt:has-text("Stift (1,0 mm)")');
-  pruefe(true, 'Plotter: Schritt 1 „Stift einsetzen“');
+  await laptop.waitForSelector('.plotter-schritt:has-text("Marker (0,8 mm)")');
+  pruefe(true, 'Plotter: Schritt 1 „Marker einsetzen“');
   await laptop.click('.plotter-schritt button:has-text("Zeichnen starten")');
-  await laptop.waitForSelector('.plotter-schritt:has-text("Stift raus, Messer rein")', { timeout: 20000 });
-  pruefe(true, 'Plotter: nach dem Zeichnen „Stift raus, Messer rein“');
+  await laptop.waitForSelector('.plotter-schritt:has-text("Marker raus, Messer rein")', { timeout: 20000 });
+  pruefe(true, 'Plotter: nach dem Zeichnen „Marker raus, Messer rein“');
   await laptop.click('.plotter-schritt button:has-text("Schneiden starten")');
   await laptop.waitForSelector('.plotter-schritt:has-text("FERTIG")', { timeout: 20000 });
   pruefe(true, 'Plotter: fertig');
