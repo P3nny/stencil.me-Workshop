@@ -116,6 +116,10 @@
   // der ganzen Gruppe zurückschreiben.
   function frischUebernehmen(){
     return Stationen.fortschritt().then(frisch => {
+      // Alles außer der eigenen Station kommt aus dem Speicher, auch was ein anderer Tab gelöscht hat
+      Object.keys(ctx.f.stationen).forEach(id => {
+        if(id !== ctx.station.id && !frisch.stationen[id]) delete ctx.f.stationen[id];
+      });
       Object.keys(frisch.stationen).forEach(id => {
         if(id !== ctx.station.id) ctx.f.stationen[id] = frisch.stationen[id];
       });
@@ -612,8 +616,9 @@
       el('p', { klasse: 'hinweis', text: 'Nächste Station wird gesucht …' })
     ]);
     inhalt.appendChild(panel);
-    return Stationen.belegung().then(beleg => {
-      const naechste = Stationen.naechste(ctx.liste, ctx.f, beleg);
+    // Frischer Stand aus dem Speicher: Ein anderer Tab kann inzwischen etwas geändert haben.
+    // So passt der Vorschlag zu dem, was der QR-Code an der nächsten Station prüft.
+    return frischUebernehmen().then(() => Stationen.vorschlagen(ctx.liste, ctx.f, ctx.gruppe.id)).then(naechste => {
       panel.removeChild(panel.lastChild);
       if(!naechste){
         panel.appendChild(el('p', { klasse: 'gross-text', text: 'Du hast alle Stationen geschafft! 🎉' }));
@@ -642,13 +647,51 @@
     ]));
   }
 
+  // Vorschlag als Ausweg: „Geht stattdessen jetzt zu …“
+  function stattdessen(panel, text){
+    const hinweis = el('p', { klasse: 'hinweis', text: 'Nächste Station wird gesucht …' });
+    panel.appendChild(hinweis);
+    return Stationen.vorschlagen(ctx.liste, ctx.f, ctx.gruppe.id, ctx.station.id).then(st => {
+      panel.removeChild(hinweis);
+      if(!st) return;
+      panel.appendChild(el('p', { klasse: 'gross-text' }, [el('span', { text: text }), el('strong', { text: st.titel })]));
+      if(TEST) panel.appendChild(el('a', { klasse: 'knopf-link', href: '?id=' + st.id + '&test', text: 'Test: direkt hin' }));
+    });
+  }
+
   function nochNichtDran(fehlend, text){
     const inhalt = document.getElementById('inhalt');
     inhalt.innerHTML = '';
-    inhalt.appendChild(el('section', { klasse: 'panel' }, [
+    const panel = el('section', { klasse: 'panel' }, [
       el('h1', { text: ctx.station.titel + ': noch nicht' }),
       text ? el('p', { text: text }) : el('p', {}, [el('span', { text: 'Diese Station kommt später. Mach zuerst: ' }), el('strong', { text: fehlend.map(s => s.titel).join(', ') })])
-    ]));
+    ]);
+    inhalt.appendChild(panel);
+    return stattdessen(panel, 'Geht stattdessen jetzt zu: ');
+  }
+
+  // Station schon voll (andere Gruppen eingecheckt oder unterwegs)? Nur ein Hinweis, keine Sperre:
+  // Hängt der Laptop oder ist ein Tab vergessen, geht es mit „Wir sind trotzdem dran“ weiter.
+  function platzPruefen(){
+    return Stationen.belegung(ctx.gruppe.id).then(beleg => {
+      const andere = (beleg && beleg[ctx.station.id]) || 0;
+      if(andere < (ctx.station.plaetze || 1)) return;
+      return new Promise(weiter => {
+        const inhalt = document.getElementById('inhalt');
+        inhalt.innerHTML = '';
+        const panel = el('section', { klasse: 'panel' }, [
+          el('h1', { text: ctx.station.titel + ': gerade voll' }),
+          el('p', { text: andere === 1 ? 'Hier ist gerade eine andere Gruppe.' : 'Hier sind gerade ' + andere + ' andere Gruppen.' })
+        ]);
+        inhalt.appendChild(panel);
+        stattdessen(panel, 'Wartet kurz oder geht zu: ').then(() => {
+          panel.appendChild(el('button', { type: 'button', klasse: 'secondary', text: 'Wir sind trotzdem dran', onclick: () => {
+            inhalt.innerHTML = '';
+            weiter();
+          } }));
+        });
+      });
+    });
   }
 
   function testWerkzeuge(){
@@ -708,10 +751,12 @@
           if(fehlend.length) return nochNichtDran(fehlend);
           if(ctx.eintrag.status !== 'begonnen'){
             // Check-in: Station ist ab jetzt für diese Gruppe besetzt
-            ctx.eintrag.status = 'begonnen';
-            ctx.eintrag.start = new Date().toISOString();
-            f.aktuell = id;
-            return speichern()
+            return platzPruefen().then(() => {
+              ctx.eintrag.status = 'begonnen';
+              ctx.eintrag.start = new Date().toISOString();
+              ctx.f.aktuell = id;
+              return speichern();
+            })
               .then(() => Outbox.ereignis(gruppe.id, 'checkin', id, {}))
               .then(stationZeigen);
           }
