@@ -38,6 +38,71 @@
     "text": "Foto von",
     "personPruefen": true
   },
+  "ersatz": [
+    {
+      "id": "taylor-swift",
+      "name": "Taylor Swift",
+      "bild": "bilder/ersatz/taylor-swift.jpg",
+      "quelle": "Foto: Glenn Francis, CC BY-SA 4.0, Wikimedia Commons",
+      "seite": "https://commons.wikimedia.org/wiki/File:Taylor_Swift_2_-_2019_by_Glenn_Francis_(cropped).jpg"
+    },
+    {
+      "id": "billie-eilish",
+      "name": "Billie Eilish",
+      "bild": "bilder/ersatz/billie-eilish.jpg",
+      "quelle": "Foto: MTV UK, CC BY 3.0, Wikimedia Commons",
+      "seite": "https://commons.wikimedia.org/wiki/File:Billie_Eilish_2019_MTV_Interview.png"
+    },
+    {
+      "id": "zendaya",
+      "name": "Zendaya",
+      "bild": "bilder/ersatz/zendaya.jpg",
+      "quelle": "Foto: Glenn Francis, CC BY-SA 4.0, Wikimedia Commons",
+      "seite": "https://commons.wikimedia.org/wiki/File:Zendaya_-_2019_by_Glenn_Francis.jpg"
+    },
+    {
+      "id": "bill-kaulitz",
+      "name": "Bill Kaulitz",
+      "bild": "bilder/ersatz/bill-kaulitz.jpg",
+      "quelle": "Foto: Promiflash, CC BY-SA 3.0, Wikimedia Commons",
+      "seite": "https://commons.wikimedia.org/wiki/File:Bill_Kaulitz_2010.JPG"
+    },
+    {
+      "id": "mark-forster",
+      "name": "Mark Forster",
+      "bild": "bilder/ersatz/mark-forster.jpg",
+      "quelle": "Foto: Harald Krichel, CC BY-SA 4.0, Wikimedia Commons",
+      "seite": "https://commons.wikimedia.org/wiki/File:Mark_Forster-9969.jpg"
+    },
+    {
+      "id": "lena",
+      "name": "Lena",
+      "bild": "bilder/ersatz/lena.jpg",
+      "quelle": "Foto: Peter Dittmann, CC BY-SA 3.0, Wikimedia Commons",
+      "seite": "https://commons.wikimedia.org/wiki/File:Lena_Meyer-Landrut_Wernigerode_2013_portrait.jpg"
+    },
+    {
+      "id": "jamal-musiala",
+      "name": "Jamal Musiala",
+      "bild": "bilder/ersatz/jamal-musiala.jpg",
+      "quelle": "Foto: ArsenalGhanaPartey (Ausschnitt), CC BY-SA 4.0, Wikimedia Commons",
+      "seite": "https://commons.wikimedia.org/wiki/File:Jamal_Musiala_2022_(cropped).jpg"
+    },
+    {
+      "id": "frida-kahlo",
+      "name": "Frida Kahlo",
+      "bild": "bilder/ersatz/frida-kahlo.jpg",
+      "quelle": "Foto: Guillermo Kahlo, 1932, gemeinfrei, Wikimedia Commons",
+      "seite": "https://commons.wikimedia.org/wiki/File:Frida_Kahlo,_by_Guillermo_Kahlo.jpg"
+    },
+    {
+      "id": "albert-einstein",
+      "name": "Albert Einstein",
+      "bild": "bilder/ersatz/albert-einstein.jpg",
+      "quelle": "Foto: Ferdinand Schmutzer, 1921 (Ausschnitt), gemeinfrei, Wikimedia Commons",
+      "seite": "https://commons.wikimedia.org/wiki/File:Einstein_1921_by_F_Schmutzer_-_restoration.jpg"
+    }
+  ],
   "fragen": [
     "ki-typ",
     "sterne"

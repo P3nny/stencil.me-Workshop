@@ -56,6 +56,13 @@ button.klein{font-size:.8rem;padding:6px 10px;}
 .beispiele figcaption{margin-top:4px;line-height:1.25;}
 .beispiele .gut figcaption{font-weight:700;}
 .foto-vorschau{display:block;max-width:220px;max-height:220px;border:3px solid var(--ink);margin-top:8px;}
+/* Ersatz-Porträts (ohne eigenes Foto) */
+.ersatz-auswahl{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;}
+button.ersatz-wahl{display:flex;flex-direction:column;align-items:center;width:104px;padding:4px;margin:0;background:#fff;color:var(--ink);text-transform:none;letter-spacing:0;font-family:inherit;font-size:.85rem;}
+button.ersatz-wahl img{width:92px;height:110px;object-fit:cover;object-position:top;}
+button.ersatz-wahl.an{background:var(--neon);}
+.ersatz-vorschau{margin:0;}
+.bild-quelle{font-size:.75rem;color:var(--muted);margin:4px 0 0;max-width:220px;}
 .eingabe{display:block;margin-bottom:12px;}
 .eingabe span{display:block;font-weight:700;margin-bottom:4px;}
 textarea{width:100%;font:inherit;border:3px solid var(--ink);padding:8px;border-radius:0;}

@@ -137,6 +137,21 @@
     ]);
   }
 
+  // Foto (oder Ersatz-Porträt) einer Person speichern, altes löschen. Ergebnis: URL zum Anzeigen
+  function fotoSpeichern(station, index, bild){
+    const eintrag = ctx.eintrag;
+    const key = station.id + ':' + index + ':' + Speicher.neueId();
+    const alt = (eintrag.dateien || {})[index];
+    eintrag.dateien = eintrag.dateien || {};
+    eintrag.dateien[index] = key;
+    return Speicher.dateiSchreiben(key, bild)
+      .then(() => alt ? Speicher.dateiSchreiben(alt, undefined) : null)
+      // Rohfoto der Foto-Station merken: brauchen spätere Stationen und das Puzzle
+      .then(() => station.id === 'foto' ? Speicher.schreiben('foto-key:' + index, key) : null)
+      .then(speichern)
+      .then(() => Speicher.dateiAlsUrl(key));
+  }
+
   function fotoFeld(station, index, name){
     const eintrag = ctx.eintrag;
     const vorschau = el('img', { klasse: 'foto-vorschau', alt: '' });
@@ -155,18 +170,7 @@
       status.textContent = 'Wird gespeichert …';
       knopf.disabled = true;
       Bild.fotoVerkleinern(datei)
-        .then(bild => {
-          const key = station.id + ':' + index + ':' + Speicher.neueId();
-          const alt = (eintrag.dateien || {})[index];
-          eintrag.dateien = eintrag.dateien || {};
-          eintrag.dateien[index] = key;
-          return Speicher.dateiSchreiben(key, bild)
-            .then(() => alt ? Speicher.dateiSchreiben(alt, undefined) : null)
-            // Rohfoto der Foto-Station merken: brauchen spätere Stationen und das Puzzle
-            .then(() => station.id === 'foto' ? Speicher.schreiben('foto-key:' + index, key) : null)
-            .then(speichern)
-            .then(() => Speicher.dateiAlsUrl(key));
-        })
+        .then(bild => fotoSpeichern(station, index, bild))
         .then(url => {
           vorschau.src = url;
           vorschau.hidden = false;
@@ -187,6 +191,79 @@
       personAnzeigen(ki, index);
     }
     return el('div', { klasse: 'foto-feld' }, [el('p', { klasse: 'foto-titel', text: titel }), knopf, input, status, el('div', { klasse: 'foto-ergebnis' }, [vorschau, ki])]);
+  }
+
+  // ---- Ohne eigenes Foto (keine Einwilligung der Eltern) ----
+  // Patricia trägt die Vornamen auf der Laptop-Seite ein. Die Person wählt dann ein Porträt
+  // einer bekannten Person (stationen/foto.json, ersatz). Stempel und Postkarte entstehen daraus.
+  function regelnLaden(gruppeId){
+    // Kurz nach der Anmeldung kennt der Laptop die Gruppe evtl. noch nicht: ein paarmal nachfragen
+    const versuch = rest => Promise.race([
+      fetch('/api/regeln?gruppe=' + gruppeId, { cache: 'no-store' }).then(r => r.json()),
+      new Promise((resolve, reject) => setTimeout(() => reject(new Error('Zeitüberschreitung')), 4000))
+    ]).then(r => (r.bekannt || rest <= 0) ? r : new Promise(resolve => setTimeout(resolve, 1500)).then(() => versuch(rest - 1)));
+    return versuch(4)
+      .then(r => Speicher.schreiben('regeln', r).then(() => r))
+      // Ohne Laptop: letzter bekannter Stand
+      .catch(() => Speicher.lesen('regeln').then(r => r || { ohneFoto: [], ohneKi: false }));
+  }
+
+  function ohneFoto(station, index){
+    return !!(station.ersatz && ctx.regeln && ctx.regeln.ohneFoto && ctx.regeln.ohneFoto[index]);
+  }
+
+  function ersatzFeld(station, index, name){
+    const eintrag = ctx.eintrag;
+    eintrag.ersatz = eintrag.ersatz || {};
+    const vorschau = el('img', { klasse: 'foto-vorschau', alt: '' });
+    vorschau.hidden = true;
+    const quelle = el('p', { klasse: 'bild-quelle' });
+    const status = el('div', { klasse: 'hinweis' });
+    function zeigen(){
+      const e = station.ersatz.filter(x => x.id === eintrag.ersatz[index])[0];
+      if(!e) return;
+      vorschau.src = '/stationen/' + e.bild;
+      vorschau.alt = e.name;
+      vorschau.hidden = false;
+      quelle.textContent = e.quelle;
+    }
+    const auswahl = el('div', { klasse: 'ersatz-auswahl' }, station.ersatz.map(e => el('button', {
+      type: 'button', klasse: 'ersatz-wahl' + (eintrag.ersatz[index] === e.id ? ' an' : ''),
+      onclick: ev => {
+        const knopf = ev.currentTarget;
+        status.textContent = 'Wird gespeichert …';
+        fetch('/stationen/' + e.bild)
+          .then(r => { if(!r.ok) throw new Error('Bild fehlt: ' + e.bild); return r.blob(); })
+          .then(blob => Bild.fotoVerkleinern(blob))
+          .then(bild => {
+            eintrag.ersatz[index] = e.id;
+            // Namensnennung (CC-Lizenz): kommt mit der Mappe zur Lehrkraft
+            eintrag.antworten = eintrag.antworten || {};
+            eintrag.antworten.quelle = Object.keys(eintrag.ersatz).map(i => {
+              const x = station.ersatz.filter(y => y.id === eintrag.ersatz[i])[0];
+              return x ? x.name + ': ' + x.quelle + ', ' + x.seite : '';
+            }).filter(Boolean).join('\n');
+            // Getestete Porträts: Die KI muss nicht nochmal suchen
+            eintrag.person = eintrag.person || {};
+            eintrag.person[index] = 'ok';
+            return fotoSpeichern(station, index, bild);
+          })
+          .then(() => {
+            Array.prototype.forEach.call(auswahl.children, k => k.classList.toggle('an', k === knopf));
+            status.textContent = '✓ Porträt gespeichert';
+            zeigen();
+            ctx.pruefen();
+          })
+          .catch(err => fehler('Das Porträt hat nicht geklappt. Bitte nochmal antippen.', err));
+      }
+    }, [el('img', { src: '/stationen/' + e.bild, alt: '' }), el('span', { text: e.name })])));
+    zeigen();
+    return el('div', { klasse: 'foto-feld' }, [
+      el('p', { klasse: 'foto-titel', text: 'Porträt für ' + name }),
+      el('p', { text: 'Du arbeitest heute mit dem Porträt einer bekannten Person. Such dir eins aus: Daraus wird dein Stempel.' }),
+      auswahl, status,
+      el('div', { klasse: 'foto-ergebnis' }, [el('figure', { klasse: 'ersatz-vorschau' }, [vorschau, quelle])])
+    ]);
   }
 
   // ---- KI prüft: Ist eine Person auf dem Foto? ----
@@ -244,7 +321,7 @@
     }
     if(check.art === 'foto'){
       const personen = check.proPerson ? ctx.gruppe.personen : [''];
-      return el('div', { klasse: 'check' }, personen.map((name, i) => fotoFeld(station, i, name)));
+      return el('div', { klasse: 'check' }, personen.map((name, i) => ohneFoto(station, i) ? ersatzFeld(station, i, name) : fotoFeld(station, i, name)));
     }
     if(check.art === 'text') return null; // nur Eingaben
     let text = 'Erledigt';
@@ -332,6 +409,8 @@
       const anzahl = check.proPerson ? ctx.gruppe.personen.length : 1;
       for(let i = 0; i < anzahl; i++){
         if(!(eintrag.dateien || {})[i]) return false;
+        // Erst nach der Anmeldung auf die Liste gesetzt: ein eigenes Foto zählt dann nicht
+        if(ohneFoto(station, i) && !(eintrag.ersatz || {})[i]) return false;
         const person = (eintrag.person || {})[i];
         if(check.personPruefen && (person === 'pruefen' || person === 'keine')) return false;
       }
@@ -588,7 +667,8 @@
         document.title = st.titel + ' · stencil.me';
         // KI schon laden, während die Kinder die Tipps lesen
         if(st.check && st.check.personPruefen && window.Personen) Personen.vorladen();
-        return kopfleiste(gruppe, liste, f).then(() => {
+        const regelnFertig = st.ersatz ? regelnLaden(gruppe.id).then(r => { ctx.regeln = r; }) : Promise.resolve();
+        return Promise.all([kopfleiste(gruppe, liste, f), regelnFertig]).then(() => {
           if(ctx.eintrag.status === 'fertig') return weiterZeigen(false);
           const fehlend = Stationen.voraussetzungen(liste, st).filter(b => !Stationen.istFertig(f, b)).map(b => liste.filter(s => s.id === b)[0]);
           const bonusFehlen = Stationen.fehlenBisBonus(liste, f, st);
