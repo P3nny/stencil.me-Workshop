@@ -46,6 +46,12 @@ async function abschliessen(page, sterne){
   await page.locator('button.stern').nth(sterne - 1).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
+  await vorschlagAbwarten(page);
+}
+
+// Der Vorschlag für die nächste Station kommt erst nach der Antwort vom Laptop
+function vorschlagAbwarten(page){
+  return page.waitForFunction(() => document.body.textContent.indexOf('Nächste Station wird gesucht') < 0);
 }
 
 (async () => {
@@ -570,6 +576,7 @@ async function abschliessen(page, sterne){
   await page.click('button:has-text("Station beendet")');
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
+  await vorschlagAbwarten(page);
   pruefe(await page.locator('text=Lasercut-Porträt').count() === 1, 'danach wird Bonus 2 vorgeschlagen');
 
   console.log('Bonus 2: Lasercut-Porträt');
