@@ -72,6 +72,12 @@ NUR_LAPTOP = EINWILLIGUNG_LISTEN + ("vibePin",)  # nie an die iPads
 frei_lock = threading.Lock()
 frei_bis = {}      # gruppe -> Zeitpunkt (time.time()), bis zu dem freie Aufträge gehen
 pin_fehler = {}    # gruppe -> [Fehlversuche, gesperrt bis]
+# Unterwegs: Das iPad hat der Gruppe eine Station vorgeschlagen, sie hat dort noch nicht eingecheckt.
+# Zählt für die Belegung mit, damit zwei Gruppen nicht gleichzeitig an eine Station mit einem Platz gehen.
+# Nur im Arbeitsspeicher, ohne Namen (Patricia, 25.10.2026).
+UNTERWEGS_SEKUNDEN = 10 * 60
+unterwegs_lock = threading.Lock()
+unterwegs = {}     # gruppe -> (station, Zeitpunkt)
 
 EVENT_TYPES = ("anmeldung", "checkin", "beendet")
 # Image types accepted from the stations, recognised by their first bytes
@@ -312,12 +318,21 @@ def list_groups(mit_regeln=False):
     return groups
 
 
-def station_occupancy():
-    """How many groups are checked in at each station right now (no names)."""
-    counts = {}
+def station_occupancy(ohne=""):
+    """How many groups are checked in at each station or on their way there (no names).
+    ohne: the asking group, so it does not count against itself."""
+    jetzt = time.time()
+    with unterwegs_lock:
+        for g in [g for g, (_, t) in unterwegs.items() if jetzt - t > UNTERWEGS_SEKUNDEN]:
+            del unterwegs[g]
+        wohin = {g: st for g, (st, _) in unterwegs.items()}
     for g in list_groups():
-        if g["aktuell"]:
-            counts[g["aktuell"]] = counts.get(g["aktuell"], 0) + 1
+        if g["aktuell"] and g["gruppe"] not in wohin:
+            wohin[g["gruppe"]] = g["aktuell"]
+    counts = {}
+    for g, st in wohin.items():
+        if g != ohne:
+            counts[st] = counts.get(st, 0) + 1
     return counts
 
 
@@ -487,7 +502,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path == "/api/status":
             return self.send_json({"ok": True})
         if path == "/api/belegung":
-            return self.send_json({"stationen": station_occupancy()})
+            group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
+            return self.send_json({"stationen": station_occupancy(group_id)})
         if path == "/api/einstellungen":
             settings = read_settings()
             if not self.is_local():
@@ -626,6 +642,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.ki_app()
         if parsed.path == "/api/ki-freigabe":
             return self.ki_freigabe()
+        if parsed.path == "/api/unterwegs":
+            return self.unterwegs_melden()
         if (parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht", "/api/mappe-usb", "/api/werkstatt") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
         if parsed.path == "/api/einstellungen":
@@ -650,6 +668,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             with frei_lock:
                 frei_bis.clear()
                 pin_fehler.clear()
+            with unterwegs_lock:
+                unterwegs.clear()
             # Namen von den Rückmeldezetteln gehören auch zu den Daten der Kinder
             settings = read_settings()
             for liste in EINWILLIGUNG_LISTEN:
@@ -695,6 +715,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         }
         os.makedirs(events_dir, exist_ok=True)
         write_atomic(target, json.dumps(record, ensure_ascii=False, indent=1).encode("utf-8"))
+        if record["art"] == "checkin":
+            with unterwegs_lock:
+                unterwegs.pop(event["gruppe"], None)  # angekommen (hier oder woanders)
         if record["art"] == "beendet" and station == FREI_STATION:
             frei_beenden(event["gruppe"])  # Station fertig: PIN-Freigabe endet sofort
         print("Station %s: %s (%s)" % (record["art"], station or "-", event["gruppe"]))
@@ -787,6 +810,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except Exception as err:  # Server darf nie abstürzen
             print("KI-App-Fehler: %r" % err)
             schreiben(ki_app.FEHLER_MARKE + "Da ist etwas schiefgegangen. Bitte nochmal versuchen.")
+
+    def unterwegs_melden(self):
+        """Das iPad hat der Gruppe eine Station vorgeschlagen: {gruppe, station}."""
+        body = self.read_body(MAX_EVENT_BYTES)
+        try:
+            anfrage = json.loads(body.decode("utf-8")) if body else {}
+        except ValueError:
+            anfrage = {}
+        if not isinstance(anfrage, dict):
+            anfrage = {}
+        gruppe, station = str(anfrage.get("gruppe", "")), str(anfrage.get("station", ""))
+        if not ID_RE.match(gruppe) or not STATION_RE.match(station):
+            return self.send_json({"ok": False, "fehler": "ungültige Anfrage"}, 400)
+        with unterwegs_lock:
+            unterwegs[gruppe] = (station, time.time())
+        return self.send_json({"ok": True})
 
     def ki_freigabe(self):
         """Erwachsene Person gibt die PIN ein: Gruppe darf 15 Minuten frei vibe coden."""

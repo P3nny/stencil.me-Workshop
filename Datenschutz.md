@@ -33,7 +33,7 @@ An jeder Station fragt die App: Was hast du gerade benutzt? Hier ist der Untersc
 | **Bildbearbeitungs-KI** | Hat aus Beispielen gelernt. Erkennt oder verändert dein Bild, erfindet nichts Neues. | Die KI findet dich auf dem Foto (BodyPix)        |
 | **Generative KI**       | Erfindet neue Bilder oder Texte. Gleicher Auftrag, jedes Mal etwas anderes.          | KI-Selbstporträt, Bild-App vibe coden (Claude)   |
 
-Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Foto findet, rechnet auf dem iPad. Dein Foto verlässt dafür das iPad nicht.
+Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Foto freistellt, rechnet auf dem iPad. Dein Foto verlässt dafür das iPad nicht.
 
 ## Station für Station
 
@@ -65,7 +65,7 @@ Fotografiere an den Stationen nur die Sache, um die es geht: die Maschine, die P
 Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen sind optional. Sie zählen nicht zu euren Stationen, und ihr verpasst nichts für euren Stempel.
 
 - **Was geht hin?** Nur der Satz aus dem Baukasten. Zum Beispiel: „Zeichne ein Selbstporträt im Stil von Frida Kahlo. Es zeigt ein 14-jähriges Mädchen mit braunen Augen und langen Haaren.“ Bei der Bild-App kommt der App-Name dazu, den ihr selbst eintippt.
-- **Frei vibe coden:** Bei der Bild-App dürft ihr eure Idee auch frei beschreiben und eure App weiterbauen lassen. Das geht nur, wenn eine erwachsene Person dabei ist: Sie schaltet euer iPad mit einer PIN frei (15 Minuten, oder bis ihr die Station beendet) und tippt eure Idee ein. Sie achtet darauf, dass nichts über euch im Auftrag steht.
+- **Frei vibe coden:** Bei der Bild-App dürft ihr eure Idee auch frei beschreiben und eure App weiterbauen lassen. Das geht nur, wenn eine erwachsene Person dabei ist: Sie schaltet euer iPad mit einer PIN frei (15 Minuten, oder bis ihr die Station beendet) und tippt eure Idee ein. Sie achtet darauf, dass nichts über euch im Auftrag (Prompt) steht.
 - **Was geht nicht hin?** Kein Foto, kein Name, nichts, was zeigt, wer ihr seid. Schreibt deshalb auch in den App-Namen keinen echten Namen.
 - **Wer schickt es?** Nicht das iPad, sondern Pennys Laptop. Anthropic sieht also nicht, von welchem iPad der Auftrag kommt.
 - **Wie lange bleibt es dort?** Anthropic löscht die Aufträge normalerweise nach höchstens 30 Tagen. Anthropic benutzt sie nicht, um die KI weiter zu trainieren.
@@ -105,7 +105,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 **Verantwortlich:** Patricia Ennenbach (im Workshop „Penny“), Workshop im Kommunalen Medienzentrum (KOMEZ). Kontakt: patricia.ennenbach@bildung.koeln.de
 
-**Welche Daten:** Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung), daraus erzeugte Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts), Fotos von Werkstücken, Textantworten, Bewertungen, Feedback, Zeitpunkte von Check-in und Abschluss jeder Station (daraus die Dauer). Die Auswertung (Laptop) zeigt Sterne, KI-Frage, Dauer und Feedback ohne Namen. Für Laser und Plotter protokolliert der Laptop nur Anzahl und Dauer der Platten und Folien, ohne Namen.
+**Welche Daten:** Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung), daraus erzeugte Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts), Fotos von Werkstücken, Textantworten, Bewertungen, Feedback, Zeitpunkte von Check-in und Abschluss jeder Station (daraus die Dauer). Die Auswertung (Laptop) zeigt Sterne, KI-Frage, Dauer und Feedback ohne Namen. Für Laser und Plotter protokolliert der Laptop nur Anzahl und Dauer der Platten und Folien, ohne Namen. Damit nicht zwei Gruppen gleichzeitig an eine volle Station geschickt werden, merkt sich der Laptop, zu welcher Station eine Gruppe gerade unterwegs ist (nur Gruppen-ID und Station, nur im Arbeitsspeicher, höchstens 10 Minuten).
 
 **Wo verarbeitet:**
 
