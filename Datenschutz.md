@@ -94,7 +94,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 ## Deine Rechte
 
-- Du darfst jederzeit nachsehen, was über dich gespeichert ist: Auf der Startseite tippst du auf „🔒 Meine Daten“. Dort steht alles, was auf dem iPad und auf Pennys Laptop liegt.
+- Du darfst jederzeit nachsehen, was über dich gespeichert ist: Auf der Startseite tippst du auf „🔒 Meine Daten“. Dort steht alles, was auf dem iPad und auf Pennys Laptop liegt, auch wann ihr an welcher Station wart und wie lange. Und was man aus diesen Daten alles ablesen könnte.
 - Du darfst sagen: Ich will nicht, dass mein Foto auf den Laptop geht. Dann findet Penny eine Lösung mit dir.
 - **Ohne eigenes Foto:** Haben deine Eltern Nein zu Fotos gesagt, macht die App kein Foto von dir. Du suchst dir stattdessen das Porträt einer bekannten Person aus, zum Beispiel Taylor Swift oder Albert Einstein. Daraus machst du deinen Stempel und deine Postkarte, ganz normal. Unter dem Bild steht, wer das Foto gemacht hat.
 - Die Stationen mit Claude sind optional. Du machst sie nur, wenn du und deine Eltern einverstanden seid. Haben deine Eltern Nein gesagt, zeigt die App euch dort nur Beispiele. Claude bekommt dann nichts von euch.
@@ -105,7 +105,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 **Verantwortlich:** Patricia Ennenbach (im Workshop „Penny“), Workshop im Kommunalen Medienzentrum (KOMEZ). Kontakt: patricia.ennenbach@bildung.koeln.de
 
-**Welche Daten:** Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung), daraus erzeugte Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts), Fotos von Werkstücken, Textantworten, Bewertungen, Feedback.
+**Welche Daten:** Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung), daraus erzeugte Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts), Fotos von Werkstücken, Textantworten, Bewertungen, Feedback, Zeitpunkte von Check-in und Abschluss jeder Station (daraus die Dauer). Die Auswertung (Laptop) zeigt Sterne, KI-Frage, Dauer und Feedback ohne Namen. Für Laser und Plotter protokolliert der Laptop nur Anzahl und Dauer der Platten und Folien, ohne Namen.
 
 **Wo verarbeitet:**
 

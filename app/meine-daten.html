@@ -12,6 +12,11 @@
   .daten-station { border-top:2px solid var(--ink); padding-top:10px; margin-top:14px; }
   .daten-station h3 { margin:0 0 6px; font-size:1rem; }
   .daten-station p { margin:4px 0; }
+  .zeiten { border-collapse:collapse; width:100%; font-size:.9rem; margin:6px 0 12px; }
+  .zeiten th, .zeiten td { border-bottom:1px solid var(--ink); padding:4px 6px; text-align:left; }
+  .zeiten td.zahl { text-align:right; font-variant-numeric:tabular-nums; }
+  .auswerten { background:#fffbe6; border:3px solid var(--ink); padding:10px 12px; }
+  .auswerten li { margin:4px 0; }
   .daten-station pre { white-space:pre-wrap; font-size:.8rem; max-height:240px; overflow:auto; background:#fff; border:1px solid var(--ink); padding:6px; }
 </style>
 </head>
@@ -44,6 +49,58 @@
     if(Array.isArray(w)) w = w.join(' · ');
     if(key === 'svg-code' || key === 'html-code') return el('details', {}, [el('summary', { text: 'Code ansehen' }), el('pre', { text: String(w) })]);
     return el('span', { text: String(w) });
+  }
+
+  function uhrzeit(iso){
+    if(!iso) return '–';
+    const d = new Date(iso);
+    return isNaN(d) ? '–' : ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+  }
+
+  // Wann wart ihr an welcher Station? zeiten: { station: { start, ende, minuten } }
+  function zeitTabelle(liste, zeiten){
+    const ids = liste.map(s => s.id).filter(id => zeiten[id] && (zeiten[id].start || zeiten[id].ende));
+    if(!ids.length) return el('p', { text: 'Noch keine.' });
+    let summe = 0;
+    const zeilen = ids.map(id => {
+      const z = zeiten[id];
+      if(z.minuten) summe += z.minuten;
+      return el('tr', {}, [el('td', { text: titel(liste, id) }), el('td', { text: uhrzeit(z.start) }), el('td', { text: uhrzeit(z.ende) }),
+        el('td', { klasse: 'zahl', text: z.minuten != null ? String(Math.round(z.minuten)) : '–' })]);
+    });
+    zeilen.push(el('tr', {}, [el('td', {}, [el('strong', { text: 'Zusammen' })]), el('td'), el('td'), el('td', { klasse: 'zahl' }, [el('strong', { text: String(Math.round(summe)) })])]));
+    return el('table', { klasse: 'zeiten' }, [
+      el('thead', {}, [el('tr', {}, ['Station', 'Start', 'Fertig', 'Minuten'].map(t => el('th', { text: t })))]),
+      el('tbody', {}, zeilen)
+    ]);
+  }
+
+  // Erlebnis (Patricia, 25.10.): Wie viele Daten erzeuge ich in einem Workshop, und was ließe sich daraus ablesen?
+  function auswertenTeil(liste, f){
+    const stationen = Object.keys(f.stationen || {}).filter(id => (f.stationen[id] || {}).status);
+    let antworten = 0, zeitpunkte = 0, klicks = 0;
+    stationen.forEach(id => {
+      const e = f.stationen[id];
+      antworten += Object.keys(e.antworten || {}).filter(k => e.antworten[k]).length;
+      zeitpunkte += (e.start ? 1 : 0) + (e.ende ? 1 : 0);
+      klicks += (e.kiTyp ? 1 : 0) + (e.sterne ? 1 : 0) + (e.quiz ? Object.keys(e.quiz).length : 0) + (e.aufgaben ? Object.keys(e.aufgaben).length : 0);
+    });
+    return el('section', { klasse: 'panel' }, [
+      el('h1', { text: '🔎 Was man aus euren Daten ablesen könnte' }),
+      el('p', { text: 'In diesem Workshop habt ihr bisher ' + stationen.length + ' Stationen besucht und dabei ' + zeitpunkte + ' Zeitpunkte, ' +
+        antworten + ' Textantworten und ' + klicks + ' Auswahl-Klicks (Sterne, KI-Frage, Quiz, Aufgaben) erzeugt. Dazu kommen eure Fotos.' }),
+      el('div', { klasse: 'auswerten' }, [
+        el('p', {}, [el('strong', { text: 'Wer alle diese Daten hat, könnte zum Beispiel auswerten:' })]),
+        el('ul', {}, [
+          'wann ihr wo wart und wie lange ihr für jede Station gebraucht habt, auch im Vergleich zu anderen Gruppen,',
+          'welche Station euch gefallen hat und welche nicht (Sterne),',
+          'ob ihr Programm, KI und generative KI unterscheiden könnt (KI-Frage),',
+          'was ihr denkt (eure Antworten, zum Beispiel zu KI und Ethik), welchen Beruf ihr euch wünscht,',
+          'wie ihr ausseht: Auf euren Fotos erkennt man euch, und eine KI könnte daraus mehr schätzen, zum Beispiel Alter oder Stimmung.'
+        ].map(t => el('li', { text: t })))
+      ]),
+      el('p', { text: 'Darum wertet Penny nur ohne Namen aus: Sterne, KI-Frage, Zeiten und Feedback, um den Workshop zu verbessern. Eure Mappe bekommt eure Lehrkraft, dann wird alles gelöscht.' })
+    ]);
   }
 
   function titel(liste, id){
@@ -83,6 +140,8 @@
         box.appendChild(el('h2', { text: 'Fotos, Stempel und Bilder (' + bildDateien.length + ')' }));
         box.appendChild(bildDateien.length ? bilder(bildDateien.map(url)) : el('p', { text: 'Noch keine.' }));
         if(apps.length) box.appendChild(el('p', { text: 'Dazu ' + apps.length + (apps.length === 1 ? ' App' : ' Apps') + ' aus „Bild-App vibe coden“.' }));
+        box.appendChild(el('h2', { text: 'Wann ihr wo wart' }));
+        box.appendChild(zeitTabelle(liste, d.zeiten || {}));
         box.appendChild(el('h2', { text: 'Eure Antworten' }));
         if(!Object.keys(d.antworten).length) box.appendChild(el('p', { text: 'Noch keine.' }));
         d.fertig.forEach(id => box.appendChild(stationZeigen(liste, id, d.antworten[id] || {})));
@@ -174,12 +233,25 @@
     return box;
   }
 
+  function zeitenAusFortschritt(f){
+    const zeiten = {};
+    Object.keys(f.stationen || {}).forEach(id => {
+      const e = f.stationen[id] || {};
+      if(!e.start && !e.ende) return;
+      const min = e.start && e.ende ? (new Date(e.ende) - new Date(e.start)) / 60000 : null;
+      zeiten[id] = { start: e.start, ende: e.ende, minuten: min != null && min >= 0 ? min : null };
+    });
+    return zeiten;
+  }
+
   function ipadTeil(gruppe, liste, f){
     const box = el('section', { klasse: 'panel' }, [
       el('h1', { text: '📱 Auf diesem iPad' }),
       el('p', { klasse: 'hinweis', text: 'Das bleibt auf dem iPad, bis Penny es nach dem Workshop zurücksetzt. Andere iPads sehen es nicht.' }),
       el('p', {}, [el('strong', { text: 'Eure Namen: ' }), el('span', { text: gruppe.personen.join(' und ') })]),
-      el('p', { text: Stationen.anzahlFertig(liste, f) + ' von ' + Stationen.anzahlPflicht(liste) + ' Stationen geschafft.' })
+      el('p', { text: Stationen.anzahlFertig(liste, f) + ' von ' + Stationen.anzahlPflicht(liste) + ' Stationen geschafft.' }),
+      el('h2', { text: 'Wann ihr wo wart' }),
+      zeitTabelle(liste, zeitenAusFortschritt(f))
     ]);
     // Erst auf Knopfdruck: Alle Fotos auf einmal zu lesen, belastet alte iPads und hält den Speicher auf
     box.appendChild(el('h2', { text: 'Fotos und Bilder' }));
@@ -217,6 +289,7 @@
       ]));
       inhalt.appendChild(ipadTeil(gruppe, werte[1], werte[2]));
       inhalt.appendChild(laptopTeil(gruppe, werte[1]));
+      inhalt.appendChild(auswertenTeil(werte[1], werte[2]));
       const platz = el('div');
       inhalt.appendChild(platz);
       fetch('/api/einstellungen', { cache: 'no-store' }).then(r => r.json())
