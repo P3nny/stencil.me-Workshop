@@ -6,7 +6,16 @@
 (function(){
   const TYP_TEXT = { programm: 'Computerprogramm', ki: 'KI (Bildbearbeitung)', generativ: 'Generative KI', analog: 'Ohne Computer' };
   // Keine Befehle („Geht an …“ klang wie eine Aufforderung), Patricia 25.10.
-  const DATENWEG_TEXT = { ipad: 'Bleibt auf dem iPad', laptop: 'Foto/Daten an den Laptop', 'laptop-video': 'Foto/Daten an den Laptop · Video: YouTube', online: 'Nutzt generative KI' };
+  // Etikett „Datenweg“ an jeder Station. Fotos bleiben seit 25.10.2026 auf dem iPad,
+  // an den Laptop gehen nur Antworten und die Dateien für Laser und Plotter.
+  const DATENWEG_TEXT = {
+    ipad: 'Bleibt auf dem iPad',
+    antworten: 'Antworten an den Laptop',
+    'foto-ipad': 'Foto bleibt auf dem iPad · Antworten an den Laptop',
+    'foto-ipad-video': 'Foto bleibt auf dem iPad · Antworten an den Laptop · Video: YouTube',
+    laptop: 'Datei für Laser/Plotter an den Laptop',
+    online: 'Nutzt generative KI'
+  };
   const KI_ANTWORTEN = [
     { wert: 'generativ', text: 'Generative KI' },
     { wert: 'ki', text: 'Bildbearbeitungs-KI' },
@@ -197,7 +206,7 @@
         .then(url => {
           vorschau.src = url;
           vorschau.hidden = false;
-          status.textContent = station.check.hochladen ? '✓ Foto gespeichert (geht beim Beenden an den Laptop)' : '✓ Foto gespeichert (bleibt auf dem iPad)';
+          status.textContent = '✓ Foto gespeichert (bleibt auf dem iPad)';
           knopf.textContent = 'Neues Foto';
           ctx.pruefen();
           if(station.check.personPruefen) return personPruefen(knopf.parentNode.querySelector('.ki-pruefung'), index, url);
@@ -578,15 +587,6 @@
     pruefen();
   }
 
-  // Fotos der Station erst jetzt an den Laptop: nur die letzten, keine verworfenen Versuche
-  function fotosSenden(station, eintrag){
-    const check = station.check || {};
-    const hochladen = check.hochladen || (check.foto && check.foto.hochladen);
-    if(!hochladen) return Promise.resolve();
-    const keys = Object.keys(eintrag.dateien || {}).map(i => eintrag.dateien[i]);
-    return keys.reduce((kette, key) => kette.then(() => Outbox.datei(ctx.gruppe.id, station.id, key)), Promise.resolve());
-  }
-
   function beenden(){
     const station = ctx.station;
     const eintrag = ctx.eintrag;
@@ -597,7 +597,6 @@
     speichern()
       // Eigene Stationsteile schicken ihre Ergebnisse erst jetzt (z. B. den fertigen Stempel)
       .then(() => art && art.beimBeenden ? art.beimBeenden(eintrag, ctx.gruppe, station).then(speichern) : null)
-      .then(() => fotosSenden(station, eintrag))
       .then(() => Outbox.ereignis(ctx.gruppe.id, 'beendet', station.id, { antworten: eintrag.antworten || {}, kiTyp: eintrag.kiTyp || '', sterne: eintrag.sterne || 0 }))
       .then(() => kopfleiste(ctx.gruppe, ctx.liste, ctx.f))
       .then(() => weiterZeigen(true))

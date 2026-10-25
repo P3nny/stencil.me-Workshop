@@ -168,7 +168,7 @@
     <div class="hint" id="kiStatus"></div>
     <div id="groupsError"></div>
     <table>
-      <thead><tr><th>Namen</th><th>Einwilligung</th><th>Gerade an</th><th>Geschafft</th><th>Fotos</th></tr></thead>
+      <thead><tr><th>Namen</th><th>Einwilligung</th><th>Gerade an</th><th>Geschafft</th><th>Dateien</th></tr></thead>
       <tbody id="groups"></tbody>
     </table>
     <div class="hint">Ordner: <span class="folder" id="groupsFolder"></span></div>
@@ -538,7 +538,7 @@
 
   document.getElementById("deleteAll").addEventListener("click", function () {
     if (!gesichert && !confirm("Noch nicht gesichert: Apps und Auswertung gehen verloren. Trotzdem weiter?")) return;
-    if (!confirm("Wirklich ALLE Stempel, Antworten und Fotos vom Laptop löschen? Das kann nicht rückgängig gemacht werden.")) return;
+    if (!confirm("Wirklich ALLE Stempel, Sticker, Antworten und KI-Bilder vom Laptop löschen? Das kann nicht rückgängig gemacht werden.")) return;
     fetch("/api/alle-loeschen", { method: "POST" }).then(function () { platte.vergessen(); folie.vergessen(); loadGroups(); loadSettings(); });
   });
 

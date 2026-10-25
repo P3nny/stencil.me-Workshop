@@ -83,8 +83,6 @@ unterwegs_lock = threading.Lock()
 unterwegs = {}     # gruppe -> (station, Zeitpunkt)
 
 EVENT_TYPES = ("anmeldung", "checkin", "beendet")
-# Image types accepted from the stations, recognised by their first bytes
-IMAGE_TYPES = ((b"\xff\xd8\xff", ".jpg", "image/jpeg"), (b"\x89PNG", ".png", "image/png"))
 
 # Paths the iPads may load. Everything else (archiv/, .git/, server/) stays private.
 PUBLIC_FILES = {"/", "/index.html", "/stencil.html", "/code-quiz.html", "/kunst-quiz.html", "/docs/ipad-test.html", "/docs/test-foto.jpg"}
@@ -618,8 +616,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.receive_stamp(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/ereignis":
             return self.receive_event()
-        if parsed.path == "/api/datei":
-            return self.receive_file(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/ki-bild":
             return self.ki_bild()
         if parsed.path == "/api/ki-app":
@@ -705,28 +701,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if record["art"] == "beendet" and station == FREI_STATION:
             frei_beenden(event["gruppe"])  # Station fertig: PIN-Freigabe endet sofort
         print("Station %s: %s (%s)" % (record["art"], station or "-", event["gruppe"]))
-        return self.send_json({"ok": True, "doppelt": False})
-
-    def receive_file(self, query):
-        file_id = (query.get("id") or [""])[0]
-        group_id = (query.get("gruppe") or [""])[0]
-        station = (query.get("station") or [""])[0]
-        if not ID_RE.match(file_id) or not ID_RE.match(group_id) or not STATION_RE.match(station):
-            return self.send_json({"ok": False, "fehler": "ungültige ID"}, 400)
-        body = self.read_body(MAX_UPLOAD_BYTES)
-        if body is None:
-            return self.send_json({"ok": False, "fehler": "Datei leer oder zu groß"}, 413)
-        ext = next((e for magic, e, _ in IMAGE_TYPES if body.startswith(magic)), None)
-        if not ext:
-            return self.send_json({"ok": False, "fehler": "kein Foto"}, 400)
-
-        files_dir = os.path.join(GROUPS_DIR, group_id, "dateien")
-        target = os.path.join(files_dir, "%s_%s%s" % (station, file_id, ext))
-        if os.path.exists(target):
-            return self.send_json({"ok": True, "doppelt": True})
-        os.makedirs(files_dir, exist_ok=True)
-        write_atomic(target, body)
-        print("Foto empfangen: %s/%s" % (group_id, os.path.basename(target)))
         return self.send_json({"ok": True, "doppelt": False})
 
     def ki_bild(self):

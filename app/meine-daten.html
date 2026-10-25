@@ -191,7 +191,6 @@
 
     function beschreiben(e){
       if(e.art === 'ereignis') return (e.ereignis === 'beendet' ? 'Station ' : e.ereignis + ' ') + (e.station || '');
-      if(e.art === 'datei') return 'Foto ' + (e.station || '');
       return e.sorte || 'Stempel';
     }
 
@@ -255,7 +254,7 @@
     ]);
     // Erst auf Knopfdruck: Alle Fotos auf einmal zu lesen, belastet alte iPads und hält den Speicher auf
     box.appendChild(el('h2', { text: 'Fotos und Bilder' }));
-    box.appendChild(el('p', { klasse: 'hinweis', text: 'Hier sind auch Fotos dabei, die ihr verworfen habt. Die gehen nicht an den Laptop.' }));
+    box.appendChild(el('p', { klasse: 'hinweis', text: 'Eure Fotos bleiben auf dem iPad, auch die, die ihr verworfen habt. Keines davon geht an den Laptop.' }));
     const zeigen = el('button', { type: 'button', klasse: 'secondary', text: 'Fotos auf dem iPad anzeigen' });
     zeigen.addEventListener('click', () => {
       zeigen.disabled = true;

@@ -198,7 +198,6 @@
         const alt = eintrag.bildKi.key;
         Speicher.dateiSchreiben(key, Bild.alsJpeg(ausgabe))
           .then(() => alt ? Speicher.dateiSchreiben(alt, undefined) : null)
-          .then(() => Outbox.datei(api.gruppe.id, station.id, key))
           .then(() => {
             eintrag.bildKi = { key: key, gesendet: true };
             return api.speichern();
@@ -207,7 +206,7 @@
           .then(url => {
             bildVorschau.src = url;
             bildVorschau.hidden = false;
-            bildStatus.textContent = '✓ Gesichert auf dem iPad. Es geht automatisch an den Laptop (Anzeige oben).';
+            bildStatus.textContent = '✓ Gespeichert auf dem iPad. Es bleibt dort.';
             api.pruefen();
           })
           .catch(err => api.fehler('Das Bild ließ sich nicht speichern. Bitte nochmal antippen.', err))

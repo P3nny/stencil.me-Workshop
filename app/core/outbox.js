@@ -27,13 +27,8 @@
       const url = '/api/stempel?id=' + eintrag.id + '&gruppe=' + eintrag.gruppe + '&name=' + encodeURIComponent(eintrag.name) + (eintrag.sorte ? '&art=' + eintrag.sorte : '');
       return mitZeitlimit(fetch(url, { method: 'POST', headers: { 'Content-Type': 'image/svg+xml' }, body: eintrag.svg }).then(antwortPruefen));
     }
-    if(eintrag.art === 'datei'){
-      return Speicher.dateiLesen(eintrag.dateiKey).then(datei => {
-        if(!datei) return; // Foto inzwischen ersetzt: nichts mehr zu senden
-        const url = '/api/datei?id=' + eintrag.id + '&gruppe=' + eintrag.gruppe + '&station=' + encodeURIComponent(eintrag.station);
-        return mitZeitlimit(fetch(url, { method: 'POST', headers: { 'Content-Type': datei.typ }, body: datei.daten }).then(antwortPruefen));
-      });
-    }
+    // Fotos bleiben seit 25.10.2026 auf dem iPad. Alte Einträge aus Tests einfach verwerfen.
+    if(eintrag.art === 'datei') return Promise.resolve();
     return mitZeitlimit(fetch('/api/ereignis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -90,9 +85,6 @@
     // Ereignis: Check-in, Station beendet, Anmeldung …
     ereignis: (gruppe, ereignis, station, daten) =>
       hinzufuegen({ art: 'ereignis', gruppe: gruppe, ereignis: ereignis, station: station || '', daten: daten || {} }),
-    // Datei: liegt schon in Speicher.dateien unter dateiKey, hier nur der Verweis
-    datei: (gruppe, station, dateiKey) =>
-      hinzufuegen({ art: 'datei', gruppe: gruppe, station: station, dateiKey: dateiKey }),
     // Stempel-Datei (SVG) für den Lasercutter, mit Vorname oder Spitzname
     stempel: (gruppe, name, svg) =>
       hinzufuegen({ art: 'stempel', gruppe: gruppe, name: name, svg: svg }),

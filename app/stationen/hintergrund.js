@@ -1,7 +1,7 @@
 // ---- Station „Hintergrund ändern“ ----
 // Für jede Person: Die KI (BodyPix) stellt das Foto frei, das Kind wählt einen
 // freien Hintergrund, schiebt sich mit dem Finger an die richtige Stelle und stellt die
-// Größe ein. Das fertige Bild geht über die Outbox an den Laptop.
+// Größe ein. Das fertige Bild bleibt auf dem iPad (seit 25.10.2026 nicht mehr an den Laptop).
 // Freistellen und Zusammensetzen passieren auf dem iPad.
 (function(){
   const KANTE_RADIUS = 2; // Kante weichzeichnen (px), sonst sieht der Rand ausgeschnitten aus
@@ -87,7 +87,7 @@
     const freiNotiz = el('p', { klasse: 'hinweis', text: 'Die KI stellt dich frei … (beim ersten Mal dauert es etwas)' });
     const ergebnisBox = el('div', { klasse: 'ergebnis-bild leer' });
     const auswahl = el('div', { klasse: 'hintergrund-auswahl' });
-    const sendenKnopf = el('button', { type: 'button', text: 'Bild an den Laptop schicken', disabled: 'disabled' });
+    const sendenKnopf = el('button', { type: 'button', text: 'Bild speichern', disabled: 'disabled' });
     const sendStatus = el('p', { klasse: 'hinweis' });
     const quelle = el('p', { klasse: 'bild-quelle' });
     stand.lage = stand.lage || Object.assign({}, START_LAGE);
@@ -175,7 +175,7 @@
       const gesendet = !!stand.gesendetHintergrund;
       const geaendert = gesendet && (stand.gesendetLage || stand.gesendetHintergrund) !== lageText(stand);
       sendenKnopf.disabled = !ergebnis || (gesendet && !geaendert);
-      sendenKnopf.textContent = geaendert ? 'Neues Bild schicken' : gesendet ? '✓ Bild ist abgeschickt' : 'Bild an den Laptop schicken';
+      sendenKnopf.textContent = geaendert ? 'Neues Bild speichern' : gesendet ? '✓ Bild ist gespeichert' : 'Bild speichern';
     }
 
     function waehlen(h){
@@ -217,7 +217,6 @@
       const gesendetLage = lageText(stand);
       Speicher.dateiSchreiben(key, Bild.alsJpeg(ergebnis))
         .then(() => alt ? Speicher.dateiSchreiben(alt, undefined) : null)
-        .then(() => Outbox.datei(api.gruppe.id, station.id, key))
         .then(() => {
           stand.key = key;
           stand.gesendetHintergrund = hintergrund;
@@ -226,7 +225,7 @@
           return api.speichern();
         })
         .then(() => {
-          sendStatus.textContent = '✓ Gesichert auf dem iPad. Es geht automatisch an den Laptop (Anzeige oben).';
+          sendStatus.textContent = '✓ Gespeichert auf dem iPad. Es bleibt dort.';
           knopfAktualisieren();
           api.pruefen();
         })
