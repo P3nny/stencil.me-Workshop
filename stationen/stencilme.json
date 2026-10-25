@@ -29,5 +29,6 @@
   "braucht": [
     "foto"
   ],
-  "plaetze": 13
+  "plaetze": 13,
+  "vorrang": true
 }
