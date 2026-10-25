@@ -105,16 +105,16 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 
 ## Datenschutz (nicht verhandelbar)
 
-- Fotos von Jugendlichen werden zuerst nur auf dem Gerät verarbeitet. Zum lokalen Server geht nur, was für Laser und Ergebnis-Mappe nötig ist (Stempel-Datei, vom Kind hochgeladene Ergebnisse).
+- Fotos von Jugendlichen werden zuerst nur auf dem Gerät verarbeitet. Zum lokalen Server geht nur, was für Laser, Plotter und den Ablauf im Workshop nötig ist (Stempel-Datei, vom Kind hochgeladene Ergebnisse).
 - **Kein Foto und kein Prompt eines Kindes geht an einen Online-Dienst**, ohne dass es in `Datenschutz.md` steht und Einwilligungen vorliegen. Das gilt auch für KI-Funktionen.
 - Der Workshop-Server ist Patricias Laptop im KOMEZ-WLAN. Er nimmt die Ergebnisse der Kinder an (Fotos, Stempel, Antworten). An einen Online-Dienst gibt er nur die Baukasten-Texte der zwei **optionalen** Claude-Stationen weiter (Anthropic), nie Fotos oder Namen.
-- Daten werden nach dem Workshop gelöscht, auf dem Laptop spätestens eine Woche danach. Abgabe der Ergebnisse als ZIP pro Paar (USB-Stick an die Lehrkraft, Verteilung über die Schulplattform).
+- Alle Daten werden am Ende des Workshops gelöscht, auf den iPads und auf dem Laptop. Keine digitale Mappe, kein USB-Stick (entschieden 25.10.2026): Die Kinder nehmen Stempel, Postkarte und Sticker mit. Vorher sichert der Laptop ohne Namen und ohne Fotos Vibe-Coding-Apps, KI-Prompts, Auswertung und Ablauf nach `archiv/workshops/` (`server/archiv.py`).
 - `Datenschutz.md` ist ein Pflicht-Ergebnis: im Stil der Stationstexte, kindgerecht, geht vorab an Lehrkräfte und Erziehungsberechtigte, Kinder sollen es selbst lesen, verstehen und hinterfragen können. Es erklärt den Datenweg pro Station und den Unterschied Programm / KI / generative KI. **Bei jeder Änderung an Datenflüssen `Datenschutz.md` mit ändern** (und das Etikett `datenweg` der Station). `archiv/Datenschutz.md` ist der Schriftwechsel mit dem KOMEZ, nicht die Datenschutzinformation.
 - Beim Bau neuer Funktionen immer fragen: Wohin gehen die Daten? Wie lange bleiben sie? Wer kann sie sehen?
 
 ## Lokaler Server und Lasercut
 
-- Der Server sammelt die Werke der Kinder (Fotos, Stempel-Datei, Antworten) pro Paar und nimmt sie auch nachträglich entgegen (Outbox). Am Ende gibt es ein ZIP pro Paar bzw. gesamt, nur mit den Werken (`server/mappe.py`, Laptop-Seite, auch direkt auf einen USB-Stick). Die Kinder sehen unter „Meine Daten“ alles, was über sie gespeichert ist.
+- Der Server sammelt die Werke der Kinder (Fotos, Stempel-Datei, Antworten) pro Paar und nimmt sie auch nachträglich entgegen (Outbox). Die Kinder sehen unter „Meine Daten“ alles, was über sie gespeichert ist (`server/mappe.py`). Am Ende: „Für die Workshop-Verbesserung sichern (ohne Namen)“, dann „Alle Daten löschen“.
 - Holzplatte: Die Laptop-Seite ordnet die Stempel (älteste zuerst) auf einer A4-Pappelsperrholz-Platte an (5 mm Rand, 3 mm Abstand). Patricia lädt die SVG in die Mr-Beam-Oberfläche, 2× gravieren. Keine Mr-Beam-Schnittstelle.
 - Stickerfolie: Die Laptop-Seite ordnet Sticker auf A4 an und schickt sie an die Silhouette Cameo 4 (Stift + Messer, `server/plotter.py`, Vorbild `archiv/00_fotobox-karte`).
 - Statusmeldungen an die Paare über „📣 Wird gelasert“ / „📣 Fertig, abholen“, die iPads fragen einmal pro Minute nach.
@@ -136,7 +136,7 @@ Grundsatz: **Jede Ausbaustufe muss den Workshop allein tragen**, die alte Stufe 
 
 Zurückgestellt (nach dem Workshop, nur bei Bedarf): eigener Router, HTTPS mit `workshop.datenhandlung.de` (`docs/https-einrichten.md`, INWX-Zugangsdaten nie ins Repo), Laser-Queue.
 
-4. Dateien an die Kinder: ZIP pro Paar (nur Werke) auf USB-Stick an die Lehrkraft (entschieden, gebaut).
+4. Dateien an die Kinder: keine. Am Ende wird alles gelöscht, vorher anonym gesichert (entschieden 25.10., ersetzt ZIP/USB).
 5. Claude-Stationen: Claude-API mit eigenem Schlüssel und Ausgabenlimit (nicht das Pro-Abo), Modell Sonnet 5.5, nur Baukasten/Lückentext, **optional** (entschieden).
 6. Canva ersetzt: „Hintergrund ändern“ lokal mit BodyPix, KI-Selbstporträt über Claude ohne Foto (entschieden).
 7. Freier Ablauf: Die App schlägt Stationen nach `braucht` und `plaetze` vor, keine Rotation (entschieden).
@@ -177,7 +177,7 @@ Patricia möchte durch die Entwicklung geführt werden. Immer nur den aktuellen 
 5. **Laser-Queue**: Anordnen auf A4-Platte, Auftrag an Mr Beam, 2× gravieren, Statusmeldungen an die Kinder.
 6. **Stationen in der App**: Inhalte als Daten, Check pro Station, Antworten und Foto-Uploads, Fragen zu KI-Typ und Bewertung.
 7. **Datenschutz.md** und Etiketten an den Stationen, Kartenspiel „Programm / KI / generativ“.
-8. **Abschluss**: ZIP-Export, Abgabe an die Lehrkraft, Löschkonzept.
+8. **Abschluss**: anonym sichern, alles löschen (erledigt 25.10.).
 9. **Claude-Station** (Unterprojekt) und Ersatz für Canva.
 10. **Optionale Wege**: Sticker, Lasercut-Porträt, Positivdruck.
 

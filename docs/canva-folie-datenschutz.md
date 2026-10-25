@@ -35,7 +35,7 @@ Aufräumen: Deine Daten gehören dir.
 
 1. 🔒 Tippt oben auf **„Meine Daten“**. Schaut euch an, was gespeichert ist: auf dem iPad und auf Pennys Laptop.
 2. 🗑 Ganz unten: **„Jetzt alles löschen“**. Dann ist auf dem iPad nichts mehr von euch.
-3. 📦 Eure Werke bekommt ihr über eure Lehrkraft. Danach löscht Penny alles auf dem Laptop, spätestens nach einer Woche.
+3. 📦 Stempel, Postkarte und Sticker nehmt ihr mit. Penny löscht jetzt alles auf dem Laptop.
 
 ## Fußzeile
 

@@ -226,6 +226,8 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 
 ## Ergebnis-Mappe und Meine Daten (24.10. spät, Branch `feature/zip-meine-daten`)
 
+**Ersetzt am 25.10.:** Mappe (ZIP) und USB-Stick sind entfernt. Am Ende wird alles gelöscht, vorher sichert der Laptop ohne Namen (`server/archiv.py`, Laptop-Seite „Für die Workshop-Verbesserung sichern“). Der folgende Text ist der alte Stand.
+
 - **Mappe** (`server/mappe.py`): ZIP pro Paar (Laptop-Seite, Spalte „Mappe“) und alle zusammen, je ein Ordner „Ada-und-Bo_<ID>“. Nur Werke (Patricia): Fotos, Stempel, Porträts, Sticker, KI-Bilder, Apps (mit CSP ohne Netz), eigener SVG- und HTML-Code als HTML-Datei. Keine Antworten, Sterne, Feedback
 - **USB-Stick:** Steckt einer unter `/media/<user>/`, zeigt die Laptop-Seite „Auf USB-Stick kopieren“. *Mit echtem Stick noch nicht getestet*
 - **Meine Daten** (`app/meine-daten.html`, Link auf der Startseite): was auf dem iPad liegt (auch verworfene Fotos) und was auf dem Laptop liegt (Bilder, Antworten, KI-Frage, Sterne, Feedback). Der Laptop gibt nur die Daten der eigenen Gruppen-ID heraus

@@ -61,8 +61,9 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 ## 5. Nach dem Workshop
 
 - [ ] Auswertung ansehen: `/auswertung` (Sterne, KI-Frage, Feedbackbögen)
-- [ ] Ergebnis-Mappen für die Lehrkraft: USB-Stick einstecken, Laptop-Seite „Auf USB-Stick kopieren“ (oder „Alle Mappen als ZIP herunterladen“ und selbst auf den Stick ziehen). Stick erst nach „Auswerfen“ abziehen. Einzelne Mappe: „ZIP“ in der Gruppen-Tabelle
-- [ ] Spätestens eine Woche nach dem Workshop (steht so in `Datenschutz.md`): Laptop-Seite „Alle Daten löschen“
+- [ ] Auswertung kurz durchsehen: Stehen im Feedback Namen, die der Laptop nicht kennt (Spitznamen)?
+- [ ] Laptop-Seite „Für die Workshop-Verbesserung sichern (ohne Namen)“ → Ordner `archiv/workshops/<Datum>/`
+- [ ] Am Ende des Workshops (steht so in `Datenschutz.md`): Laptop-Seite „Alle Daten löschen“
 - [ ] Pro iPad prüfen: steht „✓ Gelöscht“? Sonst Startseite → „Andere Gruppe? Neu anmelden“ oder Website-Daten in Safari löschen. Alle Safari-Tabs schließen
 - [ ] Laptop-Seite: Löschen-Freigabe zurücknehmen (sonst sieht die nächste Gruppe den Hinweis sofort)
 - [ ] Terminal-Fenster schließen (Server aus)

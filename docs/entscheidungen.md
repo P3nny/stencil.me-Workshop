@@ -103,9 +103,9 @@ Umschalten zwischen den Plänen heißt: einen anderen QR-Code zeigen. Was bei Pr
 
 ---
 
-## 4. Ergebnisse an die Kinder — entschieden (24.10.2026)
+## 4. Ergebnisse an die Kinder — entschieden (25.10.2026, ersetzt ZIP/USB vom 24.10.)
 
-ZIP pro Paar auf USB-Stick an die Lehrkraft, Verteilung über die Schulplattform (siehe Punkt 8). **Inhalt: nur Werke**, keine Antworten, Sterne, Feedback (Patricia, 24.10. spät). Gebaut: Laptop-Seite mit Download und „Auf USB-Stick kopieren“. „Meine Daten“ jederzeit über die Startseite.
+**Keine digitale Mappe, kein USB-Stick.** Am Ende des Workshops werden alle Daten gelöscht. Die Kinder nehmen Stempel, Postkarte und Sticker mit. Vorher sichert die Laptop-Seite ohne Namen und ohne Fotos nach `archiv/workshops/<Datum>/`: Vibe-Coding-Apps mit Aufträgen, KI-Prompts, Auswertung, Ablauf (`server/archiv.py`). Gründe: Datenschutz (Fotos nur Stunden statt einer Woche), einfache Einwilligung, kein Stress am Ende. Nachteil: kein Weiterlernen mit den Dateien zu Hause. „Meine Daten“ jederzeit über die Startseite.
 
 ## 5. Claude-Stationen — entschieden (24.10.2026)
 
@@ -135,7 +135,7 @@ Ergänzt 25.10.2026 (Patricia):
 
 - **Sticker:** Cameo 4 mit Stift + Messer wie `archiv/00_fotobox-karte/fotobox-queue.py` (Stift zeichnet Schraffur auf weiße Folie, Messer schneidet außen)
 - **Kunst-Quiz-Bilder:** urheberrechtlich geschützt, darum **nur über den Laptop** ausliefern (nicht im Repo, nicht auf GitHub/Netlify)
-- **Daten an die Kinder:** ZIP pro Paar auf USB-Stick an die Lehrkraft, Verteilung über die Schulplattform. Am Ende sieht jedes Paar auf dem iPad, was auf dem Laptop gespeichert war
+- **Daten an die Kinder:** ~~ZIP pro Paar auf USB-Stick~~, ersetzt am 25.10.: alles wird am Ende gelöscht (Punkt 4). Am Ende sieht jedes Paar auf dem iPad, was auf dem Laptop gespeichert war
 - **Alle Fotos an den Laptop**, auch das Ausgangsfoto, damit die Dokumentation lückenlos ist (muss in `Datenschutz.md`)
 - Reihenfolge der nächsten Schritte: Abschluss jeder Station → alle Fotos → Nachrichten an Gruppen → Sticker-Folie + Plotter → Bonus 2 Positiv → ZIP + „Meine Daten“ → Berufe → Kunst-Quiz-Bilder
 
@@ -155,7 +155,7 @@ Ergänzt 25.10.2026 (Patricia):
 - **Feedbackbogen** nach Bonus 1 oder über den Laptop-Knopf „für alle freigeben“, jede Person einzeln. **Bonus 2 Lasercut-Porträt** nach Sticker + Feedbackbogen, blau = gravieren, rot = schneiden
 - **Bonus 1 (Sticker)** bleibt bei 8 geschafften Stationen (jetzt 8 von 12, seit der Station Berufe)
 - **Nachrichten-Abfrage** einmal pro Minute. **Diktieren** nur als Hinweis auf die Mikrofon-Taste, keine eigene Spracherkennung
-- **Datenschutz:** `Datenschutz.md` im Stil der Stationstexte, Kontakt patricia.ennenbach@bildung.koeln.de, Löschung auf dem Laptop spätestens eine Woche nach dem Workshop
+- **Datenschutz:** `Datenschutz.md` im Stil der Stationstexte, Kontakt patricia.ennenbach@bildung.koeln.de, Löschung auf dem Laptop am Ende des Workshops (seit 25.10.)
 - **Android-Tablets:** nicht getestet. Wahrscheinlich lauffähig (Tests laufen auch in Chromium), Risiko: QR-Scan öffnet einen anderen Browser mit eigenem Speicher
 
 ---

@@ -16,8 +16,9 @@ Ihr Kind nimmt an einem Workshop teil, in dem die Jugendlichen erfahren, wie Com
 - **Name:** nur Vorname oder Spitzname, keine Nachnamen, keine E-Mail-Adresse.
 - **Fotos:** Ihr Kind macht ein Porträtfoto auf einem iPad des KOMEZ. Das Foto wird auf dem iPad bearbeitet. Auch die Bilderkennungs-KI, die die Person auf dem Foto freistellt, rechnet auf dem iPad.
 - **Ergebnisse:** Das Foto, der Stempel und weitere Werke gehen über das passwortgeschützte WLAN des KOMEZ an den Laptop der Workshopleitung im selben Raum. Die Verbindung im WLAN ist nicht zusätzlich verschlüsselt. Der Laptop gibt keine Fotos ins Internet weiter.
-- **Ergebnis-Mappe:** Die Werke (Fotos, Stempel, Bilder) bekommt Ihr Kind als Mappe über die Lehrkraft, über [Schulplattform]. Antworten und Feedback kommen nicht in die Mappe.
-- **Löschen:** Auf den iPads löschen die Jugendlichen ihre Daten am Ende selbst. Auf dem Laptop wird alles spätestens eine Woche nach dem Workshop gelöscht.
+- **Ergebnisse:** Ihr Kind nimmt Stempel, Postkarte und ggf. Sticker mit nach Hause. Digitale Dateien werden nicht weitergegeben, auch nicht über die Schule.
+- **Löschen:** Auf den iPads löschen die Jugendlichen ihre Daten am Ende selbst. Auf dem Laptop wird am Ende des Workshops alles gelöscht.
+- **Ohne Namen aufbewahrt:** Zur Verbesserung des Workshops hebt die Workshopleitung ohne Namen und ohne Fotos auf: die Apps aus dem Vibe Coding mit ihren Aufträgen, die Baukasten-Prompts der KI-Selbstporträts, Bewertungen, Feedback und die Dauer der Stationen.
 - **Einsicht:** Ihr Kind kann in der App jederzeit unter „Meine Daten“ sehen, was gespeichert ist.
 
 Die genaue Beschreibung jeder Station steht in der beiliegenden Datenschutzinformation. Sie ist so geschrieben, dass auch Ihr Kind sie lesen kann.
@@ -41,9 +42,8 @@ am [Datum] im Kommunalen Medienzentrum (KOMEZ), Klasse [ ]
 Im Workshop macht Ihr Kind ein Porträtfoto von sich. Daraus entstehen ein Stempel, eine Postkarte und weitere Werke. Dafür werden die Fotos **nur im Workshop** verarbeitet:
 
 1. **Kurz auf dem iPad gespeichert:** in den Website-Daten von Safari auf einem iPad des KOMEZ, nicht in der Fotos-App. Am Ende des Workshops löscht Ihr Kind diese Daten selbst.
-2. **Kurz auf dem Laptop der Workshopleitung gespeichert:** im selben Raum, über das passwortgeschützte WLAN des KOMEZ. Spätestens eine Woche nach dem Workshop wird alles gelöscht.
+2. **Kurz auf dem Laptop der Workshopleitung gespeichert:** im selben Raum, über das passwortgeschützte WLAN des KOMEZ. Am Ende des Workshops wird alles gelöscht.
 3. **Am Ende gezeigt:** Ihr Kind sieht unter „Meine Daten“, was über es gespeichert ist.
-4. **Als Mappe an die Lehrkraft:** Die Werke (Fotos, Stempel, Bilder) kommen pro Kind bzw. Paar auf einen USB-Stick für die Lehrkraft und von dort über [Schulplattform] zu Ihrem Kind. Danach werden sie auf dem Laptop gelöscht.
 
 **Keine Veröffentlichung:** Die Fotos werden nicht ins Internet gestellt, nicht in sozialen Medien gezeigt, nicht an die Presse gegeben und nicht für Werbung genutzt. Kein Foto geht an einen Online-Dienst oder an eine KI im Internet.
 
