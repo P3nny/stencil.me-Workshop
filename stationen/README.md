@@ -25,6 +25,9 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `braucht` | ja | Stationen, die vorher fertig sein müssen, z. B. `["foto"]`. Gibt es eine davon (noch) nicht, zählt sie nicht |
 | `hintergruende` | nein | nur Station Hintergrund: `{ "datei": "bilder/hintergruende/….jpg", "titel": "…" }`, Lizenzen in `bilder/hintergruende/README.md` |
 | `plaetze` | ja | wie viele Gruppen gleichzeitig an der Station sein können |
+| `vorrang` | nein | `true`: wird vor allen anderen vorgeschlagen, solange Platz ist (stencil.me, Lasercutter) |
+| `vorrangNach` | nein | Vorrang erst, wenn eine dieser Nachrichten vom Laptop kam, z. B. `["platte-laser", "platte-fertig"]` (Vibe Coding, sobald gelasert wird) |
+| `wartetAuf` | nein | `{ "meldung": "platte-fertig", "text": "…", "trotzdem": "…" }`: Station wird erst nach dieser Nachricht vorgeschlagen. Beim Scannen vorher: `text`, ein anderer Vorschlag und ein Knopf `trotzdem` (falls der Laptop ausfällt) |
 | `bonus` | nein | `true`: zählt nicht zu „x von y“ und nicht fürs Puzzle |
 | `optional` | nein | `true`: freiwillig (z. B. Claude-Stationen, nur mit Einwilligung). Zählt nicht zu „x von y“, wird nur vorgeschlagen, wenn keine andere Station frei ist |
 | `mindestFertig` | nein | Bonus geht erst auf, wenn so viele Stationen geschafft sind |
@@ -55,5 +58,7 @@ Nach „Station beendet“ schlägt die App die nächste Station vor:
 4. sonst unter den freien eine zufällige (optionale nur, wenn sonst keine frei ist); ist keine frei, die mit den wenigsten Gruppen
 
 Das iPad meldet den Vorschlag an den Laptop (`/api/unterwegs`). Der Platz zählt dann bis zum nächsten Check-in der Gruppe, höchstens 10 Minuten, als besetzt. Ohne Laptop zählt nur Schritt 1, 3 und 4.
+
+Nachrichten vom Laptop haben eine Art: `platte-laser` („📣 Wird gelasert“), `platte-fertig` („📣 Fertig, abholen“), dazu `folie-…` für Sticker. Das iPad merkt sich die Arten (Speicher `meldungen`) und richtet `wartetAuf` und `vorrangNach` danach.
 
 Scannt eine Gruppe eine Station, deren `braucht` fehlt, nennt die App, was fehlt, und schlägt eine andere Station vor. Ist eine Station voll, erscheint ein Hinweis mit Vorschlag und dem Knopf „Wir sind trotzdem dran“ (keine Sperre).

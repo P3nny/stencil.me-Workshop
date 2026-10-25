@@ -128,6 +128,8 @@ Ergänzt 25.10.2026 (Patricia):
 - Alle fangen mit Foto → stencil.me → Lasercutter an, damit die Holzplatte für den Mr Beam schnell voll ist (`vorrang`).
 - Plätze: Linoldruck 1 Paar, Stempeldruck 1 Paar, Lasercutter 2 Paare (bis zu 4 schauen zu), Bild-App vibe coden (Claude Code) 1 iPad, KI-Selbstporträt alle (13): Der Laptop wartet nur auf Claude, Grenze ist das Anfragelimit des Anthropic-Kontos.
 - Gruppen auf dem Weg zu einer Station zählen als besetzt. Eine volle Station zeigt nur einen Hinweis, sie sperrt nicht.
+- Stempel drucken erst nach „📣 Fertig, abholen“ für die Platte (Probedurchlauf 25.10.).
+- Vibe Coding braucht nicht mehr Coding (HTML/CSS), sondern den Lasercutter, und kommt sofort nach „📣 Wird gelasert“ dran (Engpass, Penny macht es mit den Kindern).
 
 ## 8. Entscheidungen vom 24.10.2026, abends
 
