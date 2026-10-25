@@ -454,10 +454,11 @@
     return !!eintrag.bestaetigt;
   }
 
-  // Beispielbilder: gut (✓) und nicht so gut (✗). Bilder liegen in /stationen/bilder
+  // Beispielbilder: gut (✓) und nicht so gut (✗). Bilder liegen in /stationen/bilder.
+  // "ganz": true zeigt das Bild größer und unbeschnitten (z. B. die Linoldruck-Postkarte)
   function beispiele(station){
     if(!station.beispiele || !station.beispiele.length) return null;
-    return el('div', { klasse: 'beispiele' }, station.beispiele.map(b => el('figure', { klasse: b.gut ? 'gut' : 'schlecht' }, [
+    return el('div', { klasse: 'beispiele' }, station.beispiele.map(b => el('figure', { klasse: (b.gut ? 'gut' : 'schlecht') + (b.ganz ? ' ganz' : '') }, [
       el('img', { src: '/stationen/' + b.bild, alt: b.text }),
       el('figcaption', { text: (b.gut ? '✓ ' : '✗ ') + b.text })
     ])));
