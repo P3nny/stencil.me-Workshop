@@ -467,7 +467,20 @@ function vorschlagAbwarten(page){
 
   for(const druck of [['druck-linol', 'Linolplatten'], ['druck-stempel', 'Lasercut-Stempel']]){
     console.log('Station Mit der Hand drucken: ' + druck[1]);
+    if(druck[0] === 'druck-stempel'){
+      // Erst wenn „Fertig, abholen“ für die Platte gekommen ist
+      await page.goto(BASE + '/app/station.html?id=druck-stempel&test');
+      await page.waitForSelector('text=Euer Stempel ist noch nicht fertig.');
+      await page.waitForSelector('text=Geht so lange zu:');
+      pruefe(true, 'ohne Nachricht „fertig“: noch nicht, mit anderem Vorschlag');
+      const gruppeId = await page.evaluate(() => Speicher.lesen('gruppe').then(g => g.id));
+      await page.request.post(BASE + '/api/nachricht', { data: { gruppen: [gruppeId], text: 'Der Stempel von Ada ist fertig!', art: 'platte-fertig' } });
+    }
     await page.goto(BASE + '/app/station.html?id=' + druck[0] + '&test');
+    if(druck[0] === 'druck-stempel'){
+      await page.click('.nachricht button:has-text("OK")');
+      await page.waitForFunction(() => !document.querySelector('.nachricht'));
+    }
     await page.waitForSelector('h1:has-text("Mit der Hand drucken")');
     pruefe(await page.locator('.beispiele img').evaluate(img => img.complete && img.naturalWidth > 0), 'Beispiel-Postkarte von der Karte geladen');
     const karten = page.locator('input[type=file]');
@@ -680,6 +693,8 @@ function vorschlagAbwarten(page){
   await laptop.waitForTimeout(1100);
   await laptop.click('#platte-verlauf .history-row button:has-text("Fertig, abholen")');
   await laptop.waitForFunction(() => document.querySelectorAll('#platte-verlauf .history-row .sent').length === 2);
+  const stempelNachrichten = await page.evaluate(() => Speicher.lesen('gruppe').then(g => fetch('/api/nachrichten?gruppe=' + g.id)).then(r => r.json()));
+  pruefe(stempelNachrichten.nachrichten.some(n => n.art === 'platte-fertig' && n.text.indexOf('Bitte bei Penny am Lasercutter abholen') >= 0), '„Fertig, abholen“ kommt als platte-fertig an (schaltet Stempel drucken frei)');
 
   console.log('Stickerfolie und Plotter (Testlauf ohne Plotter)');
   await laptop.click('#folie-bauen');

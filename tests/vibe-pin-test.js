@@ -19,7 +19,7 @@ function pruefe(ok, text){
 
 function anmelden(page, id, personen){
   return page.evaluate(a => Speicher.schreiben('gruppe', { id: a.id, personen: a.personen, angemeldet: new Date().toISOString() })
-    .then(() => Speicher.schreiben('fortschritt', { stationen: { foto: { status: 'fertig' }, 'coding-web': { status: 'fertig' } } }))
+    .then(() => Speicher.schreiben('fortschritt', { stationen: { foto: { status: 'fertig' }, stencilme: { status: 'fertig' }, lasercutter: { status: 'fertig' } } }))
     .then(() => Outbox.ereignis(a.id, 'anmeldung', '', { personen: a.personen })), { id: id, personen: personen });
 }
 

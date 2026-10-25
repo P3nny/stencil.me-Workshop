@@ -97,6 +97,32 @@ function ereignis(api, gruppe, art, station, nr){
   beleg = await (await api.get('/api/belegung?gruppe=b2b2b2b2b2b2')).json();
   pruefe(!beleg.stationen['druck-linol'], 'Gruppe 1 checkt woanders ein: Linoldruck wieder frei');
 
+  console.log('Stempel drucken erst nach „Fertig, abholen“');
+  const vorFertig = await page.evaluate(a => Stationen.laden().then(l => Stationen.vorschlagen(l, a.f, 'b2b2b2b2b2b2')).then(s => s && s.id), { f: fertig(ausser(['druck-stempel'])) });
+  pruefe(vorFertig !== 'druck-stempel', 'ohne Nachricht kein Stempeldruck (' + vorFertig + ')');
+  await api.post('/api/nachricht', { data: { gruppen: ['b2b2b2b2b2b2'], text: 'Der Stempel von Cem wird jetzt gelasert.', art: 'platte-laser' } });
+  const nachLaser = await page.evaluate(a => Stationen.laden().then(l => Stationen.vorschlagen(l, a.f, 'b2b2b2b2b2b2')).then(s => s && s.id), { f: fertig(ausser(['druck-stempel'])) });
+  pruefe(nachLaser !== 'druck-stempel', '„Wird gelasert“ reicht nicht (' + nachLaser + ')');
+  await api.post('/api/nachricht', { data: { gruppen: ['b2b2b2b2b2b2'], text: 'Der Stempel von Cem ist fertig!', art: 'platte-fertig' } });
+  const nachFertig = await page.evaluate(a => Stationen.laden().then(l => Stationen.vorschlagen(l, a.f, 'b2b2b2b2b2b2')).then(s => s && s.id), { f: fertig(ausser(['druck-stempel'])) });
+  pruefe(nachFertig === 'druck-stempel', 'nach „Fertig, abholen“: Stempel drucken (' + nachFertig + ')');
+
+  console.log('Vibe Coding sofort nach „Wird gelasert“');
+  await ereignis(api, 'b3b3b3b3b3b3', 'anmeldung', '', '05');
+  const stand3 = { f: fertig(['foto', 'stencilme', 'lasercutter']) };
+  const vorLaser = await page.evaluate(a => Stationen.laden().then(l => {
+    const ids = {};
+    let kette = Promise.resolve();
+    for(let i = 0; i < 10; i++) kette = kette.then(() => Stationen.vorschlagen(l, a.f, 'b3b3b3b3b3b3')).then(s => { ids[s.id] = 1; });
+    return kette.then(() => Object.keys(ids));
+  }), stand3);
+  pruefe(vorLaser.indexOf('vibe-coding') < 0, 'vorher: kein Vibe Coding (optional, andere frei)');
+  await api.post('/api/nachricht', { data: { gruppen: ['b3b3b3b3b3b3'], text: 'Der Stempel von Dua wird jetzt gelasert.', art: 'platte-laser' } });
+  const nachLaser3 = await page.evaluate(a => Stationen.laden().then(l => Stationen.vorschlagen(l, a.f, 'b3b3b3b3b3b3')).then(s => s && s.id), stand3);
+  pruefe(nachLaser3 === 'vibe-coding', 'nach „Wird gelasert“: Vibe Coding (' + nachLaser3 + ')');
+  beleg = await (await api.get('/api/belegung?gruppe=b2b2b2b2b2b2')).json();
+  pruefe(beleg.stationen['vibe-coding'] === 1, 'Vibe Coding (1 iPad) ist damit besetzt');
+
   console.log('Station gerade voll: Hinweis, aber keine Sperre');
   await ereignis(api, 'b1b1b1b1b1b1', 'checkin', 'druck-linol', '04');
   await anmelden(page, 'a1a1a1a1a1a1', fertig(['foto']));
