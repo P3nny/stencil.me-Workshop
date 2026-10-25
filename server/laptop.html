@@ -62,6 +62,11 @@
   th { font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.06em; }
   td.station { font-weight:700; }
   td img { height:56px; border:2px solid var(--ink); margin:0 4px 4px 0; }
+  .einwilligung { margin-top:16px; border-top:2px solid var(--ink); padding-top:12px; }
+  .einwilligung label { display:block; margin-top:8px; font-weight:700; }
+  .einwilligung input { display:block; width:100%; max-width:640px; box-sizing:border-box; font-size:1.05rem; border:3px solid var(--ink); padding:6px; margin-top:4px; font-family:inherit; }
+  td button.schalter { margin:0 4px 4px 0; padding:4px 8px; font-size:.75rem; }
+  td button.schalter.aus { background:#ffe14d; }
 </style>
 </head>
 <body>
@@ -145,10 +150,19 @@
       <button id="mappenUsb" type="button" hidden>Auf USB-Stick kopieren</button>
       <span class="hint" id="mappenState">Mappe = nur die Werke (Fotos, Stempel, Bilder, Apps, Code), keine Antworten und kein Feedback.</span>
     </div>
+    <div class="einwilligung">
+      <h2>Rückmeldezettel der Eltern</h2>
+      <div class="hint">Vornamen vom Zettel eintragen, mit Komma getrennt. Meldet sich ein Kind mit diesem Namen an, gilt es automatisch („Mia“ trifft auch „Mia B.“). Bei Spitznamen: unten in der Tabelle pro Person umschalten. Die Kinder sehen diese Listen nicht. „Alle Daten löschen“ leert sie.</div>
+      <label for="ohneFoto">📷 Ohne eigenes Foto: wählen in der Foto-Station ein Porträt einer bekannten Person</label>
+      <input id="ohneFoto" type="text" autocomplete="off" placeholder="z. B. Mia, Ben">
+      <label for="ohneKi">🤖 Ohne generative KI: die zwei KI-Stationen zeigen nur Beispiele (gilt fürs ganze Paar)</label>
+      <input id="ohneKi" type="text" autocomplete="off" placeholder="z. B. Lea">
+      <div class="settings"><button id="einwilligungSpeichern" type="button">Speichern</button><span class="hint" id="einwilligungState"></span></div>
+    </div>
     <div class="hint" id="kiStatus"></div>
     <div id="groupsError"></div>
     <table>
-      <thead><tr><th>Namen</th><th>Gerade an</th><th>Geschafft</th><th>Fotos</th><th>Mappe</th></tr></thead>
+      <thead><tr><th>Namen</th><th>Einwilligung</th><th>Gerade an</th><th>Geschafft</th><th>Fotos</th><th>Mappe</th></tr></thead>
       <tbody id="groups"></tbody>
     </table>
     <div class="hint">Ordner: <span class="folder" id="groupsFolder"></span></div>
@@ -353,6 +367,7 @@
     data.gruppen.forEach(function (g) {
       var row = document.createElement("tr");
       cell(row, g.personen.length ? g.personen.join(" & ") : "(noch ohne Namen)");
+      einwilligungZelle(cell(row, ""), g);
       cell(row, g.aktuell ? (stationTitles[g.aktuell] || g.aktuell) : "–", "station");
       var pflicht = g.fertig.filter(function (id) { return !bonusIds[id]; }).length;
       cell(row, pflicht + (stationCount ? " von " + stationCount : "") + ": " + g.fertig.map(function (id) { return stationTitles[id] || id; }).join(", "));
@@ -371,9 +386,60 @@
     });
     if (!data.gruppen.length) {
       var empty = document.createElement("tr");
-      cell(empty, "Noch keine Gruppe angemeldet.").colSpan = 5;
+      cell(empty, "Noch keine Gruppe angemeldet.").colSpan = 6;
       body.appendChild(empty);
     }
+  }
+
+  // ---- Einwilligungen: Namenslisten ohneFoto / ohneKi (wie server.py: steht_auf_liste) ----
+  var einwilligung = { ohneFoto: [], ohneKi: [] };
+
+  function schluessel(name) { return String(name || "").trim().toLowerCase().replace(/\s+/g, " "); }
+  function trifft(eintrag, name) {
+    var e = schluessel(eintrag), k = schluessel(name);
+    return !!k && (e === k || e === k.split(" ")[0]);
+  }
+  function namenAusFeld(id) {
+    return document.getElementById(id).value.split(/[,;\n]/).map(function (n) { return n.trim(); }).filter(Boolean);
+  }
+  function einwilligungZeigen() {
+    document.getElementById("ohneFoto").value = einwilligung.ohneFoto.join(", ");
+    document.getElementById("ohneKi").value = einwilligung.ohneKi.join(", ");
+  }
+  function einwilligungSpeichern(daten) {
+    var state = document.getElementById("einwilligungState");
+    return fetch("/api/einstellungen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(daten) })
+      .then(function (r) { return r.json(); })
+      .then(function (s) {
+        einwilligung = { ohneFoto: s.ohneFoto || [], ohneKi: s.ohneKi || [] };
+        einwilligungZeigen();
+        state.textContent = "✓ gespeichert";
+        loadGroups();
+      })
+      .catch(function () { state.textContent = "Speichern hat nicht geklappt"; });
+  }
+  document.getElementById("einwilligungSpeichern").addEventListener("click", function () {
+    einwilligungSpeichern({ ohneFoto: namenAusFeld("ohneFoto"), ohneKi: namenAusFeld("ohneKi") });
+  });
+
+  // Pro Person zwei Schalter. Gelb = ohne. Umschalten trägt den Namen ein bzw. aus.
+  function einwilligungZelle(td, g) {
+    var r = g.regeln || { ohneFoto: [], ohneKiPersonen: [] };
+    g.personen.forEach(function (name, i) {
+      [["ohneFoto", r.ohneFoto[i], "📷 " + name + ": ohne Foto", "📷 " + name + ": Foto ok"],
+       ["ohneKi", r.ohneKiPersonen[i], "🤖 " + name + ": ohne KI", "🤖 " + name + ": KI ok"]].forEach(function (s) {
+        var b = knopf(s[1] ? s[2] : s[3], function () {
+          var liste = einwilligung[s[0]];
+          var neu = s[1] ? liste.filter(function (x) { return !trifft(x, name); }) : liste.concat([name]);
+          var daten = {};
+          daten[s[0]] = neu;
+          einwilligungSpeichern(daten);
+        });
+        b.className = "schalter" + (s[1] ? " aus" : "");
+        td.appendChild(b);
+      });
+      td.appendChild(document.createElement("br"));
+    });
   }
 
   function loadGroups() {
@@ -435,6 +501,8 @@
         document.getElementById("pupils").value = s.schueler;
         freigaben = s.freigaben || [];
         freigabeZeigen();
+        einwilligung = { ohneFoto: s.ohneFoto || [], ohneKi: s.ohneKi || [] };
+        einwilligungZeigen();
       });
   }
 
@@ -462,7 +530,7 @@
 
   document.getElementById("deleteAll").addEventListener("click", function () {
     if (!confirm("Wirklich ALLE Stempel, Antworten und Fotos vom Laptop löschen? Das kann nicht rückgängig gemacht werden.")) return;
-    fetch("/api/alle-loeschen", { method: "POST" }).then(function () { platte.laden(); folie.laden(); loadGroups(); });
+    fetch("/api/alle-loeschen", { method: "POST" }).then(function () { platte.laden(); folie.laden(); loadGroups(); loadSettings(); });
   });
 
   loadInfo();

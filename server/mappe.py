@@ -66,6 +66,10 @@ def werke(state, groups_dir, stempel_dir, sticker_dir):
             sorte = "portraet" if name.endswith("-Portraet") else art
             with open(pfad, "rb") as fh:
                 liste.append(("%s_%s_%s.svg" % (sorte, name.replace("-Portraet", ""), teile[0]), fh.read()))
+    # Ersatz-Porträt statt eigenem Foto: Namensnennung (CC-Lizenz) gehört dazu
+    quelle = (state["antworten"].get("foto", {}).get("antworten") or {}).get("quelle")
+    if quelle:
+        liste.append(("foto_quelle.txt", ("Porträt-Vorlage\n" + str(quelle) + "\n").encode("utf-8")))
     for station, feld, name in CODE_DATEIEN:
         code = (state["antworten"].get(station, {}).get("antworten") or {}).get(feld)
         if code:

@@ -52,8 +52,12 @@ MAX_MESSAGE_LEN = 300
 messages_lock = threading.Lock()
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MAX_EVENT_BYTES = 64 * 1024
-DEFAULT_SETTINGS = {"schueler": 26, "freigaben": []}  # freigaben: Stationen, die der Laptop für alle öffnet
+DEFAULT_SETTINGS = {"schueler": 26, "freigaben": [], "ohneFoto": [], "ohneKi": []}  # freigaben: Stationen, die der Laptop für alle öffnet
 FREIGABE_RE = re.compile(r"^[a-z0-9-]{1,40}$")
+# Rückmeldezettel der Eltern: Vornamen ohne Foto-Einwilligung bzw. mit Opt-out für generative KI
+EINWILLIGUNG_LISTEN = ("ohneFoto", "ohneKi")
+MAX_LISTE = 60
+OHNE_KI_TEXT = "Diese Station macht ihr heute mit Beispielen."
 
 EVENT_TYPES = ("anmeldung", "checkin", "beendet")
 # Image types accepted from the stations, recognised by their first bytes
@@ -148,6 +152,33 @@ def read_settings():
     return settings
 
 
+def namen_schluessel(name):
+    return re.sub(r"\s+", " ", str(name or "").strip().casefold())
+
+
+def steht_auf_liste(name, liste):
+    """„Mia“ auf der Liste trifft auch „Mia B.“ (erstes Wort). Lieber einmal zu vorsichtig."""
+    k = namen_schluessel(name)
+    if not k:
+        return False
+    eintraege = set(namen_schluessel(x) for x in liste)
+    return k in eintraege or k.split(" ")[0] in eintraege
+
+
+def regeln(state, settings=None):
+    """Pro Person: ohne eigenes Foto? Ohne generative KI? Die KI-Stationen macht das Paar
+    zusammen: Steht eine Person auf der Liste, gilt es für die ganze Gruppe."""
+    settings = settings or read_settings()
+    personen = state["personen"]
+    ohne_foto = [steht_auf_liste(p, settings.get("ohneFoto", [])) for p in personen]
+    ohne_ki = [steht_auf_liste(p, settings.get("ohneKi", [])) for p in personen]
+    return {"bekannt": bool(personen), "ohneFoto": ohne_foto, "ohneKiPersonen": ohne_ki, "ohneKi": any(ohne_ki)}
+
+
+def gruppe_ohne_ki(group_id):
+    return ID_RE.match(group_id) is not None and regeln(group_state(group_id))["ohneKi"]
+
+
 def read_events(group_id):
     """All events of one group, oldest first."""
     events = []
@@ -186,10 +217,15 @@ def group_state(group_id):
     return state
 
 
-def list_groups():
+def list_groups(mit_regeln=False):
     if not os.path.isdir(GROUPS_DIR):
         return []
-    return [group_state(g) for g in sorted(os.listdir(GROUPS_DIR)) if ID_RE.match(g)]
+    groups = [group_state(g) for g in sorted(os.listdir(GROUPS_DIR)) if ID_RE.match(g)]
+    if mit_regeln:
+        settings = read_settings()
+        for g in groups:
+            g["regeln"] = regeln(g, settings)
+    return groups
 
 
 def station_occupancy():
@@ -368,9 +404,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path == "/api/belegung":
             return self.send_json({"stationen": station_occupancy()})
         if path == "/api/einstellungen":
-            return self.send_json(read_settings())
+            settings = read_settings()
+            if not self.is_local():
+                # Namenslisten (Einwilligungen) sehen nur der Laptop und die eigene Gruppe über /api/regeln
+                for liste in EINWILLIGUNG_LISTEN:
+                    settings.pop(liste, None)
+            return self.send_json(settings)
         if path == "/api/ki-bereit":
-            return self.send_json({"eingerichtet": ki_bild.eingerichtet()})
+            group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
+            return self.send_json({"eingerichtet": ki_bild.eingerichtet(), "ohneKi": gruppe_ohne_ki(group_id)})
+        if path == "/api/regeln":
+            # Nur die eigene Gruppe (zufällige ID). Antwort ohne Namen: welche Person ohne Foto, Gruppe ohne KI
+            group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
+            if not ID_RE.match(group_id):
+                return self.send_json({"bekannt": False, "ohneFoto": [], "ohneKi": False})
+            r = regeln(group_state(group_id))
+            return self.send_json({"bekannt": r["bekannt"], "ohneFoto": r["ohneFoto"], "ohneKi": r["ohneKi"]})
         if path == "/api/nachrichten":
             # Nur die eigene Gruppe: Die ID ist zufällig und nur dem eigenen iPad bekannt
             group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
@@ -415,7 +464,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({"adressen": ["http://%s:%d/" % (ip, port) for ip in local_ips()],
                                        "neustartNoetig": server_stand() > START_STAND})
             if path == "/api/gruppen":
-                return self.send_json({"gruppen": list_groups(), "ordner": GROUPS_DIR})
+                return self.send_json({"gruppen": list_groups(mit_regeln=True), "ordner": GROUPS_DIR})
             if path == "/api/ki-status":
                 return self.send_json(ki_bild.status(KI_LOG_FILE))
             if path == "/api/plotter/status":
@@ -506,7 +555,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             for f in (KI_LOG_FILE, MESSAGES_FILE):
                 if os.path.exists(f):
                     os.remove(f)
-            print("Alle Stempel, Antworten, Fotos und KI-Bilder gelöscht.")
+            # Namen von den Rückmeldezetteln gehören auch zu den Daten der Kinder
+            settings = read_settings()
+            for liste in EINWILLIGUNG_LISTEN:
+                settings[liste] = []
+            write_atomic(SETTINGS_FILE, json.dumps(settings).encode("utf-8"))
+            print("Alle Stempel, Antworten, Fotos, KI-Bilder und Namenslisten gelöscht.")
             return self.send_json({"ok": True})
         return self.send_error(404)
 
@@ -581,6 +635,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         auswahl = anfrage.get("auswahl")
         if not ID_RE.match(gruppe) or not isinstance(auswahl, dict):
             return self.send_json({"ok": False, "fehler": "ungültige Anfrage"}, 400)
+        if gruppe_ohne_ki(gruppe):
+            return self.send_json({"ok": False, "ohneKi": True, "fehler": OHNE_KI_TEXT}, 403)
         try:
             return self.send_json(ki_bild.bild_fuer_gruppe(os.path.join(GROUPS_DIR, gruppe), KI_LOG_FILE, auswahl, gruppe))
         except ki_bild.KiFehler as err:
@@ -598,6 +654,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         auswahl = anfrage.get("auswahl")
         if not ID_RE.match(gruppe) or not isinstance(auswahl, dict):
             return self.send_json({"ok": False, "fehler": "ungültige Anfrage"}, 400)
+        if gruppe_ohne_ki(gruppe):
+            return self.send_json({"ok": False, "ohneKi": True, "fehler": OHNE_KI_TEXT}, 403)
         gruppe_dir = os.path.join(GROUPS_DIR, gruppe)
         try:
             auftrag = ki_app.vorbereiten(gruppe_dir, KI_LOG_FILE, auswahl)
@@ -664,7 +722,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return self.send_json({"ok": True, "gruppen": len(set(groups))})
 
     def save_settings(self):
-        """Ändert nur, was mitgeschickt wird: schueler (Zahl) und/oder freigaben (Liste)."""
+        """Ändert nur, was mitgeschickt wird: schueler (Zahl), freigaben, ohneFoto, ohneKi (Listen)."""
         body = self.read_body(MAX_EVENT_BYTES)
         try:
             data = json.loads(body.decode("utf-8")) if body else {}
@@ -683,6 +741,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             settings["schueler"] = count
         if "freigaben" in data:
             settings["freigaben"] = sorted(set(f for f in data.get("freigaben") or [] if isinstance(f, str) and FREIGABE_RE.match(f)))
+        for liste in EINWILLIGUNG_LISTEN:
+            if liste in data:
+                namen = [str(n).strip()[:40] for n in (data.get(liste) or []) if isinstance(n, str) and n.strip()]
+                settings[liste] = sorted(set(namen), key=namen_schluessel)[:MAX_LISTE]
         os.makedirs(DATA_ROOT, exist_ok=True)
         write_atomic(SETTINGS_FILE, json.dumps(settings).encode("utf-8"))
         return self.send_json(settings)
