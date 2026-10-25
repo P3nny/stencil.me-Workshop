@@ -1,6 +1,6 @@
 {
   "id": "druck-stempel",
-  "titel": "Mit der Hand drucken: euer Lasercut-Stempel",
+  "titel": "Stempeldruck",
   "typ": "analog",
   "datenweg": "laptop",
   "schritte": [
@@ -47,7 +47,8 @@
   "wartetAuf": {
     "meldung": "platte-fertig",
     "text": "Euer Stempel ist noch nicht fertig. Diese Station geht auf, wenn oben die Nachricht kommt: „… ist fertig! Bitte bei Penny am Lasercutter abholen.“",
-    "trotzdem": "Penny hat uns den Stempel schon gegeben"
+    "trotzdem": "Penny hat uns den Stempel schon gegeben",
+    "grund": "sobald euer Stempel fertig ist (Nachricht „Fertig, abholen“)"
   },
   "plaetze": 1
 }

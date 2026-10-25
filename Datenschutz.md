@@ -49,7 +49,7 @@ Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Fo
 | Coding: HTML, CSS und JavaScript   | –                                                | Euer Code, eure Antwort                                   | –                                             |
 | Optional: Selbstporträts mit KI    | –                                                | Euer Prompt und die Bilder                                | **Claude:** nur euer Prompt aus dem Baukasten |
 | Optional: Bild-App vibe coden      | Euer Foto (es geht nur in eure App auf dem iPad) | Euer Auftrag und eure App                                 | **Claude:** nur euer ausgefüllter Auftrag     |
-| Mit der Hand drucken (2 Stationen) | –                                                | Fotos eurer Postkarten                                    | –                                             |
+| Linoldruck und Stempeldruck        | –                                                | Fotos eurer Postkarten                                    | –                                             |
 | Code-Quiz                          | –                                                | Wie viele Antworten richtig waren                         | –                                             |
 | Kunst-Quiz                         | –                                                | Quiz-Ergebnis, Foto eures Lieblingswerks, euer Satz       | –                                             |
 | Berufe                             | –                                                | Euer Wunschberuf                                          | –                                             |
