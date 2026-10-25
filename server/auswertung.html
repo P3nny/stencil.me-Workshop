@@ -41,6 +41,15 @@
 </div>
 
 <div class="panel">
+  <h2>Werkstatt: Laser und Plotter</h2>
+  <p class="hint">Laser: Zeit von „📣 Wird gelasert“ bis „📣 Fertig, abholen“ (nur Platten, bei denen beide Nachrichten geschickt wurden). Plotter: gemessene Zeit für Zeichnen und Schneiden.</p>
+  <table>
+    <thead><tr><th>Maschine</th><th>Bögen</th><th>Stücke</th><th>Zeit pro Bogen (Min.)</th><th>Zeit gesamt (Min.)</th></tr></thead>
+    <tbody id="werkstatt"></tbody>
+  </table>
+</div>
+
+<div class="panel">
   <h2>Generative KI: Verbrauch</h2>
   <p class="hint">Token und Kosten aus den Antworten von Claude (genau). Strom: nur grob geschätzt (0,5–5 Wh pro 1000 Ausgabe-Token, Eingabe zählt ein Zehntel), Anthropic veröffentlicht keine Zahlen.</p>
   <table>
@@ -112,8 +121,24 @@
     });
   }
 
+  function werkstattZeigen(w) {
+    var body = document.getElementById("werkstatt");
+    body.innerHTML = "";
+    if (!w) return;
+    [["Lasercutter (Holzplatten)", w.platte], ["Schneideplotter (Stickerfolien)", w.folie]].forEach(function (z) {
+      var s = z[1], row = document.createElement("tr");
+      td(row, z[0]);
+      td(row, String(s.anzahl));
+      td(row, String(s.stuecke));
+      td(row, dauer(s));
+      td(row, s.dauerAnzahl ? minuten(s.summeMin) : "–");
+      body.appendChild(row);
+    });
+  }
+
   function zeigen(d) {
     kiZeigen(d.ki);
+    werkstattZeigen(d.werkstatt);
     var g = d.gesamt;
     document.getElementById("gesamt").innerHTML = "<b>Workshop-Dauer:</b> " + (g.dauerAnzahl
       ? "Anmeldung bis letzte Pflichtstation typisch " + minuten(g.dauerMedian) + " Min." + (g.dauerAnzahl > 1 ? " (" + minuten(g.dauerMin) + "–" + minuten(g.dauerMax) + ")" : "") + ", " + g.dauerAnzahl + (g.dauerAnzahl === 1 ? " Gruppe" : " Gruppen") + " mit allen Pflichtstationen"

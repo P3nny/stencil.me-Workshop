@@ -15,6 +15,12 @@
     try { localStorage.setItem(key, JSON.stringify(wert)); } catch (e) { /* nur Komfort */ }
   }
 
+  // Werkstatt-Protokoll auf dem Laptop (Anzahl, Laser- und Plotzeiten für die Auswertung, ohne Namen)
+  function protokoll(bogen, aktion, name, stuecke) {
+    fetch("/api/werkstatt", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bogen: bogen, aktion: aktion, name: name, stuecke: stuecke || 0 }) }).catch(function () { /* nur Statistik */ });
+  }
+
   function namenListe(namen) {
     return namen.length > 1 ? namen.slice(0, -1).join(", ") + " und " + namen[namen.length - 1] : namen[0];
   }
@@ -166,6 +172,7 @@
       var verlauf = lesen(o.schluessel + "-verlauf", "[]");
       verlauf.unshift({ datei: name, stempel: aktuell.stuecke });
       schreiben(o.schluessel + "-verlauf", verlauf.slice(0, VERLAUF_MAX));
+      protokoll(o.id, "erstellt", name, aktuell.stuecke.length);
       verlaufZeigen();
       laden();
     }
@@ -191,6 +198,7 @@
       })).then(function () {
         eintrag.gesendet = eintrag.gesendet || {};
         eintrag.gesendet[art] = new Date().toTimeString().slice(0, 5);
+        protokoll(o.id, art, eintrag.datei);
         schreiben(o.schluessel + "-verlauf", lesen(o.schluessel + "-verlauf", "[]").map(function (p) { return p.datei === eintrag.datei ? eintrag : p; }));
         verlaufZeigen();
       }).catch(function () { rueckmeldung.textContent = "Senden hat nicht geklappt."; });
@@ -239,7 +247,18 @@
     verlaufZeigen();
     laden();
     setInterval(laden, 5000);
-    return { abgeschlossen: abgeschlossen, laden: laden, aktuell: function () { return aktuell; } };
+    // „Alle Daten löschen“: Verlauf (mit Namen) und Haken vergessen
+    function vergessen() {
+      platziert = [];
+      auswahl = {};
+      aktuell = null;
+      try { localStorage.removeItem(o.schluessel + "-verlauf"); localStorage.removeItem(o.schluessel + "-platziert"); } catch (e) { /* egal */ }
+      el("layout").hidden = true;
+      verlaufZeigen();
+      laden();
+    }
+
+    return { abgeschlossen: abgeschlossen, laden: laden, vergessen: vergessen, aktuell: function () { return aktuell; } };
   }
 
   window.Bogen = { erstellen: erstellen, namenListe: namenListe };

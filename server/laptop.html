@@ -546,7 +546,7 @@
 
   document.getElementById("deleteAll").addEventListener("click", function () {
     if (!confirm("Wirklich ALLE Stempel, Antworten und Fotos vom Laptop löschen? Das kann nicht rückgängig gemacht werden.")) return;
-    fetch("/api/alle-loeschen", { method: "POST" }).then(function () { platte.laden(); folie.laden(); loadGroups(); loadSettings(); });
+    fetch("/api/alle-loeschen", { method: "POST" }).then(function () { platte.vergessen(); folie.vergessen(); loadGroups(); loadSettings(); });
   });
 
   loadInfo();
