@@ -31,6 +31,7 @@
       "text": "Gegenlicht: Fenster im Rücken"
     }
   ],
+  "ankuendigung": "Nach dem Foto prüft eine KI, ob wirklich eine Person auf dem Bild ist: BodyPix, eine Personenerkennungs-KI von Google. Sie rechnet hier auf dem iPad und sagt dir, wie viel Prozent des Bildes für sie Person sind.",
   "check": {
     "art": "foto",
     "proPerson": true,

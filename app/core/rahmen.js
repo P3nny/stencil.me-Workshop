@@ -131,6 +131,24 @@
     });
   }
 
+  // Programm / Bildbearbeitungs-KI / generative KI: an der Foto-Station und im Abschluss
+  function unterschied(){
+    return [
+      el('p', {}, [el('strong', { text: 'Programm: ' }), el('span', { text: 'feste Regeln. Gleiche Eingabe, immer gleiches Ergebnis.' })]),
+      el('p', {}, [el('strong', { text: 'Bildbearbeitungs-KI: ' }), el('span', { text: 'hat aus Beispielen gelernt. Sie erkennt oder verändert dein Bild, erfindet aber nichts Neues.' })]),
+      el('p', {}, [el('strong', { text: 'Generative KI: ' }), el('span', { text: 'erfindet neue Bilder oder Texte. Gleicher Auftrag, jedes Mal etwas anderes.' })])
+    ];
+  }
+
+  // Station kündigt an, was passiert (z. B. Foto: „BodyPix sucht dich“), mit der Erklärung der drei Stufen
+  function ankuendigung(station){
+    if(!station.ankuendigung) return null;
+    return el('div', { klasse: 'ankuendigung' }, [
+      el('p', { text: station.ankuendigung }),
+      el('details', { klasse: 'ki-hilfe' }, [el('summary', { text: 'Programm, KI oder generative KI: Was ist der Unterschied?' })].concat(unterschied()))
+    ]);
+  }
+
   function etiketten(station, mitTyp){
     return el('div', { klasse: 'etiketten' }, [
       mitTyp ? el('span', { klasse: 'etikett typ-' + station.typ, text: TYP_TEXT[station.typ] || station.typ }) : null,
@@ -269,10 +287,10 @@
 
   // ---- KI prüft: Ist eine Person auf dem Foto? ----
   const PERSON_TEXT = {
-    pruefen: '🔍 Die KI sucht dich auf dem Foto … (beim ersten Mal dauert es etwas)',
-    ok: '✓ Die KI hat dich erkannt.',
-    klein: '✓ Die KI hat dich erkannt, aber du bist ziemlich klein. Tipp: näher ran an die Kamera.',
-    keine: '✗ Die KI findet hier keine Person. Mach ein neues Foto: Gesicht groß, nur Packpapier dahinter.',
+    pruefen: '🔍 BodyPix sucht dich auf dem Foto … (beim ersten Mal dauert es etwas)',
+    ok: '✓ BodyPix, die KI-Personenerkennung, hat dich erkannt.',
+    klein: '✓ BodyPix, die KI-Personenerkennung, hat dich erkannt, aber du bist ziemlich klein. Tipp: näher ran an die Kamera.',
+    keine: '✗ BodyPix, die KI-Personenerkennung, findet hier keine Person. Mach ein neues Foto: Gesicht groß, nur Packpapier dahinter.',
     trotzdem: 'Du nimmst das Foto, obwohl die KI keine Person gefunden hat.',
     fehler: 'Die KI konnte das Foto nicht prüfen. Es geht trotzdem weiter.'
   };
@@ -283,7 +301,10 @@
     box.innerHTML = '';
     box.className = 'ki-pruefung' + (zustand ? ' ' + zustand : '');
     if(!zustand) return;
-    box.appendChild(el('p', { text: PERSON_TEXT[zustand] }));
+    const anteil = (ctx.eintrag.personAnteil || {})[index];
+    const prozent = (zustand === 'ok' || zustand === 'klein' || zustand === 'keine') && anteil !== undefined
+      ? ' ' + Math.round(anteil * 100) + ' % des Bildes sind für sie Person.' : '';
+    box.appendChild(el('p', { text: PERSON_TEXT[zustand] + prozent }));
     if(zustand === 'keine'){
       box.appendChild(el('button', { type: 'button', klasse: 'secondary klein', text: 'Trotzdem nehmen', onclick: () => {
         ctx.eintrag.person[index] = 'trotzdem';
@@ -304,6 +325,8 @@
     return Personen.pruefen(url).then(ergebnis => {
       if(pruefTokens[index] !== token) return; // inzwischen neues Foto
       ctx.eintrag.person[index] = ergebnis.status;
+      ctx.eintrag.personAnteil = ctx.eintrag.personAnteil || {};
+      ctx.eintrag.personAnteil[index] = ergebnis.anteil;
       return speichern().then(() => {
         personAnzeigen(box, index);
         ctx.pruefen();
@@ -480,6 +503,7 @@
       etiketten(station, false),
       el('ol', { klasse: 'schritte' }, station.schritte.map(s => el('li', { text: s }))),
       beispiele(station),
+      ankuendigung(station),
       links.length ? el('div', { klasse: 'links' }, links) : null,
       video(station),
       checkBereich(station),
@@ -515,12 +539,7 @@
     });
     if(fragen.indexOf('ki-typ') >= 0){
       teile.push(el('h2', { text: 'Was hast du gerade genutzt?' }));
-      const hilfe = el('details', { klasse: 'ki-hilfe' }, [
-        el('summary', { text: 'Was ist der Unterschied?' }),
-        el('p', {}, [el('strong', { text: 'Programm: ' }), el('span', { text: 'feste Regeln. Gleiche Eingabe, immer gleiches Ergebnis.' })]),
-        el('p', {}, [el('strong', { text: 'Bildbearbeitungs-KI: ' }), el('span', { text: 'hat aus Beispielen gelernt. Sie erkennt oder verändert dein Bild, erfindet aber nichts Neues.' })]),
-        el('p', {}, [el('strong', { text: 'Generative KI: ' }), el('span', { text: 'erfindet neue Bilder oder Texte. Gleicher Auftrag, jedes Mal etwas anderes.' })])
-      ]);
+      const hilfe = el('details', { klasse: 'ki-hilfe' }, [el('summary', { text: 'Was ist der Unterschied?' })].concat(unterschied()));
       teile.push(el('div', { klasse: 'auswahl' }, KI_ANTWORTEN.map(a => el('button', {
         type: 'button', klasse: 'wahl' + (eintrag.kiTyp === a.wert ? ' an' : ''), text: a.text,
         onclick: ev => {
@@ -569,7 +588,10 @@
     eintrag.status = 'fertig';
     eintrag.ende = new Date().toISOString();
     ctx.f.aktuell = null;
+    const art = eigeneArten[(station.check || {}).art];
     speichern()
+      // Eigene Stationsteile schicken ihre Ergebnisse erst jetzt (z. B. den fertigen Stempel)
+      .then(() => art && art.beimBeenden ? art.beimBeenden(eintrag, ctx.gruppe, station).then(speichern) : null)
       .then(() => fotosSenden(station, eintrag))
       .then(() => Outbox.ereignis(ctx.gruppe.id, 'beendet', station.id, { antworten: eintrag.antworten || {}, kiTyp: eintrag.kiTyp || '', sterne: eintrag.sterne || 0 }))
       .then(() => kopfleiste(ctx.gruppe, ctx.liste, ctx.f))
