@@ -138,6 +138,8 @@ Freier Ablauf: Die App schlägt die nächste Station vor (Voraussetzungen `brauc
 - **Laser:** erste Platte früh starten (ab ca. 6 Stempeln)
 - **WLAN** im KOMEZ ist passwortgeschützt. HTTP im WLAN gilt damit als vertretbar (steht offen in `Datenschutz.md`)
 - **Elternbrief:** Fotos mit aktiver Einwilligung, generative KI als Opt-out (`docs/elternbrief-einwilligung.md`, Entwurf, noch rechtlich prüfen lassen)
+- **Ohne Foto-Einwilligung:** Die Person wählt in der Foto-Station ein Porträt einer bekannten Person (9 Stück, gemeinfrei oder CC BY / CC BY-SA, mit Namensnennung; Auswahl `stationen/bilder/ersatz/README.md`). Batman-Cosplay verworfen (schlechter Stempel)
+- **Zwei Schalter auf der Laptop-Seite:** „ohne Foto“ pro Person, „ohne generative KI“ pro Paar. Patricia trägt die Vornamen vorab ein, in der Gruppen-Tabelle zusätzlich pro Person umschaltbar. Die Kinder sehen die Listen nicht
 
 ## 9. Entscheidungen vom 24.10.2026, spät
 

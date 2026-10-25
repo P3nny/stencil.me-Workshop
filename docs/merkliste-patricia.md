@@ -31,7 +31,7 @@ Was nur du erledigen kannst. Abhaken, wenn erledigt. Die Aufbau-Schritte am Work
 
 - [ ] Klären, wer die Einwilligung der Erziehungsberechtigten einholt (KOMEZ, Schule oder du), siehe [fragen-medienzentrum.md](fragen-medienzentrum.md)
 - [ ] Elternbrief mit Einwilligung (Fotos: ankreuzen) und Opt-out (generative KI): Entwurf in [elternbrief-einwilligung.md](elternbrief-einwilligung.md). Platzhalter ausfüllen, von Schule/KOMEZ prüfen lassen, verschicken
-- [ ] Am Workshop-Tag: Liste, welche Kinder ohne Foto-Einwilligung bzw. mit KI-Opt-out sind
+- [ ] Vor dem Workshop: Vornamen ohne Foto-Einwilligung bzw. mit KI-Opt-out auf der Laptop-Seite eintragen („Rückmeldezettel der Eltern“). Nach der Anmeldung in der Gruppen-Tabelle prüfen: Stimmen die gelben Schalter? (Spitznamen!)
 - [ ] `Datenschutz.md` vorab an Lehrkraft und Eltern schicken
 - [ ] `docs/datenschutz-kurz.md` als Aushang ausdrucken
 - [ ] Laptop: Festplattenverschlüsselung an? (Fotos von Kindern liegen dort bis zu einer Woche)

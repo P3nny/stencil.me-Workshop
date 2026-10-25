@@ -41,13 +41,13 @@ Vorname des Kindes: ______________________  Klasse: ______
 
 ☐ Ich bin einverstanden, dass das Porträtfoto meines Kindes und die daraus entstandenen Werke wie oben beschrieben auf dem Laptop der Workshopleitung gespeichert und meinem Kind als Mappe über die Lehrkraft gegeben werden.
 
-*Ohne dieses Kreuz macht Ihr Kind mit, gestaltet seinen Stempel aber aus einem gemeinfreien Porträt statt aus einem eigenen Foto.*
+*Ohne dieses Kreuz macht Ihr Kind ganz normal mit, gestaltet seinen Stempel aber aus dem Porträt einer bekannten Person (z. B. Taylor Swift, Frida Kahlo, Albert Einstein; frei lizenzierte Fotos mit Quellenangabe) statt aus einem eigenen Foto.*
 
 **Generative KI (nur ankreuzen, wenn Sie das nicht möchten):**
 
 ☐ Ich möchte nicht, dass mein Kind die zwei freiwilligen, abgesicherten Stationen mit generativer KI nutzt.
 
-*Ohne dieses Kreuz darf Ihr Kind die Stationen nutzen, wenn es möchte.*
+*Ohne dieses Kreuz darf Ihr Kind die Stationen nutzen, wenn es möchte. Mit Kreuz sieht es dort nur vorher erzeugte Beispiele.*
 
 Sie können Ihre Entscheidung jederzeit ändern, auch am Workshop-Tag. Eine Nachricht an [Lehrkraft] oder patricia.ennenbach@bildung.koeln.de genügt.
 
