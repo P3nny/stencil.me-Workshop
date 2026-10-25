@@ -12,8 +12,6 @@
 const path = require('path');
 const pw = require('playwright');
 const fs = require('fs');
-const os = require('os');
-const { execFileSync } = require('child_process');
 
 const BROWSER = process.argv[2] || 'webkit';
 const SHOTS = process.argv[3] || path.join(__dirname, '..', 'archiv', 'screenshots');
@@ -584,7 +582,8 @@ function vorschlagAbwarten(page){
     const bogen = page.locator('.feedback-person').nth(i);
     await bogen.locator('button.wahl').first().click();
     await bogen.locator('input.feedback-wort').fill(wort);
-    await bogen.locator('textarea').first().fill('Mehr Zeit am Laser');
+    // Bo schreibt einen Namen ins Feedback: Beim Sichern muss er verschwinden
+    await bogen.locator('textarea').first().fill(i ? 'Mit Ada mehr Zeit am Laser' : 'Mehr Zeit am Laser');
   }
   await page.click('button:has-text("Station beendet")');
   await page.click('button:has-text("Fertig")');
@@ -619,22 +618,6 @@ function vorschlagAbwarten(page){
     pruefe(!!svgCode && svgCode.indexOf('polygon') > 0, 'SVG-Code auf dem Laptop gespeichert');
     const htmlCode = g.antworten['coding-web'] && g.antworten['coding-web'].antworten['html-code'];
     pruefe(!!htmlCode && htmlCode.indexOf("alert('Wir sind da!')") > 0, 'HTML-Code auf dem Laptop gespeichert');
-
-    console.log('Ergebnis-Mappe (ZIP, nur Werke)');
-    const zipAntwort = await page.request.get(BASE + '/api/mappe?gruppe=' + g.gruppe);
-    const zipDatei = path.join(os.tmpdir(), 'stencilme-mappe-test.zip');
-    fs.writeFileSync(zipDatei, await zipAntwort.body());
-    const namen = execFileSync('python3', ['-c', 'import sys,zipfile;print("\\n".join(zipfile.ZipFile(sys.argv[1]).namelist()))', zipDatei]).toString().trim().split('\n');
-    fs.unlinkSync(zipDatei);
-    const ohneOrdner = namen.map(n => n.split('/').slice(1).join('/'));
-    pruefe(namen.every(n => n.indexOf('Ada-und-Bo_' + g.gruppe.slice(0, 6) + '/') === 0), 'Mappe: ein Ordner „Ada-und-Bo_…“');
-    const art = n => ohneOrdner.filter(x => x.indexOf(n) === 0).length;
-    pruefe(art('stempel_') === 2 && art('portraet_') === 2 && art('sticker_') === 2, 'Mappe: 2 Stempel, 2 Porträts, 2 Sticker');
-    pruefe(art('foto_') === 2 && art('ki-selbstportraet_') === 2 && art('vibe-coding_') === 1, 'Mappe: Fotos, KI-Bilder, App');
-    pruefe(ohneOrdner.indexOf('coding-web_eure-webseite.html') >= 0 && ohneOrdner.indexOf('pixel-vektor_euer-svg-code.html') >= 0, 'Mappe: eigener Code als HTML');
-    pruefe(!namen.some(n => /ereignisse|\.json$|feedback/.test(n)), 'Mappe: keine Antworten, kein Feedback');
-    pruefe((await page.request.get(BASE + '/api/mappe-alle')).headers()['content-type'] === 'application/zip', 'Alle Mappen als ZIP');
-    pruefe((await (await page.request.get(BASE + '/api/usb')).json()).sticks !== undefined, 'USB-Abfrage antwortet');
 
     console.log('Meine Daten');
     pruefe((await page.request.get(BASE + '/api/meine-daten?gruppe=000000000000')).status() === 404, 'fremde ID: nichts');
@@ -740,9 +723,30 @@ function vorschlagAbwarten(page){
   pruefe(plotter[1] === '1' && plotter[2] === '2' && plotter[3] !== '–', 'Auswertung: 1 Folie mit 2 Stickern, Plotzeit erfasst (' + plotter.join(' | ') + ')');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-18-auswertung.png'), fullPage: true });
 
-  console.log('Alle Daten löschen');
+  console.log('Sichern ohne Namen (vor dem Löschen)');
   await laptop.goto(BASE + '/laptop');
   await laptop.waitForSelector('#platte-verlauf .history-row');
+  const gruppeId = (await (await laptop.request.get(BASE + '/api/gruppen')).json()).gruppen.filter(x => x.personen.join() === 'Ada,Bo').pop().gruppe;
+  await laptop.click('#sichern');
+  await laptop.waitForSelector('#sichernState:has-text("✓ Gesichert in")');
+  const ordner = (await laptop.locator('#sichernState').textContent()).match(/Gesichert in (.+?) \(/)[1];
+  const gesichert = [];
+  (function sammeln(d){ fs.readdirSync(d).forEach(f => { const p = path.join(d, f); if(fs.statSync(p).isDirectory()) sammeln(p); else gesichert.push(p); }); })(ordner);
+  const rel = gesichert.map(p => path.relative(ordner, p)).sort();
+  pruefe(['ablauf.json', 'auswertung.html', 'auswertung.json', 'ki-bilder.json', 'apps/auftraege.json'].every(f => rel.indexOf(f) >= 0) && rel.filter(f => /^apps\/app-\d\d_gruppe-\d+\.html$/.test(f)).length >= 1, 'gesichert: Apps, Aufträge, Auswertung, Ablauf, KI-Prompts (' + rel.join(', ') + ')');
+  pruefe(!rel.some(f => /\.(jpg|png|svg)$/.test(f)), 'keine Fotos und keine SVGs');
+  const alles = gesichert.map(p => fs.readFileSync(p, 'utf8')).join('\n');
+  pruefe(!/(^|[^\wäöüß])(Ada|Bo)([^\wäöüß]|$)/.test(alles), 'kein Vorname (Ada, Bo) in den gesicherten Dateien, auch nicht im Feedback');
+  pruefe(alles.indexOf('[Name]') >= 0, 'Name im Feedback durch [Name] ersetzt');
+  pruefe(alles.indexOf(gruppeId) < 0, 'keine Gruppen-ID');
+  const auswertungSeite = await browser.newPage();
+  await auswertungSeite.goto('file://' + path.join(ordner, 'auswertung.html'));
+  await auswertungSeite.waitForFunction(() => document.querySelectorAll('#stationen tr').length > 10);
+  pruefe(true, 'gesicherte Auswertung lässt sich ohne Server öffnen');
+  await auswertungSeite.close();
+  fs.rmSync(ordner, { recursive: true });
+
+  console.log('Alle Daten löschen');
   laptop.once('dialog', d => d.accept());
   await laptop.click('#deleteAll');
   await laptop.waitForSelector('#platte-verlauf:has-text("Noch nichts erledigt")');

@@ -80,8 +80,8 @@ function anmelden(page, id, personen, fortschritt){
   await page.waitForFunction(() => Speicher.outboxAlle().then(o => o.length === 0), null, { timeout: 30000, polling: 500 }).catch(() => {});
   const regeln = await (await api.get('/api/regeln?gruppe=a1a1a1a1a1a1')).json();
   pruefe(regeln.ohneFoto.join() === 'true,false' && regeln.ohneKi === false && !('ohneKiPersonen' in regeln), '/api/regeln: „Mia B.“ ohne Foto (erstes Wort), keine Namen');
-  const zip = (await (await api.get('/api/mappe?gruppe=a1a1a1a1a1a1')).body()).toString('latin1');
-  pruefe(zip.indexOf('foto_quelle.txt') >= 0, 'Mappe enthält die Quellenangabe');
+  const meine = await (await api.get('/api/meine-daten?gruppe=a1a1a1a1a1a1')).json();
+  pruefe(!!((meine.antworten.foto || {}).antworten || {}).quelle, '„Meine Daten“ nennen die Quelle des Porträts');
 
   console.log('KI-Station: Lea hat ein Opt-out');
   const page2 = await browser.newPage({ viewport: { width: 1180, height: 820 } });

@@ -79,6 +79,8 @@ function outboxLeer(page){
   await page.fill('.vibe-frei-text', 'Eine App, die Katzenohren auf mein Foto setzt.');
   await page.click('button:has-text("Neue App bauen")');
   await page.waitForSelector('text=Testet eure App!', { timeout: 20000 });
+  // Die Karte erscheint kurz nach dem Hinweis „Testet eure App!“
+  await page.waitForFunction(() => document.querySelectorAll('.vibe-karte').length === 1, null, { timeout: 10000 }).catch(() => {});
   pruefe(await page.locator('.vibe-karte').count() === 1, 'freie App ist da');
   await page.fill('.vibe-frei-text', 'Mach den Hintergrund blau.');
   await page.click('button:has-text("Letzte App ändern")');
