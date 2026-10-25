@@ -47,19 +47,31 @@
   "verstaendnis": [
     {
       "frage": "Wer stellt im Beruf Licht und Hintergrund ein, damit ein Foto gut weiterbearbeitet werden kann?",
-      "antworten": ["Mediengestalter:in / Fotograf:in", "Fachinformatiker:in", "Verfahrensmechaniker:in"],
+      "antworten": [
+        "Mediengestalter:in / Fotograf:in",
+        "Fachinformatiker:in",
+        "Verfahrensmechaniker:in"
+      ],
       "richtig": 0,
       "erklaerung": "Genau das habt ihr an der Foto-Station gemacht."
     },
     {
       "frage": "Wer schreibt den Code für eine App wie stencil.me?",
-      "antworten": ["Technische:r Modellbauer:in", "Fachinformatiker:in Anwendungsentwicklung", "Fotograf:in"],
+      "antworten": [
+        "Technische:r Modellbauer:in",
+        "Fachinformatiker:in Anwendungsentwicklung",
+        "Fotograf:in"
+      ],
       "richtig": 1,
       "erklaerung": "Fachinformatiker:innen planen, programmieren und testen Apps."
     },
     {
       "frage": "Wer wählt am Lasercutter Leistung und Tempo für das Holz und achtet auf Brandschutz?",
-      "antworten": ["Mediengestalter:in", "Fachinformatiker:in", "Verfahrensmechaniker:in / Technische:r Modellbauer:in"],
+      "antworten": [
+        "Mediengestalter:in",
+        "Fachinformatiker:in",
+        "Verfahrensmechaniker:in / Technische:r Modellbauer:in"
+      ],
       "richtig": 2,
       "erklaerung": "Wie Penny am Mr Beam: Einstellungen wählen, die Maschine beobachten, auf Sicherheit achten."
     }
@@ -72,7 +84,6 @@
     }
   ],
   "fragen": [
-    "ki-typ",
     "sterne"
   ],
   "datenschutz": "Eure Antwort zum Wunschberuf geht an den Laptop. Sie kommt nicht in die Ergebnis-Mappe für die Lehrkraft.",

@@ -4,7 +4,7 @@
   "typ": "analog",
   "datenweg": "laptop",
   "schritte": [
-    "Lasst euch kurz zeigen, wie man mit dem Schnitzeisen ein Motiv in Linol schneidet.",
+    "Lasst euch kurz zeigen, wie ein Linoldruck entsteht.",
     "Sucht euch eine der fertigen Linolplatten aus.",
     "Rollt die Druckfarbe gleichmäßig mit der Rolle auf die Platte.",
     "Legt die Postkarte auf, schiebt alles durch die Druckpresse und zieht den Abdruck ab.",
@@ -12,9 +12,9 @@
   ],
   "beispiele": [
     {
-      "bild": "bilder/drucken/postkarte.jpg",
+      "bild": "bilder/drucken/linoldruck.jpg",
       "gut": true,
-      "text": "So kann eure Postkarte aussehen (Linoldruck-Stempel-Postkarte, Bild: pen)"
+      "text": "So kann eure Postkarte aussehen (Linoldruck „STARK loslassen“, Bild: pen)"
     }
   ],
   "check": {
@@ -32,7 +32,6 @@
     }
   ],
   "fragen": [
-    "ki-typ",
     "sterne"
   ],
   "datenschutz": "Das Foto eurer Postkarte geht an den Laptop, für eure Ergebnis-Mappe. Fotografiert nur die Karte, keine Leute.",
