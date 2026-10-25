@@ -279,7 +279,7 @@ function vorschlagAbwarten(page){
   await page.waitForFunction(() => document.querySelectorAll('.frei-bild canvas').length === 2, null, { timeout: 120000 });
   pruefe(true, 'beide Fotos freigestellt');
   pruefe(await page.locator('.hintergrund-person').first().locator('button.hintergrund-wahl').count() === 10, 'zehn Hintergründe zur Auswahl (mit Paris, Tokio, Rom, Köln)');
-  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor die Bilder abgeschickt sind');
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor die Bilder gespeichert sind');
   await page.locator('.hintergrund-person').nth(0).locator('button.hintergrund-wahl').nth(2).click();
   await page.locator('.hintergrund-person').nth(1).locator('button.hintergrund-wahl:has-text("Köln")').click();
   await page.waitForFunction(() => document.querySelectorAll('.ergebnis-bild canvas').length === 2);
@@ -300,9 +300,9 @@ function vorschlagAbwarten(page){
   const lage = await page.evaluate(() => Speicher.lesen('fortschritt').then(f => f.stationen.hintergrund.bilder[1].lage));
   pruefe(lage && lage.x > 0 && lage.y > 0 && Math.abs(lage.s - 0.7) < 0.01, 'Lage gespeichert (' + JSON.stringify(lage) + ')');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-9-hintergrund.png'), fullPage: true });
-  await page.locator('.hintergrund-person').nth(0).locator('button:has-text("Bild an den Laptop schicken")').click();
-  await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild an den Laptop schicken")').click();
-  await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist abgeschickt') >= 0).length === 2);
+  await page.locator('.hintergrund-person').nth(0).locator('button:has-text("Bild speichern")').click();
+  await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild speichern")').click();
+  await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist gespeichert') >= 0).length === 2);
   await abschliessen(page, 4);
   pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 12') >= 0, 'Zähler steht auf 5 von 12');
 
@@ -612,7 +612,10 @@ function vorschlagAbwarten(page){
   if(g){
     pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor,coding-web,ki-selbstportraet,vibe-coding,druck-linol,druck-stempel,code-quiz,kunst-quiz,berufe,sticker,feedback,portraet', 'fertige Stationen: ' + g.fertig.join(', '));
     const arten = g.dateien.map(d => d.split('/').pop().split('_')[0]).sort().join(',');
-    pruefe(arten === 'druck-linol,druck-linol,druck-stempel,druck-stempel,foto,foto,hintergrund,hintergrund,ki-selbstportraet,ki-selbstportraet,koerpererkennung,kunst-quiz,kunst-quiz,lasercutter,vibe-coding', 'auf dem Laptop: alle Fotos inkl. Ausgangsfotos (nur die letzten, keine verworfenen), Laser-Foto, KI-Ansicht, Hintergrund-, KI-, Postkarten- und Streetart-Bilder (' + arten + ')');
+    pruefe(arten === 'ki-selbstportraet,ki-selbstportraet,vibe-coding', 'auf dem Laptop kein Foto, nur KI-Bilder und App (' + arten + ')');
+    const fotosLaptop = fs.existsSync(path.join(__dirname, '..', 'archiv', 'testdaten', 'gruppen', g.gruppe, 'dateien')) ? fs.readdirSync(path.join(__dirname, '..', 'archiv', 'testdaten', 'gruppen', g.gruppe, 'dateien')).filter(f => /\.(jpg|png)$/.test(f)) : [];
+    pruefe(!fotosLaptop.length, 'kein JPG/PNG im Ordner der Gruppe (' + fotosLaptop.join(', ') + ')');
+    pruefe((await page.request.post(BASE + '/api/datei?id=aaaaaaaaaaaa&gruppe=' + g.gruppe + '&station=foto', { data: fs.readFileSync(FOTO) })).status() === 404, 'Laptop nimmt keine Fotos mehr an');
     pruefe(g.antworten.lasercutter && g.antworten.lasercutter.antworten.frage === 'Wie heiß wird der Laser?', 'Antwort angekommen');
     const svgCode = g.antworten['pixel-vektor'] && g.antworten['pixel-vektor'].antworten['svg-code'];
     pruefe(!!svgCode && svgCode.indexOf('polygon') > 0, 'SVG-Code auf dem Laptop gespeichert');
@@ -626,7 +629,8 @@ function vorschlagAbwarten(page){
     await page.click('a:has-text("Meine Daten")');
     await page.waitForSelector('text=Auf Pennys Laptop');
     await page.waitForSelector('text=Feedbackbogen');
-    await page.waitForFunction(() => document.querySelectorAll('.panel')[2].querySelectorAll('.daten-bilder img').length > 10);
+    // Laptop: keine Fotos mehr, nur Stempel, Porträts, Sticker und KI-Bilder (je 2)
+    await page.waitForFunction(() => document.querySelectorAll('.panel')[2].querySelectorAll('.daten-bilder img').length >= 8);
     pruefe(await page.locator('text=Wie heiß wird der Laser?').count() === 1, 'Meine Daten: Antworten vom Laptop');
     pruefe(await page.locator('table.zeiten').count() === 2, 'Meine Daten: Zeit pro Station auf dem iPad und auf dem Laptop');
     pruefe(await page.locator('table.zeiten').nth(1).locator('tbody tr').count() >= 15, 'Meine Daten: Laptop kennt Start und Ende jeder Station');
