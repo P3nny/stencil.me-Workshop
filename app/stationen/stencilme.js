@@ -1,8 +1,10 @@
 // ---- Station „Bild bearbeiten“ (stencil.me) und Bonus-Station „Sticker“ ----
 // Für jede Person nacheinander: Rohbild → Schwarz-Weiß → KI: Person → Otsu → Stempel
 // (bzw. Sticker). Jeder Schritt erscheint als eigenes Bild, damit die Kinder sehen,
-// was passiert. Einstellbar ist nur der rote Schnittrand. Das Ergebnis geht über die
-// Outbox an den Laptop. Was Stempel und Sticker unterscheidet, steht in ARTEN unten.
+// was passiert. Einstellbar ist nur der rote Schnittrand. „Stempel ist fertig“ merkt sich
+// die Datei auf dem iPad. An den Laptop (Outbox) geht sie erst beim Beenden der Station,
+// so landet nur die letzte Fassung auf der Holzplatte (Patricia, 25.10.).
+// Was Stempel und Sticker unterscheidet, steht in ARTEN unten.
 (function(){
   const PAUSE_MS = 400; // kurze Pause zwischen den Schritten, damit man sie sieht
   const SCHRITTE = [
@@ -15,6 +17,9 @@
   const TYP_KURZ = { programm: 'Programm', ki: 'KI' };
 
   function warten(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+
+  // Fertige Datei bis zum Beenden der Station auf dem iPad (nicht im Fortschritt: zu groß)
+  function svgSchluessel(art, index){ return 'svg-fertig:' + art.name + ':' + index; }
 
   function person(station, api, index, name, art){
     const el = api.el;
@@ -37,7 +42,7 @@
     const reglerWert = el('strong');
     const warnung = el('p', { klasse: 'rand-warnung' });
     warnung.hidden = true;
-    const sendenKnopf = el('button', { type: 'button', text: art.name + ' an den Laptop schicken', disabled: 'disabled' });
+    const sendenKnopf = el('button', { type: 'button', text: '✓ ' + art.name + ' ist fertig', disabled: 'disabled' });
     const sendStatus = el('p', { klasse: 'hinweis' });
     const randBox = el('div', { klasse: 'rand' }, [
       el('label', { for: 'rand-' + index }, [el('span', { text: 'Roter Schnittrand: ' }), reglerWert]),
@@ -75,10 +80,11 @@
       felder[4].notiz.textContent = Math.round(st.widthMm) + ' × ' + Math.round(st.heightMm) + ' mm, ' + art.notiz;
       warnung.hidden = st.cutLoops <= 1;
       warnung.textContent = '⚠ Der rote Rand hat Lücken: ' + art.dein + ' würde in ' + st.cutLoops + ' Teile zerfallen. Schieb den Regler nach rechts.';
-      const gesendet = stand.gesendetMm !== undefined;
-      const geaendert = gesendet && stand.gesendetMm !== mm;
-      sendenKnopf.disabled = st.cutLoops > 1 || (gesendet && !geaendert);
-      sendenKnopf.textContent = geaendert ? 'Geänderten ' + art.name + ' neu schicken' : gesendet ? '✓ ' + art.name + ' ist abgeschickt' : art.name + ' an den Laptop schicken';
+      const fertig = stand.fertigMm !== undefined;
+      const geaendert = fertig && stand.fertigMm !== mm;
+      sendenKnopf.disabled = st.cutLoops > 1 || (fertig && !geaendert);
+      sendenKnopf.textContent = geaendert ? 'Geänderten ' + art.name + ' als fertig nehmen' : '✓ ' + art.name + ' ist fertig';
+      sendenKnopf.className = fertig && !geaendert ? 'secondary' : '';
     }
 
     let reglerTimer = null;
@@ -98,14 +104,14 @@
       if(!svgAktuell) return;
       sendenKnopf.disabled = true;
       const mm = parseFloat(regler.value);
-      art.senden(api.gruppe.id, name, svgAktuell)
+      Speicher.schreiben(svgSchluessel(art, index), svgAktuell)
         .then(() => {
-          stand.gesendetMm = mm;
+          stand.fertigMm = mm;
           eintrag.stempel[index] = stand;
           return api.speichern();
         })
         .then(() => {
-          sendStatus.textContent = '✓ Gesichert auf dem iPad. Er geht automatisch an den Laptop (Anzeige oben).';
+          sendStatus.textContent = '✓ Gesichert auf dem iPad. ' + art.dein + ' geht an den Laptop, wenn ihr unten auf „Station beendet“ tippt.';
           stempelZeichnen();
           api.pruefen();
         })
@@ -162,7 +168,7 @@
           eintrag.stempel[index] = stand;
           randBox.hidden = false;
           stempelZeichnen();
-          if(stand.gesendetMm !== undefined) sendStatus.textContent = '✓ ' + art.dieser + ' ist schon abgeschickt.';
+          if(stand.fertigMm !== undefined) sendStatus.textContent = '✓ ' + art.dieser + ' ist fertig. Er geht beim Beenden der Station an den Laptop.';
           return api.speichern();
         })
         .catch(err => {
@@ -209,6 +215,15 @@
         ])))
       ].concat(personen.map(p => p.box)));
     },
-    erfuellt: (eintrag, gruppe) => gruppe.personen.every((n, i) => eintrag.stempel && eintrag.stempel[i] && eintrag.stempel[i].gesendetMm !== undefined)
+    erfuellt: (eintrag, gruppe) => gruppe.personen.every((n, i) => eintrag.stempel && eintrag.stempel[i] && eintrag.stempel[i].fertigMm !== undefined),
+    // „Station beendet“: jetzt erst die fertigen Dateien an den Laptop, nur wenn neu oder geändert
+    beimBeenden: (eintrag, gruppe) => gruppe.personen.reduce((kette, name, i) => kette.then(() => {
+      const stand = (eintrag.stempel || {})[i];
+      if(!stand || stand.fertigMm === undefined || stand.gesendetMm === stand.fertigMm) return null;
+      return Speicher.lesen(svgSchluessel(ARTEN[id], i)).then(svg => {
+        if(!svg) return null;
+        return ARTEN[id].senden(gruppe.id, name, svg).then(() => { stand.gesendetMm = stand.fertigMm; });
+      });
+    }), Promise.resolve())
   }));
 })();
