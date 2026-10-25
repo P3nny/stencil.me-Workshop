@@ -159,6 +159,13 @@
       <input id="ohneKi" type="text" autocomplete="off" placeholder="z. B. Lea">
       <div class="settings"><button id="einwilligungSpeichern" type="button">Speichern</button><span class="hint" id="einwilligungState"></span></div>
     </div>
+    <div class="settings" style="margin-top:16px">
+      <label for="vibePin">🔓 PIN für „frei vibe coden“ (nur für die erwachsene Person in der KI-Ecke, 4–6 Ziffern):</label>
+      <input id="vibePin" type="text" inputmode="numeric" maxlength="6" autocomplete="off" style="width:110px">
+      <button id="vibePinSpeichern" type="button">Speichern</button>
+      <span class="hint" id="vibePinState"></span>
+    </div>
+    <div class="hint">Leer = kein freier Modus, nur der Baukasten. Eine Freigabe gilt 15 Minuten und endet, wenn die Gruppe die Station beendet.</div>
     <div class="hint" id="kiStatus"></div>
     <div id="groupsError"></div>
     <table>
@@ -503,6 +510,7 @@
         freigabeZeigen();
         einwilligung = { ohneFoto: s.ohneFoto || [], ohneKi: s.ohneKi || [] };
         einwilligungZeigen();
+        document.getElementById("vibePin").value = s.vibePin || "";
       });
   }
 
@@ -515,6 +523,14 @@
   }
   document.getElementById("feedbackFreigabe").addEventListener("click", function () { freigabeUmschalten("feedback", "freigabeState"); });
   document.getElementById("loeschenFreigabe").addEventListener("click", function () { freigabeUmschalten("loeschen", "loeschenState"); });
+
+  document.getElementById("vibePinSpeichern").addEventListener("click", function () {
+    var state = document.getElementById("vibePinState");
+    fetch("/api/einstellungen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ vibePin: document.getElementById("vibePin").value }) })
+      .then(function (r) { return r.json(); })
+      .then(function (s) { state.textContent = s.ok === false ? "⚠ " + s.fehler : (s.vibePin ? "✓ PIN gespeichert" : "✓ Freier Modus aus"); })
+      .catch(function () { state.textContent = "Speichern hat nicht geklappt"; });
+  });
 
   document.getElementById("savePupils").addEventListener("click", function () {
     var state = document.getElementById("pupilsState");

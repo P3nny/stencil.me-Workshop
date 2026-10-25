@@ -27,6 +27,7 @@ import socket
 import subprocess
 import sys
 import threading
+import time
 import urllib.parse
 
 import ki_app
@@ -52,12 +53,23 @@ MAX_MESSAGE_LEN = 300
 messages_lock = threading.Lock()
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MAX_EVENT_BYTES = 64 * 1024
-DEFAULT_SETTINGS = {"schueler": 26, "freigaben": [], "ohneFoto": [], "ohneKi": []}  # freigaben: Stationen, die der Laptop für alle öffnet
+DEFAULT_SETTINGS = {"schueler": 26, "freigaben": [], "ohneFoto": [], "ohneKi": [], "vibePin": ""}  # freigaben: Stationen, die der Laptop für alle öffnet
 FREIGABE_RE = re.compile(r"^[a-z0-9-]{1,40}$")
 # Rückmeldezettel der Eltern: Vornamen ohne Foto-Einwilligung bzw. mit Opt-out für generative KI
 EINWILLIGUNG_LISTEN = ("ohneFoto", "ohneKi")
 MAX_LISTE = 60
 OHNE_KI_TEXT = "Diese Station macht ihr heute mit Beispielen."
+# Vibe Coding frei: Eine erwachsene Person schaltet eine Gruppe mit der PIN frei (Patricia, 25.10.2026).
+# Die Freigabe gilt 15 Minuten und endet sofort, wenn die Gruppe die Station beendet.
+PIN_RE = re.compile(r"^\d{4,6}$")
+FREI_STATION = "vibe-coding"
+FREI_SEKUNDEN = 15 * 60
+PIN_VERSUCHE = 5
+PIN_SPERRE_SEKUNDEN = 5 * 60
+NUR_LAPTOP = EINWILLIGUNG_LISTEN + ("vibePin",)  # nie an die iPads
+frei_lock = threading.Lock()
+frei_bis = {}      # gruppe -> Zeitpunkt (time.time()), bis zu dem freie Aufträge gehen
+pin_fehler = {}    # gruppe -> [Fehlversuche, gesperrt bis]
 
 EVENT_TYPES = ("anmeldung", "checkin", "beendet")
 # Image types accepted from the stations, recognised by their first bytes
@@ -177,6 +189,18 @@ def regeln(state, settings=None):
 
 def gruppe_ohne_ki(group_id):
     return ID_RE.match(group_id) is not None and regeln(group_state(group_id))["ohneKi"]
+
+
+def frei_rest(group_id):
+    """Sekunden, die die Gruppe noch frei vibe coden darf (0 = nicht freigeschaltet)."""
+    with frei_lock:
+        rest = frei_bis.get(group_id, 0) - time.time()
+    return max(0, int(rest))
+
+
+def frei_beenden(group_id):
+    with frei_lock:
+        frei_bis.pop(group_id, None)
 
 
 def read_events(group_id):
@@ -406,13 +430,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path == "/api/einstellungen":
             settings = read_settings()
             if not self.is_local():
-                # Namenslisten (Einwilligungen) sehen nur der Laptop und die eigene Gruppe über /api/regeln
-                for liste in EINWILLIGUNG_LISTEN:
+                # Namenslisten (Einwilligungen) und PIN sehen nur der Laptop (Gruppe: /api/regeln, /api/ki-bereit)
+                for liste in NUR_LAPTOP:
                     settings.pop(liste, None)
             return self.send_json(settings)
         if path == "/api/ki-bereit":
             group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
-            return self.send_json({"eingerichtet": ki_bild.eingerichtet(), "ohneKi": gruppe_ohne_ki(group_id)})
+            ohne_ki = gruppe_ohne_ki(group_id)
+            return self.send_json({"eingerichtet": ki_bild.eingerichtet(), "ohneKi": ohne_ki,
+                                   "pinEingerichtet": bool(read_settings().get("vibePin")) and not ohne_ki,
+                                   "freiRest": 0 if ohne_ki else frei_rest(group_id)})
         if path == "/api/regeln":
             # Nur die eigene Gruppe (zufällige ID). Antwort ohne Namen: welche Person ohne Foto, Gruppe ohne KI
             group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
@@ -536,6 +563,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.ki_bild()
         if parsed.path == "/api/ki-app":
             return self.ki_app()
+        if parsed.path == "/api/ki-freigabe":
+            return self.ki_freigabe()
         if (parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht", "/api/mappe-usb") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
         if parsed.path == "/api/einstellungen":
@@ -555,6 +584,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             for f in (KI_LOG_FILE, MESSAGES_FILE):
                 if os.path.exists(f):
                     os.remove(f)
+            with frei_lock:
+                frei_bis.clear()
+                pin_fehler.clear()
             # Namen von den Rückmeldezetteln gehören auch zu den Daten der Kinder
             settings = read_settings()
             for liste in EINWILLIGUNG_LISTEN:
@@ -600,6 +632,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         }
         os.makedirs(events_dir, exist_ok=True)
         write_atomic(target, json.dumps(record, ensure_ascii=False, indent=1).encode("utf-8"))
+        if record["art"] == "beendet" and station == FREI_STATION:
+            frei_beenden(event["gruppe"])  # Station fertig: PIN-Freigabe endet sofort
         print("Station %s: %s (%s)" % (record["art"], station or "-", event["gruppe"]))
         return self.send_json({"ok": True, "doppelt": False})
 
@@ -656,9 +690,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.send_json({"ok": False, "fehler": "ungültige Anfrage"}, 400)
         if gruppe_ohne_ki(gruppe):
             return self.send_json({"ok": False, "ohneKi": True, "fehler": OHNE_KI_TEXT}, 403)
+        frei = anfrage.get("frei")
+        if frei is not None:
+            # Freier Auftrag nur mit gültiger Freigabe, und nie nach dem Ende der Station
+            if FREI_STATION in group_state(gruppe)["fertig"]:
+                frei_beenden(gruppe)
+            if not frei_rest(gruppe):
+                return self.send_json({"ok": False, "freiAbgelaufen": True,
+                                       "fehler": "Die Freigabe ist vorbei. Die erwachsene Person kann neu freischalten."}, 401)
         gruppe_dir = os.path.join(GROUPS_DIR, gruppe)
         try:
-            auftrag = ki_app.vorbereiten(gruppe_dir, KI_LOG_FILE, auswahl)
+            auftrag = ki_app.vorbereiten(gruppe_dir, KI_LOG_FILE, auswahl, frei, anfrage.get("basis") if frei is not None else None)
         except ki_bild.KiFehler as err:
             return self.send_json({"ok": False, "fehler": err.text}, err.status)
         self.send_response(200)
@@ -681,6 +723,39 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except Exception as err:  # Server darf nie abstürzen
             print("KI-App-Fehler: %r" % err)
             schreiben(ki_app.FEHLER_MARKE + "Da ist etwas schiefgegangen. Bitte nochmal versuchen.")
+
+    def ki_freigabe(self):
+        """Erwachsene Person gibt die PIN ein: Gruppe darf 15 Minuten frei vibe coden."""
+        body = self.read_body(MAX_EVENT_BYTES)
+        try:
+            anfrage = json.loads(body.decode("utf-8")) if body else {}
+        except ValueError:
+            anfrage = {}
+        if not isinstance(anfrage, dict):
+            anfrage = {}
+        gruppe, pin = str(anfrage.get("gruppe", "")), str(anfrage.get("pin", "")).strip()
+        if not ID_RE.match(gruppe):
+            return self.send_json({"ok": False, "fehler": "ungültige Anfrage"}, 400)
+        richtig = read_settings().get("vibePin") or ""
+        if not richtig:
+            return self.send_json({"ok": False, "fehler": "Auf dem Laptop ist keine PIN eingerichtet."}, 409)
+        if gruppe_ohne_ki(gruppe):
+            return self.send_json({"ok": False, "ohneKi": True, "fehler": OHNE_KI_TEXT}, 403)
+        if FREI_STATION in group_state(gruppe)["fertig"]:
+            return self.send_json({"ok": False, "fehler": "Ihr habt die Station schon beendet."}, 409)
+        jetzt = time.time()
+        with frei_lock:
+            versuche, gesperrt = pin_fehler.get(gruppe, [0, 0])
+            if gesperrt > jetzt:
+                return self.send_json({"ok": False, "fehler": "Zu viele falsche PINs. In %d Minuten nochmal." % (int(gesperrt - jetzt) // 60 + 1)}, 429)
+            if pin != richtig:
+                versuche += 1
+                pin_fehler[gruppe] = [0, jetzt + PIN_SPERRE_SEKUNDEN] if versuche >= PIN_VERSUCHE else [versuche, 0]
+                return self.send_json({"ok": False, "fehler": "Falsche PIN."}, 401)
+            pin_fehler.pop(gruppe, None)
+            frei_bis[gruppe] = jetzt + FREI_SEKUNDEN
+        print("Vibe Coding frei für %s (15 Minuten)" % gruppe)
+        return self.send_json({"ok": True, "restSekunden": FREI_SEKUNDEN})
 
     def plotter_folie(self):
         body = self.read_body(MAX_SHEET_BYTES)
@@ -722,7 +797,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return self.send_json({"ok": True, "gruppen": len(set(groups))})
 
     def save_settings(self):
-        """Ändert nur, was mitgeschickt wird: schueler (Zahl), freigaben, ohneFoto, ohneKi (Listen)."""
+        """Ändert nur, was mitgeschickt wird: schueler (Zahl), freigaben, ohneFoto, ohneKi (Listen), vibePin."""
         body = self.read_body(MAX_EVENT_BYTES)
         try:
             data = json.loads(body.decode("utf-8")) if body else {}
@@ -741,6 +816,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             settings["schueler"] = count
         if "freigaben" in data:
             settings["freigaben"] = sorted(set(f for f in data.get("freigaben") or [] if isinstance(f, str) and FREIGABE_RE.match(f)))
+        if "vibePin" in data:
+            pin = str(data.get("vibePin") or "").strip()
+            if pin and not PIN_RE.match(pin):
+                return self.send_json({"ok": False, "fehler": "PIN: 4 bis 6 Ziffern"}, 400)
+            settings["vibePin"] = pin
         for liste in EINWILLIGUNG_LISTEN:
             if liste in data:
                 namen = [str(n).strip()[:40] for n in (data.get(liste) or []) if isinstance(n, str) and n.strip()]
