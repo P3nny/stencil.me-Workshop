@@ -7,12 +7,12 @@
   "schritte": [
     "Vibe coding heißt: Ihr sagt einer KI (Claude), was eine App können soll, und sie schreibt den Code. So ist auch stencil.me entstanden.",
     "Füllt den Auftrag aus: Welchen Effekt soll eure App haben? Mit einer erwachsenen Person dürft ihr auch frei beschreiben, was eure App können soll.",
-    "Tippt auf „App bauen lassen“ und schaut zu, wie der Code entsteht (etwa eine Minute).",
+    "Tippt auf „App bauen lassen“ und schaut zu, wie der Code entsteht (etwa eine Minute). Eure App nimmt automatisch euer Foto.",
     "Testet eure App mit eurem Foto.",
     "Vergleicht: Welche Schritte aus stencil.me findet ihr in eurer App wieder?"
   ],
   "ki": {
-    "satz": "Baue eine Webseite, die ein Foto {effekt}. Die App heißt {name}. Der Knopf zum Foto-Wählen heißt {knopf}. Die Farben der Seite: {farben}. {regler}",
+    "satz": "Baue eine App, die unser Foto {effekt}. Die App heißt {name}. Die Seite ist {farben}. {regler}",
     "proGruppe": 3,
     "proGruppeFrei": 6,
     "mindestApps": 1,
@@ -24,7 +24,7 @@
           {
             "id": "warhol",
             "name": "Pop-Art wie Warhol",
-            "text": "in 4 knallige Farbflächen wie bei Andy Warhol umwandelt"
+            "text": "in vier knallbunte Bilder wie bei Andy Warhol verwandelt"
           },
           {
             "id": "pixel",
@@ -34,17 +34,17 @@
           {
             "id": "farbe",
             "name": "Farben verrückt",
-            "text": "mit verrückten Farben verfremdet, zum Beispiel Farben vertauscht oder umgekehrt"
+            "text": "mit verrückten Farben verfremdet, zum Beispiel mit vertauschten oder umgekehrten Farben"
           },
           {
             "id": "comic",
             "name": "Comic-Look",
-            "text": "wie ein Comic mit dicken schwarzen Konturen und wenigen Farben aussehen lässt"
+            "text": "wie einen Comic aussehen lässt, mit dicken schwarzen Linien und wenigen Farben"
           },
           {
             "id": "stencil",
             "name": "Schablone (Stencil)",
-            "text": "in Schwarz-Weiß wie eine Schablone (Stencil) verwandelt"
+            "text": "in eine Schwarz-Weiß-Schablone (Stencil) verwandelt"
           }
         ]
       },
@@ -56,20 +56,13 @@
         "start": "Mein Foto-Zauber"
       },
       {
-        "id": "knopf",
-        "frage": "Text auf dem Knopf",
-        "art": "text",
-        "maxLaenge": 24,
-        "start": "Foto wählen"
-      },
-      {
         "id": "farben",
         "frage": "Farben der Seite",
         "optionen": [
           {
             "id": "pink",
             "name": "Pink und Schwarz",
-            "text": "Pink und Schwarz"
+            "text": "pink und schwarz"
           },
           {
             "id": "bunt",
@@ -84,7 +77,7 @@
           {
             "id": "pastell",
             "name": "Pastell",
-            "text": "sanfte Pastellfarben"
+            "text": "in sanften Pastellfarben"
           }
         ]
       },
@@ -95,7 +88,7 @@
           {
             "id": "mit",
             "name": "mit Regler",
-            "text": "Ein Regler verändert die Stärke des Effekts sofort."
+            "text": "Mit einem Regler kann man die Stärke des Effekts sofort ändern."
           },
           {
             "id": "ohne",

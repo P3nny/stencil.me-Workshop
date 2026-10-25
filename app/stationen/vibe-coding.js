@@ -9,6 +9,9 @@
 // Beim Beenden der Station endet die Freigabe (Laptop und iPad).
 (function(){
   const FEHLER_MARKE = '\u0000FEHLER:';
+  const INFO_MARKE = '\u0000INFO:'; // am Ende: Token, Kosten, Strom (server/ki_app.py)
+  // Fortschritt beim Bauen: Claude plant große Apps oft 20 bis 60 Sekunden, bevor Code kommt
+  const PHASEN = ['Auftrag geht an den Laptop', 'Claude plant eure App', 'Claude schreibt den Code', 'App wird gestartet'];
   const BEREIT_TIMEOUT_MS = 4000;
   const CSP = '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'unsafe-inline\'; ' +
     'style-src \'unsafe-inline\'; img-src data: blob:; media-src data: blob:; connect-src \'none\'; form-action \'none\'; base-uri \'none\'">';
@@ -102,21 +105,28 @@
       const offline = el('div');
       offline.hidden = true;
 
+      // Euer gespeichertes Foto geht automatisch in die App (kein Datei-Feld, keine Foto-Mediathek):
+      // beim Laden und wenn die App per postMessage({ fotoBitte: true }) danach fragt
       function appKarte(app, beispiel){
         const rahmen = el('iframe', { sandbox: 'allow-scripts', klasse: 'vibe-rahmen', title: 'Eure App' });
-        rahmen.srcdoc = abgeschottet(app.html);
-        const fotoKnopf = el('button', { type: 'button', klasse: 'secondary', text: '📷 Euer Foto in die App schicken', onclick: () => {
+        function fotoSchicken(){
           fotoAlsDataUrl().then(url => {
-            if(!url) return api.fehler('Kein Foto gefunden. Ihr könnt auch in der App selbst ein Foto wählen.');
-            rahmen.contentWindow.postMessage({ bild: url }, '*'); // App hat keinen eigenen Ursprung (sandbox)
+            if(url && rahmen.contentWindow) rahmen.contentWindow.postMessage({ bild: url }, '*'); // App hat keinen eigenen Ursprung (sandbox)
           });
-        } });
+        }
+        function bitte(e){
+          if(!document.body.contains(rahmen)){ window.removeEventListener('message', bitte); return; }
+          if(e.source === rahmen.contentWindow && e.data && e.data.fotoBitte) fotoSchicken();
+        }
+        window.addEventListener('message', bitte);
+        rahmen.addEventListener('load', fotoSchicken);
+        rahmen.srcdoc = abgeschottet(app.html);
         const quelltext = el('pre', { klasse: 'vibe-code', text: app.html });
         quelltext.hidden = true;
         const codeKnopf = el('button', { type: 'button', klasse: 'secondary klein', text: 'Code ansehen', onclick: () => { quelltext.hidden = !quelltext.hidden; } });
         return el('figure', { klasse: 'vibe-karte' }, [
           el('figcaption', {}, [el('strong', { text: beispiel ? 'Beispiel-App (vorher erzeugt)' : 'App ' + app.nr }), el('span', { text: ' „' + app.auftrag + '“' })]),
-          rahmen, fotoKnopf, codeKnopf, quelltext
+          rahmen, KiVerbrauch.zeile(el, app.verbrauch), codeKnopf, quelltext
         ]);
       }
 
@@ -224,17 +234,33 @@
       function bauen(extra, auftrag){
         laeuft = true;
         appsZeigen();
-        code.hidden = false;
+        code.hidden = true;
         code.textContent = '';
         const start = Date.now();
-        status.textContent = 'Die KI schreibt eure App … Schaut zu, wie der Code entsteht.';
+        let phase = 0;
         let text = '';
+        // Schritte mit ✓ und Sekunden, damit niemand denkt, es hängt
+        function fortschritt(){
+          const sek = Math.round((Date.now() - start) / 1000);
+          status.innerHTML = '';
+          status.appendChild(el('ol', { klasse: 'vibe-phasen' }, PHASEN.map((p, i) => el('li', {
+            klasse: i < phase ? 'fertig' : (i === phase ? 'jetzt' : ''),
+            text: (i < phase ? '✓ ' : (i === phase ? '⏳ ' : '')) + p + (i === phase ? ' … ' + sek + ' s' + (i === 2 ? ' (' + text.split('\n').length + ' Zeilen)' : '') : '')
+          }))));
+          if(phase === 1 && sek > 20) status.appendChild(el('p', { klasse: 'hinweis', text: 'Bei großen Apps denkt Claude manchmal eine Minute nach, bevor die erste Zeile kommt. Das ist normal.' }));
+        }
+        const uhr = setInterval(fortschritt, 1000);
+        fortschritt();
         fetch('/api/ki-app', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(Object.assign({ gruppe: api.gruppe.id, auswahl: eintrag.auswahl }, extra))
         }).then(res => {
+          phase = 1;
+          fortschritt();
           if(!res.ok){
+            clearInterval(uhr);
+            status.textContent = '';
             return res.json().then(d => {
               code.hidden = true;
               if(d.freiAbgelaufen){ freiBis = 0; status.textContent = '⚠ ' + d.fehler; return; }
@@ -244,27 +270,37 @@
           }
           // Stück für Stück lesen; ältere Safari ohne Datenstrom: alles auf einmal
           const fertig = () => {
+            clearInterval(uhr);
             const fehler = text.indexOf(FEHLER_MARKE);
             if(fehler >= 0){
               status.textContent = '⚠ ' + text.slice(fehler + FEHLER_MARKE.length);
               return;
             }
+            let verbrauch = null;
+            const info = text.indexOf(INFO_MARKE);
+            if(info >= 0){
+              try { verbrauch = JSON.parse(text.slice(info + INFO_MARKE.length)); } catch(e){ verbrauch = null; }
+              text = text.slice(0, info);
+            }
             const html = htmlHerausziehen(text);
             if(!html){ status.textContent = '⚠ Die KI hat keine fertige App geliefert. Bitte nochmal versuchen.'; return; }
-            eintrag.apps.push({ nr: eintrag.apps.length + 1, auftrag: auftrag, html: html });
+            phase = 3;
+            fortschritt();
+            eintrag.apps.push({ nr: eintrag.apps.length + 1, auftrag: auftrag, html: html, verbrauch: verbrauch });
             eintrag.antworten = eintrag.antworten || {};
             eintrag.antworten.auftraege = eintrag.apps.map(a => a.auftrag);
             code.hidden = true;
             status.textContent = '✓ Fertig nach ' + Math.round((Date.now() - start) / 1000) + ' Sekunden. Testet eure App!';
             return api.speichern().then(() => api.pruefen());
           };
-          if(!res.body || !res.body.getReader) return res.text().then(t => { text = t; code.textContent = t; return fertig(); });
+          if(!res.body || !res.body.getReader) return res.text().then(t => { text = t; code.textContent = t.split(INFO_MARKE)[0]; return fertig(); });
           const leser = res.body.getReader();
           const dekoder = new TextDecoder();
           const weiter = () => leser.read().then(stueck => {
             if(stueck.done) return fertig();
             text += dekoder.decode(stueck.value, { stream: true });
-            code.textContent = text.replace(FEHLER_MARKE, '\n⚠ ');
+            if(phase < 2){ phase = 2; code.hidden = false; }
+            code.textContent = text.split(INFO_MARKE)[0].replace(FEHLER_MARKE, '\n⚠ ');
             code.scrollTop = code.scrollHeight;
             return weiter();
           });
@@ -273,6 +309,7 @@
           console.error(err);
           ohneKi('Der Laptop antwortet nicht.');
         }).then(() => {
+          clearInterval(uhr);
           laeuft = false;
           appsZeigen();
         });
