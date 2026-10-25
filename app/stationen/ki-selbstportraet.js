@@ -111,7 +111,7 @@
           .then(antwort => {
             if(!antwort.ok){
               status.textContent = '';
-              if(antwort.status === 503) return ohneKi(antwort.daten.fehler || 'Die KI ist gerade nicht erreichbar.');
+              if(antwort.status === 503 || antwort.status === 403) return ohneKi(antwort.daten.fehler || 'Die KI ist gerade nicht erreichbar.');
               status.textContent = '⚠ ' + (antwort.daten.fehler || 'Das hat nicht geklappt.');
               return;
             }
@@ -130,8 +130,10 @@
       });
 
       // Ist die KI auf dem Laptop eingerichtet? Sonst gleich Beispiele zeigen
-      mitZeitlimit(fetch('/api/ki-bereit').then(r => r.json()), BEREIT_TIMEOUT_MS)
+      mitZeitlimit(fetch('/api/ki-bereit?gruppe=' + api.gruppe.id).then(r => r.json()), BEREIT_TIMEOUT_MS)
         .then(d => {
+          // Opt-out der Eltern (Liste auf dem Laptop): nur Beispiele, der Laptop fragt die KI nicht
+          if(d.ohneKi) return ohneKi('Diese Station macht ihr heute mit Beispielen.');
           if(!d.eingerichtet) return ohneKi('Die KI ist auf dem Laptop nicht eingerichtet.');
           // KI ist (wieder) da: richtig erzeugen statt nur Beispiele
           if(eintrag.ohneKi){

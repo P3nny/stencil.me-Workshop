@@ -152,7 +152,7 @@
           if(!res.ok){
             return res.json().then(d => {
               code.hidden = true;
-              if(res.status === 503) return ohneKi(d.fehler || 'Die KI ist gerade nicht erreichbar.');
+              if(res.status === 503 || res.status === 403) return ohneKi(d.fehler || 'Die KI ist gerade nicht erreichbar.');
               status.textContent = '⚠ ' + (d.fehler || 'Das hat nicht geklappt.');
             });
           }
@@ -189,8 +189,10 @@
         }).then(appsZeigen);
       });
 
-      fetch('/api/ki-bereit').then(r => r.json())
+      fetch('/api/ki-bereit?gruppe=' + api.gruppe.id).then(r => r.json())
         .then(d => {
+          // Opt-out der Eltern (Liste auf dem Laptop): nur Beispiele, der Laptop fragt die KI nicht
+          if(d.ohneKi) return ohneKi('Diese Station macht ihr heute mit Beispielen.');
           if(!d.eingerichtet) return ohneKi('Die KI ist auf dem Laptop nicht eingerichtet.');
           if(eintrag.ohneKi){ eintrag.ohneKi = false; appsZeigen(); api.speichern().then(() => api.pruefen()); }
         })
