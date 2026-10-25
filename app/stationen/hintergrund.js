@@ -1,10 +1,13 @@
 // ---- Station „Hintergrund ändern“ ----
 // Für jede Person: Die KI (BodyPix) stellt das Foto frei, das Kind wählt einen
-// gemeinfreien Hintergrund, das fertige Bild geht über die Outbox an den Laptop.
+// freien Hintergrund, schiebt sich mit dem Finger an die richtige Stelle und stellt die
+// Größe ein. Das fertige Bild geht über die Outbox an den Laptop.
 // Freistellen und Zusammensetzen passieren auf dem iPad.
 (function(){
   const KANTE_RADIUS = 2; // Kante weichzeichnen (px), sonst sieht der Rand ausgeschnitten aus
   const ARBEIT_PX = 640; // längere Seite: reicht für die Anzeige und schont alte iPads
+  const GROESSE_MIN = 40, GROESSE_MAX = 200; // Prozent
+  const START_LAGE = { x: 0, y: 0, s: 1 }; // Verschiebung (Anteil der Bildbreite/-höhe) und Größe
 
   function bildLaden(src){
     return new Promise((resolve, reject) => {
@@ -58,16 +61,20 @@
     return c;
   }
 
-  // Hintergrund füllt das ganze Bild (wie CSS cover), Person darüber
-  function zusammensetzen(person, hintergrund){
-    const c = document.createElement('canvas');
-    c.width = person.width; c.height = person.height;
+  // Hintergrund füllt das ganze Bild (wie CSS cover), Person darüber: verschoben und skaliert
+  function zusammensetzen(c, person, hintergrund, lage){
     const ctx = c.getContext('2d');
     const scale = Math.max(c.width / hintergrund.naturalWidth, c.height / hintergrund.naturalHeight);
     const bw = hintergrund.naturalWidth * scale, bh = hintergrund.naturalHeight * scale;
+    ctx.clearRect(0, 0, c.width, c.height);
     ctx.drawImage(hintergrund, (c.width - bw) / 2, (c.height - bh) / 2, bw, bh);
-    ctx.drawImage(person, 0, 0);
-    return c;
+    const pw = person.width * lage.s, ph = person.height * lage.s;
+    ctx.drawImage(person, (c.width - pw) / 2 + lage.x * c.width, (c.height - ph) / 2 + lage.y * c.height, pw, ph);
+  }
+
+  function lageText(stand){
+    const l = stand.lage || START_LAGE;
+    return stand.hintergrund + '|' + l.x.toFixed(3) + '|' + l.y.toFixed(3) + '|' + l.s.toFixed(2);
   }
 
   function person(station, api, index, name){
@@ -82,12 +89,24 @@
     const auswahl = el('div', { klasse: 'hintergrund-auswahl' });
     const sendenKnopf = el('button', { type: 'button', text: 'Bild an den Laptop schicken', disabled: 'disabled' });
     const sendStatus = el('p', { klasse: 'hinweis' });
+    const quelle = el('p', { klasse: 'bild-quelle' });
+    stand.lage = stand.lage || Object.assign({}, START_LAGE);
+    const groesse = el('input', { type: 'range', min: String(GROESSE_MIN), max: String(GROESSE_MAX), step: '5', 'aria-label': 'Größe' });
+    groesse.value = String(Math.round(stand.lage.s * 100));
+    const groesseWert = el('strong', { text: groesse.value + ' %' });
+    const mitte = el('button', { type: 'button', klasse: 'secondary klein', text: 'Zurück in die Mitte' });
+    const lageBox = el('div', { klasse: 'hintergrund-lage' }, [
+      el('p', { klasse: 'hinweis', text: '👆 Schieb dich mit dem Finger im Bild an die richtige Stelle.' }),
+      el('label', {}, [el('span', { text: 'Deine Größe: ' }), groesseWert, groesse]),
+      mitte
+    ]);
+    lageBox.hidden = true;
 
     const box = el('section', { klasse: 'hintergrund-person' }, [
       el('h2', { text: 'Bild von ' + name }),
       el('div', { klasse: 'hintergrund-reihe' }, [
         el('figure', {}, [freiBox, el('figcaption', {}, [el('strong', { text: 'Freigestellt ' }), el('span', { klasse: 'etikett mini typ-ki', text: 'KI' })]), freiNotiz]),
-        el('figure', {}, [ergebnisBox, el('figcaption', {}, [el('strong', { text: 'Mit neuem Hintergrund' })])])
+        el('figure', {}, [ergebnisBox, el('figcaption', {}, [el('strong', { text: 'Mit neuem Hintergrund' })]), quelle, lageBox])
       ]),
       el('p', { klasse: 'auswahl-titel', text: 'Such dir einen Hintergrund aus:' }),
       auswahl,
@@ -97,10 +116,64 @@
 
     let freigestellt = null;
     let ergebnis = null;
+    let hgBild = null;
+    let zeichnenGeplant = false;
+
+    function neuZeichnen(){
+      if(zeichnenGeplant || !ergebnis || !hgBild) return;
+      zeichnenGeplant = true;
+      requestAnimationFrame(() => {
+        zeichnenGeplant = false;
+        zusammensetzen(ergebnis, freigestellt, hgBild, stand.lage);
+        knopfAktualisieren();
+      });
+    }
+
+    let lageTimer = null;
+    function lageSpeichern(){
+      eintrag.bilder[index] = stand;
+      clearTimeout(lageTimer);
+      lageTimer = setTimeout(api.speichern, 400);
+    }
+
+    groesse.addEventListener('input', () => {
+      stand.lage.s = parseInt(groesse.value, 10) / 100;
+      groesseWert.textContent = groesse.value + ' %';
+      neuZeichnen();
+      lageSpeichern();
+    });
+    mitte.addEventListener('click', () => {
+      stand.lage = Object.assign({}, START_LAGE);
+      groesse.value = '100';
+      groesseWert.textContent = '100 %';
+      neuZeichnen();
+      lageSpeichern();
+    });
+
+    // Verschieben mit dem Finger (oder der Maus): Bewegung relativ zur angezeigten Bildgröße
+    let ziehen = null;
+    ergebnisBox.addEventListener('pointerdown', ev => {
+      if(!ergebnis) return;
+      ziehen = { x: ev.clientX, y: ev.clientY, lx: stand.lage.x, ly: stand.lage.y };
+      if(ergebnisBox.setPointerCapture) ergebnisBox.setPointerCapture(ev.pointerId);
+      ev.preventDefault();
+    });
+    ergebnisBox.addEventListener('pointermove', ev => {
+      if(!ziehen) return;
+      const r = ergebnis.getBoundingClientRect();
+      stand.lage.x = Math.max(-1, Math.min(1, ziehen.lx + (ev.clientX - ziehen.x) / r.width));
+      stand.lage.y = Math.max(-1, Math.min(1, ziehen.ly + (ev.clientY - ziehen.y) / r.height));
+      neuZeichnen();
+    });
+    ['pointerup', 'pointercancel'].forEach(art => ergebnisBox.addEventListener(art, () => {
+      if(!ziehen) return;
+      ziehen = null;
+      lageSpeichern();
+    }));
 
     function knopfAktualisieren(){
       const gesendet = !!stand.gesendetHintergrund;
-      const geaendert = gesendet && stand.gesendetHintergrund !== stand.hintergrund;
+      const geaendert = gesendet && (stand.gesendetLage || stand.gesendetHintergrund) !== lageText(stand);
       sendenKnopf.disabled = !ergebnis || (gesendet && !geaendert);
       sendenKnopf.textContent = geaendert ? 'Neues Bild schicken' : gesendet ? '✓ Bild ist abgeschickt' : 'Bild an den Laptop schicken';
     }
@@ -111,10 +184,18 @@
       api.speichern();
       Array.prototype.forEach.call(auswahl.children, b => b.classList.toggle('an', b.getAttribute('data-datei') === h.datei));
       return bildLaden('/stationen/' + h.datei).then(hg => {
-        ergebnis = zusammensetzen(freigestellt, hg);
-        ergebnisBox.innerHTML = '';
-        ergebnisBox.classList.remove('leer');
-        ergebnisBox.appendChild(ergebnis);
+        hgBild = hg;
+        if(!ergebnis){
+          ergebnis = document.createElement('canvas');
+          ergebnis.width = freigestellt.width;
+          ergebnis.height = freigestellt.height;
+          ergebnisBox.innerHTML = '';
+          ergebnisBox.classList.remove('leer');
+          ergebnisBox.appendChild(ergebnis);
+          lageBox.hidden = false;
+        }
+        quelle.textContent = h.quelle || '';
+        zusammensetzen(ergebnis, freigestellt, hgBild, stand.lage);
         knopfAktualisieren();
       }).catch(err => api.fehler('Der Hintergrund lässt sich nicht laden.', err));
     }
@@ -133,12 +214,14 @@
       const key = 'hintergrund:' + index + ':' + Speicher.neueId();
       const alt = stand.key;
       const hintergrund = stand.hintergrund;
+      const gesendetLage = lageText(stand);
       Speicher.dateiSchreiben(key, Bild.alsJpeg(ergebnis))
         .then(() => alt ? Speicher.dateiSchreiben(alt, undefined) : null)
         .then(() => Outbox.datei(api.gruppe.id, station.id, key))
         .then(() => {
           stand.key = key;
           stand.gesendetHintergrund = hintergrund;
+          stand.gesendetLage = gesendetLage;
           eintrag.bilder[index] = stand;
           return api.speichern();
         })

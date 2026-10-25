@@ -101,6 +101,11 @@ textarea{width:100%;font:inherit;border:3px solid var(--ink);padding:8px;border-
 .frei-bild{background-color:#fff;background-image:linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%);background-size:20px 20px;background-position:0 0,10px 10px;}
 .frei-bild.leer,.ergebnis-bild.leer{border-style:dashed;border-color:#bbb;background:#f4f4f4;}
 .frei-bild canvas,.ergebnis-bild canvas{max-width:100%;max-height:100%;display:block;}
+/* Verschieben mit dem Finger: kein Scrollen der Seite, solange man im Bild zieht */
+.ergebnis-bild canvas{touch-action:none;cursor:grab;}
+.hintergrund-lage{max-width:260px;margin-top:6px;}
+.hintergrund-lage label{display:block;margin:6px 0;}
+.hintergrund-lage input[type=range]{width:100%;}
 .hintergrund-reihe figcaption{margin-top:4px;display:flex;align-items:center;gap:6px;}
 .auswahl-titel{font-weight:700;margin:16px 0 6px;}
 .hintergrund-auswahl{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
