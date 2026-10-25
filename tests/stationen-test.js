@@ -607,6 +607,9 @@ async function abschliessen(page, sterne){
     await page.waitForSelector('text=Feedbackbogen');
     await page.waitForFunction(() => document.querySelectorAll('.panel')[2].querySelectorAll('.daten-bilder img').length > 10);
     pruefe(await page.locator('text=Wie heiß wird der Laser?').count() === 1, 'Meine Daten: Antworten vom Laptop');
+    pruefe(await page.locator('table.zeiten').count() === 2, 'Meine Daten: Zeit pro Station auf dem iPad und auf dem Laptop');
+    pruefe(await page.locator('table.zeiten').nth(1).locator('tbody tr').count() >= 15, 'Meine Daten: Laptop kennt Start und Ende jeder Station');
+    pruefe(/Zeitpunkte/.test(await page.locator('text=Was man aus euren Daten ablesen könnte').locator('..').textContent()), 'Meine Daten: „Was man aus euren Daten ablesen könnte“');
     await page.click('button:has-text("Fotos auf dem iPad anzeigen")');
     await page.locator('.panel').nth(1).locator('.daten-bilder img').nth(1).waitFor();
     pruefe(await page.locator('.panel').nth(1).locator('.daten-bilder img').count() >= 2, 'Meine Daten: Fotos auf dem iPad (erst auf Knopfdruck)');
@@ -649,6 +652,9 @@ async function abschliessen(page, sterne){
   await page.waitForSelector('h1');
   await page.waitForTimeout(1500);
   pruefe(await page.locator('.nachricht').count() === 0, 'nach OK bleibt die Nachricht weg');
+  await laptop.waitForTimeout(1100);
+  await laptop.click('#platte-verlauf .history-row button:has-text("Fertig, abholen")');
+  await laptop.waitForFunction(() => document.querySelectorAll('#platte-verlauf .history-row .sent').length === 2);
 
   console.log('Stickerfolie und Plotter (Testlauf ohne Plotter)');
   await laptop.click('#folie-bauen');
@@ -674,7 +680,8 @@ async function abschliessen(page, sterne){
   await laptop.waitForSelector('#folie-verlauf .history-row .sent');
   await page.goto(BASE + '/');
   await page.waitForSelector('.nachricht', { timeout: 20000 });
-  pruefe(/Die Sticker von Ada und Bo sind fertig/.test(await page.locator('.nachricht p').first().textContent()), 'Startseite zeigt: Sticker fertig');
+  await page.waitForTimeout(500);
+  pruefe(/Die Sticker von Ada und Bo sind fertig/.test((await page.locator('.nachricht p').allTextContents()).join(' ')), 'Startseite zeigt: Sticker fertig');
 
   console.log('Auswertung');
   await laptop.goto(BASE + '/auswertung');
@@ -687,7 +694,22 @@ async function abschliessen(page, sterne){
   pruefe(await laptop.locator('#woerter span').count() === 2, 'Auswertung: zwei Wörter');
   const kiZusammen = await laptop.locator('#ki tr').last().textContent();
   pruefe(await laptop.locator('#ki tr').count() === 3 && /Wh/.test(kiZusammen) && /\$/.test(kiZusammen), 'Auswertung: Token, Kosten, Strom der KI-Stationen (' + kiZusammen + ')');
+  const laser = await laptop.locator('#werkstatt tr').first().locator('td').evaluateAll(t => t.map(x => x.textContent));
+  const plotter = await laptop.locator('#werkstatt tr').nth(1).locator('td').evaluateAll(t => t.map(x => x.textContent));
+  pruefe(laser[1] === '1' && laser[2] === '4' && laser[3] !== '–', 'Auswertung: 1 Platte mit 4 Stücken, Laserzeit erfasst (' + laser.join(' | ') + ')');
+  pruefe(plotter[1] === '1' && plotter[2] === '2' && plotter[3] !== '–', 'Auswertung: 1 Folie mit 2 Stickern, Plotzeit erfasst (' + plotter.join(' | ') + ')');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-18-auswertung.png'), fullPage: true });
+
+  console.log('Alle Daten löschen');
+  await laptop.goto(BASE + '/laptop');
+  await laptop.waitForSelector('#platte-verlauf .history-row');
+  laptop.once('dialog', d => d.accept());
+  await laptop.click('#deleteAll');
+  await laptop.waitForSelector('#platte-verlauf:has-text("Noch nichts erledigt")');
+  await laptop.waitForSelector('#folie-verlauf:has-text("Noch nichts erledigt")');
+  pruefe(true, 'Löschen leert „Letzte Platten“ und „Letzte Folien“');
+  const geloescht = await (await laptop.request.get(BASE + '/api/auswertung')).json();
+  pruefe(geloescht.werkstatt.platte.anzahl === 0 && geloescht.werkstatt.folie.anzahl === 0, 'Werkstatt-Protokoll gelöscht');
 
   pruefe(konsolenFehler.length === 0, 'keine JavaScript-Fehler' + (konsolenFehler.length ? ': ' + konsolenFehler.join(' | ') : ''));
   await browser.close();
