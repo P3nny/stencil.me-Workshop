@@ -99,7 +99,7 @@
           'wie ihr ausseht: Auf euren Fotos erkennt man euch, und eine KI könnte daraus mehr schätzen, zum Beispiel Alter oder Stimmung.'
         ].map(t => el('li', { text: t })))
       ]),
-      el('p', { text: 'Darum wertet Penny nur ohne Namen aus: Sterne, KI-Frage, Zeiten und Feedback, um den Workshop zu verbessern. Eure Mappe bekommt eure Lehrkraft, dann wird alles gelöscht.' })
+      el('p', { text: 'Darum wertet Penny nur ohne Namen aus: Sterne, KI-Frage, Zeiten und Feedback, um den Workshop zu verbessern. Am Ende wird alles gelöscht. Nur die Apps aus dem Vibe Coding hebt Penny ohne Namen auf.' })
     ]);
   }
 
@@ -125,7 +125,7 @@
   function laptopTeil(gruppe, liste){
     const box = el('section', { klasse: 'panel' }, [
       el('h1', { text: '💻 Auf Pennys Laptop' }),
-      el('p', { klasse: 'hinweis', text: 'Das hat dein iPad an den Laptop geschickt. Nur Penny sieht es. Spätestens eine Woche nach dem Workshop wird alles gelöscht.' })
+      el('p', { klasse: 'hinweis', text: 'Das hat dein iPad an den Laptop geschickt. Nur Penny sieht es. Am Ende des Workshops wird alles gelöscht.' })
     ]);
     const warte = el('p', { text: 'Frage den Laptop …' });
     box.appendChild(warte);
@@ -154,17 +154,17 @@
   }
 
   // Abschluss: Erst wenn der Laptop es freigibt (oder mit ?test), können die Kinder alles auf dem
-  // iPad löschen. Vorher muss alles beim Laptop sein, sonst fehlt es in der Mappe.
+  // iPad löschen. Vorher sollte alles beim Laptop sein, sonst fehlt es in Pennys Auswertung.
   function loeschenTeil(){
     const box = el('section', { klasse: 'panel' }, [
       el('h1', { text: '🗑 Alles auf diesem iPad löschen' }),
-      el('p', { text: 'Der Workshop ist vorbei. Eure Werke sind auf Pennys Laptop und kommen in eure Mappe. Auf dem iPad braucht ihr nichts mehr.' }),
+      el('p', { text: 'Der Workshop ist vorbei. Mit nach Hause nehmt ihr Stempel, Postkarte und Sticker. Auf dem iPad und auf Pennys Laptop wird jetzt alles gelöscht.' }),
       el('p', { text: 'Wenn ihr löscht, sind eure Namen, Fotos und Antworten auf diesem iPad weg. Die nächste Gruppe sieht nichts von euch.' }),
       el('p', { klasse: 'rand-warnung', text: 'Bitte schließt vorher in Safari alle anderen Tabs außer diesem (Tab-Übersicht: Symbol mit den zwei Kästchen, dann bei jedem Tab auf ✕).' })
     ]);
     const status = el('p', { klasse: 'hinweis' });
     const knopf = el('button', { type: 'button', klasse: 'gross', text: '🗑 Jetzt alles löschen' });
-    const trotzdem = el('button', { type: 'button', klasse: 'secondary', text: 'Trotzdem löschen (fehlt dann in der Mappe)' });
+    const trotzdem = el('button', { type: 'button', klasse: 'secondary', text: 'Trotzdem löschen' });
     trotzdem.hidden = true;
 
     // Wartet höchstens ms Millisekunden, dann geht es mit 'zeit' weiter (nie hängen bleiben)
@@ -225,7 +225,7 @@
         });
     });
     trotzdem.addEventListener('click', () => {
-      if(confirm('Was noch nicht beim Laptop ist, fehlt dann in eurer Mappe. Trotzdem alles löschen?')) loeschen();
+      if(confirm('Noch nicht alles ist beim Laptop. Trotzdem alles löschen?')) loeschen();
     });
     box.appendChild(knopf);
     box.appendChild(status);

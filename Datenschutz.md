@@ -11,7 +11,7 @@ Für Lehrkräfte und Eltern stehen die genauen Angaben ganz unten.
 - Deine Fotos bearbeitet das iPad. Kein Foto von dir geht ins Internet.
 - Deine Ergebnisse sammelt Pennys Laptop hier im Raum. Er schickt sie nicht ins Internet.
 - Nur an zwei Stationen geht etwas ins Internet: an eine KI namens Claude. Dorthin gehen nur Wörter aus einem Baukasten, bei der Bild-App auch eine freie Idee, die eine erwachsene Person mit euch eintippt. Kein Foto, kein Name. Diese zwei Stationen sind optional: Du musst sie nicht machen.
-- Nach dem Workshop löscht Penny alles. Eure Ergebnis-Mappe bekommt eure Lehrkraft.
+- Am Ende des Workshops löscht Penny alles. Mit nach Hause nehmt ihr Stempel, Postkarte und Sticker.
 
 ## Drei Orte für deine Daten
 
@@ -89,7 +89,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 ## Wie lange bleiben die Daten?
 
 - **Auf dem iPad:** bis zum Ende des Workshops. Dann seht ihr unter „Meine Daten“ noch einmal alles an und löscht es selbst mit „Jetzt alles löschen“. Die nächste Gruppe sieht nichts von euch.
-- **Auf Pennys Laptop:** bis zum Ende des Workshops. Penny macht daraus eine Ergebnis-Mappe für jedes Paar und gibt sie eurer Lehrkraft. In der Mappe sind nur eure Werke: Fotos, Stempel, Bilder, Apps und euer Code. Eure Antworten, Sterne und euer Feedback sind nicht dabei. Danach löscht Penny alles auf dem Laptop.
+- **Auf Pennys Laptop:** bis zum Ende des Workshops. Dann löscht Penny alles auf dem Laptop. Vorher hebt sie ohne Namen und ohne Fotos auf, was ihr hilft, den Workshop besser zu machen: die Apps aus dem Vibe Coding mit ihren Aufträgen, die Prompts der KI-Selbstporträts, die Sterne, die Antworten auf die KI-Frage, euer Feedback und wie lange ihr wo wart. Statt eurer Namen steht dort „Gruppe 1“, „Gruppe 2“ … Schreibt jemand einen Namen ins Feedback, ersetzt der Laptop ihn durch „[Name]“.
 - **Bei Claude:** höchstens 30 Tage (siehe oben).
 
 ## Deine Rechte
@@ -111,8 +111,9 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 - Bildverarbeitung und Personenerkennung (BodyPix, TensorFlow.js) laufen vollständig im Browser des iPads. Modell und Programm liegen lokal auf dem Laptop, es gibt keine Abrufe bei Google oder anderen CDNs.
 - Speicherung auf dem iPad: Website-Daten von Safari (IndexedDB), nicht die Fotos-App.
-- Speicherung auf dem Laptop: lokaler Python-Server im KOMEZ-WLAN (HTTP, unverschlüsselt). Der Laptop gibt keine Fotos weiter. Übersicht und Mappen sind nur am Laptop selbst abrufbar. „Meine Daten“ zeigt jedem iPad nur die Daten der eigenen Gruppe (zufällige 12-stellige Gruppen-ID, nur diesem iPad bekannt).
-- Ergebnis-Mappe für die Lehrkraft (ZIP pro Paar): nur Werke (Fotos, Stempel-, Sticker- und Porträtdateien, KI-Bilder, Apps, eigener Code), keine Textantworten, Bewertungen oder Feedbackbögen.
+- Speicherung auf dem Laptop: lokaler Python-Server im KOMEZ-WLAN (HTTP, unverschlüsselt). Der Laptop gibt keine Fotos weiter. Übersicht und Auswertung sind nur am Laptop selbst abrufbar. „Meine Daten“ zeigt jedem iPad nur die Daten der eigenen Gruppe (zufällige 12-stellige Gruppen-ID, nur diesem iPad bekannt).
+- Keine Ergebnis-Mappe, keine Weitergabe an Lehrkraft oder Schulplattform (entschieden 25.10.2026). Mitgenommen werden nur die analogen Ergebnisse (Stempel, Postkarte, Sticker).
+- Aufbewahrt zur Verbesserung des Workshops (vor dem Löschen gesichert, im Ordner `archiv/workshops/` auf dem Laptop, nicht veröffentlicht): Vibe-Coding-Apps mit Aufträgen, Baukasten-Prompts der KI-Selbstporträts, Auswertung (Sterne, KI-Frage, Dauer, Feedback), Ablauf der Stationen mit Uhrzeiten. Ohne Namen (Gruppen als Nummer, Vornamen in Freitexten automatisch ersetzt), ohne Gruppen-ID, ohne Fotos, Stempel- oder Bilddateien, ohne sonstige Textantworten.
 
 **Online-Dienste:**
 
@@ -128,7 +129,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 **Einwilligung und Opt-out:** Die Workshopleitung trägt vor dem Workshop auf dem Laptop die Vornamen der Kinder ein, für die keine Foto-Einwilligung vorliegt bzw. die Eltern die generative KI abgewählt haben (Rückmeldebogen, `docs/elternbrief-einwilligung.md`). Die Listen liegen nur auf dem Laptop, die iPads erfahren nur „diese Person ohne Foto“ bzw. „diese Gruppe ohne KI“ für die eigene Gruppe.
 
-- Ohne Foto-Einwilligung: Die Foto-Station zeigt statt der Kamera eine Auswahl von Porträts bekannter Personen (Wikimedia Commons, gemeinfrei oder CC BY / CC BY-SA, Quelle in `stationen/bilder/ersatz/README.md`). Das gewählte Porträt ersetzt das eigene Foto auf allen Stationen, die Quellenangabe kommt mit in die Ergebnis-Mappe. An der Station Körpererkennung kann statt der eigenen Person ein Foto einer Person gefilmt werden. Ohne Laptop-Verbindung kennt das iPad die Liste nicht: Dann achtet die Workshopleitung selbst darauf.
+- Ohne Foto-Einwilligung: Die Foto-Station zeigt statt der Kamera eine Auswahl von Porträts bekannter Personen (Wikimedia Commons, gemeinfrei oder CC BY / CC BY-SA, Quelle in `stationen/bilder/ersatz/README.md`). Das gewählte Porträt ersetzt das eigene Foto auf allen Stationen, die Quellenangabe steht unter „Meine Daten“. An der Station Körpererkennung kann statt der eigenen Person ein Foto einer Person gefilmt werden. Ohne Laptop-Verbindung kennt das iPad die Liste nicht: Dann achtet die Workshopleitung selbst darauf.
 - Opt-out generative KI: Die zwei Claude-Stationen zeigen nur vorher erzeugte Beispiele und zählen trotzdem als erledigt. Der Laptop lehnt Claude-Anfragen dieser Gruppe ab. Bei Paaren gilt das für beide, weil sie die Station gemeinsam machen.
 
-**Löschung:** Laptop: „Alle Daten löschen“ auf der Laptop-Seite (löscht auch die Namenslisten zu Einwilligung und Opt-out) nach Übergabe der Ergebnis-Mappen (ZIP) an die Lehrkraft, spätestens eine Woche nach dem Workshop. iPads: Abmelden in der App bzw. Website-Daten in Safari löschen, am Ende des Workshops. Anthropic: siehe oben.
+**Löschung:** Laptop: am Ende des Workshops „Für die Workshop-Verbesserung sichern (ohne Namen)“, danach „Alle Daten löschen“ auf der Laptop-Seite (löscht auch die Namenslisten zu Einwilligung und Opt-out). iPads: Abmelden in der App bzw. Website-Daten in Safari löschen, am Ende des Workshops. Anthropic: siehe oben.

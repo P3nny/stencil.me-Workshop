@@ -297,7 +297,7 @@
     "ki-typ",
     "sterne"
   ],
-  "datenschutz": "Euer Prompt (nur die Bausteine, kein Name, kein Foto) geht über den Laptop an Claude, eine KI der Firma Anthropic in den USA. Die Bilder kommen in eure Ergebnis-Mappe.",
+  "datenschutz": "Euer Prompt (nur die Bausteine, kein Name, kein Foto) geht über den Laptop an Claude, eine KI der Firma Anthropic in den USA. Die Bilder liegen auf dem Laptop. Am Ende des Workshops wird alles gelöscht.",
   "braucht": [
     "foto"
   ],

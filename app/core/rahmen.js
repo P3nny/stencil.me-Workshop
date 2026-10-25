@@ -260,7 +260,7 @@
           .then(blob => Bild.fotoVerkleinern(blob))
           .then(bild => {
             eintrag.ersatz[index] = e.id;
-            // Namensnennung (CC-Lizenz): kommt mit der Mappe zur Lehrkraft
+            // Namensnennung (CC-Lizenz): steht in „Meine Daten“
             eintrag.antworten = eintrag.antworten || {};
             eintrag.antworten.quelle = Object.keys(eintrag.ersatz).map(i => {
               const x = station.ersatz.filter(y => y.id === eintrag.ersatz[i])[0];
