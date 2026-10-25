@@ -133,7 +133,11 @@
   ],
   "datenschutz": "Euer Auftrag geht über den Laptop an Claude (Anthropic, USA), kein Name, kein Foto. Einen freien Auftrag tippt eine erwachsene Person mit euch. Eure fertige App läuft abgeschottet ohne Internet. Die App kommt in eure Ergebnis-Mappe.",
   "braucht": [
-    "coding-web"
+    "lasercutter"
   ],
-  "plaetze": 1
+  "plaetze": 1,
+  "vorrangNach": [
+    "platte-laser",
+    "platte-fertig"
+  ]
 }
