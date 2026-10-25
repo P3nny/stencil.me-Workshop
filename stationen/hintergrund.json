@@ -5,7 +5,7 @@
   "datenweg": "laptop",
   "schritte": [
     "Die KI stellt dein Foto frei: Sie erkennt, welche Pixel zu dir gehören, und lässt den Rest weg.",
-    "Such dir einen neuen Hintergrund aus.",
+    "Such dir einen neuen Hintergrund aus. Schieb dich mit dem Finger an die richtige Stelle und stell deine Größe ein.",
     "Schau genau hin: Wo hat die KI sauber gearbeitet, wo nicht (Haare, Hände, Ränder)?",
     "Schick dein Bild an den Laptop."
   ],
@@ -33,6 +33,26 @@
     {
       "datei": "bilder/hintergruende/galaxien.jpg",
       "titel": "Tausende Galaxien (Hubble)"
+    },
+    {
+      "datei": "bilder/hintergruende/paris-eiffelturm.jpg",
+      "titel": "Paris: Eiffelturm",
+      "quelle": "Foto: Benh Lieu Song, gemeinfrei, Wikimedia Commons"
+    },
+    {
+      "datei": "bilder/hintergruende/tokio-tower.jpg",
+      "titel": "Tokio: Tokyo Tower",
+      "quelle": "Foto: Volfgang, CC BY-SA 3.0, Wikimedia Commons"
+    },
+    {
+      "datei": "bilder/hintergruende/rom-kolosseum.jpg",
+      "titel": "Rom: Kolosseum",
+      "quelle": "Foto: FeaturedPics, CC BY-SA 4.0, Wikimedia Commons"
+    },
+    {
+      "datei": "bilder/hintergruende/koeln-dom.jpg",
+      "titel": "Köln: Dom",
+      "quelle": "Foto: Raimond Spekking, CC BY-SA 4.0, Wikimedia Commons"
     }
   ],
   "check": {
