@@ -143,9 +143,12 @@ def read_messages():
         return {}
 
 
-def add_message(groups, text):
-    """Nachricht an mehrere Gruppen. Jede Gruppe sieht nur ihre eigenen."""
+def add_message(groups, text, art=""):
+    """Nachricht an mehrere Gruppen. Jede Gruppe sieht nur ihre eigenen.
+    art: z. B. „platte-fertig“. Danach richtet sich, welche Station das iPad vorschlägt."""
     entry = {"id": os.urandom(6).hex(), "zeit": datetime.datetime.now().isoformat(timespec="seconds"), "text": text}
+    if art:
+        entry["art"] = art
     with messages_lock:
         data = read_messages()
         for g in groups:
@@ -895,7 +898,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         text = str(data.get("text", "")).strip()[:MAX_MESSAGE_LEN]
         if not groups or not text:
             return self.send_json({"ok": False, "fehler": "Gruppen oder Text fehlen"}, 400)
-        add_message(sorted(set(groups)), text)
+        art = str(data.get("art", ""))
+        add_message(sorted(set(groups)), text, art if STATION_RE.match(art) else "")
         print("Nachricht an %d Gruppe(n): %s" % (len(set(groups)), text))
         return self.send_json({"ok": True, "gruppen": len(set(groups))})
 

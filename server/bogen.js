@@ -193,7 +193,7 @@
         return fetch("/api/nachricht", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ gruppen: [g], text: o.nachrichten[art].text(proGruppe[g]) })
+          body: JSON.stringify({ gruppen: [g], text: o.nachrichten[art].text(proGruppe[g]), art: o.id + "-" + art })
         }).then(function (r) { if (!r.ok) throw new Error(r.status); });
       })).then(function () {
         eintrag.gesendet = eintrag.gesendet || {};
