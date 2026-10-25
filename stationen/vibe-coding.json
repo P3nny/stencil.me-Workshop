@@ -6,7 +6,7 @@
   "datenweg": "online",
   "schritte": [
     "Vibe coding heißt: Ihr sagt einer KI (Claude), was eine App können soll, und sie schreibt den Code. So ist auch stencil.me entstanden.",
-    "Füllt den Auftrag aus: Welchen Effekt soll eure App haben?",
+    "Füllt den Auftrag aus: Welchen Effekt soll eure App haben? Mit einer erwachsenen Person dürft ihr auch frei beschreiben, was eure App können soll.",
     "Tippt auf „App bauen lassen“ und schaut zu, wie der Code entsteht (etwa eine Minute).",
     "Testet eure App mit eurem Foto.",
     "Vergleicht: Welche Schritte aus stencil.me findet ihr in eurer App wieder?"
@@ -14,6 +14,7 @@
   "ki": {
     "satz": "Baue eine Webseite, die ein Foto {effekt}. Die App heißt {name}. Der Knopf zum Foto-Wählen heißt {knopf}. Die Farben der Seite: {farben}. {regler}",
     "proGruppe": 3,
+    "proGruppeFrei": 6,
     "mindestApps": 1,
     "baukasten": [
       {
@@ -136,7 +137,7 @@
     "ki-typ",
     "sterne"
   ],
-  "datenschutz": "Nur euer ausgefüllter Auftrag geht über den Laptop an Claude (Anthropic, USA), kein Name, kein Foto. Eure fertige App läuft abgeschottet ohne Internet. Die App kommt in eure Ergebnis-Mappe.",
+  "datenschutz": "Euer Auftrag geht über den Laptop an Claude (Anthropic, USA), kein Name, kein Foto. Einen freien Auftrag tippt eine erwachsene Person mit euch. Eure fertige App läuft abgeschottet ohne Internet. Die App kommt in eure Ergebnis-Mappe.",
   "braucht": [
     "coding-web"
   ],

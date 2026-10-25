@@ -4,6 +4,9 @@
 // Laptop, Claude schreibt die App, der Code erscheint Stück für Stück (server/ki_app.py).
 // Die fertige App läuft abgeschottet: sandbox ohne allow-same-origin und eine
 // Content-Security-Policy ohne Netz. Das Foto geht nur per postMessage in diese App.
+// Freier Auftrag: Eine erwachsene Person schaltet die Gruppe mit der PIN 15 Minuten frei
+// (/api/ki-freigabe). Dann geht ein freier Text an Claude, auch „Letzte App ändern“.
+// Beim Beenden der Station endet die Freigabe (Laptop und iPad).
 (function(){
   const FEHLER_MARKE = '\u0000FEHLER:';
   const BEREIT_TIMEOUT_MS = 4000;
@@ -117,11 +120,91 @@
         ]);
       }
 
+      // ---- Freier Auftrag mit erwachsener Person ----
+      const proGruppeFrei = ki.proGruppeFrei || ki.proGruppe;
+      let freiBis = 0; // nur im Arbeitsspeicher: nach Neuladen fragt das iPad den Laptop
+      let uhr = null;
+      let laeuft = false;
+      const freiTeil = el('div', { klasse: 'vibe-frei' });
+      freiTeil.hidden = true;
+      const pinFeld = el('input', { type: 'password', inputmode: 'numeric', autocomplete: 'off', maxlength: '6', 'aria-label': 'PIN', klasse: 'vibe-pin' });
+      const pinStatus = el('p', { klasse: 'hinweis' });
+      const pinKnopf = el('button', { type: 'button', text: 'Freischalten' });
+      const pinBox = el('div', { klasse: 'vibe-pin-box' }, [el('label', { text: 'PIN: ' }, [pinFeld]), pinKnopf]);
+      pinBox.hidden = true;
+      const oeffnen = el('button', { type: 'button', klasse: 'secondary', text: '🔓 Erwachsene Person: frei vibe coden freischalten', onclick: () => {
+        pinBox.hidden = false;
+        oeffnen.hidden = true;
+        pinFeld.focus();
+      } });
+      const freiText = el('textarea', { maxlength: '1000', rows: '5', klasse: 'vibe-frei-text',
+        placeholder: 'Zum Beispiel: Eine App, die Katzenohren auf mein Foto setzt. Mit Knöpfen für verschiedene Ohren und einem Glitzer-Regler.' });
+      const freiUhr = el('p', { klasse: 'hinweis' });
+      const neuKnopf = el('button', { type: 'button', klasse: 'gross', text: '✨ Neue App bauen' });
+      const aendernKnopf = el('button', { type: 'button', klasse: 'gross secondary', text: '🔧 Letzte App ändern' });
+      const freiOffen = el('div', {}, [
+        el('label', { klasse: 'eingabe' }, [el('span', { text: 'Eure Idee (die erwachsene Person tippt):' }), freiText]),
+        el('p', { klasse: 'rand-warnung', text: 'Keine Namen, nichts über euch. Nur, was die App können soll.' }),
+        freiUhr, neuKnopf, aendernKnopf
+      ]);
+      freiOffen.hidden = true;
+      freiTeil.appendChild(el('h2', { text: 'Frei vibe coden' }));
+      freiTeil.appendChild(el('p', { klasse: 'hinweis', text: 'Mit einer erwachsenen Person dürft ihr euren Auftrag frei formulieren und eure App weiterbauen lassen, wie im echten Leben.' }));
+      [oeffnen, pinBox, pinStatus, freiOffen].forEach(k => freiTeil.appendChild(k));
+
+      function freiZeigen(){
+        const rest = Math.max(0, Math.round((freiBis - Date.now()) / 1000));
+        const offen = rest > 0 && !eintrag.ohneKi && eintrag.status !== 'fertig';
+        freiOffen.hidden = !offen;
+        oeffnen.hidden = offen || !pinBox.hidden;
+        if(offen){
+          freiUhr.textContent = '🔓 Freigeschaltet: noch ' + Math.ceil(rest / 60) + ' Min.';
+          neuKnopf.disabled = laeuft || eintrag.apps.length >= proGruppeFrei;
+          aendernKnopf.disabled = laeuft || !eintrag.apps.length || eintrag.apps.length >= proGruppeFrei;
+          if(eintrag.apps.length >= proGruppeFrei) freiUhr.textContent += ' Ihr habt alle ' + proGruppeFrei + ' Apps bauen lassen.';
+        }else if(uhr){
+          clearInterval(uhr);
+          uhr = null;
+          freiBis = 0;
+        }
+      }
+
+      function freiStarten(sekunden){
+        freiBis = Date.now() + sekunden * 1000;
+        pinBox.hidden = true;
+        clearInterval(uhr);
+        uhr = setInterval(freiZeigen, 5000);
+        freiZeigen();
+      }
+
+      pinKnopf.addEventListener('click', () => {
+        pinKnopf.disabled = true;
+        pinStatus.textContent = '';
+        fetch('/api/ki-freigabe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gruppe: api.gruppe.id, pin: pinFeld.value }) })
+          .then(r => r.json())
+          .then(d => {
+            pinFeld.value = '';
+            if(!d.ok){ pinStatus.textContent = '⚠ ' + (d.fehler || 'Das hat nicht geklappt.'); return; }
+            pinStatus.textContent = '';
+            freiStarten(d.restSekunden);
+          })
+          .catch(() => { pinStatus.textContent = '⚠ Der Laptop antwortet nicht.'; })
+          .then(() => { pinKnopf.disabled = false; });
+      });
+
+      neuKnopf.addEventListener('click', () => bauen({ frei: freiText.value }, freiText.value.trim()));
+      aendernKnopf.addEventListener('click', () => {
+        const letzte = eintrag.apps[eintrag.apps.length - 1];
+        bauen({ frei: freiText.value, basis: letzte.html }, 'Änderung an App ' + letzte.nr + ': ' + freiText.value.trim());
+      });
+
       function appsZeigen(){
         apps.innerHTML = '';
         eintrag.apps.slice().reverse().forEach(a => apps.appendChild(appKarte(a, false)));
-        knopf.disabled = eintrag.apps.length >= ki.proGruppe || !!eintrag.ohneKi;
-        zaehler.textContent = eintrag.apps.length ? 'Ihr habt ' + eintrag.apps.length + ' von höchstens ' + ki.proGruppe + ' Apps bauen lassen.' : '';
+        knopf.disabled = laeuft || eintrag.apps.length >= ki.proGruppe || !!eintrag.ohneKi;
+        zaehler.textContent = eintrag.apps.length ? 'Ihr habt ' + eintrag.apps.length + ' von höchstens ' + ki.proGruppe + ' Apps bauen lassen' +
+          (freiBis ? ' (frei: ' + proGruppeFrei + ').' : '.') : '';
+        freiZeigen();
       }
 
       function ohneKi(text){
@@ -133,25 +216,28 @@
           offline.appendChild(appKarte({ html: html, auftrag: b.prompt || '' }, true));
         }).catch(() => {}));
         knopf.disabled = true;
+        freiTeil.hidden = true;
         api.speichern().then(() => api.pruefen());
       }
 
-      knopf.addEventListener('click', () => {
-        knopf.disabled = true;
+      // Baukasten: extra = {} ; frei: extra = { frei, basis? }
+      function bauen(extra, auftrag){
+        laeuft = true;
+        appsZeigen();
         code.hidden = false;
         code.textContent = '';
-        const auftrag = satz(ki, eintrag.auswahl);
         const start = Date.now();
         status.textContent = 'Die KI schreibt eure App … Schaut zu, wie der Code entsteht.';
         let text = '';
         fetch('/api/ki-app', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gruppe: api.gruppe.id, auswahl: eintrag.auswahl })
+          body: JSON.stringify(Object.assign({ gruppe: api.gruppe.id, auswahl: eintrag.auswahl }, extra))
         }).then(res => {
           if(!res.ok){
             return res.json().then(d => {
               code.hidden = true;
+              if(d.freiAbgelaufen){ freiBis = 0; status.textContent = '⚠ ' + d.fehler; return; }
               if(res.status === 503 || res.status === 403) return ohneKi(d.fehler || 'Die KI ist gerade nicht erreichbar.');
               status.textContent = '⚠ ' + (d.fehler || 'Das hat nicht geklappt.');
             });
@@ -186,8 +272,13 @@
         }).catch(err => {
           console.error(err);
           ohneKi('Der Laptop antwortet nicht.');
-        }).then(appsZeigen);
-      });
+        }).then(() => {
+          laeuft = false;
+          appsZeigen();
+        });
+      }
+
+      knopf.addEventListener('click', () => bauen({}, satz(ki, eintrag.auswahl)));
 
       fetch('/api/ki-bereit?gruppe=' + api.gruppe.id).then(r => r.json())
         .then(d => {
@@ -195,6 +286,9 @@
           if(d.ohneKi) return ohneKi('Diese Station macht ihr heute mit Beispielen.');
           if(!d.eingerichtet) return ohneKi('Die KI ist auf dem Laptop nicht eingerichtet.');
           if(eintrag.ohneKi){ eintrag.ohneKi = false; appsZeigen(); api.speichern().then(() => api.pruefen()); }
+          // Freier Modus nur, wenn auf dem Laptop eine PIN eingerichtet ist
+          freiTeil.hidden = !d.pinEingerichtet;
+          if(d.freiRest) freiStarten(d.freiRest);
         })
         .catch(() => ohneKi('Ohne Laptop gibt es keine KI-Apps.'));
 
@@ -202,7 +296,7 @@
       return el('div', { klasse: 'vibe-station' }, [
         el('h2', { text: 'Euer Auftrag an die KI' }),
         el('p', { klasse: 'hinweis', text: 'Wählt aus und tippt in die hellen Felder. Ihr sprecht mit einer KI (Claude), nicht mit einem Menschen.' }),
-        lueckentext, knopf, status, zaehler, code, offline,
+        lueckentext, knopf, freiTeil, status, zaehler, code, offline,
         el('h2', { text: 'Eure Apps' }), apps
       ]);
     },
