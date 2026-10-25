@@ -49,8 +49,11 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 
 Nach „Station beendet“ schlägt die App die nächste Station vor:
 
-1. nur Stationen, die noch nicht fertig sind und deren `braucht` erfüllt ist
-2. davon bevorzugt Stationen mit freien Plätzen (der Laptop zählt mit)
-3. unter den freien eine zufällige; ist keine frei, die mit den wenigsten Gruppen
+1. nur Stationen, die noch nicht fertig sind und deren `braucht` erfüllt ist (frisch aus dem Speicher, auch wenn ein anderer Tab etwas geändert hat)
+2. davon bevorzugt Stationen mit freien Plätzen (der Laptop zählt eingecheckte Gruppen und Gruppen, die gerade dorthin unterwegs sind)
+3. Stationen mit `"vorrang": true` (stencil.me, Lasercutter) zuerst, solange sie Platz haben: Alle fangen damit an, damit die Holzplatte schnell voll ist
+4. sonst unter den freien eine zufällige (optionale nur, wenn sonst keine frei ist); ist keine frei, die mit den wenigsten Gruppen
 
-Ohne Laptop zählt nur Schritt 1 und 3.
+Das iPad meldet den Vorschlag an den Laptop (`/api/unterwegs`). Der Platz zählt dann bis zum nächsten Check-in der Gruppe, höchstens 10 Minuten, als besetzt. Ohne Laptop zählt nur Schritt 1, 3 und 4.
+
+Scannt eine Gruppe eine Station, deren `braucht` fehlt, nennt die App, was fehlt, und schlägt eine andere Station vor. Ist eine Station voll, erscheint ein Hinweis mit Vorschlag und dem Knopf „Wir sind trotzdem dran“ (keine Sperre).

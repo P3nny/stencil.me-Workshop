@@ -124,6 +124,11 @@ ZIP pro Paar auf USB-Stick an die Lehrkraft, Verteilung über die Schulplattform
 
 Freier Ablauf: Die App schlägt die nächste Station vor (Voraussetzungen `braucht`, freie `plaetze`). Keine feste Rotation.
 
+Ergänzt 25.10.2026 (Patricia):
+- Alle fangen mit Foto → stencil.me → Lasercutter an, damit die Holzplatte für den Mr Beam schnell voll ist (`vorrang`).
+- Plätze: Linoldruck 1 Paar, Stempeldruck 1 Paar, Lasercutter 2 Paare (bis zu 4 schauen zu), Bild-App vibe coden (Claude Code) 1 iPad.
+- Gruppen auf dem Weg zu einer Station zählen als besetzt. Eine volle Station zeigt nur einen Hinweis, sie sperrt nicht.
+
 ## 8. Entscheidungen vom 24.10.2026, abends
 
 - **Sticker:** Cameo 4 mit Stift + Messer wie `archiv/00_fotobox-karte/fotobox-queue.py` (Stift zeichnet Schraffur auf weiße Folie, Messer schneidet außen)

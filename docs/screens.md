@@ -24,6 +24,7 @@ Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Cl
 - Fest: Check-in → Foto → stencil.me → Laser.
 - 26 Jugendliche gleichzeitig am Laser sind zu viel. Sie sollen nacheinander ankommen. Auch andere Stationen bauen aufeinander auf.
 - **Gebaut:** Jede Station hat in den Daten `braucht: [...]` (Voraussetzungen) und `plaetze` (wie viele Paare gleichzeitig). Die App schlägt nur Stationen vor, deren Voraussetzungen erfüllt sind und die noch Platz haben. Optionale Stationen nur, wenn keine andere frei ist.
+- **Ergänzt (25.10.):** stencil.me und Lasercutter haben Vorrang (alle fangen mit Station 1–3 an). Gruppen auf dem Weg zählen als besetzt. Gesperrte Station: Vorschlag statt Sackgasse. Volle Station: Hinweis „Wartet kurz oder geht zu …“ und „Wir sind trotzdem dran“. Details: [stationen/README.md](../stationen/README.md).
 - **Zählung (Stand 24.10. spät):** 12 Pflichtstationen für „x von 12“ und das Puzzle (seit Station Berufe). Dazu 2 optionale Stationen (Claude: KI-Selbstporträt, vibe coding) und 3 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen, Lasercut-Porträt), die nicht mitzählen.
 
 ## Gerüst (gebaut, Branch `feature/geruest`)
