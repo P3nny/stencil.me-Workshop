@@ -5,7 +5,8 @@
 // und melden sich mit Rahmen.eigeneArt() an.
 (function(){
   const TYP_TEXT = { programm: 'Computerprogramm', ki: 'KI (Bildbearbeitung)', generativ: 'Generative KI', analog: 'Ohne Computer' };
-  const DATENWEG_TEXT = { ipad: 'Bleibt auf dem iPad', laptop: 'Geht an den Laptop', 'laptop-video': 'Geht an den Laptop · Video: YouTube', online: 'Geht an einen Online-Dienst' };
+  // Keine Befehle („Geht an …“ klang wie eine Aufforderung), Patricia 25.10.
+  const DATENWEG_TEXT = { ipad: 'Bleibt auf dem iPad', laptop: 'Foto/Daten an den Laptop', 'laptop-video': 'Foto/Daten an den Laptop · Video: YouTube', online: 'Nutzt generative KI' };
   const KI_ANTWORTEN = [
     { wert: 'generativ', text: 'Generative KI' },
     { wert: 'ki', text: 'Bildbearbeitungs-KI' },
@@ -396,7 +397,9 @@
         clearTimeout(timer);
         timer = setTimeout(speichern, 400);
       });
-      return el('label', { klasse: 'eingabe', for: 'eingabe-' + e.id }, [el('span', { text: e.text + (e.pflicht ? '' : ' (freiwillig)') }), feld]);
+      const label = el('label', { klasse: 'eingabe', for: 'eingabe-' + e.id }, [el('span', { text: e.text + (e.pflicht ? '' : ' (freiwillig)') }), feld]);
+      // z. B. „KI und Ethik“: eigene Überschrift, damit die Frage als solche erkennbar ist
+      return e.ueberschrift ? el('div', {}, [el('h2', { klasse: 'eingabe-ueberschrift', text: e.ueberschrift }), label]) : label;
     })));
   }
 
@@ -511,13 +514,13 @@
       teile.push(el('p', { klasse: 'aufloesung-text' }, [el('strong', { text: 'Auflösung: ' }), el('span', { text: e.aufloesung })]));
     });
     if(fragen.indexOf('ki-typ') >= 0){
-      teile.push(el('h2', { text: 'Hast du hier gerade generative KI oder Bildbearbeitungs-KI genutzt?' }));
-      teile.push(el('details', { klasse: 'ki-hilfe' }, [
+      teile.push(el('h2', { text: 'Was hast du gerade genutzt?' }));
+      const hilfe = el('details', { klasse: 'ki-hilfe' }, [
         el('summary', { text: 'Was ist der Unterschied?' }),
         el('p', {}, [el('strong', { text: 'Programm: ' }), el('span', { text: 'feste Regeln. Gleiche Eingabe, immer gleiches Ergebnis.' })]),
         el('p', {}, [el('strong', { text: 'Bildbearbeitungs-KI: ' }), el('span', { text: 'hat aus Beispielen gelernt. Sie erkennt oder verändert dein Bild, erfindet aber nichts Neues.' })]),
         el('p', {}, [el('strong', { text: 'Generative KI: ' }), el('span', { text: 'erfindet neue Bilder oder Texte. Gleicher Auftrag, jedes Mal etwas anderes.' })])
-      ]));
+      ]);
       teile.push(el('div', { klasse: 'auswahl' }, KI_ANTWORTEN.map(a => el('button', {
         type: 'button', klasse: 'wahl' + (eintrag.kiTyp === a.wert ? ' an' : ''), text: a.text,
         onclick: ev => {
@@ -527,6 +530,7 @@
           pruefen();
         }
       }))));
+      teile.push(hilfe); // unter den Antworten (Patricia, 25.10.)
       teile.push(aufloesung);
     }
     if(fragen.indexOf('sterne') >= 0){
