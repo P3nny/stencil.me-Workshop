@@ -21,6 +21,10 @@
   // Grafikspeicher sofort freigeben statt sammeln: etwas langsamer, aber alte iPads
   // stürzen vor allem wegen vollem Speicher ab
   const TEXTUR_SCHWELLE_BYTES = 0;
+  // Der erste Aufruf auf einer Seite ist sehr langsam (Grafikchip wird vorbereitet, auf einem
+  // iPad 14 s gemessen, danach ein Bruchteil). Darum gleich nach dem Laden einmal mit einem
+  // winzigen leeren Bild rechnen, dann wartet nicht das Kind beim ersten Foto.
+  const AUFWAERM_PX = 64;
   let netzPromise = null;
   let netzArt = null;
 
@@ -50,11 +54,19 @@
         quantBytes: 2,
         modelUrl: MODELLE[art].modelUrl
       }))
+      .then(net => aufwaermen(net).then(() => net))
       .catch(err => {
         netzPromise = null; // beim nächsten Foto nochmal versuchen
         throw err;
       });
     return netzPromise;
+  }
+
+  function aufwaermen(net){
+    const c = document.createElement('canvas');
+    c.width = c.height = AUFWAERM_PX;
+    return net.segmentPerson(c, { internalResolution: 'medium', segmentationThreshold: 0.4 })
+      .catch(err => console.error(err)); // ohne Aufwärmen geht es auch, nur langsamer
   }
 
   function bildAusUrl(url){
