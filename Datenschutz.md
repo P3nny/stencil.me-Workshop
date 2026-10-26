@@ -1,16 +1,16 @@
 # Datenschutz im Workshop „Vom Selfie zum Lasercut-Stempel“
 
-Hier steht, was mit deinen Fotos und Antworten passiert. Lies es selbst. Wenn dir etwas komisch vorkommt: Frag Penny. Kritische Fragen sind ausdrücklich erwünscht.
+Hier steht, wie im Workshop stencil.me mit deinen Daten umgegangen wird, was mit deinen Fotos und Antworten passiert. Wenn dir etwas komisch vorkommt: Frag Penny. Kritische Fragen sind ausdrücklich erwünscht.
 
 Für Lehrkräfte und Eltern stehen die genauen Angaben ganz unten.
 
-**Alles offen:** Den ganzen Code der App und das komplette Workshop-Material kann jede Person ansehen: [github.com/P3nny/stencil.me-Workshop](https://github.com/P3nny/stencil.me-Workshop). Du kannst also selbst nachprüfen, ob hier stimmt, was wir schreiben.
+**Alles offen:** Den ganzen Code der App und das komplette Workshop-Material kann jede Person im Internet ansehen: [github.com/P3nny/stencil.me-Workshop](https://github.com/P3nny/stencil.me-Workshop). Du kannst also selbst nachprüfen, ob stimmt, was hier steht.
 
 ## Kurz gesagt
 
 - Deine Fotos bleiben auf dem iPad. Dort werden sie auch bearbeitet. Kein Foto von dir geht an den Laptop oder ins Internet.
 - Pennys Laptop hier im Raum bekommt nur, was er für Laser und Plotter braucht (deinen Stempel, Sticker, Porträt), und eure Antworten. Er schickt nichts davon ins Internet.
-- Nur an zwei Stationen geht etwas ins Internet: an eine KI namens Claude. Dorthin gehen nur Wörter aus einem Baukasten, bei der Bild-App auch eine freie Idee, die eine erwachsene Person mit euch eintippt. Kein Foto, kein Name. Diese zwei Stationen sind optional: Du musst sie nicht machen.
+- Nur an zwei Stationen geht etwas ins Internet: an eine KI namens Claude. Dorthin gehen nur Wörter aus einem Baukasten, bei der Station "Optional: Bild-App vibe coden" kannst Du auch eine freie Idee umsetzen, wenn eine erwachsene Person den Prompt (Anfrage an die KI) mit euch eintippt. Dort wird nur Text eingegeben, kein Foto, kein Name. Diese zwei Stationen sind optional: Du musst sie nicht machen.
 - Am Ende des Workshops löscht Penny alles. Mit nach Hause nehmt ihr Stempel, Postkarte und Sticker.
 
 ## Drei Orte für deine Daten
@@ -89,7 +89,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 ## Wie lange bleiben die Daten?
 
 - **Auf dem iPad:** bis zum Ende des Workshops. Dann seht ihr unter „Meine Daten“ noch einmal alles an und löscht es selbst mit „Jetzt alles löschen“. Die nächste Gruppe sieht nichts von euch.
-- **Auf Pennys Laptop:** bis zum Ende des Workshops. Dann löscht Penny alles auf dem Laptop. Vorher hebt sie ohne Namen und ohne Fotos auf, was ihr hilft, den Workshop besser zu machen: die Apps aus dem Vibe Coding mit ihren Aufträgen, die Prompts der KI-Selbstporträts, die Sterne, die Antworten auf die KI-Frage, euer Feedback und wie lange ihr wo wart. Statt eurer Namen steht dort „Gruppe 1“, „Gruppe 2“ … Schreibt jemand einen Namen ins Feedback, ersetzt der Laptop ihn durch „[Name]“.
+- **Auf Pennys Laptop:** bis zum Ende des Workshops. Dann löscht Penny alles auf dem Laptop. Vorher hebt sie anonymisiert - also ohne Namen und ohne Fotos - auf, was ihr hilft, den Workshop besser zu machen: die Apps aus dem Vibe Coding mit ihren Aufträgen, die Prompts der KI-Selbstporträts, die Sterne, die Antworten auf die KI-Frage, euer Feedback und wie lange ihr wo wart. Statt eurer Namen steht dort „Gruppe 1“, „Gruppe 2“ … Schreibt jemand einen Namen ins Feedback, ersetzt der Laptop ihn durch „[Name]“.
 - **Bei Claude:** höchstens 30 Tage (siehe oben).
 
 ## Deine Rechte
@@ -105,14 +105,14 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen si
 
 **Verantwortlich:** Patricia Ennenbach (im Workshop „Penny“), Workshop im Kommunalen Medienzentrum (KOMEZ). Kontakt: patricia.ennenbach@bildung.koeln.de
 
-**Welche Daten:** Auf dem iPad: Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung) und Fotos von Werkstücken. Fotos gehen seit 25.10.2026 nicht mehr an den Laptop. Auf dem Laptop: Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), die aus dem Foto erzeugten Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts, nötig für Laser und Plotter), KI-Selbstporträts (von Claude gezeichnet, kein Foto), Vibe-Coding-Apps, Textantworten, Bewertungen, Feedback, Zeitpunkte von Check-in und Abschluss jeder Station (daraus die Dauer). Die Auswertung (Laptop) zeigt Sterne, KI-Frage, Dauer und Feedback ohne Namen. Für Laser und Plotter protokolliert der Laptop nur Anzahl und Dauer der Platten und Folien, ohne Namen. Damit nicht zwei Gruppen gleichzeitig an eine volle Station geschickt werden, merkt sich der Laptop, zu welcher Station eine Gruppe gerade unterwegs ist (nur Gruppen-ID und Station, nur im Arbeitsspeicher, höchstens 10 Minuten).
+**Welche Daten:** Auf dem iPad: Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung) und Fotos von Werkstücken. Diese Fotos gehen nicht an den Laptop. Auf dem Laptop: Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), die aus dem Foto erzeugten Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts, nötig für Laser und Plotter), KI-Selbstporträts (von Claude gezeichnet, kein Foto), Vibe-Coding-Apps, Textantworten, Bewertungen, Feedback, Zeitpunkte von Check-in und Abschluss jeder Station (daraus die Dauer). Die Auswertung (Laptop) zeigt Sterne, KI-Frage, Dauer und Feedback ohne Namen. Für Laser und Plotter protokolliert der Laptop nur Anzahl und Dauer der Platten und Folien, ohne Namen. Damit nicht zwei Gruppen gleichzeitig an eine volle Station geschickt werden, merkt sich der Laptop, zu welcher Station eine Gruppe gerade unterwegs ist (nur Gruppen-ID und Station, nur im Arbeitsspeicher, höchstens 10 Minuten).
 
 **Wo verarbeitet:**
 
 - Bildverarbeitung und Personenerkennung (BodyPix, TensorFlow.js) laufen vollständig im Browser des iPads. Modell und Programm liegen lokal auf dem Laptop, es gibt keine Abrufe bei Google oder anderen CDNs.
 - Speicherung auf dem iPad: Website-Daten von Safari (IndexedDB), nicht die Fotos-App.
 - Speicherung auf dem Laptop: lokaler Python-Server im KOMEZ-WLAN (HTTP, unverschlüsselt). Der Laptop nimmt keine Fotos an und gibt keine Daten weiter. Übersicht und Auswertung sind nur am Laptop selbst abrufbar. „Meine Daten“ zeigt jedem iPad nur die Daten der eigenen Gruppe (zufällige 12-stellige Gruppen-ID, nur diesem iPad bekannt).
-- Keine Ergebnis-Mappe, keine Weitergabe an Lehrkraft oder Schulplattform (entschieden 25.10.2026). Mitgenommen werden nur die analogen Ergebnisse (Stempel, Postkarte, Sticker).
+- Die Fotos/Ergebnisse auf den iPad und auf dem Laptop werden am Ende des Workshops gelöscht. Mitgenommen werden nur die analogen Ergebnisse (Stempel, Postkarte, Sticker).
 - Aufbewahrt zur Verbesserung des Workshops (vor dem Löschen gesichert, im Ordner `archiv/workshops/` auf dem Laptop, nicht veröffentlicht): Vibe-Coding-Apps mit Aufträgen, Baukasten-Prompts der KI-Selbstporträts, Auswertung (Sterne, KI-Frage, Dauer, Feedback), Ablauf der Stationen mit Uhrzeiten. Ohne Namen (Gruppen als Nummer, Vornamen in Freitexten automatisch ersetzt), ohne Gruppen-ID, ohne Fotos, Stempel- oder Bilddateien, ohne sonstige Textantworten.
 
 **Online-Dienste:**
