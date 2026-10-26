@@ -19,7 +19,7 @@
   const KI_ANTWORTEN = [
     { wert: 'generativ', text: 'Generative KI' },
     { wert: 'ki', text: 'Bildbearbeitungs-KI' },
-    { wert: 'programm', text: 'Keine KI, nur ein Programm' },
+    { wert: 'programm', text: 'Computerprogramm ohne KI' },
     { wert: 'analog', text: 'Ohne Computer' },
     { wert: 'weiss-nicht', text: 'Weiß nicht' }
   ];
@@ -222,7 +222,9 @@
       if((eintrag.person || {})[index] === 'pruefen') eintrag.person[index] = 'fehler';
       personAnzeigen(ki, index);
     }
-    return el('div', { klasse: 'foto-feld' }, [el('p', { klasse: 'foto-titel', text: titel }), knopf, input, status, el('div', { klasse: 'foto-ergebnis' }, [vorschau, ki])]);
+    // Chrome auf dem iPad braucht die Kamera-Erlaubnis in den iPad-Einstellungen, sonst bleibt das Bild schwarz
+    const chrome = /CriOS/.test(navigator.userAgent) ? el('p', { klasse: 'hinweis', text: 'Kamera bleibt schwarz? Sag Penny Bescheid.' }) : null;
+    return el('div', { klasse: 'foto-feld' }, [el('p', { klasse: 'foto-titel', text: titel }), knopf, chrome, input, status, el('div', { klasse: 'foto-ergebnis' }, [vorschau, ki])]);
   }
 
   // ---- Ohne eigenes Foto (keine Einwilligung der Eltern) ----

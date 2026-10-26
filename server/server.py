@@ -654,8 +654,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             settings = read_settings()
             for liste in EINWILLIGUNG_LISTEN:
                 settings[liste] = []
+            # Nächster Workshop startet wieder zu: Feedbackbogen erst nach Bonus 1, Löschen gesperrt
+            settings["freigaben"] = []
+            os.makedirs(DATA_ROOT, exist_ok=True)
             write_atomic(SETTINGS_FILE, json.dumps(settings).encode("utf-8"))
-            print("Alle Stempel, Antworten, Fotos, KI-Bilder und Namenslisten gelöscht.")
+            print("Alle Stempel, Antworten, KI-Bilder und Namenslisten gelöscht, Freigaben zurückgesetzt.")
             return self.send_json({"ok": True})
         return self.send_error(404)
 

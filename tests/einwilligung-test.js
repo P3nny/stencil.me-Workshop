@@ -120,10 +120,12 @@ function anmelden(page, id, personen, fortschritt){
   pruefe(await laptop.inputValue('#ohneFoto') === 'Ben', 'Umschalten nimmt Mia wieder raus');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-einwilligung-laptop.png'), fullPage: true });
 
-  console.log('Alle Daten löschen leert die Listen');
+  console.log('Alle Daten löschen leert die Listen und nimmt die Freigaben zurück');
+  await api.post('/api/einstellungen', { data: { freigaben: ['feedback', 'loeschen'] } });
   await api.post('/api/alle-loeschen');
   s = await (await api.get('/api/einstellungen')).json();
   pruefe(!s.ohneFoto.length && !s.ohneKi.length, 'Namenslisten leer');
+  pruefe(!s.freigaben.length, 'Feedbackbogen und Löschen wieder gesperrt');
 
   pruefe(!konsolenFehler.length, 'keine JavaScript-Fehler' + (konsolenFehler.length ? ': ' + konsolenFehler.join(' | ') : ''));
   await browser.close();

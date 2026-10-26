@@ -31,6 +31,10 @@
     <button type="button" class="gross" id="start">Check starten</button>
     <div id="gesamt"></div>
     <ul class="check-liste" id="liste"></ul>
+    <!-- Kamera braucht ein Antippen: Ob sie ein Bild liefert, kann die Seite nicht von allein prüfen -->
+    <p id="kameraBox" hidden><button type="button" class="gross" id="kameraTest">📷 Kamera testen</button><br>
+      <span class="hinweis">Mach ein Foto. Es wird nicht gespeichert.</span>
+      <input type="file" accept="image/*" capture="user" id="kameraFeld" hidden></p>
     <div id="bericht" hidden>
       <h2>Ergebnis zum Weiterschicken</h2>
       <p class="hinweis">Bitte einen Screenshot machen oder den Text kopieren und an Patricia schicken.</p>
@@ -45,16 +49,24 @@
 (function(){
   const liste = document.getElementById('liste');
   const ergebnisse = [];
+  let kamera = null;
 
   function eintrag(name, stufe, detail){
-    ergebnisse.push({ name: name, stufe: stufe, detail: detail || '' });
-    const li = document.createElement('li');
-    li.className = stufe;
-    li.innerHTML = '<span class="zeichen"></span><span><strong></strong><br><span class="detail"></span></span>';
-    li.querySelector('.zeichen').textContent = stufe === 'ok' ? '✓' : stufe === 'warn' ? '!' : '✗';
-    li.querySelector('strong').textContent = name;
-    li.querySelector('.detail').textContent = detail || '';
-    liste.appendChild(li);
+    const e = { name: name, li: document.createElement('li') };
+    ergebnisse.push(e);
+    e.li.innerHTML = '<span class="zeichen"></span><span><strong></strong><br><span class="detail"></span></span>';
+    e.li.querySelector('strong').textContent = name;
+    aendern(e, stufe, detail);
+    liste.appendChild(e.li);
+    return e;
+  }
+
+  function aendern(e, stufe, detail){
+    e.stufe = stufe;
+    e.detail = detail || '';
+    e.li.className = stufe;
+    e.li.querySelector('.zeichen').textContent = stufe === 'ok' ? '✓' : stufe === 'warn' ? '!' : '✗';
+    e.li.querySelector('.detail').textContent = e.detail;
   }
 
   function mitZeit(promise, ms){
@@ -67,6 +79,8 @@
     const version = m ? m[1] + '.' + m[2] : (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1 ? '13 oder neuer (iPadOS meldet sich als Mac)' : 'unbekannt');
     const safari = /Version\/([\d.]+)/.exec(ua);
     eintrag('iPadOS / Browser', 'ok', 'iPadOS ' + version + ', Safari ' + (safari ? safari[1] : '?') + (/CriOS/.test(ua) ? ' (Chrome)' : ''));
+    // Chrome auf dem iPad fragt iOS nach der Kamera. Ohne Erlaubnis bleibt das Kamerabild schwarz.
+    if(/CriOS/.test(ua)) eintrag('Chrome statt Safari', 'warn', 'Chrome ist nur Notlösung. Bleibt die Kamera schwarz: Einstellungen › Chrome › Kamera erlauben, oder Safari nehmen.');
     eintrag('Bildschirm', 'ok', screen.width + ' × ' + screen.height + ' px, Pixeldichte ' + (window.devicePixelRatio || 1));
   }
 
@@ -100,7 +114,7 @@
 
   function funktionen(){
     const input = document.createElement('input');
-    eintrag('Kamera-Feld (Foto aufnehmen)', 'capture' in input ? 'ok' : 'warn', 'capture' in input ? 'Kamera öffnet sich direkt' : 'nur Fotoauswahl, Kamera über „Foto aufnehmen“ im Menü');
+    kamera = eintrag('Kamera (Foto aufnehmen)', 'warn', 'capture' in input ? 'Noch nicht getestet: unten „Kamera testen“ antippen. Bleibt das Bild schwarz: Kamera in den iPad-Einstellungen für diesen Browser erlauben' : 'Nur Fotoauswahl, Kamera über „Foto aufnehmen“ im Menü. Unten „Kamera testen“ antippen');
     const video = document.createElement('video');
     const h264 = video.canPlayType('video/mp4; codecs="avc1.42E01E"');
     const hevc = video.canPlayType('video/mp4; codecs="hvc1"');
@@ -135,8 +149,9 @@
             let summe = 0;
             for(let i = 0; i < seg.data.length; i++) summe += seg.data[i];
             const gefunden = summe / seg.data.length > 0.02;
-            eintrag('KI Personenerkennung (Foto, Stempel)', !gefunden ? 'fehlt' : rechnen < 8 ? 'ok' : 'warn',
-              'Modell laden ' + laden.toFixed(1) + ' s, ein Foto ' + rechnen.toFixed(1) + ' s' + (gefunden ? '' : ', Person NICHT gefunden'));
+            // „Laden“ enthält das einmalige Vorbereiten (Personen.netz rechnet einmal zum Aufwärmen)
+            eintrag('KI Personenerkennung (Foto, Stempel)', !gefunden ? 'fehlt' : rechnen < 8 && laden < 30 ? 'ok' : 'warn',
+              'Modell laden und vorbereiten ' + laden.toFixed(1) + ' s (einmal pro Seite), ein Foto ' + rechnen.toFixed(1) + ' s' + (gefunden ? '' : ', Person NICHT gefunden'));
           });
         });
       })
@@ -167,7 +182,32 @@
       .then(ki)
       .then(gesamt)
       .catch(err => { eintrag('Check abgebrochen', 'fehlt', String(err)); gesamt(); })
-      .then(() => { ev.target.textContent = 'Fertig'; });
+      .then(() => {
+        ev.target.textContent = 'Fertig';
+        document.getElementById('kameraBox').hidden = false;
+      });
+  });
+
+  const kameraFeld = document.getElementById('kameraFeld');
+  document.getElementById('kameraTest').addEventListener('click', () => kameraFeld.click());
+  kameraFeld.addEventListener('change', () => {
+    const datei = kameraFeld.files && kameraFeld.files[0];
+    kameraFeld.value = '';
+    if(!datei || !kamera) return;
+    const url = URL.createObjectURL(datei);
+    Personen.bildAusUrl(url)
+      .then(img => {
+        // Ein schwarzes Foto heißt meist: Browser darf die Kamera nicht benutzen
+        const c = Personen.verkleinert(img, 32);
+        const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+        let summe = 0;
+        for(let i = 0; i < d.length; i += 4) summe += d[i] + d[i + 1] + d[i + 2];
+        const hell = summe / (d.length / 4) / 3;
+        if(hell < 8) aendern(kamera, 'fehlt', 'Foto ist schwarz: Einstellungen › ' + (/CriOS/.test(navigator.userAgent) ? 'Chrome' : 'Safari') + ' › Kamera erlauben, Bildschirmzeit prüfen');
+        else aendern(kamera, 'ok', 'Kamera liefert ein Bild (' + (img.naturalWidth || img.width) + ' × ' + (img.naturalHeight || img.height) + ' px)');
+      })
+      .catch(() => aendern(kamera, 'fehlt', 'Foto lässt sich nicht öffnen'))
+      .then(() => { URL.revokeObjectURL(url); gesamt(); });
   });
 
   document.getElementById('kopieren').addEventListener('click', () => {

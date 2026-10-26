@@ -11,6 +11,7 @@ Ausdrucken und neben den Laptop legen. Ruhig bleiben: Es gibt immer einen Plan B
 | Puzzle oder Zähler stimmt nicht | Zur Startseite wechseln oder die Station neu laden. Nichts löschen |
 | App hängt oder stürzt ab | App schließen und neu öffnen. Der letzte Stand ist auf dem iPad gespeichert. Hilft das nicht: laminierte Karte, Foto per Pairdrop (**Plan C**) |
 | Kind ohne Foto-Einwilligung sieht trotzdem die Kamera | Laptop-Seite: In der Gruppen-Tabelle „📷 Name: Foto ok“ antippen (wird gelb), dann Foto-Station neu laden. Ohne Laptop (Plan B/C): kein Foto, Porträt aus `stationen/bilder/ersatz/` nehmen |
+| Kamera bleibt schwarz | iPad-Einstellungen › Safari (bzw. Chrome) › Kamera: „Erlauben“. Bildschirmzeit › Beschränkungen › Kamera prüfen. In Chrome: lieber Safari nehmen |
 | Foto ohne Person / nur Hintergrund | Neues Foto machen: Gesicht groß, heller Hintergrund |
 | Laptop aus oder Akku leer | Netzteil, dann `./server/start.sh`. Bis dahin arbeiten die iPads weiter, die Stempel werden automatisch nachgesendet |
 | Mr Beam nicht erreichbar | Stempel auf dem Laptop sammeln, auf USB-Stick, später lasern. Drucken mit Beispielstempeln, falls vorhanden |
