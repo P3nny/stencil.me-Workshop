@@ -6,6 +6,7 @@ Was vorher noch zu erledigen ist (Canva, Einwilligung, KOMEZ): [merkliste-patric
 
 - [ ] KOMEZ bitten, `https://stencilme-workshop.netlify.app/app/geraetecheck.html` auf einem ihrer iPads zu öffnen und das Ergebnis zu schicken
 - [ ] Vor Ort über den Laptop: `http://<IP>:8000/app/geraetecheck.html` (prüft zusätzlich die Verbindung zum Laptop)
+- [ ] Am Ende des Checks auf jedem iPad „📷 Kamera testen“ antippen und ein Foto machen. Bleibt das Bild schwarz: Einstellungen › Safari › Kamera erlauben
 - [ ] Falls Android-Tablets dazukommen: nicht getestet. Gerätecheck machen, Chrome als Standardbrowser, prüfen, dass der QR-Scan in Chrome öffnet (nicht in Samsung Internet o. Ä.)
 
 ## 1. 5-Minuten-Test im KOMEZ (Plan A möglich?)
