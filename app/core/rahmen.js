@@ -19,7 +19,7 @@
   const KI_ANTWORTEN = [
     { wert: 'generativ', text: 'Generative KI' },
     { wert: 'ki', text: 'Bildbearbeitungs-KI' },
-    { wert: 'programm', text: 'Keine KI, nur ein Programm' },
+    { wert: 'programm', text: 'Computerprogramm ohne KI' },
     { wert: 'analog', text: 'Ohne Computer' },
     { wert: 'weiss-nicht', text: 'Weiß nicht' }
   ];

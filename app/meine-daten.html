@@ -32,7 +32,7 @@
 <script>
 (function(){
   const el = Rahmen.el;
-  const KI_TEXT = { generativ: 'Generative KI', ki: 'Bildbearbeitungs-KI', programm: 'Keine KI, nur ein Programm', analog: 'Ohne Computer', 'weiss-nicht': 'Weiß nicht' };
+  const KI_TEXT = { generativ: 'Generative KI', ki: 'Bildbearbeitungs-KI', programm: 'Computerprogramm ohne KI', analog: 'Ohne Computer', 'weiss-nicht': 'Weiß nicht' };
   const FELDER = { 'svg-code': 'Euer SVG-Code', 'html-code': 'Euer HTML-Code', quiz: 'Quiz', auftraege: 'Eure Aufträge an Claude', feedback: 'Feedbackbogen' };
   const inhalt = document.getElementById('inhalt');
 
@@ -137,7 +137,7 @@
         const url = datei => '/api/meine-datei?gruppe=' + gruppe.id + '&datei=' + encodeURIComponent(datei);
         const bildDateien = d.dateien.filter(f => /\.(jpg|png|svg)$/.test(f));
         const apps = d.dateien.filter(f => /\.html$/.test(f));
-        box.appendChild(el('h2', { text: 'Fotos, Stempel und Bilder (' + bildDateien.length + ')' }));
+        box.appendChild(el('h2', { text: 'Stempel und Bilder (' + bildDateien.length + ')' }));
         box.appendChild(bildDateien.length ? bilder(bildDateien.map(url)) : el('p', { text: 'Noch keine.' }));
         if(apps.length) box.appendChild(el('p', { text: 'Dazu ' + apps.length + (apps.length === 1 ? ' App' : ' Apps') + ' aus „Bild-App vibe coden“.' }));
         box.appendChild(el('h2', { text: 'Wann ihr wo wart' }));

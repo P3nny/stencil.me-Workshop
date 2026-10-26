@@ -143,7 +143,7 @@ function vorschlagAbwarten(page){
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-1-foto.png'), fullPage: true });
   await page.click('button:has-text("Station beendet")');
   pruefe(await page.locator('button:has-text("Fertig")').isDisabled(), '„Fertig“ gesperrt ohne Antworten');
-  await page.click('button.wahl:has-text("Keine KI")');
+  await page.click('button.wahl:has-text("Computerprogramm ohne KI")');
   pruefe(await page.locator('.aufloesung .etikett').count() === 1, 'Auflösung erscheint nach der Antwort');
   await page.locator('button.stern').nth(3).click();
   await page.click('.ki-hilfe summary');
@@ -402,7 +402,7 @@ function vorschlagAbwarten(page){
   await page.fill('#eingabe-regler', 'JavaScript');
   await page.click('button:has-text("Station beendet")');
   pruefe(await page.locator('.aufloesung-text').count() === 1, 'Auflösung zur Regler-Frage');
-  await page.click('button.wahl:has-text("Keine KI")');
+  await page.click('button.wahl:has-text("Computerprogramm ohne KI")');
   await page.locator('button.stern').nth(4).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
