@@ -651,8 +651,11 @@ function vorschlagAbwarten(page){
   const platte = await laptop.evaluate(() => {
     const svg = document.querySelector('#platte-vorschau svg');
     const ids = Array.prototype.map.call(svg.querySelectorAll('[id]'), e => e.id);
-    return { gruppen: svg.children.length, ids: ids.length, eindeutig: new Set(ids).size === ids.length, breite: svg.getAttribute('width') };
+    return { gruppen: svg.children.length, ids: ids.length, eindeutig: new Set(ids).size === ids.length, breite: svg.getAttribute('width'),
+      // Mr Beam (BeamOS) entfernt diese Elemente mit Warnung (Test 02.11.2026)
+      fremd: svg.querySelectorAll('clipPath, mask, use, pattern').length };
   });
+  pruefe(platte.fremd === 0, 'Platte ohne clipPath/mask/use/pattern (Mr Beam kennt sie nicht)');
   pruefe(platte.gruppen >= 2, 'Stempel auf der Platte: ' + platte.gruppen);
   pruefe(platte.eindeutig, 'jede ID auf der Platte nur einmal');
   pruefe(platte.gruppen === 4, 'Platte: zwei Stempel und zwei Porträts (' + platte.gruppen + ')');

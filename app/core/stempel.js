@@ -382,8 +382,9 @@ function buildStampSvg(mask, offsetMm){
   const scale = STEMPEL_MM / WORK_SIZE;
   const off = computeOffsetCutPath(mask, WORK_SIZE, scale, offsetMm);
   const w = off.widthMm.toFixed(3), h = off.heightMm.toFixed(3);
-  const engraveLayer = `<clipPath id="cutClip"><path d="${off.cutPathD}" clip-rule="evenodd"/></clipPath>` +
-    `<path d="${off.cutPathD} ${off.motifPathD}" fill="${ENGRAVE_COLOR}" fill-rule="evenodd" stroke="none" clip-path="url(#cutClip)"/>`;
+  // Kein clipPath: Mr Beam entfernt ihn („nicht unterstützt“, Test 02.11.2026). Nicht nötig,
+  // das Motiv liegt immer innerhalb der Schnittkontur (pixelgleich geprüft).
+  const engraveLayer = `<path d="${off.cutPathD} ${off.motifPathD}" fill="${ENGRAVE_COLOR}" fill-rule="evenodd" stroke="none"/>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}mm" height="${h}mm">` +
     `<g transform="translate(${w},0) scale(-1,1)">` +
     `<g transform="translate(${off.dxMm.toFixed(3)},${off.dyMm.toFixed(3)})">` +

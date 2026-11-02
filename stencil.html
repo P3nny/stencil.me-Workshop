@@ -869,9 +869,9 @@ function buildLaserSvg(variant, mode){
         // Motiv (weiß/kein Job) ist Loch in der blauen Gravurfläche — die Gravurfläche
         // reicht dabei nur bis zum (schmalen) Schnittrand, nicht bis zum vollen Quadrat.
         // Gravurfläche = exakt die rote Schnittkontur (Offset gilt nur für Rot), minus Motivkonturen.
-        // clip-path stellt sicher, dass Blau nie über die rote Linie hinausragt.
-        engraveLayer = `<clipPath id="cutClip"><path d="${off.cutPathD}" clip-rule="evenodd"/></clipPath>` +
-          `<path d="${off.cutPathD} ${motifPathD}" fill="${engraveColor}" fill-rule="evenodd" stroke="none" clip-path="url(#cutClip)"/>`;
+        // Kein clip-path: Mr Beam entfernt clipPath („nicht unterstützt“, Test 02.11.2026).
+        // Nicht nötig, das Motiv liegt immer innerhalb der Schnittkontur.
+        engraveLayer = `<path d="${off.cutPathD} ${motifPathD}" fill="${engraveColor}" fill-rule="evenodd" stroke="none"/>`;
       } else {
         // Motiv selbst ist die blaue Gravurfläche
         engraveLayer = `<path d="${motifPathD}" fill="${engraveColor}" fill-rule="evenodd" stroke="none"/>`;
