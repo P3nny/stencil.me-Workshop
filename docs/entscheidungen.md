@@ -164,6 +164,8 @@ Ergänzt 25.10.2026 (Patricia):
 - **Schnittlinie geglättet** wie beim Sticker (53 statt ca. 1365 Ecken): Der Schnitt ging nicht ganz durch, Stempel mussten herausgebrochen werden, Holz splitterte
 - **Kein `clipPath` in der Stempel-SVG:** Mr Beam meldet „Nicht unterstützte Elemente in SVG: clipPath … wurden entfernt“. Der Clip war überflüssig (pixelgleich ohne). Test prüft: kein `clipPath`, `mask`, `use`, `pattern` auf der Platte
 - **IP bleibt `192.168.0.30`** (`Gast-KOMEZ`, laut Medientechniker): QR-Karten werden laminiert. Fallback: QR-Seite vorab als PDF speichern und auf einem 2. Laptop am großen Bildschirm zeigen (`/qr` ist absichtlich nur am Ubuntu-Laptop erreichbar)
+- **Stationen frei nach „Bild bearbeiten“:** Pflicht nacheinander nur Anmeldung → Foto → Bild bearbeiten (stencil.me). Alle anderen Pflicht- und Claude-Stationen haben `braucht: ["stencilme"]`, auch Hintergrund (vorher nach Körpererkennung), Vibe Coding und Stempeldruck (vorher nach Lasercutter). Lasercutter behält den Vorrang im Vorschlag. Stempeldruck wartet weiter auf „📣 Fertig, abholen“ (`wartetAuf`), Vibe Coding wird weiter bevorzugt, sobald „Wird gelasert“ kommt. Bonus bleibt wie bisher (Sticker ab 8, dann Feedbackbogen, dann Porträt)
+- **Alle iPads ins WLAN `Gast-KOMEZ`:** Aus einem anderen KOMEZ-WLAN erreicht ein iPad den Laptop nicht
 
 ---
 

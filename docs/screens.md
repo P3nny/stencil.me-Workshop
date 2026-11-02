@@ -25,6 +25,7 @@ Arbeitsplan für den Bau der Stationen-App. Patricia beschreibt jeden Screen, Cl
 - 26 Jugendliche gleichzeitig am Laser sind zu viel. Sie sollen nacheinander ankommen. Auch andere Stationen bauen aufeinander auf.
 - **Gebaut:** Jede Station hat in den Daten `braucht: [...]` (Voraussetzungen) und `plaetze` (wie viele Paare gleichzeitig). Die App schlägt nur Stationen vor, deren Voraussetzungen erfüllt sind und die noch Platz haben. Optionale Stationen nur, wenn keine andere frei ist.
 - **Ergänzt (25.10.):** stencil.me und Lasercutter haben Vorrang (alle fangen mit Station 1–3 an). Gruppen auf dem Weg zählen als besetzt. Gesperrte Station: Vorschlag statt Sackgasse. Volle Station: Hinweis „Wartet kurz oder geht zu …“ und „Wir sind trotzdem dran“. Details: [stationen/README.md](../stationen/README.md).
+- **Geändert (02.11.):** Nacheinander sind nur Anmeldung → Foto → Bild bearbeiten Pflicht. Danach sind alle Pflicht- und Claude-Stationen frei (`braucht: ["stencilme"]`). Bonus bleibt wie bisher.
 - **Zählung (Stand 24.10. spät):** 12 Pflichtstationen für „x von 12“ und das Puzzle (seit Station Berufe). Dazu 2 optionale Stationen (Claude: KI-Selbstporträt, vibe coding) und 3 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen, Lasercut-Porträt), die nicht mitzählen.
 
 ## Gerüst (gebaut, Branch `feature/geruest`)
@@ -109,7 +110,7 @@ Beschreibung von Patricia:
 - Pro Person: KI stellt das Foto frei (Karomuster = durchsichtig), Hintergrund aus sechs gemeinfreien Bildern wählen, „Bild an den Laptop schicken“. Erst wenn beide Bilder abgeschickt sind, geht „Station beendet“
 - Hintergründe (Public Domain, Lizenzen in `stationen/bilder/hintergruende/README.md`): Erdaufgang (NASA), Die große Welle (Hokusai), Sternennacht (van Gogh), Dschungel mit Tiger (Rousseau), Komposition 8 (Kandinsky), Tausende Galaxien (Hubble)
 - Freiwillige Frage „Wo hat die KI beim Freistellen Fehler gemacht?“ (heller Rand um die Person ist so ein Fehler)
-- Kommt nach der Körpererkennung: `braucht: ["foto", "koerpererkennung"]`. Solange es die Station Körpererkennung nicht gibt, zählt nur das Foto
+- ~~Kommt nach der Körpererkennung~~ Seit 02.11.: frei nach „Bild bearbeiten“, `braucht: ["stencilme"]` wie alle Pflicht- und Claude-Stationen
 - Findet die KI keine Person: Hinweis, Station kann trotzdem beendet werden
 
 Beschreibung von Patricia:
