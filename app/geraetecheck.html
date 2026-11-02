@@ -144,14 +144,21 @@
         const laden = (performance.now() - start) / 1000;
         return Personen.bildAusUrl('/docs/test-foto.jpg').then(img => {
           const s2 = performance.now();
-          return net.segmentPerson(Personen.verkleinert(img, 1024), { internalResolution: 'medium', segmentationThreshold: 0.4 }).then(seg => {
-            const rechnen = (performance.now() - s2) / 1000;
+          const opt = { internalResolution: 'medium', segmentationThreshold: 0.4 };
+          // zwei Fotos: Ist das zweite viel schneller, hat das Aufwärmen nicht gegriffen
+          return net.segmentPerson(Personen.verkleinert(img, 1024), opt).then(() => {
+            const rechnen1 = (performance.now() - s2) / 1000;
+            const s3 = performance.now();
+            return net.segmentPerson(Personen.verkleinert(img, 1024), opt).then(seg => ({ seg: seg, rechnen1: rechnen1, rechnen2: (performance.now() - s3) / 1000 }));
+          }).then(r => {
+            const seg = r.seg;
+            const rechnen = Math.max(r.rechnen1, r.rechnen2);
             let summe = 0;
             for(let i = 0; i < seg.data.length; i++) summe += seg.data[i];
             const gefunden = summe / seg.data.length > 0.02;
             // „Laden“ enthält das einmalige Vorbereiten (Personen.netz rechnet einmal zum Aufwärmen)
             eintrag('KI Personenerkennung (Foto, Stempel)', !gefunden ? 'fehlt' : rechnen < 8 && laden < 30 ? 'ok' : 'warn',
-              'Modell laden und vorbereiten ' + laden.toFixed(1) + ' s (einmal pro Seite), ein Foto ' + rechnen.toFixed(1) + ' s' + (gefunden ? '' : ', Person NICHT gefunden'));
+              'Modell laden und vorbereiten ' + laden.toFixed(1) + ' s (einmal pro Seite), erstes Foto ' + r.rechnen1.toFixed(1) + ' s, zweites Foto ' + r.rechnen2.toFixed(1) + ' s' + (gefunden ? '' : ', Person NICHT gefunden'));
           });
         });
       })
