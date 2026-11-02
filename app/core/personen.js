@@ -22,9 +22,12 @@
   // stürzen vor allem wegen vollem Speicher ab
   const TEXTUR_SCHWELLE_BYTES = 0;
   // Der erste Aufruf auf einer Seite ist sehr langsam (Grafikchip wird vorbereitet, auf einem
-  // iPad 14 s gemessen, danach ein Bruchteil). Darum gleich nach dem Laden einmal mit einem
-  // winzigen leeren Bild rechnen, dann wartet nicht das Kind beim ersten Foto.
-  const AUFWAERM_PX = 64;
+  // iPad 14 s gemessen, danach ein Bruchteil). Darum gleich nach dem Laden einmal rechnen,
+  // dann wartet nicht das Kind beim ersten Foto. TF.js baut die Grafikchip-Programme sonst
+  // für jede Bildgröße neu (KOMEZ-iPad 02.11.: 11 s pro Foto trotz Aufwärmen mit 64 px).
+  // Darum Bildgrößen als Variablen (WEBGL_USE_SHAPES_UNIFORMS) und Aufwärmen in Fotogröße
+  // (Hochformat, wie verkleinert(foto, 1024) aus der iPad-Kamera).
+  const AUFWAERM_B = 768, AUFWAERM_H = 1024;
   let netzPromise = null;
   let netzArt = null;
 
@@ -45,6 +48,7 @@
     netzPromise = (window.tf ? Promise.resolve() : skriptLaden('/vendor/tfjs/tf.min.js'))
       .then(() => {
         try{ tf.env().set('WEBGL_DELETE_TEXTURE_THRESHOLD', TEXTUR_SCHWELLE_BYTES); }catch(err){ console.error(err); }
+        try{ tf.env().set('WEBGL_USE_SHAPES_UNIFORMS', true); }catch(err){ console.error(err); }
         return window.bodyPix ? null : skriptLaden('/vendor/body-pix/body-pix.min.js');
       })
       .then(() => bodyPix.load({
@@ -64,7 +68,8 @@
 
   function aufwaermen(net){
     const c = document.createElement('canvas');
-    c.width = c.height = AUFWAERM_PX;
+    c.width = AUFWAERM_B;
+    c.height = AUFWAERM_H;
     return net.segmentPerson(c, { internalResolution: 'medium', segmentationThreshold: 0.4 })
       .catch(err => console.error(err)); // ohne Aufwärmen geht es auch, nur langsamer
   }
