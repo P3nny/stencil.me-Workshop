@@ -5,6 +5,8 @@ Ausdrucken und neben den Laptop legen. Ruhig bleiben: Es gibt immer einen Plan B
 | Wenn … | dann … |
 | --- | --- |
 | iPads finden die Seite auf dem Laptop nicht | Laptop im richtigen WLAN? Terminal-Fenster mit dem Server offen? Sonst `./server/start.sh` neu starten. Hilft das nicht: **Plan B**, Netlify-QR-Code zeigen |
+| QR-Code muss auf den großen Bildschirm (Laptop-Seite nicht zeigbar) | QR-PDF auf dem 2. Laptop im Vollbild öffnen (vorher gespeichert, siehe Aufbau-Checkliste Abschnitt 2) |
+| Mr Beam: Schnitt nicht ganz durch | Platte nicht bewegen, Datei noch einmal laden, nur Rot (Schnitt) lasern, Blau weglassen (noch nicht ausprobiert). Nicht herausbrechen, das Holz splittert |
 | iPad zeigt „… noch nicht beim Laptop“ | Nichts tun: Alles ist auf dem iPad gespeichert, die App sendet von selbst nach, sobald der Laptop wieder erreichbar ist |
 | Laptop-Seite zeigt pinken Neustart-Hinweis | Terminal: Server mit Strg+C beenden, `./server/start.sh` neu starten. Die iPads arbeiten weiter |
 | Claude-Stationen: „KI nicht erreichbar“ | Die Stationen zeigen Beispiele und lassen sich trotzdem beenden. Sie sind optional: Gruppe zu einer anderen Station schicken |

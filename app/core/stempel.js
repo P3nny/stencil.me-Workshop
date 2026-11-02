@@ -6,7 +6,10 @@
 // stencil.html behält bis nach dem Test am 02.11.2026 seine eigene Kopie (Rückfallebene).
 (function(){
 const WORK_SIZE = 480; // px Arbeitsraster (quadratisch)
-const STEMPEL_MM = 50;
+// Breite des Arbeitsrasters in mm (Motiv ohne Rand). 50 → 40 mm am 02.11.2026: 3 Stempel
+// mit 50 mm brauchten 27 Min. auf dem Mr Beam (fast alles Gravur), zu lang für 18 Kinder.
+// Gilt auch für Sticker und Porträt, weil alle drei denselben Rand (autoOffset) nutzen.
+const STEMPEL_MM = 40;
 const DESPECKLE_PASSES = 2;
 const ENGRAVE_COLOR = '#1e4fd6'; // Blau = Gravieren
 const CUT_COLOR = '#d6291e';     // Rot = Schneiden
@@ -382,13 +385,17 @@ function buildStampSvg(mask, offsetMm){
   const scale = STEMPEL_MM / WORK_SIZE;
   const off = computeOffsetCutPath(mask, WORK_SIZE, scale, offsetMm);
   const w = off.widthMm.toFixed(3), h = off.heightMm.toFixed(3);
-  const engraveLayer = `<clipPath id="cutClip"><path d="${off.cutPathD}" clip-rule="evenodd"/></clipPath>` +
-    `<path d="${off.cutPathD} ${off.motifPathD}" fill="${ENGRAVE_COLOR}" fill-rule="evenodd" stroke="none" clip-path="url(#cutClip)"/>`;
+  // Kein clipPath: Mr Beam entfernt ihn („nicht unterstützt“, Test 02.11.2026). Nicht nötig,
+  // das Motiv liegt immer innerhalb der Schnittkontur (pixelgleich geprüft).
+  // Schnittlinie geglättet wie beim Sticker: Die Pixeltreppe hatte ca. 1500 Ecken, an denen
+  // der Laser bremst; der Schnitt ging am 02.11.2026 nicht ganz durch.
+  const cutD = glattePfadeD(off.cutLoops, scale, STICKER_SCHNITT_GENAU_MM);
+  const engraveLayer = `<path d="${cutD} ${off.motifPathD}" fill="${ENGRAVE_COLOR}" fill-rule="evenodd" stroke="none"/>`;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}mm" height="${h}mm">` +
     `<g transform="translate(${w},0) scale(-1,1)">` +
     `<g transform="translate(${off.dxMm.toFixed(3)},${off.dyMm.toFixed(3)})">` +
     engraveLayer +
-    `<path d="${off.cutPathD}" fill="none" stroke="${CUT_COLOR}" stroke-width="0.15" stroke-linejoin="round"/>` +
+    `<path d="${cutD}" fill="none" stroke="${CUT_COLOR}" stroke-width="0.15" stroke-linejoin="round"/>` +
     `</g></g></svg>`;
   return { svg: svg, cutLoops: off.cutLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
 }

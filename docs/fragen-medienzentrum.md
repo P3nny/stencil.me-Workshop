@@ -35,7 +35,7 @@
 
 ## Mr Beam
 
-- [ ] Welches Modell? (z. B. Mr Beam II, dreamcut, Mr Beam 5)
+- [x] Welches Modell? **dreamcut [x]/[S]** (02.11.)
 - [ ] Ist er im KOMEZ-WLAN? Unter welcher Adresse öffnet sich die Oberfläche?
 - [ ] Wer hat Zugang zur Oberfläche (Benutzer, Passwort)?
 
