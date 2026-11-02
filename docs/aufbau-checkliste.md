@@ -40,6 +40,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 ## 3. Aufbau im Raum
 
 - [ ] Laptop ins KOMEZ-WLAN, Netzteil anschließen, Laptop **aufgeklappt** lassen
+- [ ] **Alle iPads ins WLAN `Gast-KOMEZ`** (wie der Laptop, sonst lädt die Seite endlos). Erscheint die Anmeldeseite nicht: in Safari `http://captive.apple.com` öffnen, sonst WLAN › (i) › „Automatisch anmelden“ an, „Private WLAN-Adresse“ aus, neu verbinden
 - [ ] Terminal im Repo-Ordner öffnen: `./server/start.sh`
   - Der Browser öffnet die Laptop-Seite mit QR-Code und Stempel-Liste.
   - Der Laptop geht nicht in den Ruhezustand, solange das Terminal-Fenster offen ist.
@@ -55,7 +56,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Die Gruppen melden sich auf der Startseite an (Vornamen) und scannen an jeder Station den QR-Code.
 - [ ] **Erste Laserplatte früh starten**, sobald etwa 4 Stempel da sind (eine Reihe). Laserzeit grob: eine Reihe Stempel ca. 20–25 Min. (am 02.11. gemessen: 3 Stempel mit 50 mm = 27 Min., jetzt 40 mm, neu messen).
 - [ ] Mr-Beam-Einstellungen: Material „Sperrholz Pappel 3 mm“. Gravur (Blau) 2 Durchgänge, Schnitt (Rot) wie im Preset.
-  - **Schnitt geht nicht durch:** Platte liegt nicht flach (verzogenes Sperrholz beschweren oder aussortieren). Sonst beim Schnitt 1 Durchgang mehr einstellen. Stempel nicht herausbrechen, sondern den Schnitt wiederholen: Platte nicht bewegen, dieselbe Datei noch einmal laden und nur Rot (Schnitt) lasern, Blau in der Mr-Beam-Oberfläche weglassen. *Noch nicht ausprobiert.*
+  - **Schnitt geht nicht durch** (am 02.11. auch mit glatter Linie und Preset 3 mm): der Reihe nach prüfen: Materialstärke in der Mr-Beam-Oberfläche wirklich 3 mm (bestimmt den Fokus)? Platte flach (verzogenes Sperrholz beschweren)? Linse sauber? Dann beim Schnitt **1 Durchgang mehr** einstellen, reicht das nicht, die Schnittgeschwindigkeit um etwa 20 % senken. Erst an einem Probestempel testen, Werte hier eintragen: Durchgänge __ , Geschwindigkeit __ , Intensität __ . Stempel nicht herausbrechen, sondern den Schnitt wiederholen: Platte nicht bewegen, dieselbe Datei noch einmal laden und nur Rot (Schnitt) lasern, Blau in der Mr-Beam-Oberfläche weglassen. *Noch nicht ausprobiert.*
   - **Gravur zu langsam:** Falls die Mr-Beam-Oberfläche einen Linienabstand anbietet, an einem Probestempel 0,15 mm statt 0,1 mm testen. Druckt der Stempel noch sauber, so lassen.
 - [ ] Neue Stempel erscheinen auf der Laptop-Seite unter „Stempel → A4-Holzplatte“: anhaken, „Platte zusammenstellen“, „Platte herunterladen (SVG)“, in der Mr-Beam-Oberfläche hochladen, 2× gravieren.
 - [ ] Unter „Letzte Platten“: „📣 Wird gelasert“ und „📣 Fertig, abholen“ an die Gruppen schicken.
