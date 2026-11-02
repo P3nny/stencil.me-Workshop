@@ -71,8 +71,7 @@
   ],
   "datenschutz": "Das Freistellen passiert auf dem iPad. Dein fertiges Bild mit dem neuen Hintergrund bleibt auch auf dem iPad. Am Ende löscht ihr es selbst.",
   "braucht": [
-    "foto",
-    "koerpererkennung"
+    "stencilme"
   ],
   "plaetze": 3
 }

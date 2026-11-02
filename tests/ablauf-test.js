@@ -75,6 +75,20 @@ function ereignis(api, gruppe, art, station, nr){
   pruefe(vorrang.nachStencil.join() === 'lasercutter', 'danach immer Lasercutter (' + vorrang.nachStencil + ')');
   pruefe(vorrang.laserVoll.indexOf('lasercutter') < 0 && vorrang.laserVoll.length > 0, 'Lasercutter voll (2 Paare): andere Station (' + vorrang.laserVoll.length + ' verschiedene)');
 
+  console.log('Frei nach Foto und Bild bearbeiten (Patricia, 02.11.2026)');
+  const frei = await page.evaluate(() => Stationen.laden().then(liste => {
+    const f = { stationen: { foto: { status: 'fertig' }, stencilme: { status: 'fertig' } } };
+    const offen = st => Stationen.voraussetzungen(liste, st).every(b => Stationen.istFertig(f, b));
+    return {
+      zu: liste.filter(st => !st.bonus && st.id !== 'foto' && st.id !== 'stencilme' && !offen(st)).map(st => st.id),
+      bonusOffen: liste.filter(st => st.bonus && offen(st)).map(st => st.id),
+      nurFotoOffen: liste.filter(st => st.id !== 'foto' && st.id !== 'stencilme' && Stationen.voraussetzungen(liste, st).every(b => b === 'foto')).map(st => st.id)
+    };
+  }));
+  pruefe(!frei.zu.length, 'alle Pflicht- und Claude-Stationen offen' + (frei.zu.length ? ', gesperrt: ' + frei.zu.join(', ') : ''));
+  pruefe(!frei.bonusOffen.length, 'Bonus bleibt gesperrt' + (frei.bonusOffen.length ? ': ' + frei.bonusOffen.join(', ') : ''));
+  pruefe(!frei.nurFotoOffen.length, 'ohne Bild bearbeiten ist nur stencil.me offen' + (frei.nurFotoOffen.length ? ', auch: ' + frei.nurFotoOffen.join(', ') : ''));
+
   console.log('Unterwegs: zwei Gruppen, Linoldruck hat einen Platz');
   const liste = await page.evaluate(() => Stationen.laden().then(l => l.map(s => s.id)));
   const ausser = keep => liste.filter(id => keep.indexOf(id) < 0);
@@ -125,11 +139,11 @@ function ereignis(api, gruppe, art, station, nr){
 
   console.log('Station gerade voll: Hinweis, aber keine Sperre');
   await ereignis(api, 'b1b1b1b1b1b1', 'checkin', 'druck-linol', '04');
-  await anmelden(page, 'a1a1a1a1a1a1', fertig(['foto']));
+  await anmelden(page, 'a1a1a1a1a1a1', fertig(['foto', 'stencilme']));
   await page.goto(BASE + '/app/station.html?id=druck-linol');
   await page.waitForSelector('text=Hier ist gerade eine andere Gruppe.');
   await page.waitForSelector('text=Wartet kurz oder geht zu:');
-  pruefe((await page.locator('.gross-text strong').textContent()) === 'Bild bearbeiten', 'Ausweg: Bild bearbeiten (stencil.me, Vorrang)');
+  pruefe((await page.locator('.gross-text strong').textContent()) === 'Lasercutter', 'Ausweg: Lasercutter (Vorrang)');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-ablauf-voll.png'), fullPage: true });
   await page.click('text=Wir sind trotzdem dran');
   await page.waitForSelector('text=Foto von der Postkarte');
