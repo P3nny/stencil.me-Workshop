@@ -20,7 +20,7 @@ Was vorher noch zu erledigen ist (Canva, Einwilligung, KOMEZ): [merkliste-patric
 - [ ] „Foto aufnehmen“ testen, Seite einmal neu laden, „Ergebnis kopieren“
 - [ ] Ergebnis ins Testprotokoll in [entscheidungen.md](entscheidungen.md) eintragen
 - [ ] Mr-Beam-Oberfläche vom Laptop aus öffnen
-- [ ] IP-Adresse des Laptops notieren und beim nächsten Besuch vergleichen: Bleibt sie gleich, können die QR-Karten laminiert werden
+- [x] IP-Adresse des Laptops notieren: `192.168.0.30` im `Gast-KOMEZ`, bleibt laut Medientechniker gleich (02.11.). QR-Karten können laminiert werden
 
 Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testseite auf dem iPad funktioniert, aber nicht, ob das KOMEZ-WLAN mitspielt.
 
@@ -30,6 +30,8 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Netlify-Version ist aktuell (Plan B)
 - [ ] [notfallkarte.md](notfallkarte.md) ausgedruckt, laminierte Karten dabei (Plan C)
 - [ ] QR-Codes für die Stationen: Server starten, `http://localhost:8000/qr` öffnen, Adresse wählen, drucken. Nur gültig für diese Adresse: Bekommt der Laptop im KOMEZ eine andere IP, dort neu drucken (oder Netlify-Version für Plan B mitnehmen)
+- [ ] Fallback für den großen Bildschirm: Auf `/qr` einmal mit `http://192.168.0.30:8000/` und einmal mit der Netlify-Adresse „Drucken“ → „Als PDF sichern“. Beide PDFs auf den 2. Laptop legen. `/qr` selbst öffnet sich nur am Ubuntu-Laptop
+- [ ] **Probestempel am Mr Beam** (eine Platte mit 2–4 Stempeln): Zeit notieren, prüfen, ob der Schnitt durchgeht (siehe Abschnitt 4)
 - [ ] USB-Stick dabei
 - [ ] Claude-Stationen (optional): Guthaben in der Claude Console prüfen, Laptop-Seite zeigt „KI (claude-sonnet-5-5): heute …“ (sonst `./server/einrichten.sh`). Braucht Internet im KOMEZ-WLAN. Ohne KI zeigen die Stationen Beispiele
 - [ ] Einwilligungen der Erziehungsberechtigten liegen vor (Fotos im Workshop, Claude-Stationen), `Datenschutz.md` ist vorab verschickt
@@ -51,7 +53,10 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 ## 4. Während des Workshops
 
 - [ ] Die Gruppen melden sich auf der Startseite an (Vornamen) und scannen an jeder Station den QR-Code.
-- [ ] **Erste Laserplatte früh starten**, sobald etwa 6 Stempel da sind. Die anderen kommen auf die zweite Platte.
+- [ ] **Erste Laserplatte früh starten**, sobald etwa 4 Stempel da sind (eine Reihe). Laserzeit grob: eine Reihe Stempel ca. 20–25 Min. (am 02.11. gemessen: 3 Stempel mit 50 mm = 27 Min., jetzt 40 mm, neu messen).
+- [ ] Mr-Beam-Einstellungen: Material „Sperrholz Pappel 3 mm“. Gravur (Blau) 2 Durchgänge, Schnitt (Rot) wie im Preset.
+  - **Schnitt geht nicht durch:** Platte liegt nicht flach (verzogenes Sperrholz beschweren oder aussortieren). Sonst beim Schnitt 1 Durchgang mehr einstellen. Stempel nicht herausbrechen, sondern den Schnitt wiederholen: Platte nicht bewegen, dieselbe Datei noch einmal laden und nur Rot (Schnitt) lasern, Blau in der Mr-Beam-Oberfläche weglassen. *Noch nicht ausprobiert.*
+  - **Gravur zu langsam:** Falls die Mr-Beam-Oberfläche einen Linienabstand anbietet, an einem Probestempel 0,15 mm statt 0,1 mm testen. Druckt der Stempel noch sauber, so lassen.
 - [ ] Neue Stempel erscheinen auf der Laptop-Seite unter „Stempel → A4-Holzplatte“: anhaken, „Platte zusammenstellen“, „Platte herunterladen (SVG)“, in der Mr-Beam-Oberfläche hochladen, 2× gravieren.
 - [ ] Unter „Letzte Platten“: „📣 Wird gelasert“ und „📣 Fertig, abholen“ an die Gruppen schicken.
 - [ ] Sticker (Bonus): „Folie zusammenstellen“, dann die Plotter-Schritte auf der Laptop-Seite.

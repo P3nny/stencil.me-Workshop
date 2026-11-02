@@ -94,7 +94,7 @@ Beschreibung von Patricia:
   - 5 mm Rand, 3 mm Abstand (Patricia, 24.10.). Bei ca. 45 × 52 mm passen 20 Stempel auf eine Platte
   - Wer zuerst fertig war, kommt zuerst auf die Platte. Was nicht passt, steht als „nächste Platte“ da
   - Nach dem Download sind die Stempel grau und nicht mehr angehakt. Einzelne Stempel: nur diesen anhaken
-  - In der Mr-Beam-Oberfläche: Gravur (Blau) 2 Durchgänge, Schnitt (Rot). *Am 02.11. testen, ob BeamOS die zusammengesetzte Datei richtig liest*
+  - In der Mr-Beam-Oberfläche: Gravur (Blau) 2 Durchgänge, Schnitt (Rot). *Getestet 02.11.: BeamOS liest die Platte (seit dem Test ohne `clipPath`). Schnitt ging mit 3-mm-Preset nicht ganz durch, siehe [aufbau-checkliste.md](aufbau-checkliste.md) Abschnitt 4. Stempel seit 02.11. 40 mm*
 
 Beschreibung von Patricia:
 

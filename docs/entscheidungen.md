@@ -21,9 +21,9 @@ Wir bauen mit diesen Annahmen weiter. Stellt sich eine als falsch heraus, greift
 | iPads im KOMEZ-WLAN können den Laptop erreichen | Laptop durfte ins WLAN, Pairdrop lief zwischen Geräten | Plan B (Netlify + Teilen) |
 | Safari auf den iPads ist nutzbar | Pairdrop lief im Browser | Plan C (Karten) |
 | iPads sind älter, wenig Arbeitsspeicher (2–3 GB) | Abstürze bei der Bildverarbeitung im letzten Workshop | — darum: Bilder klein rechnen, Fehler abfangen |
-| iPadOS-Version unbekannt | — | vorsichtige Syntax (kein `?.`, `??`), keine neuen Web-APIs voraussetzen |
+| ~~iPadOS-Version unbekannt~~ | **02.11.:** KOMEZ-iPad 820 × 1180 (iPad Air 4/5 oder iPad 10. Gen.), iPadOS 27.2, Safari | ES2017 bleibt trotzdem | vorsichtige Syntax (kein `?.`, `??`), keine neuen Web-APIs voraussetzen |
 | ~~„Zum Home-Bildschirm“ evtl. gesperrt~~ | entschieden 24.10.: wird nicht benutzt | App läuft im normalen Safari-Tab |
-| Mr Beam ist vom Ubuntu-Laptop erreichbar | laut Patricia möglich, Test am 02.11. | Pairdrop vom Laptop an das KOMEZ-MacBook am Mr Beam |
+| ~~Mr Beam ist vom Ubuntu-Laptop erreichbar~~ | **bestätigt 02.11.:** Platte vom Ubuntu-Laptop direkt gelasert (Mr Beam dreamcut [x]/[S]) | Pairdrop vom Laptop an das KOMEZ-MacBook am Mr Beam |
 
 Tests laufen mit Patricias Ubuntu-Laptop und ihrem eigenen iPad. Das ist eine Annäherung: Die KOMEZ-iPads können älter und langsamer sein.
 
@@ -158,6 +158,13 @@ Ergänzt 25.10.2026 (Patricia):
 - **Datenschutz:** `Datenschutz.md` im Stil der Stationstexte, Kontakt patricia.ennenbach@bildung.koeln.de, Löschung auf dem Laptop am Ende des Workshops (seit 25.10.)
 - **Android-Tablets:** nicht getestet. Wahrscheinlich lauffähig (Tests laufen auch in Chromium), Risiko: QR-Scan öffnet einen anderen Browser mit eigenem Speicher
 
+## 10. Entscheidungen vom 02.11.2026 (Test vor Ort)
+
+- **Stempel 40 mm statt 50 mm** (`STEMPEL_MM` in `app/core/stempel.js`, gilt auch für Sticker und Porträt, weil alle denselben Rand nutzen). Grund: 3 Stempel mit 50 mm brauchten 27 Min. auf dem Mr Beam, fast alles Gravur (2×). Hochgerechnet auf 18 Teilnehmer:innen ca. 2,7 h, mit 40 mm geschätzt ca. 1,8 h (noch nicht gemessen)
+- **Schnittlinie geglättet** wie beim Sticker (53 statt ca. 1365 Ecken): Der Schnitt ging nicht ganz durch, Stempel mussten herausgebrochen werden, Holz splitterte
+- **Kein `clipPath` in der Stempel-SVG:** Mr Beam meldet „Nicht unterstützte Elemente in SVG: clipPath … wurden entfernt“. Der Clip war überflüssig (pixelgleich ohne). Test prüft: kein `clipPath`, `mask`, `use`, `pattern` auf der Platte
+- **IP bleibt `192.168.0.30`** (`Gast-KOMEZ`, laut Medientechniker): QR-Karten werden laminiert. Fallback: QR-Seite vorab als PDF speichern und auf einem 2. Laptop am großen Bildschirm zeigen (`/qr` ist absichtlich nur am Ubuntu-Laptop erreichbar)
+
 ---
 
 ## Testprotokoll
@@ -171,3 +178,4 @@ Ergänzt 25.10.2026 (Patricia):
 | 02.11.2026, 12:28 | **KOMEZ-iPad** (820 × 1180, Pixeldichte 2: iPad Air 4/5 oder iPad 10. Gen.), iPadOS 27.2 | Safari 27.2 | Netlify | Gerätecheck alles ok (Kamera 4032 × 3024, 41 GB frei für Websites). **KI zu langsam:** Modell laden 19,7 s, ein Foto **11,1 s** trotz Aufwärmen. Ursache: TF.js baut die Grafikchip-Programme für jede Bildgröße neu, das Aufwärmen lief nur mit 64 px |
 | 02.11.2026, 12:49–12:56 | KOMEZ-iPad | Safari 27.2 | WLAN `Gast-KOMEZ`, Laptop `http://192.168.0.30:8000` | **Plan A geht im KOMEZ-WLAN.** 2 Durchläufe Anmeldung → Foto → stencil.me → Lasercutter, alles beim Laptop angekommen (3 Stempel). Platte zusammengestellt, heruntergeladen, im Mr Beam gelasert |
 | 02.11.2026, 13:19 | KOMEZ-iPad | Safari 27.2 | `Gast-KOMEZ`, Laptop `:8000`, Branch `fix/ki-aufwaermen-bildgroesse` | Gerätecheck **alles ok**, Laptop antwortet. KI: Modell laden und vorbereiten 1,6 s, erstes Foto **0,6 s**, zweites 0,4 s (vorher 11,1 s). Bildgrößen als Variablen (`WEBGL_USE_SHAPES_UNIFORMS`), Aufwärmen in Fotogröße 768 × 1024 (`app/core/personen.js`) |
+| 02.11.2026, nachmittags | KOMEZ-iPad, Ubuntu-Laptop, Mr Beam dreamcut [x]/[S] | Safari 27.2 | `Gast-KOMEZ`, Laptop `:8000` | **Mr Beam direkt vom Ubuntu-Laptop** gelasert, 3 mm Pappelsperrholz (Preset 3 mm). 3 Stempel (50 mm, eine Reihe) **27 Min.**, fast alles Gravur 2×. **Schnitt nicht ganz durch**, Holz splitterte beim Herausbrechen. Mr Beam meldet beim Laden `clipPath` als nicht unterstützt. „📣 Wird gelasert / Fertig“ kommen auf dem iPad an. Weitere Stationen auf dem iPad angetippt (Rückmeldung folgt). IP bleibt laut Medientechniker gleich |
