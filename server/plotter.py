@@ -28,11 +28,12 @@ TEST = os.environ.get("STENCILME_PLOTTER_TEST") == "1"
 EXT_PYTHON = os.environ.get("EXT_PYTHON", "/usr/bin/python3")   # System-Python (Extension braucht numpy/usb)
 EXT = os.environ.get("EXT", os.path.expanduser("~/.config/inkscape/extensions/sendto_silhouette.py"))
 PEN = dict(pressure=int(os.environ.get("PEN_PRESSURE", 5)), speed=int(os.environ.get("PEN_SPEED", 5)))
-# Stickerpapier komplett durchschneiden (Patricia 08.11.: 14/3/Tiefe 4 ritzte nur an). Noch nicht am Gerät getestet.
-CUT = dict(pressure=int(os.environ.get("CUT_PRESSURE", 26)), speed=int(os.environ.get("CUT_SPEED", 2)))
-CUT_PASSES = int(os.environ.get("CUT_PASSES", 3))
+# Stickerpapier mit Trägerpapier (Tests 08.11.): 26/Tiefe 8 nur obere Schicht, 33/10/4 durch die Matte,
+# 30/10/6: Sticker lässt sich herauslösen, Trägerpapier fast durch.
+CUT = dict(pressure=int(os.environ.get("CUT_PRESSURE", 30)), speed=int(os.environ.get("CUT_SPEED", 2)))
+CUT_PASSES = int(os.environ.get("CUT_PASSES", 6))
 CUT_TOOL = os.environ.get("CUT_TOOL", "autoblade")
-CUT_DEPTH = int(os.environ.get("CUT_DEPTH", 8))
+CUT_DEPTH = int(os.environ.get("CUT_DEPTH", 10))
 ENDPOS = os.environ.get("ENDPOS", "start")
 JOIN_MM = float(os.environ.get("JOIN_MM", 0.7))
 SIMPLIFY_MM = float(os.environ.get("SIMPLIFY_MM", 0.05))
