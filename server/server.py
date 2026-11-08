@@ -524,7 +524,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def end_headers(self):
         # Always load the newest app version after a restart
-        if self.path.split("?")[0] in PUBLIC_FILES or self.path.startswith(("/app/", "/stationen/")):
+        # /server/: Laptop-Seite, bogen.js, QR, Auswertung (sonst nimmt der Browser die alte bogen.js)
+        if self.path.split("?")[0] in PUBLIC_FILES or self.path.startswith(("/app/", "/stationen/", "/server/")):
             self.send_header("Cache-Control", "no-cache")
         super().end_headers()
 
