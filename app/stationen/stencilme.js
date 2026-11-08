@@ -170,7 +170,7 @@
         })
         .then(() => {
           zeigeCanvas(3, Stempel.bilder.maske(ergebnis.mask));
-          felder[3].notiz.textContent = 'Heller als ' + ergebnis.schwelle + ' wird weiß, dunkler wird schwarz';
+          felder[3].notiz.textContent = 'Heller als ' + ergebnis.schwelle + ' wird weiß, dunkler wird schwarz. Dazu wird schwarz, was dunkler ist als seine Umgebung (Augen, Mund).';
           // Stempel-Porträt fürs Puzzle in der Kopfleiste
           return art.puzzle ? Speicher.dateiSchreiben('portraet:' + index, Bild.alsPng(Stempel.bilder.maske(ergebnis.mask))) : null;
         })
