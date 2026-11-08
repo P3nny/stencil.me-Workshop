@@ -57,10 +57,11 @@
       art.info ? el('p', { text: art.info }) : null,
       el('div', { klasse: 'schritte-reihe' }, felder.map(f => f.fig)),
       randBox,
+      // Stempel gefällt nicht (auch beim Promi-Porträt): zurück zur Foto-Station, nur im Pflichtweg.
+      // Steht vor „fertig“: Erst das Foto klären, dann den Stempel abschließen (Patricia, 08.11.)
+      art.name === 'Stempel' ? el('a', { klasse: 'knopf-link', href: '/app/station.html?id=foto&nochmal' + Rahmen.testZusatz(), text: '📷 Stempel gefällt dir nicht? Zurück zum Foto' }) : null,
       sendenKnopf,
-      sendStatus,
-      // Stempel gefällt nicht (auch beim Promi-Porträt): zurück zur Foto-Station, nur im Pflichtweg
-      art.name === 'Stempel' ? el('a', { klasse: 'knopf-link', href: '/app/station.html?id=foto&nochmal' + Rahmen.testZusatz(), text: '📷 Stempel gefällt dir nicht? Zurück zum Foto' }) : null
+      sendStatus
     ]);
 
     let ergebnis = null; // Rechenergebnis aus Stempel.berechnen
