@@ -6,13 +6,13 @@
   "datenweg": "online",
   "schritte": [
     "Vibe coding heißt: Ihr sagt einer KI (Claude), was eine App können soll, und sie schreibt den Code. So ist auch stencil.me entstanden.",
-    "Füllt den Auftrag aus: Welchen Effekt soll eure App haben? Mit einer erwachsenen Person dürft ihr auch frei beschreiben, was eure App können soll.",
+    "Füllt den Auftrag aus: Was soll eure App mit dem Foto machen? Mit einer erwachsenen Person dürft ihr auch frei beschreiben, was eure App können soll.",
     "Tippt auf „App bauen lassen“ und schaut zu, wie der Code entsteht (etwa eine Minute). Eure App nimmt automatisch euer Foto.",
     "Testet eure App mit eurem Foto.",
     "Vergleicht: Welche Schritte aus stencil.me findet ihr in eurer App wieder?"
   ],
   "ki": {
-    "satz": "Baue eine App, die unser Foto {effekt}. Die App heißt {name}. Die Seite ist {farben}. {regler}",
+    "satz": "Baue eine App, die unser Foto {effekt} verwandelt. {tun}. Die Seite ist {farben}.",
     "proGruppe": 3,
     "proGruppeFrei": 6,
     "mindestApps": 1,
@@ -23,37 +23,56 @@
         "optionen": [
           {
             "id": "warhol",
-            "name": "Pop-Art wie Warhol",
-            "text": "in vier knallbunte Bilder wie bei Andy Warhol verwandelt"
+            "name": "in Pop-Art wie bei Warhol",
+            "text": "in vier knallbunte Kopien nebeneinander, wie bei Andy Warhol,"
           },
           {
             "id": "pixel",
-            "name": "Pixel-Art",
-            "text": "in Pixel-Art mit großen, sichtbaren Blöcken verwandelt"
-          },
-          {
-            "id": "farbe",
-            "name": "Farben verrückt",
-            "text": "mit verrückten Farben verfremdet, zum Beispiel mit vertauschten oder umgekehrten Farben"
+            "name": "in Pixel-Art",
+            "text": "in Pixel-Art mit großen, sichtbaren Blöcken"
           },
           {
             "id": "comic",
-            "name": "Comic-Look",
-            "text": "wie einen Comic aussehen lässt, mit dicken schwarzen Linien und wenigen Farben"
+            "name": "in einen Comic",
+            "text": "in einen Comic mit dicken schwarzen Linien und wenigen Farben"
           },
           {
             "id": "stencil",
-            "name": "Schablone (Stencil)",
-            "text": "in eine Schwarz-Weiß-Schablone (Stencil) verwandelt"
+            "name": "in eine Schablone (Stencil)",
+            "text": "in eine Schablone (Stencil) nur aus Schwarz und Weiß"
+          },
+          {
+            "id": "farbe",
+            "name": "in verrückte Farben",
+            "text": "in verrückte Farben, zum Beispiel vertauscht oder umgekehrt,"
           }
         ]
       },
       {
-        "id": "name",
-        "frage": "Name der App",
-        "art": "text",
-        "maxLaenge": 24,
-        "start": "Mein Foto-Zauber"
+        "id": "tun",
+        "frage": "Was man tun kann",
+        "optionen": [
+          {
+            "id": "regler",
+            "name": "Mit einem Regler macht man den Effekt stärker oder schwächer",
+            "text": "Mit einem Regler macht man den Effekt sofort stärker oder schwächer"
+          },
+          {
+            "id": "farbknoepfe",
+            "name": "Mit Knöpfen wählt man verschiedene Farben",
+            "text": "Mit drei oder vier Knöpfen wählt man verschiedene Farbsets für den Effekt"
+          },
+          {
+            "id": "malen",
+            "name": "Mit dem Finger malt man auf dem Bild",
+            "text": "Mit dem Finger malt man auf dem fertigen Bild (Touch auf dem iPad)"
+          },
+          {
+            "id": "zufall",
+            "name": "Ein Knopf mischt alles zufällig neu",
+            "text": "Ein Knopf mischt Farben und Einstellungen zufällig neu, jedes Mal anders"
+          }
+        ]
       },
       {
         "id": "farben",
@@ -61,47 +80,31 @@
         "optionen": [
           {
             "id": "pink",
-            "name": "Pink und Schwarz",
+            "name": "pink und schwarz",
             "text": "pink und schwarz"
           },
           {
             "id": "bunt",
-            "name": "Bunt",
+            "name": "bunt",
             "text": "bunt und fröhlich"
           },
           {
             "id": "dunkel",
-            "name": "Dunkel",
+            "name": "dunkel mit Neonfarben",
             "text": "dunkel mit Neonfarben"
           },
           {
             "id": "pastell",
-            "name": "Pastell",
+            "name": "in Pastellfarben",
             "text": "in sanften Pastellfarben"
-          }
-        ]
-      },
-      {
-        "id": "regler",
-        "frage": "Regler",
-        "optionen": [
-          {
-            "id": "mit",
-            "name": "mit Regler",
-            "text": "Mit einem Regler kann man die Stärke des Effekts sofort ändern."
-          },
-          {
-            "id": "ohne",
-            "name": "ohne Regler",
-            "text": ""
           }
         ]
       }
     ],
     "start": {
       "effekt": "warhol",
-      "farben": "pink",
-      "regler": "mit"
+      "tun": "regler",
+      "farben": "pink"
     },
     "beispiele": [
       {
