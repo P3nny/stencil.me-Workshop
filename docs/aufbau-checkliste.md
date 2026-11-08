@@ -51,6 +51,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Laptop-Seite: Anzahl Schüler:innen eintragen
 - [ ] Laptop-Seite: Vornamen von den Rückmeldezetteln eintragen (ohne Foto → Promi-Porträt, ohne KI → Beispiele)
 - [ ] Laptop-Bildschirm mit dem QR-Code zu den iPads drehen
+- [ ] Browser am Laptop: Einstellungen → Downloads → „Jedes Mal fragen, wo gespeichert werden soll“ an. Platten und Folien direkt in `server/daten/stempel/` speichern (nicht in die Tages-Unterordner): „Alle Daten löschen“ löscht sie dort mit, `~/Downloads` nicht
 - [ ] Pro iPad: Einstellungen → Safari → Erweitert → Website-Daten: alte Daten der Workshop-Adresse löschen (Fotos der letzten Gruppe)
 - [ ] Pro iPad: alle alten Safari-Tabs schließen, QR-Code in **Safari** öffnen (nicht „Zum Home-Bildschirm“), ein Testfoto machen, danach mit `?test` → „Alles zurücksetzen“
 - [ ] Schnelltest aller Stationen (nur Testgerät): `…/app/station.html?id=foto&test&frei` öffnet jede Station ohne Voraussetzungen, oben rechts „Station öffnen …“. Danach „Alles zurücksetzen“ und den Tab schließen: `&frei` gehört auf kein Kinder-iPad.
@@ -80,6 +81,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Auswertung kurz durchsehen: Stehen im Feedback Namen, die der Laptop nicht kennt (Spitznamen)?
 - [ ] Laptop-Seite „Für die Workshop-Verbesserung sichern (ohne Namen)“ → Ordner `archiv/workshops/<Datum>/`
 - [ ] Am Ende des Workshops (steht so in `Datenschutz.md`): Laptop-Seite „Alle Daten löschen“
+- [ ] In `~/Downloads` nach `platte-*.svg` und `folie-*.svg` schauen und löschen (falls doch dort gelandet)
 - [ ] Pro iPad prüfen: steht „✓ Gelöscht“? Sonst Startseite → „Andere Gruppe? Neu anmelden“ oder Website-Daten in Safari löschen. Alle Safari-Tabs schließen
 - [ ] Laptop-Seite: Löschen-Freigabe zurücknehmen (sonst sieht die nächste Gruppe den Hinweis sofort)
 - [ ] Terminal-Fenster schließen (Server aus)
