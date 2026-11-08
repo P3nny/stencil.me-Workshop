@@ -440,16 +440,13 @@ function vorschlagAbwarten(page){
   console.log('Station Bild-App vibe coden (Server im Testmodus, ohne Claude)');
   await page.goto(BASE + '/app/station.html?id=vibe-coding&test');
   await page.waitForSelector('.vibe-auftrag select');
-  pruefe(await page.locator('.vibe-auftrag select').count() === 3 && await page.locator('.vibe-auftrag input').count() === 1, 'Lückentext: 3 Auswahlfelder, 1 kurzes Textfeld (App-Name)');
-  pruefe((await page.locator('.vibe-auftrag').textContent()).indexOf('Baue eine App, die unser Foto') === 0, 'Lückentext in lesbarem Deutsch');
-  await page.locator('.vibe-auftrag input').first().fill('Ada<script>');
+  pruefe(await page.locator('.vibe-auftrag select').count() === 3 && await page.locator('.vibe-auftrag input').count() === 0, 'Lückentext: 3 Auswahlfelder (Effekt, was man tun kann, Farben), kein Textfeld');
+  const satzText = await page.locator('.vibe-auftrag').evaluate(el => Array.from(el.childNodes).map(n => n.tagName === 'SELECT' ? n.options[n.selectedIndex].text : n.textContent).join(''));
+  pruefe(satzText.indexOf('Baue eine App, die unser Foto in Pop-Art wie bei Warhol verwandelt. Mit einem Regler') === 0, 'Lückentext in lesbarem Deutsch: ' + satzText);
   await page.click('button:has-text("App bauen lassen")');
-  await page.waitForSelector('text=Buchstaben, Zahlen und Satzzeichen');
-  pruefe(true, 'verbotene Zeichen im Freitext: Laptop lehnt ab');
-  await page.locator('.vibe-auftrag input').first().fill('Pop-Maschine');
-  await page.click('button:has-text("App bauen lassen")');
-  await page.waitForSelector('.vibe-phasen');
-  pruefe(true, 'Fortschritt mit Schritten');
+  // Im Testmodus ist die App manchmal schon fertig, bevor die Schritte erscheinen
+  await page.waitForSelector('.vibe-phasen, .vibe-karte iframe');
+  pruefe(true, 'Fortschritt mit Schritten oder schon fertig');
   await page.waitForSelector('.vibe-karte iframe');
   pruefe(true, 'App gebaut und angezeigt');
   pruefe(/Token rein/.test(await page.locator('.vibe-karte .ki-verbrauch').textContent()), 'Token, Kosten und Strom unter der App');
