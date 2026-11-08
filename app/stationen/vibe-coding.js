@@ -124,10 +124,19 @@
         const quelltext = el('pre', { klasse: 'vibe-code', text: app.html });
         quelltext.hidden = true;
         const codeKnopf = el('button', { type: 'button', klasse: 'secondary klein', text: 'Code ansehen', onclick: () => { quelltext.hidden = !quelltext.hidden; } });
-        return el('figure', { klasse: 'vibe-karte' }, [
+        // Groß öffnen: Nur Klassen wechseln, das iframe bleibt an seinem Platz (kein Neuladen, Einstellungen bleiben)
+        let karte = null;
+        function gross(an){
+          karte.classList.toggle('vibe-gross', an);
+          document.body.classList.toggle('vibe-offen', an);
+        }
+        const grossKnopf = el('button', { type: 'button', klasse: 'secondary klein', text: '⛶ Groß öffnen', onclick: () => gross(true) });
+        const zurueckKnopf = el('button', { type: 'button', klasse: 'vibe-zurueck', text: '✕ Zurück', onclick: () => gross(false) });
+        karte = el('figure', { klasse: 'vibe-karte' }, [
           el('figcaption', {}, [el('strong', { text: beispiel ? 'Beispiel-App (vorher erzeugt)' : 'App ' + app.nr }), el('span', { text: ' „' + app.auftrag + '“' })]),
-          rahmen, KiVerbrauch.zeile(el, app.verbrauch), codeKnopf, quelltext
+          zurueckKnopf, rahmen, KiVerbrauch.zeile(el, app.verbrauch), grossKnopf, codeKnopf, quelltext
         ]);
+        return karte;
       }
 
       // ---- Freier Auftrag mit erwachsener Person ----

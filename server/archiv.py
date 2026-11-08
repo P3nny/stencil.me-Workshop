@@ -23,6 +23,41 @@ def namen_entfernen(text, namen):
     return text
 
 
+# Im Archiv öffnet man eine App einzeln, ohne Workshop-Seite: dann kommt kein Foto per postMessage.
+# Dieser Knopf erscheint nur dann und schickt ein selbst gewähltes Foto genauso an die App.
+# Das Foto bleibt im Browser (Content-Security-Policy ohne Netz). Auf dem iPad gibt es den Knopf nicht.
+FOTO_KNOPF = """<script>(function(){
+  var da = false;
+  window.addEventListener('message', function(e){ if(e.data && e.data.bild) da = true; });
+  setTimeout(function(){
+    if(da && window.parent !== window) return;
+    var feld = document.createElement('input');
+    feld.type = 'file'; feld.accept = 'image/*'; feld.style.display = 'none';
+    var knopf = document.createElement('button');
+    knopf.type = 'button'; knopf.textContent = '📷 Foto wählen';
+    knopf.style.cssText = 'position:fixed;top:8px;right:8px;z-index:99999;font:600 16px system-ui,sans-serif;' +
+      'padding:10px 16px;border:2px solid #000;background:#fff;color:#000;border-radius:8px;cursor:pointer;';
+    knopf.onclick = function(){ feld.click(); };
+    feld.onchange = function(){
+      var datei = feld.files && feld.files[0];
+      if(!datei) return;
+      var leser = new FileReader();
+      leser.onload = function(){ window.postMessage({ bild: leser.result }, '*'); };
+      leser.readAsDataURL(datei);
+      feld.value = '';
+    };
+    document.body.appendChild(feld);
+    document.body.appendChild(knopf);
+  }, 1500);
+})();</script>"""
+
+
+def foto_knopf(html):
+    """FOTO_KNOPF vor </body> einsetzen, sonst ans Ende."""
+    stelle = html.lower().rfind("</body>")
+    return html[:stelle] + FOTO_KNOPF + html[stelle:] if stelle >= 0 else html + FOTO_KNOPF
+
+
 def ordner_anlegen(wurzel):
     """Neuer Ordner mit Datum und Uhrzeit, nie einen alten überschreiben."""
     basis = os.path.join(wurzel, datetime.datetime.now().strftime("%Y-%m-%d_%H%M"))
@@ -72,12 +107,12 @@ def sichern(wurzel, gruppen, auswertung, ki_eintraege, auswertung_html):
                        "stationen": sorted(stationen.values(), key=lambda s: s["checkin"] or s["fertig"])})
     schreiben("ablauf.json", als_json(ablauf))
 
-    # Apps aus dem Vibe Coding, abgeschottet wie früher in der Mappe
+    # Apps aus dem Vibe Coding, abgeschottet wie früher in der Mappe, mit Foto-Knopf zum Ausprobieren
     nr = 0
     for g in gruppen:
         for _, html in g["apps"]:
             nr += 1
-            schreiben("apps/app-%02d_gruppe-%d.html" % (nr, nummer[g["gruppe"]]), mappe.abgeschottet(html))
+            schreiben("apps/app-%02d_gruppe-%d.html" % (nr, nummer[g["gruppe"]]), foto_knopf(mappe.abgeschottet(html)))
 
     # Aufträge (Apps) und Prompts (KI-Selbstporträts) aus dem KI-Protokoll, Gruppe als Nummer
     def eintrag(e, felder):
