@@ -21,6 +21,7 @@ import http.server
 import json
 import os
 import posixpath
+import random
 import re
 import shutil
 import socket
@@ -53,6 +54,10 @@ WERKSTATT_LOG = os.path.join(DATA_ROOT, "werkstatt-protokoll.jsonl")  # Platten,
 werkstatt_lock = threading.Lock()
 # Vor dem Löschen am Ende: Apps, Auswertung und Ablauf ohne Namen (server/archiv.py)
 ARCHIV_DIR = os.path.abspath(os.environ.get("STENCILME_ARCHIV") or os.path.join(REPO_DIR, "archiv", "workshops"))
+# Feedbackbögen: anonym, getrennt von den Gruppen (ohne Gruppe, Name, Uhrzeit; zufällige Reihenfolge), Patricia 08.11.2026
+FEEDBACK_FILE = os.path.join(DATA_ROOT, "feedback.json")
+MAX_FEEDBACK_LEN = 500
+feedback_lock = threading.Lock()
 MESSAGES_FILE = os.path.join(DATA_ROOT, "nachrichten.json")  # Laptop -> Gruppen („wird gelasert“, „fertig“)
 MAX_MESSAGE_LEN = 300
 messages_lock = threading.Lock()
@@ -340,6 +345,31 @@ def station_occupancy(ohne=""):
     return counts
 
 
+def read_feedback():
+    """Anonyme Feedbackbögen: {"ids": [...], "boegen": [...]}."""
+    try:
+        with open(FEEDBACK_FILE, encoding="utf-8") as fh:
+            data = json.load(fh)
+        if isinstance(data, dict) and isinstance(data.get("ids"), list) and isinstance(data.get("boegen"), list):
+            return data
+    except (OSError, ValueError):
+        pass
+    return {"ids": [], "boegen": []}
+
+
+def feedback_felder():
+    """Erlaubte Felder eines Bogens: die Fragen aus stationen/feedback.json, bei Ja/Nein dazu <id>Warum."""
+    felder = set()
+    for s in load_stations():
+        if s.get("id") == "feedback":
+            for f in s.get("feedback", []):
+                felder.add(f.get("id"))
+                if f.get("art") == "janein":
+                    felder.add(f.get("id") + "Warum")
+    felder.discard(None)
+    return felder
+
+
 def load_stations():
     """Stationen aus stationen/*.json (für Titel und Typ in der Auswertung)."""
     try:
@@ -419,7 +449,9 @@ def evaluation():
             if daten.get("kiTyp"):
                 st["kiTyp"][daten["kiTyp"]] = st["kiTyp"].get(daten["kiTyp"], 0) + 1
             if sid == "feedback":
-                feedback.extend(p for p in (daten.get("antworten") or {}).get("feedback", []) if isinstance(p, dict))
+                # Alte Bögen (vor dem 08.11.) hingen an der Gruppe: nur ohne Namen übernehmen
+                feedback.extend({k: v for k, v in p.items() if k != "name"} for p in (daten.get("antworten") or {}).get("feedback", []) if isinstance(p, dict))
+    feedback.extend(read_feedback()["boegen"])
     stats = []
     for s in per_station.values():
         n = len(s["sterne"])
@@ -616,6 +648,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.receive_stamp(urllib.parse.parse_qs(parsed.query))
         if parsed.path == "/api/ereignis":
             return self.receive_event()
+        if parsed.path == "/api/feedback":
+            return self.receive_feedback()
         if parsed.path == "/api/ki-bild":
             return self.ki_bild()
         if parsed.path == "/api/ki-app":
@@ -642,7 +676,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             for d in (DATA_DIR, STICKER_DIR, PLOTTER_DIR, GROUPS_DIR):
                 if os.path.isdir(d):
                     shutil.rmtree(d)
-            for f in (KI_LOG_FILE, MESSAGES_FILE, WERKSTATT_LOG):
+            for f in (KI_LOG_FILE, MESSAGES_FILE, WERKSTATT_LOG, FEEDBACK_FILE):
                 if os.path.exists(f):
                     os.remove(f)
             with frei_lock:
@@ -671,6 +705,32 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if length <= 0 or length > limit:
             return None
         return self.rfile.read(length)
+
+    def receive_feedback(self):
+        """Ein Feedbackbogen, anonym: nur ID (gegen Doppelte) und Antworten. Keine Gruppe, kein Name, keine Zeit."""
+        body = self.read_body(MAX_EVENT_BYTES)
+        if body is None:
+            return self.send_json({"ok": False, "fehler": "leer oder zu groß"}, 413)
+        try:
+            data = json.loads(body.decode("utf-8"))
+        except ValueError:
+            return self.send_json({"ok": False, "fehler": "kein JSON"}, 400)
+        if not isinstance(data, dict) or not ID_RE.match(str(data.get("id", ""))) or not isinstance(data.get("bogen"), dict):
+            return self.send_json({"ok": False, "fehler": "ungültiger Bogen"}, 400)
+        felder = feedback_felder()
+        bogen = {k: v.strip()[:MAX_FEEDBACK_LEN] for k, v in data["bogen"].items() if k in felder and isinstance(v, str) and v.strip()}
+        with feedback_lock:
+            alle = read_feedback()
+            if data["id"] in alle["ids"]:
+                return self.send_json({"ok": True, "doppelt": True})
+            alle["ids"].append(data["id"])
+            random.shuffle(alle["ids"])
+            # zufällige Stelle: Die Reihenfolge verrät nicht, wann (und damit von wem) ein Bogen kam
+            alle["boegen"].insert(random.randint(0, len(alle["boegen"])), bogen)
+            os.makedirs(DATA_ROOT, exist_ok=True)
+            write_atomic(FEEDBACK_FILE, json.dumps(alle, ensure_ascii=False, indent=1).encode("utf-8"))
+        print("Feedbackbogen empfangen (anonym)")
+        return self.send_json({"ok": True, "doppelt": False})
 
     def receive_event(self):
         body = self.read_body(MAX_EVENT_BYTES)

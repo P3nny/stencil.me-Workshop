@@ -20,13 +20,19 @@
     {
       "id": "wort",
       "art": "wort",
-      "text": "So war der Tag für mich (ein Wort):",
+      "text": "So war der Workshop für mich (ein Wort):",
       "pflicht": true
     },
     {
       "id": "anders",
       "art": "text",
-      "text": "Das würde ich beim nächsten Mal anders machen:",
+      "text": "Das sollte Penny beim nächsten Mal anders machen:",
+      "pflicht": true
+    },
+    {
+      "id": "empfehlen",
+      "art": "janein",
+      "text": "Würdest du den Workshop anderen Schulklassen empfehlen?",
       "pflicht": true
     },
     {
@@ -40,7 +46,7 @@
     "art": "feedback"
   },
   "fragen": [],
-  "datenschutz": "Euer Feedback geht mit euren Vornamen an den Laptop. Penny liest es, um den Workshop besser zu machen.",
+  "datenschutz": "Euer Feedback geht ohne Namen an den Laptop und liegt dort getrennt von euren anderen Antworten. Penny sieht nicht, von wem es ist.",
   "braucht": [
     "sticker"
   ],

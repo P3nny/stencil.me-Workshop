@@ -54,7 +54,7 @@ Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Fo
 | Kunst-Quiz                         | Foto eures Lieblingswerks                        | Quiz-Ergebnis, euer Satz                                  | –                                             |
 | Berufe                             | –                                                | Euer Wunschberuf                                          | –                                             |
 | Bonus: Sticker                     | –                                                | Dein Sticker und dein Name                                | –                                             |
-| Feedback                           | –                                                | Dein Feedback mit deinem Vornamen                         | –                                             |
+| Feedback                           | –                                                | Dein Feedback, ohne Namen, getrennt von euren Daten       | –                                             |
 | Bonus 2: Lasercut-Porträt          | –                                                | Dein Porträt und dein Name                                | –                                             |
 | Nach jeder Station                 | –                                                | Deine Sterne und deine Antwort auf die KI-Frage           | –                                             |
 

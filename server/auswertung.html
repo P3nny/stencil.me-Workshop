@@ -63,10 +63,13 @@
   <p class="hint" id="fbAnzahl"></p>
   <h2 style="font-size:1rem">Welche Station hat am besten gefallen?</h2>
   <table><tbody id="lieblinge"></tbody></table>
-  <h2 style="font-size:1rem;margin-top:16px">So war der Tag (ein Wort)</h2>
+  <h2 style="font-size:1rem;margin-top:16px">So war der Workshop (ein Wort)</h2>
   <div class="woerter" id="woerter"></div>
-  <h2 style="font-size:1rem;margin-top:16px">Das würde ich beim nächsten Mal anders machen</h2>
+  <h2 style="font-size:1rem;margin-top:16px">Das sollte Penny beim nächsten Mal anders machen</h2>
   <ul class="saetze" id="anders"></ul>
+  <h2 style="font-size:1rem;margin-top:16px">Anderen Schulklassen empfehlen?</h2>
+  <p id="empfehlen"></p>
+  <ul class="saetze" id="empfehlenWarum"></ul>
   <h2 style="font-size:1rem;margin-top:16px">Was hat am meisten überrascht?</h2>
   <ul class="saetze" id="ueberrascht"></ul>
 </div>
@@ -178,6 +181,10 @@
     woerter.innerHTML = "";
     fb.forEach(function (p) { if (p.wort) { var s = document.createElement("span"); s.textContent = p.wort; woerter.appendChild(s); } });
     liste("anders", fb.map(function (p) { return p.anders; }).filter(Boolean));
+    var ja = fb.filter(function (p) { return p.empfehlen === "ja"; }).length;
+    var nein = fb.filter(function (p) { return p.empfehlen === "nein"; }).length;
+    document.getElementById("empfehlen").textContent = (ja + nein) ? "Ja: " + ja + " · Nein: " + nein : "–";
+    liste("empfehlenWarum", fb.filter(function (p) { return p.empfehlenWarum && p.empfehlen; }).map(function (p) { return (p.empfehlen === "ja" ? "Ja: " : "Nein: ") + p.empfehlenWarum; }));
     liste("ueberrascht", fb.map(function (p) { return p.ueberrascht; }).filter(Boolean));
   }
 
