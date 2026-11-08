@@ -27,6 +27,14 @@
       const url = '/api/stempel?id=' + eintrag.id + '&gruppe=' + eintrag.gruppe + '&name=' + encodeURIComponent(eintrag.name) + (eintrag.sorte ? '&art=' + eintrag.sorte : '');
       return mitZeitlimit(fetch(url, { method: 'POST', headers: { 'Content-Type': 'image/svg+xml' }, body: eintrag.svg }).then(antwortPruefen));
     }
+    // Feedbackbogen: anonym, ohne Gruppe und ohne Zeit (Patricia, 08.11.2026)
+    if(eintrag.art === 'feedback'){
+      return mitZeitlimit(fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: eintrag.id, bogen: eintrag.bogen })
+      }).then(antwortPruefen));
+    }
     // Fotos bleiben seit 25.10.2026 auf dem iPad. Alte Einträge aus Tests einfach verwerfen.
     if(eintrag.art === 'datei') return Promise.resolve();
     return mitZeitlimit(fetch('/api/ereignis', {
@@ -91,6 +99,8 @@
     // Sticker für den Schneideplotter: gleicher Weg, eigener Ordner auf dem Laptop
     sticker: (gruppe, name, svg) =>
       hinzufuegen({ art: 'stempel', sorte: 'sticker', gruppe: gruppe, name: name, svg: svg }),
+    // Feedbackbogen einer Person, anonym (kein Feld gruppe, kein Name)
+    feedback: bogen => hinzufuegen({ art: 'feedback', bogen: bogen }),
     // Lasercut-Porträt (Bonus 2): kommt zu den Stempeln auf die Holzplatte
     portraet: (gruppe, name, svg) =>
       hinzufuegen({ art: 'stempel', sorte: 'portraet', gruppe: gruppe, name: name, svg: svg }),

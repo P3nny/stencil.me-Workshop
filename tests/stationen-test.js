@@ -582,6 +582,8 @@ function vorschlagAbwarten(page){
     const bogen = page.locator('.feedback-person').nth(i);
     await bogen.locator('button.wahl').first().click();
     await bogen.locator('input.feedback-wort').fill(wort);
+    await bogen.locator('button.wahl >> text="Ja"').click();
+    await bogen.locator('textarea').nth(1).fill('Laser ist toll');
     // Bo schreibt einen Namen ins Feedback: Beim Sichern muss er verschwinden
     await bogen.locator('textarea').first().fill(i ? 'Mit Ada mehr Zeit am Laser' : 'Mehr Zeit am Laser');
   }
@@ -617,6 +619,9 @@ function vorschlagAbwarten(page){
     pruefe(!fotosLaptop.length, 'kein JPG/PNG im Ordner der Gruppe (' + fotosLaptop.join(', ') + ')');
     pruefe((await page.request.post(BASE + '/api/datei?id=aaaaaaaaaaaa&gruppe=' + g.gruppe + '&station=foto', { data: fs.readFileSync(FOTO) })).status() === 404, 'Laptop nimmt keine Fotos mehr an');
     pruefe(g.antworten.lasercutter && g.antworten.lasercutter.antworten.frage === 'Wie heiß wird der Laser?', 'Antwort angekommen');
+    pruefe(!JSON.stringify(g.antworten.feedback || {}).match(/spannend|laut|Laser ist toll/), 'Feedback liegt nicht im Ordner der Gruppe');
+    const fbDatei = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'archiv', 'testdaten', 'feedback.json'), 'utf8'));
+    pruefe(fbDatei.boegen.length === 2 && fbDatei.boegen.every(b => !b.name && !b.gruppe && !b.zeit && b.empfehlen === 'ja' && b.empfehlenWarum === 'Laser ist toll'), 'Feedback anonym getrennt gespeichert: ohne Name, Gruppe, Zeit, mit Empfehlung');
     const svgCode = g.antworten['pixel-vektor'] && g.antworten['pixel-vektor'].antworten['svg-code'];
     pruefe(!!svgCode && svgCode.indexOf('polygon') > 0, 'SVG-Code auf dem Laptop gespeichert');
     const htmlCode = g.antworten['coding-web'] && g.antworten['coding-web'].antworten['html-code'];
@@ -628,7 +633,9 @@ function vorschlagAbwarten(page){
     await page.goto(BASE + '/');
     await page.click('a:has-text("Meine Daten")');
     await page.waitForSelector('text=Auf Pennys Laptop');
-    await page.waitForSelector('text=Feedbackbogen');
+    // Feedback ist anonym und liegt nicht bei der Gruppe: kein „Feedbackbogen“ unter „Auf Pennys Laptop“
+    await page.waitForSelector('text=Wie heiß wird der Laser?');
+    pruefe(!/Feedbackbogen/.test(await page.locator('.panel').nth(2).textContent()), 'Meine Daten: Feedback nicht bei der Gruppe auf dem Laptop');
     // Laptop: keine Fotos mehr, nur Stempel, Porträts, Sticker und KI-Bilder (je 2)
     await page.waitForFunction(() => document.querySelectorAll('.panel')[2].querySelectorAll('.daten-bilder img').length >= 8);
     pruefe(await page.locator('text=Wie heiß wird der Laser?').count() === 1, 'Meine Daten: Antworten vom Laptop');
