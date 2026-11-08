@@ -58,7 +58,9 @@
       el('div', { klasse: 'schritte-reihe' }, felder.map(f => f.fig)),
       randBox,
       sendenKnopf,
-      sendStatus
+      sendStatus,
+      // Stempel gefällt nicht (auch beim Promi-Porträt): zurück zur Foto-Station, nur im Pflichtweg
+      art.name === 'Stempel' ? el('a', { klasse: 'knopf-link', href: '/app/station.html?id=foto&nochmal' + Rahmen.testZusatz(), text: '📷 Stempel gefällt dir nicht? Zurück zum Foto' }) : null
     ]);
 
     let ergebnis = null; // Rechenergebnis aus Stempel.berechnen
@@ -220,8 +222,6 @@
       // Nacheinander rechnen: zwei Fotos gleichzeitig wären zu viel für alte iPads
       personen.reduce((kette, p) => kette.then(p.rechnen), Promise.resolve());
       return api.el('div', { klasse: 'stempel-station' }, [
-        // Foto gefällt nicht (auch beim Promi-Porträt): zurück zur Foto-Station, nur im Pflichtweg
-        id === 'stempel' ? api.el('a', { klasse: 'knopf-link secondary', href: '/app/station.html?id=foto&nochmal' + Rahmen.testZusatz(), text: '📷 Foto gefällt nicht? Zurück zum Foto' }) : null,
         api.el('p', { klasse: 'legende' }, ARTEN[id].legende.map(l => api.el('span', { klasse: 'legende-eintrag' }, [
           api.el('span', { klasse: 'farbe ' + l[0] }), api.el('span', { text: l[1] })
         ])))
