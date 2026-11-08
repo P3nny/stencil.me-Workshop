@@ -47,7 +47,12 @@
     var platziert = lesen(o.schluessel + "-platziert", "[]");
     var liste = [];
     var gesehen = null;
-    var aktuell = null; // { svg, pfade, stuecke }
+    var aktuell = null; // { svg, pfade, stuecke, belegt }
+    // Wie weit der Bogen im Gerät schon benutzt ist (nur Koordinaten, keine Namen):
+    // Cursor des Regal-Packens und die Flächen der Stücke darauf, für die graue Vorschau.
+    var belegt = lesen(o.schluessel + "-belegt", "null") || leerBelegt();
+
+    function leerBelegt() { return { x: o.rand, y: o.rand, zeile: 0, flaechen: [] }; }
 
     function istGewaehlt(pfad) {
       return pfad in auswahl ? auswahl[pfad] : platziert.indexOf(pfad) < 0;
@@ -55,8 +60,10 @@
 
     // Regal-Packen: Reihe für Reihe. Nach dem ersten Stück, das nicht mehr passt, ist Schluss,
     // damit keins von später vorrutscht.
-    function regal(items) {
-      var x = o.rand, y = o.rand, zeile = 0, passt = [], rest = [];
+    // start: wo der angefangene Bogen weitergeht. Höhere Stücke in der angefangenen Reihe
+    // sind kein Problem, die nächste Reihe beginnt unter dem höchsten.
+    function regal(items, start) {
+      var x = start.x, y = start.y, zeile = start.zeile, passt = [], rest = [];
       items.forEach(function (it) {
         if (rest.length) { rest.push(it); return; }
         if (x + it.w > BREITE - o.rand) { x = o.rand; y += zeile + o.abstand; zeile = 0; }
@@ -66,20 +73,35 @@
         x += it.w + o.abstand;
         zeile = Math.max(zeile, it.h);
       });
-      return { passt: passt, rest: rest };
+      return { passt: passt, rest: rest, ende: { x: x, y: y, zeile: zeile } };
     }
 
     // Erst in Ankunftsreihenfolge prüfen, wer passt, dann platzsparend (höchste zuerst)
     function anordnen(items) {
-      var probe = regal(items);
+      var probe = regal(items, belegt);
       var sortiert = probe.passt.map(function (it, i) { return { it: it, i: i }; })
         .sort(function (a, b) { return (b.it.h - a.it.h) || (a.i - b.i); })
         .map(function (p) { return p.it; });
-      var gepackt = regal(sortiert);
-      return { passt: gepackt.passt, rest: gepackt.rest.concat(probe.rest) };
+      var gepackt = regal(sortiert, belegt);
+      return { passt: gepackt.passt, rest: gepackt.rest.concat(probe.rest), ende: gepackt.ende };
     }
 
     function el(id) { return document.getElementById(o.id + "-" + id); }
+
+    function belegtZeigen() {
+      var n = belegt.flaechen.length;
+      el("belegt").textContent = n
+        ? "Im Gerät liegt " + o.bogenEins + " mit " + n + " " + (n > 1 ? o.mehrzahl : o.einzahl) + ". Neue kommen auf den freien Rest."
+        : "Im Gerät liegt " + o.bogenEins + ", noch leer.";
+    }
+
+    // Graue Flächen nur in der Vorschau, nie in der Datei für Laser oder Plotter
+    function grauVorschau(svg) {
+      var grau = belegt.flaechen.map(function (f) {
+        return '<rect x="' + f.x + '" y="' + f.y + '" width="' + f.w + '" height="' + f.h + '" fill="#bbb" stroke="#888" stroke-width="0.5"/>';
+      }).join("");
+      return grau ? svg.replace(/<\/svg>$/, grau + "</svg>") : svg;
+    }
 
     function listeZeigen(daten) {
       liste = daten.stempel;
@@ -133,7 +155,7 @@
       el("layout").hidden = false;
       if (!gewaehlt.length) {
         info.innerHTML = '<p class="warn">Nichts angehakt.</p>';
-        el("vorschau").innerHTML = "";
+        el("vorschau").innerHTML = grauVorschau('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + BREITE + " " + HOEHE + '"></svg>');
         aktuell = null;
         o.bereit(null);
         return Promise.resolve();
@@ -148,10 +170,24 @@
         aktuell = {
           svg: svg,
           pfade: ergebnis.passt.map(function (it) { return it.s.pfad; }),
-          stuecke: ergebnis.passt.map(function (it) { return { name: it.s.name, gruppe: it.s.gruppe, pfad: it.s.pfad }; })
+          stuecke: ergebnis.passt.map(function (it) { return { name: it.s.name, gruppe: it.s.gruppe, pfad: it.s.pfad }; }),
+          belegt: {
+            x: ergebnis.ende.x, y: ergebnis.ende.y, zeile: ergebnis.ende.zeile,
+            flaechen: belegt.flaechen.concat(ergebnis.passt.map(function (it) {
+              return { x: +it.x.toFixed(1), y: +it.y.toFixed(1), w: +it.w.toFixed(1), h: +it.h.toFixed(1) };
+            }))
+          }
         };
-        el("vorschau").innerHTML = svg;
-        var html = "<p><b>" + ergebnis.passt.length + " " + o.mehrzahl + "</b> auf " + o.bogen + ": " +
+        if (!ergebnis.passt.length) {
+          aktuell = null;
+          el("vorschau").innerHTML = grauVorschau(svg);
+          info.innerHTML = '<p class="warn">' + o.bogenGross + " ist voll. Neue einlegen und „" + el("neu").textContent + "“ drücken.</p>";
+          o.bereit(null);
+          return;
+        }
+        el("vorschau").innerHTML = grauVorschau(svg);
+        var html = (belegt.flaechen.length ? "<p>Grau = schon benutzt, die neuen kommen auf den Rest.</p>" : "") +
+          "<p><b>" + ergebnis.passt.length + " " + o.mehrzahl + "</b> auf " + o.bogen + ": " +
           ergebnis.passt.map(function (it) { return it.s.name; }).join(", ") + "</p>";
         if (ergebnis.rest.length) {
           html += '<p class="warn">Passen nicht mehr: ' + ergebnis.rest.map(function (it) { return it.s.name; }).join(", ") +
@@ -169,6 +205,9 @@
       if (!aktuell) return;
       aktuell.pfade.forEach(function (p) { if (platziert.indexOf(p) < 0) platziert.push(p); delete auswahl[p]; });
       schreiben(o.schluessel + "-platziert", platziert);
+      belegt = aktuell.belegt;
+      schreiben(o.schluessel + "-belegt", belegt);
+      belegtZeigen();
       var verlauf = lesen(o.schluessel + "-verlauf", "[]");
       verlauf.unshift({ datei: name, stempel: aktuell.stuecke });
       schreiben(o.schluessel + "-verlauf", verlauf.slice(0, VERLAUF_MAX));
@@ -244,6 +283,14 @@
       schreiben(o.schluessel + "-platziert", platziert);
       laden();
     });
+    el("neu").addEventListener("click", function () {
+      if (belegt.flaechen.length && !window.confirm("Wirklich " + o.bogenNeu + " eingelegt? Dann fängt die Anordnung wieder oben links an.")) return;
+      belegt = leerBelegt();
+      schreiben(o.schluessel + "-belegt", belegt);
+      belegtZeigen();
+      el("layout").hidden = true;
+    });
+    belegtZeigen();
     verlaufZeigen();
     laden();
     setInterval(laden, 5000);
@@ -252,7 +299,9 @@
       platziert = [];
       auswahl = {};
       aktuell = null;
-      try { localStorage.removeItem(o.schluessel + "-verlauf"); localStorage.removeItem(o.schluessel + "-platziert"); } catch (e) { /* egal */ }
+      belegt = leerBelegt();
+      try { ["-verlauf", "-platziert", "-belegt"].forEach(function (k) { localStorage.removeItem(o.schluessel + k); }); } catch (e) { /* egal */ }
+      belegtZeigen();
       el("layout").hidden = true;
       verlaufZeigen();
       laden();

@@ -92,11 +92,14 @@
     <div class="grid" id="platte-grid"></div>
     <div class="hint">Angehakte Stempel kommen auf die Platte: 5 mm Rand, 3 mm Abstand. Wer zuerst fertig war, kommt zuerst dran.</div>
     <button id="platte-bauen" type="button">Platte zusammenstellen</button>
+    <button id="platte-neu" type="button">Neue Platte eingelegt</button>
+    <div class="hint" id="platte-belegt"></div>
     <div class="plate-layout" id="platte-layout" hidden>
       <div class="plate" id="platte-vorschau"></div>
       <div class="plate-info">
         <div id="platte-info"></div>
         <div id="platte-aktionen"></div>
+        <div class="hint">Angefangene Platte nicht verschieben. In der Mr-Beam-Oberfläche die Datei immer an derselben Stelle (A4-Ecke der Platte) ausrichten.</div>
         <div class="hint">In der Mr-Beam-Oberfläche: Datei öffnen, Gravur (Blau) mit <b>2 Durchgängen</b>, dann Schnitt (Rot).</div>
         <div class="hint">Grau = schon auf einer heruntergeladenen Platte, wird nicht mehr angehakt. Ging eine Platte schief:</div>
         <button id="platte-zuruecksetzen" type="button">Alle Stempel wieder anhaken</button>
@@ -113,6 +116,8 @@
     <div class="grid" id="folie-grid"></div>
     <div class="hint">Angehakte Sticker kommen auf die Folie: 8 mm Rand, 4 mm Abstand.</div>
     <button id="folie-bauen" type="button">Folie zusammenstellen</button>
+    <button id="folie-neu" type="button">Neue Folie eingelegt</button>
+    <div class="hint" id="folie-belegt"></div>
     <div class="plate-layout" id="folie-layout" hidden>
       <div class="plate folie" id="folie-vorschau"></div>
       <div class="plate-info">
@@ -241,7 +246,8 @@
   // ---- Holzplatte für den Mr Beam: herunterladen, in BeamOS öffnen ----
   var platte = Bogen.erstellen({
     id: "platte", schluessel: "stencilme-platte", liste: "/api/liste", dateien: "/daten/",
-    einzahl: "Stempel", mehrzahl: "Stempel", haken: "auf die Platte", bogen: "der Platte", naechster: "die nächste Platte",
+    einzahl: "Stempel", mehrzahl: "Stempel", haken: "auf die Platte", bogen: "der Platte",
+    bogenEins: "eine Platte", bogenGross: "Die Platte", bogenNeu: "eine neue Platte", naechster: "die nächste Platte",
     rand: 5, abstand: 3,
     nachrichten: {
       laser: { knopf: "📣 Wird gelasert", text: function (namen) { var s = stuecke(namen, "Stempel", "Stempel"); return s.text + (s.viele ? " werden" : " wird") + " jetzt gelasert. Kommt gern zum Zuschauen!"; } },
@@ -262,7 +268,8 @@
   // ---- Stickerfolie für die Cameo: an den Plotter (Stift, dann Messer) ----
   var folie = Bogen.erstellen({
     id: "folie", schluessel: "stencilme-folie", liste: "/api/sticker", dateien: "/sticker/",
-    einzahl: "Sticker", mehrzahl: "Sticker", haken: "auf die Folie", bogen: "der Folie", naechster: "die nächste Folie",
+    einzahl: "Sticker", mehrzahl: "Sticker", haken: "auf die Folie", bogen: "der Folie",
+    bogenEins: "eine Folie", bogenGross: "Die Folie", bogenNeu: "eine neue Folie", naechster: "die nächste Folie",
     rand: 8, abstand: 4, einzelDownload: true,
     nachrichten: {
       laser: { knopf: "📣 Wird geplottet", text: function (namen) { var s = stuecke(namen, "Sticker", "Sticker"); return s.text + (s.viele ? " werden" : " wird") + " jetzt geplottet. Kommt gern zum Zuschauen!"; } },
@@ -290,7 +297,7 @@
 
   // ---- Plotter Schritt für Schritt (wie die Fotobox, aber mit Knöpfen statt Enter) ----
   var PLOTTER_SCHRITTE = {
-    bereit: { klasse: "", text: ["1. NEUE weiße Stickerfolie auf die Matte, oben links an die Mattenecke.", "2. Marker (0,8 mm) links einsetzen, Matte laden."], knopf: ["Zeichnen starten", "zeichnen"] },
+    bereit: { klasse: "", text: ["1. Stickerfolie (neu oder die angefangene, wie auf der Vorschau) auf die Matte, oben links an die Mattenecke.", "2. Marker (0,8 mm) links einsetzen, Matte laden."], knopf: ["Zeichnen starten", "zeichnen"] },
     zeichnet: { klasse: "laeuft", text: ["Zeichnen läuft …"] },
     gezeichnet: { klasse: "", text: ["3. Marker raus, Messer rein. Matte NICHT herausnehmen."], knopf: ["Schneiden starten", "schneiden"] },
     schneidet: { klasse: "laeuft", text: ["Schneiden läuft …"] },
