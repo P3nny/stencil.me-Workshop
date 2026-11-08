@@ -49,6 +49,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Laptop-Bildschirm mit dem QR-Code zu den iPads drehen
 - [ ] Pro iPad: Einstellungen → Safari → Erweitert → Website-Daten: alte Daten der Workshop-Adresse löschen (Fotos der letzten Gruppe)
 - [ ] Pro iPad: alle alten Safari-Tabs schließen, QR-Code in **Safari** öffnen (nicht „Zum Home-Bildschirm“), ein Testfoto machen, danach mit `?test` → „Alles zurücksetzen“
+- [ ] Schnelltest aller Stationen (nur Testgerät): `…/app/station.html?id=foto&test&frei` öffnet jede Station ohne Voraussetzungen, oben rechts „Station öffnen …“. Danach „Alles zurücksetzen“ und den Tab schließen: `&frei` gehört auf kein Kinder-iPad.
 - [ ] App offen lassen, nicht neu laden
 
 ## 4. Während des Workshops

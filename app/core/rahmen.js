@@ -26,6 +26,13 @@
   // Eigene Stationsteile (z. B. stencil.me): art -> { anzeigen(station, api), erfuellt(eintrag, gruppe, station) }
   const eigeneArten = {};
   const TEST = /[?&]test\b/.test(location.search);
+  // station.html?id=foto&nochmal: Foto-Station noch einmal öffnen, obwohl sie fertig ist
+  // (Link „Zurück zum Foto“ in „Bild bearbeiten“)
+  const NOCHMAL = /[?&]nochmal\b/.test(location.search);
+  // Testschalter an Links weitergeben, damit man beim Testen im Testmodus bleibt
+  function testZusatz(){
+    return (TEST ? '&test' : '') + (Stationen.FREI ? '&frei' : '');
+  }
 
   // ---- kleine Helfer ----
   function el(tag, attrs, kinder){
@@ -180,6 +187,8 @@
       .then(() => alt ? Speicher.dateiSchreiben(alt, undefined) : null)
       // Rohfoto der Foto-Station merken: brauchen spätere Stationen und das Puzzle
       .then(() => station.id === 'foto' ? Speicher.schreiben('foto-key:' + index, key) : null)
+      // Neues Foto: Das Stempel-Porträt im Puzzle passt nicht mehr, bis „Bild bearbeiten“ neu rechnet
+      .then(() => station.id === 'foto' && alt ? Speicher.dateiSchreiben('portraet:' + index, undefined) : null)
       .then(speichern)
       .then(() => Speicher.dateiAlsUrl(key));
   }
@@ -195,6 +204,32 @@
     input.hidden = true;
     const status = el('div', { klasse: 'hinweis' });
     const knopf = el('button', { type: 'button', text: keyAlt ? 'Neues Foto' : 'Foto aufnehmen', onclick: () => input.click() });
+    // Foto gefällt nicht: löschen und von vorne anfangen
+    const verwerfen = el('button', { type: 'button', klasse: 'secondary', text: '🗑 Foto verwerfen', onclick: () => {
+      if(!confirm('Foto löschen und ein neues machen?')) return;
+      const key = (eintrag.dateien || {})[index];
+      delete eintrag.dateien[index];
+      delete (eintrag.person || {})[index];
+      delete (eintrag.personAnteil || {})[index];
+      pruefTokens[index] = (pruefTokens[index] || 0) + 1; // laufende KI-Prüfung gilt nicht mehr
+      Promise.all([
+        key ? Speicher.dateiSchreiben(key, undefined) : null,
+        station.id === 'foto' ? Speicher.schreiben('foto-key:' + index, undefined) : null,
+        station.id === 'foto' ? Speicher.dateiSchreiben('portraet:' + index, undefined) : null
+      ])
+        .then(speichern)
+        .then(() => {
+          vorschau.hidden = true;
+          vorschau.removeAttribute('src');
+          verwerfen.hidden = true;
+          knopf.textContent = 'Foto aufnehmen';
+          status.textContent = 'Foto gelöscht. Mach ein neues.';
+          personAnzeigen(ki, index);
+          ctx.pruefen();
+        })
+        .catch(err => fehler('Löschen hat nicht geklappt. Bitte nochmal antippen.', err));
+    } });
+    verwerfen.hidden = !keyAlt;
 
     input.addEventListener('change', () => {
       const datei = input.files && input.files[0];
@@ -208,6 +243,7 @@
           vorschau.hidden = false;
           status.textContent = '✓ Foto gespeichert (bleibt auf dem iPad)';
           knopf.textContent = 'Neues Foto';
+          verwerfen.hidden = false;
           ctx.pruefen();
           if(station.check.personPruefen) return personPruefen(knopf.parentNode.querySelector('.ki-pruefung'), index, url);
         })
@@ -224,7 +260,7 @@
     }
     // Chrome auf dem iPad braucht die Kamera-Erlaubnis in den iPad-Einstellungen, sonst bleibt das Bild schwarz
     const chrome = /CriOS/.test(navigator.userAgent) ? el('p', { klasse: 'hinweis', text: 'Kamera bleibt schwarz? Sag Penny Bescheid.' }) : null;
-    return el('div', { klasse: 'foto-feld' }, [el('p', { klasse: 'foto-titel', text: titel }), knopf, chrome, input, status, el('div', { klasse: 'foto-ergebnis' }, [vorschau, ki])]);
+    return el('div', { klasse: 'foto-feld' }, [el('p', { klasse: 'foto-titel', text: titel }), knopf, verwerfen, chrome, input, status, el('div', { klasse: 'foto-ergebnis' }, [vorschau, ki])]);
   }
 
   // ---- Ohne eigenes Foto (keine Einwilligung der Eltern) ----
@@ -595,6 +631,7 @@
     eintrag.status = 'fertig';
     eintrag.ende = new Date().toISOString();
     ctx.f.aktuell = null;
+    ctx.nochmal = false;
     const art = eigeneArten[(station.check || {}).art];
     speichern()
       // Eigene Stationsteile schicken ihre Ergebnisse erst jetzt (z. B. den fertigen Stempel)
@@ -614,6 +651,7 @@
       geradeFertig && (ctx.station.optional || ctx.station.bonus)
         ? el('p', { text: 'Diese Station war ' + (ctx.station.optional ? 'optional' : 'ein Bonus') + '. Sie bringt kein Puzzleteil, dafür gibt es oben einen Extra-Stern ⭐.' })
         : null,
+      fotoNochmal(geradeFertig),
       el('p', { klasse: 'hinweis', text: 'Nächste Station wird gesucht …' })
     ]);
     inhalt.appendChild(panel);
@@ -628,8 +666,21 @@
       panel.appendChild(el('p', { klasse: 'gross-text' }, [el('span', { text: 'Weiter geht es an der Station ' }), el('strong', { text: naechste.titel })]));
       if(naechste.optional) panel.appendChild(el('p', { text: 'Diese Station ist optional: Ihr müsst sie nicht machen.' }));
       panel.appendChild(el('p', { text: 'Geh hin und scanne dort den QR-Code.' }));
-      if(TEST) panel.appendChild(el('a', { klasse: 'knopf-link', href: '?id=' + naechste.id + '&test', text: 'Test: direkt hin' }));
+      if(TEST || Stationen.FREI) panel.appendChild(el('a', { klasse: 'knopf-link', href: '?id=' + naechste.id + testZusatz(), text: 'Test: direkt hin' }));
     });
+  }
+
+  // Foto-Station schon fertig: Foto gefällt nicht? Solange der Stempel noch nicht beim
+  // Laptop ist, geht es nochmal von vorne. Danach nur mit Penny (sonst zwei Stempel auf der Platte).
+  function fotoNochmal(geradeFertig){
+    if(ctx.station.id !== 'foto' || geradeFertig) return null;
+    if(Stationen.istFertig(ctx.f, 'stencilme')){
+      return el('p', { klasse: 'hinweis', text: 'Euer Stempel ist schon beim Laptop. Ein neues Foto? Sag Penny Bescheid.' });
+    }
+    return el('button', { type: 'button', klasse: 'secondary', text: '📷 Foto gefällt nicht? Neues Foto machen', onclick: () => {
+      ctx.nochmal = true;
+      stationZeigen();
+    } });
   }
 
   function nichtAngemeldet(){
@@ -656,7 +707,7 @@
       panel.removeChild(hinweis);
       if(!st) return;
       panel.appendChild(el('p', { klasse: 'gross-text' }, [el('span', { text: text }), el('strong', { text: st.titel })]));
-      if(TEST) panel.appendChild(el('a', { klasse: 'knopf-link', href: '?id=' + st.id + '&test', text: 'Test: direkt hin' }));
+      if(TEST || Stationen.FREI) panel.appendChild(el('a', { klasse: 'knopf-link', href: '?id=' + st.id + testZusatz(), text: 'Test: direkt hin' }));
     });
   }
 
@@ -701,6 +752,7 @@
   // Station schon voll (andere Gruppen eingecheckt oder unterwegs)? Nur ein Hinweis, keine Sperre:
   // Hängt der Laptop oder ist ein Tab vergessen, geht es mit „Wir sind trotzdem dran“ weiter.
   function platzPruefen(){
+    if(Stationen.FREI) return Promise.resolve();
     return Stationen.belegung(ctx.gruppe.id).then(beleg => {
       const andere = (beleg && beleg[ctx.station.id]) || 0;
       if(andere < (ctx.station.plaetze || 1)) return;
@@ -723,9 +775,15 @@
   }
 
   function testWerkzeuge(){
-    if(!TEST) return;
+    if(!TEST && !Stationen.FREI) return;
+    // ?frei: Sprungliste zu allen Stationen, gut sichtbar, damit es auf keinem Kinder-iPad bleibt
+    const sprung = Stationen.FREI ? el('select', { 'aria-label': 'Station öffnen', onchange: ev => {
+      if(ev.target.value) location.href = '?id=' + ev.target.value + testZusatz();
+    } }, [el('option', { value: '', text: 'Station öffnen …' })]) : null;
+    if(sprung) Stationen.laden().then(liste => liste.forEach(s => sprung.appendChild(el('option', { value: s.id, text: s.titel })))).catch(() => {});
     document.body.appendChild(el('div', { klasse: 'test-leiste' }, [
-      el('span', { text: 'Test: ' }),
+      el('span', { text: Stationen.FREI ? 'Test: alle Stationen offen ' : 'Test: ' }),
+      sprung,
       el('button', { type: 'button', klasse: 'secondary', text: 'Alles zurücksetzen', onclick: () => {
         if(!confirm('Gruppe, Fortschritt und Fotos auf diesem iPad löschen?')) return;
         Speicher.allesLoeschen()
@@ -740,7 +798,7 @@
     if(document.hidden || !ctx || !ctx.eintrag.status) return;
     frischUebernehmen()
       .then(() => kopfleiste(ctx.gruppe, ctx.liste, ctx.f))
-      .then(() => { if(ctx.eintrag.status === 'fertig') weiterZeigen(false); })
+      .then(() => { if(ctx.eintrag.status === 'fertig' && !ctx.nochmal) weiterZeigen(false); })
       .catch(err => console.error(err));
   }
 
@@ -769,7 +827,14 @@
         if(st.check && st.check.personPruefen && window.Personen) Personen.vorladen();
         const regelnFertig = st.ersatz ? regelnLaden(gruppe.id).then(r => { ctx.regeln = r; }) : Promise.resolve();
         return Promise.all([kopfleiste(gruppe, liste, f), regelnFertig]).then(() => {
-          if(ctx.eintrag.status === 'fertig') return weiterZeigen(false);
+          if(ctx.eintrag.status === 'fertig'){
+            // „Zurück zum Foto“ aus „Bild bearbeiten“: nochmal, solange der Stempel nicht beim Laptop ist
+            if(NOCHMAL && id === 'foto' && !Stationen.istFertig(f, 'stencilme')){
+              ctx.nochmal = true;
+              return stationZeigen();
+            }
+            return weiterZeigen(false);
+          }
           const fehlend = Stationen.voraussetzungen(liste, st).filter(b => !Stationen.istFertig(f, b)).map(b => liste.filter(s => s.id === b)[0]);
           const bonusFehlen = Stationen.fehlenBisBonus(liste, f, st);
           if(st.bonus && (bonusFehlen || fehlend.length)){
@@ -801,6 +866,7 @@
     fehler: fehler,
     el: el,
     // Eigene Stationsteile anmelden (app/stationen/*.js), z. B. Rahmen.eigeneArt('stempel', {...})
-    eigeneArt: (art, teil) => { eigeneArten[art] = teil; }
+    eigeneArt: (art, teil) => { eigeneArten[art] = teil; },
+    testZusatz: testZusatz
   };
 })();

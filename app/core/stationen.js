@@ -4,6 +4,9 @@
 // nimmt die App diese Kopie.
 (function(){
   const BELEGUNG_TIMEOUT_MS = 3000;
+  // Nur zum Testen: station.html?id=…&frei öffnet jede Station ohne Voraussetzungen,
+  // ohne Bonus-Schwelle, ohne Warten auf den Laptop und ohne „gerade voll“
+  const FREI = /[?&]frei\b/.test(location.search);
 
   function jsonHolen(url){
     return fetch(url, { cache: 'no-cache' }).then(res => {
@@ -48,7 +51,7 @@
 
   // Wie viele Stationen müssen geschafft sein, bevor eine Bonus-Station frei ist?
   function fehlenBisBonus(liste, f, station){
-    if(freigegeben(station)) return 0;
+    if(FREI || freigegeben(station)) return 0;
     return Math.max(0, (station.mindestFertig || 0) - anzahlFertig(liste, f));
   }
 
@@ -69,7 +72,7 @@
   // Voraussetzungen, die es als Station (noch) nicht gibt, zählen nicht.
   // So kann eine Station schon auf eine spätere verweisen (z. B. Körpererkennung).
   function voraussetzungen(liste, station){
-    if(freigegeben(station)) return [];
+    if(FREI || freigegeben(station)) return [];
     return (station.braucht || []).filter(b => liste.some(s => s.id === b));
   }
 
@@ -90,6 +93,7 @@
   // Wartet die Station noch auf eine Nachricht? Dann: { meldung, text, trotzdem }, sonst null
   function wartet(station){
     const w = station.wartetAuf;
+    if(FREI) return null;
     return w && meldungen.indexOf(w.meldung) < 0 ? w : null;
   }
 
@@ -144,6 +148,7 @@
   }
 
   window.Stationen = {
+    FREI: FREI,
     laden: laden,
     fortschritt: fortschritt,
     fortschrittSpeichern: f => Speicher.schreiben('fortschritt', f),

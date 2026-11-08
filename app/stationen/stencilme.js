@@ -126,7 +126,17 @@
       let img = null;
       let segmentation = null;
       return Speicher.lesen('foto-key:' + index)
-        .then(key => key ? Speicher.dateiAlsUrl(key) : null)
+        .then(key => {
+          // Neues Foto seit dem letzten Mal (Zurück zum Foto): alter Rand und „fertig“ gelten nicht mehr
+          if(key && stand.fotoKey && stand.fotoKey !== key){
+            delete stand.randMm;
+            delete stand.fertigMm;
+            delete stand.gesendetMm;
+            sendStatus.textContent = '';
+          }
+          if(key) stand.fotoKey = key;
+          return key ? Speicher.dateiAlsUrl(key) : null;
+        })
         .then(url => {
           if(!url) throw new Error('kein Foto');
           return Personen.bildAusUrl(url);
@@ -210,6 +220,8 @@
       // Nacheinander rechnen: zwei Fotos gleichzeitig wären zu viel für alte iPads
       personen.reduce((kette, p) => kette.then(p.rechnen), Promise.resolve());
       return api.el('div', { klasse: 'stempel-station' }, [
+        // Foto gefällt nicht (auch beim Promi-Porträt): zurück zur Foto-Station, nur im Pflichtweg
+        id === 'stempel' ? api.el('a', { klasse: 'knopf-link secondary', href: '/app/station.html?id=foto&nochmal' + Rahmen.testZusatz(), text: '📷 Foto gefällt nicht? Zurück zum Foto' }) : null,
         api.el('p', { klasse: 'legende' }, ARTEN[id].legende.map(l => api.el('span', { klasse: 'legende-eintrag' }, [
           api.el('span', { klasse: 'farbe ' + l[0] }), api.el('span', { text: l[1] })
         ])))
