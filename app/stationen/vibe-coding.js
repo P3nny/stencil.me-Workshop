@@ -124,18 +124,33 @@
         const quelltext = el('pre', { klasse: 'vibe-code', text: app.html });
         quelltext.hidden = true;
         const codeKnopf = el('button', { type: 'button', klasse: 'secondary klein', text: 'Code ansehen', onclick: () => { quelltext.hidden = !quelltext.hidden; } });
+        // In der Seite nur ein Vorschaubild (nicht bedienbar), benutzt wird die App groß.
+        // Die Vorschau zeigt die App in Bildschirmgröße, verkleinert: so sieht sie auch groß aus.
         // Groß öffnen: Nur Klassen wechseln, das iframe bleibt an seinem Platz (kein Neuladen, Einstellungen bleiben)
         let karte = null;
+        const vorschau = el('div', { klasse: 'vibe-vorschau', role: 'button', 'aria-label': 'App öffnen', onclick: () => gross(true) }, [rahmen]);
+        function massstab(){
+          if(!karte || karte.classList.contains('vibe-gross')) return;
+          const w = window.innerWidth, h = Math.max(300, window.innerHeight - 48);
+          const k = Math.min(1, (vorschau.clientWidth || 320) / w);
+          rahmen.style.width = w + 'px';
+          rahmen.style.height = h + 'px';
+          rahmen.style.transform = 'scale(' + k + ')';
+          vorschau.style.height = Math.round(h * k) + 'px';
+        }
         function gross(an){
           karte.classList.toggle('vibe-gross', an);
           document.body.classList.toggle('vibe-offen', an);
+          if(!an) massstab();
         }
-        const grossKnopf = el('button', { type: 'button', klasse: 'secondary klein', text: '⛶ Groß öffnen', onclick: () => gross(true) });
+        window.addEventListener('resize', massstab);
+        const grossKnopf = el('button', { type: 'button', klasse: 'gross', text: '▶ App öffnen', onclick: () => gross(true) });
         const zurueckKnopf = el('button', { type: 'button', klasse: 'vibe-zurueck', text: '✕ Zurück', onclick: () => gross(false) });
         karte = el('figure', { klasse: 'vibe-karte' }, [
           el('figcaption', {}, [el('strong', { text: beispiel ? 'Beispiel-App (vorher erzeugt)' : 'App ' + app.nr }), el('span', { text: ' „' + app.auftrag + '“' })]),
-          zurueckKnopf, rahmen, KiVerbrauch.zeile(el, app.verbrauch), grossKnopf, codeKnopf, quelltext
+          zurueckKnopf, vorschau, grossKnopf, KiVerbrauch.zeile(el, app.verbrauch), codeKnopf, quelltext
         ]);
+        setTimeout(massstab, 0);
         return karte;
       }
 

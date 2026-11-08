@@ -208,11 +208,13 @@ body.ce-kompakt .test-leiste{display:none;}
 .vibe-apps{display:flex;flex-direction:column;gap:18px;}
 .vibe-karte{margin:0;}
 .vibe-karte figcaption{margin-bottom:6px;}
-.vibe-rahmen{width:100%;height:70vh;min-height:520px;border:3px solid var(--ink);background:#fff;display:block;margin-bottom:6px;}
+/* Vorschau: App in Bildschirmgröße, per JS verkleinert (scale), nicht bedienbar. Antippen öffnet sie groß */
+.vibe-vorschau{position:relative;width:100%;max-width:520px;height:300px;overflow:hidden;border:3px solid var(--ink);background:#fff;cursor:pointer;margin-bottom:8px;}
+.vibe-rahmen{border:0;background:#fff;display:block;transform-origin:0 0;pointer-events:none;}
 /* „⛶ Groß öffnen“: App über den ganzen Bildschirm, oben „✕ Zurück“ */
 .vibe-zurueck{display:none;}
 .vibe-gross .vibe-zurueck{display:block;position:fixed;top:0;left:0;z-index:1001;width:100%;height:48px;padding:0 18px;margin:0;box-sizing:border-box;}
-.vibe-gross .vibe-rahmen{position:fixed;top:48px;left:0;width:100%;height:calc(100% - 48px);min-height:0;margin:0;border:0;z-index:1000;}
+.vibe-gross .vibe-rahmen{position:fixed;top:48px;left:0;width:100% !important;height:calc(100% - 48px) !important;transform:none !important;pointer-events:auto;margin:0;border:0;z-index:1000;}
 body.vibe-offen{overflow:hidden;}
 /* Fortschritt beim Bauen und Verbrauch einer KI-Anfrage */
 .vibe-phasen{list-style:none;padding:0;margin:8px 0;}
