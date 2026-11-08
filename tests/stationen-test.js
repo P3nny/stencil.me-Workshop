@@ -2,7 +2,7 @@
 //
 // Voraussetzung: Test-Server läuft mit eigenem Datenordner (echte Stempel bleiben unberührt)
 // und KI im Testmodus (kein Aufruf bei Claude, keine Kosten):
-//   STENCILME_DATEN=archiv/testdaten STENCILME_KI_TEST=1 python3 server/server.py --port 8765
+//   STENCILME_DATEN=archiv/testdaten STENCILME_KI_TEST=1 STENCILME_PLOTTER_TEST=1 python3 server/server.py --port 8765
 // und Playwright
 // ist außerhalb des Repos installiert (~/.cache/stencilme-playwright).
 //
@@ -489,7 +489,12 @@ function vorschlagAbwarten(page){
   pruefe((await page.locator('.zaehler').textContent()).indexOf('9 von 12') >= 0, 'Zähler steht auf 9 von 12');
 
   // Quiz in der Station durchspielen: immer die obere Antwort, dann weiter
+  async function quizOeffnen(){
+    if(!(await page.locator('.quiz-box.vollbild').count())) await page.click('button:has-text("Quiz")');
+    await page.waitForSelector('.quiz-box.vollbild .quiz-rahmen');
+  }
   async function quizSpielen(){
+    await quizOeffnen();
     const quiz = page.frameLocator('.quiz-rahmen');
     await quiz.locator('.startbtn:has-text("Los geht")').click();
     for(let i = 0; i < 20; i++){
@@ -498,18 +503,24 @@ function vorschlagAbwarten(page){
       await quiz.locator('#nextBtn:not([disabled])').click();
       await page.waitForTimeout(150);
     }
+    await page.click('.vollbild-zurueck');
   }
 
   console.log('Station Code-Erklärung interaktiv');
   await page.goto(BASE + '/app/station.html?id=code-quiz&test');
-  await page.waitForSelector('.quiz-rahmen');
+  await page.waitForSelector('button:has-text("Quiz starten")');
+  pruefe(!(await page.locator('.quiz-rahmen').isVisible()), 'Quiz nicht in der Seite, nur der Knopf');
+  await quizOeffnen();
   await page.frameLocator('.quiz-rahmen').locator('.startbtn:has-text("Los geht")').waitFor();
+  const voll = await page.evaluate(() => { const r = document.querySelector('.quiz-rahmen').getBoundingClientRect(); return r.width >= innerWidth - 1 && r.bottom >= innerHeight - 1; });
+  pruefe(voll, 'Quiz im Vollbild');
   // Direkt im Rahmen nachsehen (frameLocator wertet das in Chromium nicht verlässlich aus)
   const quizRahmen = page.frames().filter(fr => /code-quiz\.html/.test(fr.url()))[0];
   await quizRahmen.waitForFunction(() => typeof buildDots === 'function');
   const zurueck = await quizRahmen.evaluate(() => Array.prototype.map.call(document.querySelectorAll('.backlink'), a => a.hidden));
   pruefe(zurueck.length > 0 && zurueck.every(Boolean), 'eingebettetes Quiz ohne „Zurück zum Workshop“');
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor das Quiz fertig ist');
+  await page.click('.vollbild-zurueck');
   await quizSpielen();
   const codeErgebnis = await page.locator('.quiz-status').textContent();
   pruefe(/von 9 richtig/.test(codeErgebnis), 'Quiz meldet Ergebnis: ' + codeErgebnis);
@@ -518,18 +529,17 @@ function vorschlagAbwarten(page){
 
   console.log('Station Kunst-Quiz');
   await page.goto(BASE + '/app/station.html?id=kunst-quiz&test');
-  await page.waitForSelector('.quiz-rahmen');
+  await page.waitForSelector('button:has-text("Quiz starten")');
   if((await page.request.get(BASE + '/kunst-bilder/yayoi-kusama-1.jpg')).ok()){
+    await quizOeffnen();
     const kunst = page.frameLocator('.quiz-rahmen');
     await kunst.locator('.startbtn:has-text("Los geht")').click();
     await kunst.locator('.kunstbilder img').nth(1).waitFor();
     pruefe(await kunst.locator('.kunstbilder img').count() === 2, 'Kunst-Quiz zeigt Porträt und Werk (vom Laptop)');
     await page.waitForTimeout(800);
-    const mass = await page.evaluate(() => { const r = document.querySelector('.quiz-rahmen'); return { rahmen: r.clientHeight, inhalt: Math.ceil(r.contentDocument.body.getBoundingClientRect().height) }; });
-    pruefe(mass.rahmen >= mass.inhalt, 'Quiz-Rahmen wächst mit, kein Scrollen im Rahmen (' + mass.rahmen + ' ≥ ' + mass.inhalt + ')');
-    await page.screenshot({ path: path.join(SHOTS, BROWSER + '-23-kunst-quiz.png'), fullPage: true });
+    await page.screenshot({ path: path.join(SHOTS, BROWSER + '-23-kunst-quiz.png') });
     await page.reload();
-    await page.waitForSelector('.quiz-rahmen');
+    await page.waitForSelector('button:has-text("Quiz starten")');
   }else{
     console.log('  (ohne archiv/kunst-quiz-bilder: Bilder nicht geprüft)');
   }

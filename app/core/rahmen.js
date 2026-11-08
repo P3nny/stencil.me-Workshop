@@ -424,20 +424,21 @@
       const e = eintrag.quizErgebnis;
       status.className = 'quiz-status' + (e ? ' fertig' : '');
       status.textContent = e ? '✓ Quiz geschafft: ' + e.richtig + ' von ' + e.gesamt + ' richtig' : 'Spielt das Quiz bis zum Ende, dann wird es hier abgehakt.';
+      if(startKnopf) startKnopf.textContent = e ? '▶ Quiz nochmal öffnen' : '▶ Quiz starten';
     }
+    // Das Quiz läuft nur im Vollbild (wie die Vibe-Coding-Apps), in der Seite steht ein großer Knopf.
+    // Das iframe bleibt beim Schließen im DOM: kein Neuladen, der Spielstand bleibt.
     const rahmen = el('iframe', { src: check.url, klasse: 'quiz-rahmen', title: 'Quiz' });
+    const zurueck = el('button', { type: 'button', klasse: 'vollbild-zurueck', text: '✕ Zurück zur Station', onclick: () => vollbild(false) });
+    const box = el('div', { klasse: 'quiz-box' }, [zurueck, rahmen]);
+    function vollbild(an){
+      box.classList.toggle('vollbild', an);
+      document.body.classList.toggle('vollbild-offen', an);
+    }
+    const startKnopf = el('button', { type: 'button', klasse: 'gross', onclick: () => vollbild(true) });
     window.addEventListener('message', ev => {
       if(ev.source !== rahmen.contentWindow || ev.origin !== location.origin || !ev.data) return;
-      // Rahmen wächst mit dem Quiz: Es scrollt die Seite, nicht der Rahmen
-      if(ev.data.stencilHoehe){
-        rahmen.style.height = Math.max(300, Number(ev.data.stencilHoehe) + 6) + 'px';
-        return;
-      }
-      if(ev.data.stencilOben){
-        if(rahmen.getBoundingClientRect().top < 0) rahmen.scrollIntoView();
-        return;
-      }
-      if(!ev.data.stencilQuiz) return;
+      if(!ev.data.stencilQuiz) return; // stencilHoehe/stencilOben: im Vollbild nicht nötig
       const e = ev.data.stencilQuiz;
       eintrag.quizErgebnis = { richtig: Number(e.richtig) || 0, gesamt: Number(e.gesamt) || 0 };
       eintrag.antworten = eintrag.antworten || {};
@@ -447,7 +448,7 @@
       ctx.pruefen();
     });
     statusZeigen();
-    const teile = [status, rahmen];
+    const teile = [startKnopf, box, status];
     if(check.foto){
       // fotoFeld liest station.check: hier die Foto-Angaben des Quiz-Checks
       const fotoStation = { id: station.id, check: check.foto };
