@@ -70,6 +70,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
   - **Gravur zu langsam:** Falls die Mr-Beam-Oberfläche einen Linienabstand anbietet, an einem Probestempel 0,15 mm statt 0,1 mm testen. Druckt der Stempel noch sauber, so lassen.
 - [ ] Neue Stempel erscheinen auf der Laptop-Seite unter „Stempel → A4-Holzplatte“: anhaken, „Platte zusammenstellen“, „Platte herunterladen (SVG)“, in der Mr-Beam-Oberfläche hochladen, 2× gravieren.
 - [ ] Unter „Letzte Platten“: „📣 Wird gelasert“ und „📣 Fertig, abholen“ an die Gruppen schicken.
+- [ ] **Angefangene Platte/Folie weiter nutzen:** Die Laptop-Seite merkt sich, was schon belegt ist (grau in der Vorschau), und setzt die nächsten Stücke auf den Rest. Platte dafür nicht verschieben und die SVG in der Mr-Beam-Oberfläche immer an derselben Stelle (A4-Ecke) ausrichten. Folie wieder oben links an die Mattenecke. Neue Platte oder Folie eingelegt: „Neue Platte eingelegt“ bzw. „Neue Folie eingelegt“ drücken (auch nach einem verworfenen Plotter-Auftrag).
 - [ ] Sticker (Bonus): „Folie zusammenstellen“, dann die Plotter-Schritte auf der Laptop-Seite.
 - [ ] Ca. 20 Min. vor Schluss: „Feedbackbogen für alle freigeben“ (Feedback kommt anonym, ohne Namen und ohne Gruppe).
 - [ ] Abschlusspräsentation, letzte Folie: „Abschluss: Löschen auf den iPads freigeben“. Die Kinder sehen „Meine Daten“ an und tippen „Jetzt alles löschen“ (geht erst, wenn alles beim Laptop ist).
