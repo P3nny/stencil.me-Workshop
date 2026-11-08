@@ -140,7 +140,7 @@
         }
         function gross(an){
           karte.classList.toggle('vibe-gross', an);
-          document.body.classList.toggle('vibe-offen', an);
+          document.body.classList.toggle('vollbild-offen', an);
           if(!an) massstab();
         }
         window.addEventListener('resize', massstab);

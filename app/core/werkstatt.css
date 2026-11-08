@@ -215,7 +215,12 @@ body.ce-kompakt .test-leiste{display:none;}
 .vibe-zurueck{display:none;}
 .vibe-gross .vibe-zurueck{display:block;position:fixed;top:0;left:0;z-index:1001;width:100%;height:48px;padding:0 18px;margin:0;box-sizing:border-box;}
 .vibe-gross .vibe-rahmen{position:fixed;top:48px;left:0;width:100% !important;height:calc(100% - 48px) !important;transform:none !important;pointer-events:auto;margin:0;border:0;z-index:1000;}
-body.vibe-offen{overflow:hidden;}
+/* Vollbild für das Quiz (rahmen.js quizBereich), gleiche Leiste wie bei den Vibe-Apps */
+.vollbild-zurueck{display:none;}
+.vollbild .vollbild-zurueck{display:block;position:fixed;top:0;left:0;z-index:1001;width:100%;height:48px;padding:0 18px;margin:0;box-sizing:border-box;}
+.quiz-box:not(.vollbild) .quiz-rahmen{display:none;}
+.vollbild .quiz-rahmen{position:fixed;top:48px;left:0;width:100%;height:calc(100% - 48px);margin:0;border:0;z-index:1000;}
+body.vollbild-offen{overflow:hidden;}
 /* Fortschritt beim Bauen und Verbrauch einer KI-Anfrage */
 .vibe-phasen{list-style:none;padding:0;margin:8px 0;}
 .vibe-phasen li{padding:3px 0;color:var(--muted);}

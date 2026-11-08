@@ -10,7 +10,6 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
 body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;letter-spacing:.01em;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
-.eingebettet body{min-height:0}
 a{color:var(--ink)}a:hover{color:var(--neon);background:var(--ink)}
 .topbar{display:flex;align-items:center;gap:14px;padding:16px 20px 10px;flex-shrink:0;max-width:760px;width:100%;margin:0 auto}
 .dots{display:flex;gap:8px;flex:1}
@@ -57,6 +56,21 @@ h1{font-family:var(--head);font-weight:700;font-size:1.9rem;line-height:1.15;mar
 .badge{padding:8px 14px;border:3px solid var(--ink);font-family:var(--mono);font-size:.85rem;background:#fff}
 .backlink{font-family:var(--head);font-size:.85rem;text-transform:uppercase;letter-spacing:.12em}
 .hidden{display:none !important}
+/* iPad im Vollbild der Workshop-App: Platz ausnutzen (Patricia, 08.11.) */
+@media (min-width:900px){
+.topbar,.navbar{max-width:1000px}
+.card{max-width:960px;gap:18px}
+h1{font-size:2.3rem}
+.lede{font-size:17px}
+.quiz .q{font-size:1.3rem}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.choice{font-size:17px;padding:16px 18px}
+.cluepanel{font-size:18px}
+.codepanel pre{font-size:15px}
+.kunstbilder img{max-height:34vh}
+.feedback{font-size:16px}
+.full h1{font-size:3rem}.full .lede{max-width:640px;font-size:18px}
+}
 </style>
 </head>
 <body>
