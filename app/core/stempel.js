@@ -368,10 +368,37 @@ function computeOffsetCutPath(baseMask, baseSize, scale, offsetMm){
 // ---- Ab hier nur für den Pflichtweg Negativ-Stempel ----
 
 // Schwarz-Weiß: dunkle Pixel innerhalb der Person = Motiv (1). Ohne Personenmaske: ganzes Bild.
+function lokalesMittel(gray, radius){
+  const n = WORK_SIZE, s = n + 1;
+  const integral = new Float64Array(s * s);
+  for(let y = 0; y < n; y++){
+    let zeile = 0;
+    for(let x = 0; x < n; x++){
+      zeile += gray[y*n + x];
+      integral[(y+1)*s + x + 1] = integral[y*s + x + 1] + zeile;
+    }
+  }
+  const mittel = new Float32Array(n * n);
+  for(let y = 0; y < n; y++){
+    const y0 = Math.max(0, y - radius), y1 = Math.min(n, y + radius + 1);
+    for(let x = 0; x < n; x++){
+      const x0 = Math.max(0, x - radius), x1 = Math.min(n, x + radius + 1);
+      const summe = integral[y1*s + x1] - integral[y0*s + x1] - integral[y1*s + x0] + integral[y0*s + x0];
+      mittel[y*n + x] = summe / ((y1 - y0) * (x1 - x0));
+    }
+  }
+  return mittel;
+}
+
+// Zusätzlich zur Otsu-Schwelle: Ein Pixel wird auch schwarz, wenn es deutlich dunkler ist als
+// seine Umgebung (Fenster 61 × 61 px, 12 % dunkler). Sonst verschwinden bei hellen Gesichtern
+// Augen und Mund, weil Otsu nur Haare/Kleidung von der Haut trennt (Promi-Porträts, 08.11.).
+const LOKAL_RADIUS = 30, LOKAL_DUNKLER = 0.12;
 function stampMask(gray, personMask, threshold){
   let mask = new Uint8Array(WORK_SIZE*WORK_SIZE);
+  const mittel = lokalesMittel(gray, LOKAL_RADIUS);
   for(let i=0;i<gray.length;i++){
-    const dark = gray[i] < threshold ? 1 : 0;
+    const dark = (gray[i] < threshold || gray[i] < mittel[i] * (1 - LOKAL_DUNKLER)) ? 1 : 0;
     mask[i] = personMask ? (dark & personMask[i]) : dark;
   }
   return despeckle(mask, WORK_SIZE, DESPECKLE_PASSES);
@@ -563,21 +590,23 @@ function buildStickerSvg(mask, offsetMm){
   return { svg: svg, cutLoops: schnittLoops.length, widthMm: off.widthMm, heightMm: off.heightMm };
 }
 
-// Kleinster Schnittrand (ganze mm), bei dem der rote Rand in einem Stück außen herumläuft.
-// Gesucht wird durch Halbieren (4 statt bis zu 12 Rechnungen): Ein größerer Rand
-// verbindet höchstens mehr Teile, nie weniger.
-const OFFSET_MIN = 2, OFFSET_MAX = 15, OFFSET_START = 4;
+// Kleinster Schnittrand (in 0,5-mm-Schritten wie der Regler), bei dem der rote Rand in einem
+// Stück außen herumläuft und innen keine Löcher hat (sonst cutLoops > 1). Kleiner Rand =
+// weniger Fläche zum Gravieren = kürzere Laserzeit (Patricia, 08.11.: vorher ab 4 mm).
+// Gesucht wird durch Halbieren (ca. 5 Rechnungen): Ein größerer Rand verbindet höchstens mehr Teile, nie weniger.
+const OFFSET_MIN = 2, OFFSET_MAX = 15, OFFSET_SCHRITT = 0.5;
 function autoOffset(mask){
   const scale = STEMPEL_MM / WORK_SIZE;
   const einStueck = mm => computeOffsetCutPath(mask, WORK_SIZE, scale, mm).cutLoops.length <= 1;
-  if(einStueck(OFFSET_START)) return OFFSET_START;
-  let zuKlein = OFFSET_START, gross = OFFSET_MAX;
-  if(!einStueck(gross)) return OFFSET_MAX;
+  if(einStueck(OFFSET_MIN)) return OFFSET_MIN;
+  if(!einStueck(OFFSET_MAX)) return OFFSET_MAX;
+  // in Schritten zählen: 0 = OFFSET_MIN (zu klein), n = OFFSET_MAX (passt)
+  let zuKlein = 0, gross = Math.round((OFFSET_MAX - OFFSET_MIN) / OFFSET_SCHRITT);
   while(gross - zuKlein > 1){
     const mitte = Math.floor((zuKlein + gross) / 2);
-    if(einStueck(mitte)) gross = mitte; else zuKlein = mitte;
+    if(einStueck(OFFSET_MIN + mitte * OFFSET_SCHRITT)) gross = mitte; else zuKlein = mitte;
   }
-  return gross;
+  return OFFSET_MIN + gross * OFFSET_SCHRITT;
 }
 
 // ---- Zwischenbilder für die Anzeige ----

@@ -165,7 +165,8 @@
     if(!station.ankuendigung) return null;
     return el('div', { klasse: 'ankuendigung' }, [
       el('p', { text: station.ankuendigung }),
-      el('details', { klasse: 'ki-hilfe' }, [el('summary', { text: 'Programm, KI oder generative KI: Was ist der Unterschied?' })].concat(unterschied()))
+      // An der Foto-Station (erste Station) immer aufgeklappt (Patricia, 08.11.)
+      el('details', station.id === 'foto' ? { klasse: 'ki-hilfe', open: 'open' } : { klasse: 'ki-hilfe' }, [el('summary', { text: 'Programm, KI oder generative KI: Was ist der Unterschied?' })].concat(unterschied()))
     ]);
   }
 
