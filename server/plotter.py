@@ -28,12 +28,20 @@ TEST = os.environ.get("STENCILME_PLOTTER_TEST") == "1"
 EXT_PYTHON = os.environ.get("EXT_PYTHON", "/usr/bin/python3")   # System-Python (Extension braucht numpy/usb)
 EXT = os.environ.get("EXT", os.path.expanduser("~/.config/inkscape/extensions/sendto_silhouette.py"))
 PEN = dict(pressure=int(os.environ.get("PEN_PRESSURE", 5)), speed=int(os.environ.get("PEN_SPEED", 5)))
-# Stickerpapier mit Trägerpapier (Tests 08.11.): 26/Tiefe 8 nur obere Schicht, 33/10/4 durch die Matte,
-# 30/10/6: Sticker lässt sich herauslösen, Trägerpapier fast durch.
-CUT = dict(pressure=int(os.environ.get("CUT_PRESSURE", 30)), speed=int(os.environ.get("CUT_SPEED", 2)))
-CUT_PASSES = int(os.environ.get("CUT_PASSES", 6))
+# Stickerpapier mit Trägerpapier: nur ANSCHNEIDEN (Stickerschicht), das Trägerpapier bleibt ganz.
+# Tests 08.11.: 26/Tiefe 8/3 Durchgänge nur obere Schicht, 30/10/6 meist obere Schicht, einmal am
+# 09.11. aber durch die Matte (die Automatik-Klinge stellt sich unterschiedlich tief ein), 33/10/4
+# durch die Matte. Darum 26/8/3 mit Abstand zur Matte (Patricia 09.11.): Den Bogen schneidet sie an
+# den gezeichneten Trennlinien von Hand auseinander.
+CUT = dict(pressure=int(os.environ.get("CUT_PRESSURE", 26)), speed=int(os.environ.get("CUT_SPEED", 2)))
+CUT_PASSES = int(os.environ.get("CUT_PASSES", 3))
 CUT_TOOL = os.environ.get("CUT_TOOL", "autoblade")
-CUT_DEPTH = int(os.environ.get("CUT_DEPTH", 10))
+CUT_DEPTH = int(os.environ.get("CUT_DEPTH", 8))
+# Obergrenze: Werte darüber haben die Matte durchgeschnitten. Auch per Umgebungsvariable nicht höher.
+CUT_PRESSURE_MAX, CUT_DEPTH_MAX, CUT_PASSES_MAX = 30, 9, 4
+CUT["pressure"] = min(CUT["pressure"], CUT_PRESSURE_MAX)
+CUT_DEPTH = min(CUT_DEPTH, CUT_DEPTH_MAX)
+CUT_PASSES = min(CUT_PASSES, CUT_PASSES_MAX)
 ENDPOS = os.environ.get("ENDPOS", "start")
 JOIN_MM = float(os.environ.get("JOIN_MM", 0.7))
 SIMPLIFY_MM = float(os.environ.get("SIMPLIFY_MM", 0.05))
