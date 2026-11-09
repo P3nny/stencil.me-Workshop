@@ -64,8 +64,8 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 | --- | --- |
 | 08:45 | Ankommen |
 | 09:00 | Startpräsentation, dann Stationen: Foto, Bild bearbeiten, erste Lasercuts, erste Sticker |
-| 10:00–10:10 | Kleine Pause (vorher Hintergrund-Stationen, wichtig fürs Quiz) |
-| 10:55–11:30 | Große Pause mit Rausgehen |
+| 10:00–10:10 | Kleine Pause (vorher Hintergrund-Stationen, wichtig fürs Quiz). Laptop-Seite: „☕ 10 Min.“ |
+| 10:55–11:30 | Große Pause mit Rausgehen. Laptop-Seite: „☕ 35 Min.“ oder „Bis Uhrzeit“ 11:30 |
 | 11:30 | Quiz Teil 1 |
 | 12:00 | Feedback für alle freigeben |
 | 12:30 | Abschlussrunde, Quiz Teil 2, Siegerehrung, Daten löschen |
@@ -85,6 +85,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Bunte Druckfarben bereitlegen, nicht nur Schwarz
 - [ ] Präsentationslaptop vorne: Start-, Zwischen- und Abschlusspräsentation
 - [ ] Testgruppen vor dem Start auf der Laptop-Seite löschen
+- [ ] **Pause-Knopf** auf der Laptop-Seite (☕ 10 Min., 35 Min. oder bis Uhrzeit): Alle iPads zeigen spätestens nach einer Minute „Pause bis … Uhr“ mit Countdown, nichts antippbar. Endet von selbst oder mit „Pause beenden“ (iPads geben spätestens nach 15 Sekunden frei)
 
 ## 4. Während des Workshops
 

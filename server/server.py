@@ -68,7 +68,7 @@ MAX_MESSAGE_LEN = 300
 messages_lock = threading.Lock()
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MAX_EVENT_BYTES = 64 * 1024
-DEFAULT_SETTINGS = {"schueler": 26, "freigaben": [], "ohneFoto": [], "ohneKi": [], "vibePin": ""}  # freigaben: Stationen, die der Laptop für alle öffnet
+DEFAULT_SETTINGS = {"schueler": 26, "freigaben": [], "ohneFoto": [], "ohneKi": [], "vibePin": "", "pauseBis": 0}  # pauseBis: Unix-Zeit, 0 = keine Pause  # freigaben: Stationen, die der Laptop für alle öffnet
 FREIGABE_RE = re.compile(r"^[a-z0-9-]{1,40}$")
 # Rückmeldezettel der Eltern: Vornamen ohne Foto-Einwilligung bzw. mit Opt-out für generative KI
 EINWILLIGUNG_LISTEN = ("ohneFoto", "ohneKi")
@@ -143,6 +143,13 @@ def list_stamps(base=DATA_DIR):
                     "gruppe": parts[3] if len(parts) > 3 and ID_RE.match(parts[3]) else "",
                 })
     return result
+
+
+def pause_rest(settings):
+    try:
+        return max(0, int(round(float(settings.get("pauseBis") or 0) - time.time())))
+    except (TypeError, ValueError):
+        return 0
 
 
 def geloeschte_gruppen():
@@ -633,8 +640,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not ID_RE.match(group_id):
                 return self.send_json({"nachrichten": []})
             # loeschen: Laptop hat zum Abschluss das Löschen auf den iPads freigegeben
+            # pauseRest: Sekunden bis zum Ende der Pause (Laptop-Uhr, damit falsch gestellte iPads nicht stören)
+            settings = read_settings()
             return self.send_json({"nachrichten": read_messages().get(group_id, []),
-                                   "loeschen": "loeschen" in read_settings().get("freigaben", [])})
+                                   "loeschen": "loeschen" in settings.get("freigaben", []),
+                                   "pauseRest": pause_rest(settings)})
         if path.startswith("/kunst-bilder/"):
             name = path[len("/kunst-bilder/"):]
             if not KUNST_RE.match(name) or not os.path.isfile(os.path.join(KUNST_DIR, name)):
@@ -768,6 +778,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 settings[liste] = []
             # Nächster Workshop startet wieder zu: Feedbackbogen erst nach Bonus 1, Löschen gesperrt
             settings["freigaben"] = []
+            settings["pauseBis"] = 0
             os.makedirs(DATA_ROOT, exist_ok=True)
             write_atomic(SETTINGS_FILE, json.dumps(settings).encode("utf-8"))
             print("Alle Stempel, Antworten, KI-Bilder und Namenslisten gelöscht, Freigaben zurückgesetzt.")
@@ -1043,6 +1054,26 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             settings["schueler"] = count
         if "freigaben" in data:
             settings["freigaben"] = sorted(set(f for f in data.get("freigaben") or [] if isinstance(f, str) and FREIGABE_RE.match(f)))
+        # Pause für alle iPads (Patricia, 09.11.2026): pauseMinuten (1–90), pauseUhr „HH:MM“ (heute) oder pauseEnde
+        if data.get("pauseEnde"):
+            settings["pauseBis"] = 0
+        elif "pauseMinuten" in data:
+            try:
+                minuten = int(data.get("pauseMinuten"))
+            except (ValueError, TypeError):
+                return self.send_json({"ok": False, "fehler": "Minuten fehlen"}, 400)
+            if not 1 <= minuten <= 90:
+                return self.send_json({"ok": False, "fehler": "1 bis 90 Minuten"}, 400)
+            settings["pauseBis"] = time.time() + minuten * 60
+        elif "pauseUhr" in data:
+            m = re.match(r"^([01]?\d|2[0-3]):([0-5]\d)$", str(data.get("pauseUhr") or "").strip())
+            if not m:
+                return self.send_json({"ok": False, "fehler": "Uhrzeit wie 11:30"}, 400)
+            bis = datetime.datetime.now().replace(hour=int(m.group(1)), minute=int(m.group(2)), second=0, microsecond=0)
+            sekunden = (bis - datetime.datetime.now()).total_seconds()
+            if not 0 < sekunden <= 90 * 60:
+                return self.send_json({"ok": False, "fehler": "Die Uhrzeit muss in den nächsten 90 Minuten liegen"}, 400)
+            settings["pauseBis"] = bis.timestamp()
         if "vibePin" in data:
             pin = str(data.get("vibePin") or "").strip()
             if pin and not PIN_RE.match(pin):

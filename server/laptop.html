@@ -142,6 +142,15 @@
       <span class="hint" id="pupilsState"></span>
     </div>
     <div class="settings" style="margin-top:10px">
+      <span>☕ Pause für alle iPads:</span>
+      <button id="pause10" type="button">10 Min.</button>
+      <button id="pause35" type="button">35 Min.</button>
+      <input id="pauseUhr" type="time" aria-label="Pause bis Uhrzeit">
+      <button id="pauseUhrStart" type="button">Bis Uhrzeit</button>
+      <button id="pauseEnde" type="button" hidden>Pause beenden</button>
+      <span class="hint" id="pauseState"></span>
+    </div>
+    <div class="settings" style="margin-top:10px">
       <button id="feedbackFreigabe" type="button">Feedbackbogen für alle freigeben (ab ca. 12:00)</button>
       <span class="hint" id="freigabeState"></span>
       <a href="/auswertung" style="margin-left:auto">Auswertung: Smileys, KI-Frage, Feedback →</a>
@@ -532,8 +541,37 @@
         einwilligung = { ohneFoto: s.ohneFoto || [], ohneKi: s.ohneKi || [] };
         einwilligungZeigen();
         document.getElementById("vibePin").value = s.vibePin || "";
+        pauseBis = (s.pauseBis || 0) * 1000;
+        pauseAnzeigen();
       });
   }
+
+  // ---- Pause für alle iPads: Vollbild mit Countdown auf jedem iPad (spätestens nach 1 Minute) ----
+  var pauseBis = 0;
+  function pauseAnzeigen() {
+    var rest = Math.max(0, Math.round((pauseBis - Date.now()) / 1000));
+    var bis = new Date(pauseBis);
+    document.getElementById("pauseState").textContent = rest
+      ? "Pause läuft bis " + bis.getHours() + ":" + ("0" + bis.getMinutes()).slice(-2) + " (noch " + Math.ceil(rest / 60) + " Min.). Die iPads zeigen sie spätestens nach einer Minute."
+      : "Keine Pause.";
+    document.getElementById("pauseEnde").hidden = !rest;
+  }
+  function pauseSetzen(daten) {
+    var state = document.getElementById("pauseState");
+    fetch("/api/einstellungen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(daten) })
+      .then(function (r) { return r.json(); })
+      .then(function (s) {
+        if (s.ok === false) { state.textContent = s.fehler; return; }
+        pauseBis = (s.pauseBis || 0) * 1000;
+        pauseAnzeigen();
+      })
+      .catch(function () { state.textContent = "Speichern hat nicht geklappt"; });
+  }
+  document.getElementById("pause10").addEventListener("click", function () { pauseSetzen({ pauseMinuten: 10 }); });
+  document.getElementById("pause35").addEventListener("click", function () { pauseSetzen({ pauseMinuten: 35 }); });
+  document.getElementById("pauseUhrStart").addEventListener("click", function () { pauseSetzen({ pauseUhr: document.getElementById("pauseUhr").value }); });
+  document.getElementById("pauseEnde").addEventListener("click", function () { pauseSetzen({ pauseEnde: true }); });
+  setInterval(pauseAnzeigen, 10000);
 
   function freigabeUmschalten(name, stateId) {
     var neu = freigaben.indexOf(name) >= 0 ? freigaben.filter(function (f) { return f !== name; }) : freigaben.concat([name]);

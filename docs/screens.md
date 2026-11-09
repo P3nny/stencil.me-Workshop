@@ -287,3 +287,9 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - **Feedbackbogen nur über die Freigabe am Laptop** (ab ca. 12:00, `nurFreigabe`), nicht mehr nach dem Sticker oder allen Stationen
 - **„Das sollte Penny anders machen“** zum Antippen (mehrere möglich), darunter freiwillig ein eigener Satz. Auswertung zählt die Antworten
 - Sticker-Video getauscht (`X-PuUR-Sn8k`), das erste ließ sich nicht einbetten
+
+## Pause-Knopf (09.11., Branch `feature/pause`)
+
+- Laptop-Seite, Bereich „Gruppen an den Stationen“: **☕ Pause für alle iPads**: „10 Min.“, „35 Min.“, „Bis Uhrzeit“, „Pause beenden“. Gespeichert als `pauseBis` in den Einstellungen, „Alle Daten löschen“ beendet sie
+- iPads fragen wie bei den Nachrichten einmal pro Minute nach (`pauseRest` in `/api/nachrichten`, nach der Uhr des Laptops). Dann Vollbild „☕ Pause bis 10:10 Uhr · noch 7:32 · Lasst das iPad hier liegen“ über allem. Während der Pause fragen sie alle 15 Sekunden, damit „Pause beenden“ schnell ankommt. Ohne Laptop endet die Pause von selbst, wenn die Zeit um ist
+- Keine Daten von Kindern, darum keine Änderung an `Datenschutz.md`
