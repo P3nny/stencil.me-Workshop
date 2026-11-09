@@ -290,3 +290,13 @@ button.stern.an{color:var(--neon);}
 /* Erinnerung „Station noch offen“: bleibt beim Scrollen oben sichtbar */
 .erinnerung{position:-webkit-sticky;position:sticky;top:8px;z-index:50;flex-wrap:wrap;}
 .erinnerung[hidden]{display:none;}
+
+/* Code-Editor groß (code-editor.js): ganzer Bildschirm unter der Leiste „Zurück zur Station“ */
+.ce-label-eingabe{color:#f4f4f4;}
+.ce-box.vollbild .ce{position:fixed;top:48px;left:0;right:0;bottom:0;margin:0;z-index:1000;overflow:auto;display:flex;flex-direction:column;border-width:0;}
+.ce-box.vollbild .ce.kompakt{z-index:1000;}
+.ce-box.vollbild .ce-code{flex:1;}
+.ce-box.vollbild .ce-kopf-rechts{width:42%;}
+.ce-box.vollbild .ce-vorschau iframe{height:300px;}
+.ce-box.vollbild .ce-vorschau img{width:150px;height:150px;}
+.ce-box.vollbild .ce-lueckentext{font-size:1.2rem;}
