@@ -53,7 +53,7 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 
 - `index.html`: Startseite der Workshop-App (Anmeldung allein/zu zweit, dann Foto-Station).
 - `app/station.html?id=<station>`: eine Seite für alle Stationen, Inhalte aus `stationen/*.json` (Format: `stationen/README.md`). Gemeinsamer Code in `app/core/`, eigene Stationsteile in `app/stationen/`. Gerätecheck: `app/geraetecheck.html`.
-- Stationen (Stand 24.10.2026): 12 Pflichtstationen (zählen für „x von 12“ und das Puzzle), 2 optionale Claude-Stationen (KI-Selbstporträt, Bild-App vibe coden), 3 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen, Lasercut-Porträt). Reihenfolge über `braucht` und `plaetze`, Überblick und Verlauf in `docs/screens.md`.
+- Stationen (Stand 09.11.2026): 11 Pflichtstationen (zählen für „x von 11“ und das Puzzle; „Bild bearbeiten“ macht das Lasercut-Porträt), optional: 2 Claude-Stationen (KI-Selbstporträt, Bild-App vibe coden), Stempel und Stempeldruck, 2 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen). Reihenfolge über `braucht` und `plaetze`, Überblick und Verlauf in `docs/screens.md`.
 - `server/`: Workshop-Server (Python, nur Standardbibliothek; Ausnahme: Anthropic-SDK im venv für die Claude-Stationen, `server/einrichten.sh`). Laptop-Seite `/laptop` (Holzplatte, Stickerfolie mit Plotter, Nachrichten, Freigaben), `/qr`, `/auswertung`.
 - `tests/`: Playwright-Tests (`stationen-test.js` kompletter Durchlauf, `tabs-test.js`, `leistung-test.js`), laufen in WebKit und Chromium.
 - `Datenschutz.md`: kindgerechte Datenschutzinformation (dazu `docs/datenschutz-kurz.md`, `docs/canva-folie-datenschutz.md`).
@@ -122,7 +122,7 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 ## Lokaler Server und Lasercut
 
 - Der Server sammelt die Werke der Kinder (Fotos, Stempel-Datei, Antworten) pro Paar und nimmt sie auch nachträglich entgegen (Outbox). Die Kinder sehen unter „Meine Daten“ alles, was über sie gespeichert ist (`server/mappe.py`). Am Ende: „Für die Workshop-Verbesserung sichern (ohne Namen)“, dann „Alle Daten löschen“.
-- Holzplatte: Die Laptop-Seite ordnet die Stempel (älteste zuerst) auf einer A4-Pappelsperrholz-Platte an (5 mm Rand, 3 mm Abstand). Patricia lädt die SVG in die Mr-Beam-Oberfläche, 2× gravieren. Keine Mr-Beam-Schnittstelle.
+- Holzplatte: Die Laptop-Seite ordnet die Porträts (älteste zuerst) auf einer A4-Pappelsperrholz-Platte an (5 mm Rand, 3 mm Abstand). Patricia lädt die SVG in die Mr-Beam-Oberfläche, Porträts 1× gravieren. Optionale Stempel (2×) auf eine eigene Platte. Keine Mr-Beam-Schnittstelle.
 - Stickerfolie: Die Laptop-Seite ordnet Sticker auf A4 an und schickt sie an die Silhouette Cameo 4 (Stift + Messer, `server/plotter.py`, Vorbild `archiv/00_fotobox-karte`).
 - Statusmeldungen an die Paare über „📣 Wird gelasert“ / „📣 Fertig, abholen“, die iPads fragen einmal pro Minute nach.
 - Server läuft auf dem **Ubuntu-Laptop** (entschieden). Nach Updates neu starten, die Laptop-Seite zeigt dann einen Hinweis.

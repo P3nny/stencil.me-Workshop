@@ -262,3 +262,11 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 ## Noch offen
 
 - Kunst-Quiz mit Bildern aus `03_stencil.me-Künstlerinnen_A4.pdf`, nur über den Laptop ausgeliefert, nicht im Repo
+
+## Porträt Pflicht, Stempel optional (09.11., Branch `feature/portraet-pflicht`)
+
+- **Bild bearbeiten** macht das Lasercut-Porträt (45 mm, nicht gespiegelt, Check `portraet`). „Zurück zum Foto“ und das Puzzle-Bild hängen am Porträt. Ersetzt Bonus 2 (`portraet`, Station gelöscht)
+- **Neue optionale Station `stempel`** („Optional: Stempel zum Drucken“): Negativ-Stempel 50 mm, gespiegelt, braucht Bild bearbeiten. **Stempeldruck** ist optional und braucht `stempel`
+- Größen in `app/core/stempel.js` (`MM`): Porträt 45, Stempel 50, Sticker 40. Der automatische Schnittrand rechnet mit der Größe der jeweiligen Art
+- **Laptop-Seite, Holzplatte:** Porträts sind vorausgewählt, Stempel nicht. Gemischt kommt eine Warnung (Porträts 1×, Stempel 2× gravieren)
+- Zählung jetzt „x von 11“
