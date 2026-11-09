@@ -1,6 +1,6 @@
-// ---- Station „Bild bearbeiten“ (stencil.me) und Bonus-Station „Sticker“ ----
-// Für jede Person nacheinander: Rohbild → Schwarz-Weiß → KI: Person → Otsu → Stempel
-// (bzw. Sticker). Jeder Schritt erscheint als eigenes Bild, damit die Kinder sehen,
+// ---- Station „Bild bearbeiten“ (stencil.me, Lasercut-Porträt) und die Stationen „Stempel“ und „Sticker“ ----
+// Für jede Person nacheinander: Rohbild → Schwarz-Weiß → KI: Person → Otsu → Porträt
+// (bzw. Stempel, Sticker). Seit 09.11.2026 ist das Porträt Pflicht, der Stempel optional. Jeder Schritt erscheint als eigenes Bild, damit die Kinder sehen,
 // was passiert. Einstellbar ist nur der rote Schnittrand. „Stempel ist fertig“ merkt sich
 // die Datei auf dem iPad. An den Laptop (Outbox) geht sie erst beim Beenden der Station,
 // so landet nur die letzte Fassung auf der Holzplatte (Patricia, 25.10.).
@@ -47,7 +47,7 @@
     const randBox = el('div', { klasse: 'rand' }, [
       el('label', { for: 'rand-' + index }, [el('span', { text: 'Roter Schnittrand: ' }), reglerWert]),
       regler,
-      el('p', { klasse: 'hinweis', text: 'Der rote Rand muss in einem Stück außen um alles herumlaufen. Sonst fällt der ' + art.name + ' auseinander.' }),
+      el('p', { klasse: 'hinweis', text: 'Der rote Rand muss in einem Stück außen um alles herumlaufen. Sonst fällt ' + art.der + ' ' + art.name + ' auseinander.' }),
       warnung
     ]);
     randBox.hidden = true;
@@ -57,9 +57,9 @@
       art.info ? el('p', { text: art.info }) : null,
       el('div', { klasse: 'schritte-reihe' }, felder.map(f => f.fig)),
       randBox,
-      // Stempel gefällt nicht (auch beim Promi-Porträt): zurück zur Foto-Station, nur im Pflichtweg.
-      // Steht vor „fertig“: Erst das Foto klären, dann den Stempel abschließen (Patricia, 08.11.)
-      art.name === 'Stempel' ? el('a', { klasse: 'knopf-link', href: '/app/station.html?id=foto&nochmal' + Rahmen.testZusatz(), text: '📷 Stempel gefällt dir nicht? Zurück zum Foto' }) : null,
+      // Ergebnis gefällt nicht (auch beim Promi-Porträt): zurück zur Foto-Station, nur im Pflichtweg.
+      // Steht vor „fertig“: Erst das Foto klären, dann abschließen (Patricia, 08.11.)
+      art.pflicht ? el('a', { klasse: 'knopf-link', href: '/app/station.html?id=foto&nochmal' + Rahmen.testZusatz(), text: '📷 ' + art.name + ' gefällt dir nicht? Zurück zum Foto' }) : null,
       sendenKnopf,
       sendStatus
     ]);
@@ -86,7 +86,7 @@
       const fertig = stand.fertigMm !== undefined;
       const geaendert = fertig && stand.fertigMm !== mm;
       sendenKnopf.disabled = st.cutLoops > 1 || (fertig && !geaendert);
-      sendenKnopf.textContent = geaendert ? 'Geänderten ' + art.name + ' als fertig nehmen' : '✓ ' + art.name + ' ist fertig';
+      sendenKnopf.textContent = geaendert ? art.geaendert + ' ' + art.name + ' als fertig nehmen' : '✓ ' + art.name + ' ist fertig';
       sendenKnopf.className = fertig && !geaendert ? 'secondary' : '';
     }
 
@@ -120,7 +120,7 @@
         })
         .catch(err => {
           sendenKnopf.disabled = false;
-          api.fehler('Der ' + art.name + ' ließ sich nicht speichern. Bitte nochmal antippen.', err);
+          api.fehler(art.dein + ' ließ sich nicht speichern. Bitte nochmal antippen.', err);
         });
     });
 
@@ -176,12 +176,12 @@
         })
         .then(() => warten(PAUSE_MS))
         .then(() => {
-          regler.value = String(stand.randMm || Stempel.autoOffset(ergebnis.mask));
+          regler.value = String(stand.randMm || Stempel.autoOffset(ergebnis.mask, art.id));
           stand.randMm = parseFloat(regler.value);
           eintrag.stempel[index] = stand;
           randBox.hidden = false;
           stempelZeichnen();
-          if(stand.fertigMm !== undefined) sendStatus.textContent = '✓ ' + art.dieser + ' ist fertig. Er geht beim Beenden der Station an den Laptop.';
+          if(stand.fertigMm !== undefined) sendStatus.textContent = '✓ ' + art.dieser + ' ist fertig. ' + art.er + ' geht beim Beenden der Station an den Laptop.';
           return api.speichern();
         })
         .catch(err => {
@@ -196,26 +196,30 @@
 
   const ARTEN = {
     stempel: {
-      name: 'Stempel', dein: 'Dein Stempel', dieser: 'Dieser Stempel', notiz: 'gespiegelt', puzzle: true,
-      info: 'Jetzt wird aus deinem Foto eine Datei, die der Lasercutter als Stempel ausschneiden kann.',
+      name: 'Stempel', dein: 'Dein Stempel', dieser: 'Dieser Stempel', der: 'der', er: 'Er', geaendert: 'Geänderten', notiz: 'gespiegelt', puzzle: false,
+      info: 'Aus deinem Foto wird ein Stempel: Der Laser trägt alles außer dem Motiv ab, das Motiv bleibt stehen und druckt.',
       legende: [['rot', 'Rot: Hier schneidet der Laser durch. Das ist der Rand deines Stempels.'], ['blau', 'Blau: Hier graviert der Laser, das Holz wird abgetragen.'], ['weiss', 'Weiß: Hier bleibt das Holz stehen und nimmt beim Drucken die Farbe auf.']],
       svg: (mask, mm) => Stempel.svg(mask, mm),
       senden: (gruppe, name, svg) => Outbox.stempel(gruppe, name, svg)
     },
     sticker: {
-      name: 'Sticker', dein: 'Dein Sticker', dieser: 'Dieser Sticker', notiz: 'nicht gespiegelt', puzzle: false,
+      name: 'Sticker', dein: 'Dein Sticker', dieser: 'Dieser Sticker', der: 'der', er: 'Er', geaendert: 'Geänderten', notiz: 'nicht gespiegelt', puzzle: false,
       legende: [['schwarz', 'Schwarz: Diese Fläche malt der Plotter mit einem Marker aus, Linie für Linie.'], ['rot', 'Rot: Hier schneidet das Messer, das ist der Rand des Stickers.']],
       svg: (mask, mm) => Stempel.stickerSvg(mask, mm),
       senden: (gruppe, name, svg) => Outbox.sticker(gruppe, name, svg)
     }
   };
 
+  // Pflicht seit 09.11.2026 (Station „Bild bearbeiten“): Puzzle-Bild und „Zurück zum Foto“
   ARTEN.portraet = {
-    name: 'Porträt', dein: 'Dein Porträt', dieser: 'Dieses Porträt', notiz: 'nicht gespiegelt', puzzle: false,
+    name: 'Porträt', dein: 'Dein Porträt', dieser: 'Dieses Porträt', der: 'das', er: 'Es', geaendert: 'Geändertes', notiz: 'nicht gespiegelt', puzzle: true, pflicht: true,
+    info: 'Jetzt wird aus deinem Foto eine Datei, mit der der Lasercutter dein Porträt ins Holz graviert und ausschneidet.',
     legende: [['blau', 'Blau: Hier graviert der Laser, das Holz wird dunkel.'], ['weiss', 'Weiß: bleibt hell.'], ['rot', 'Rot: Hier schneidet der Laser das Porträt aus.']],
     svg: (mask, mm) => Stempel.portraitSvg(mask, mm),
     senden: (gruppe, name, svg) => Outbox.portraet(gruppe, name, svg)
   };
+
+  Object.keys(ARTEN).forEach(id => { ARTEN[id].id = id; });
 
   Object.keys(ARTEN).forEach(id => Rahmen.eigeneArt(id, {
     anzeigen: (station, api) => {

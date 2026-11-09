@@ -31,8 +31,7 @@
   "braucht": [
     "foto",
     "stencilme",
-    "lasercutter",
-    "druck-stempel"
+    "lasercutter"
   ],
   "plaetze": 3
 }

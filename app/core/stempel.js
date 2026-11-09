@@ -6,10 +6,14 @@
 // stencil.html behält bis nach dem Test am 02.11.2026 seine eigene Kopie (Rückfallebene).
 (function(){
 const WORK_SIZE = 480; // px Arbeitsraster (quadratisch)
-// Breite des Arbeitsrasters in mm (Motiv ohne Rand). 50 → 40 mm am 02.11.2026: 3 Stempel
-// mit 50 mm brauchten 27 Min. auf dem Mr Beam (fast alles Gravur), zu lang für 18 Kinder.
-// Gilt auch für Sticker und Porträt, weil alle drei denselben Rand (autoOffset) nutzen.
-const STEMPEL_MM = 40;
+// Breite des Arbeitsrasters in mm (Motiv ohne Rand), pro Art:
+// - Porträt (Pflicht ab Dezember 2026): 45 mm, Gravur 1×, geschätzt ca. 3 Min. pro Stück
+//   (Schätzung 09.11., docs/entscheidungen.md Abschnitt 11).
+// - Stempel (optional): 50 mm. 40 mm waren am 09.11. zu klein, die Drucke wurden schlecht.
+//   Laserzeit ca. 9 Min. pro Stempel (2×), darum nur noch optional.
+// - Sticker: 40 mm wie bisher (Stickerfolie, Cameo).
+// Der Schnittrand (autoOffset) rechnet mit derselben Größe wie die Datei.
+const MM = { stempel: 50, portraet: 45, sticker: 40 };
 const DESPECKLE_PASSES = 2;
 const ENGRAVE_COLOR = '#1e4fd6'; // Blau = Gravieren
 const CUT_COLOR = '#d6291e';     // Rot = Schneiden
@@ -409,7 +413,7 @@ function stampMask(gray, personMask, threshold){
 // roten Rands außer dem Motiv wird graviert, das Motiv bleibt stehen und druckt.
 // cutLoops > 1 heißt: Der rote Rand zerfällt in mehrere Teile (Stempel fällt auseinander).
 function buildStampSvg(mask, offsetMm){
-  const scale = STEMPEL_MM / WORK_SIZE;
+  const scale = MM.stempel / WORK_SIZE;
   const off = computeOffsetCutPath(mask, WORK_SIZE, scale, offsetMm);
   const w = off.widthMm.toFixed(3), h = off.heightMm.toFixed(3);
   // Kein clipPath: Mr Beam entfernt ihn („nicht unterstützt“, Test 02.11.2026). Nicht nötig,
@@ -432,7 +436,7 @@ function buildStampSvg(mask, offsetMm){
 // Das Motiv (die dunklen Stellen des Fotos) wird graviert und dunkel, der Rest bleibt
 // hell. Nicht gespiegelt: Es ist ein Bild, kein Stempel.
 function buildPortraitSvg(mask, offsetMm){
-  const scale = STEMPEL_MM / WORK_SIZE;
+  const scale = MM.portraet / WORK_SIZE;
   const off = computeOffsetCutPath(mask, WORK_SIZE, scale, offsetMm);
   const w = off.widthMm.toFixed(3), h = off.heightMm.toFixed(3);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}mm" height="${h}mm">` +
@@ -571,7 +575,7 @@ function einziehen(mask, size, rPx){
 // die Gruppe „schneiden-rot“ schneidet das Messer. Nicht gespiegelt: Ein Sticker zeigt
 // das Motiv so, wie es ist.
 function buildStickerSvg(mask, offsetMm){
-  const scale = STEMPEL_MM / WORK_SIZE;
+  const scale = MM.sticker / WORK_SIZE;
   const off = computeOffsetCutPath(mask, WORK_SIZE, scale, offsetMm);
   const stift = STICKER_STIFT_MM;
   const stiftMaske = einziehen(off.paddedMask, off.paddedSize, (stift / 2) * STICKER_STIFT_AUSGLEICH / scale);
@@ -595,8 +599,9 @@ function buildStickerSvg(mask, offsetMm){
 // weniger Fläche zum Gravieren = kürzere Laserzeit (Patricia, 08.11.: vorher ab 4 mm).
 // Gesucht wird durch Halbieren (ca. 5 Rechnungen): Ein größerer Rand verbindet höchstens mehr Teile, nie weniger.
 const OFFSET_MIN = 2, OFFSET_MAX = 15, OFFSET_SCHRITT = 0.5;
-function autoOffset(mask){
-  const scale = STEMPEL_MM / WORK_SIZE;
+// art: 'stempel' | 'portraet' | 'sticker' (Größe wie die Datei, siehe MM)
+function autoOffset(mask, art){
+  const scale = (MM[art] || MM.stempel) / WORK_SIZE;
   const einStueck = mm => computeOffsetCutPath(mask, WORK_SIZE, scale, mm).cutLoops.length <= 1;
   if(einStueck(OFFSET_MIN)) return OFFSET_MIN;
   if(!einStueck(OFFSET_MAX)) return OFFSET_MAX;
@@ -663,6 +668,7 @@ window.Stempel = {
   stickerSvg: buildStickerSvg,
   portraitSvg: buildPortraitSvg,
   autoOffset: autoOffset,
+  MM: MM,
   bilder: {
     roh: squareCanvas,
     grau: grayCanvas,

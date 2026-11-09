@@ -1,0 +1,34 @@
+{
+  "id": "stempel",
+  "titel": "Optional: Stempel zum Drucken",
+  "typ": "ki",
+  "datenweg": "laptop",
+  "optional": true,
+  "schritte": [
+    "Optional, wenn ihr Zeit habt: Aus eurem Foto wird zusätzlich ein Stempel.",
+    "Der Laser trägt alles außer dem Motiv ab. Das Motiv bleibt stehen und nimmt beim Drucken die Farbe auf.",
+    "Der Stempel ist gespiegelt, damit euer Abdruck richtig herum ist.",
+    "Prüft den roten Rand und schickt euren Stempel an den Laptop.",
+    "Penny sagt euch Bescheid, wenn er fertig ist. Dann geht der Stempeldruck auf."
+  ],
+  "check": {
+    "art": "stempel"
+  },
+  "eingaben": [
+    {
+      "id": "unterschied",
+      "text": "Was ist anders als bei eurem Porträt?",
+      "pflicht": false,
+      "aufloesung": "Beim Porträt graviert der Laser das Motiv selbst ins Holz: ein Bild zum Anschauen, darum nicht gespiegelt. Beim Stempel graviert er alles außer dem Motiv weg, damit das Motiv druckt, und er ist gespiegelt."
+    }
+  ],
+  "fragen": [
+    "ki-typ",
+    "sterne"
+  ],
+  "datenschutz": "Die Bearbeitung passiert auf dem iPad. Nur der fertige Stempel und dein Name gehen an den Laptop.",
+  "braucht": [
+    "stencilme"
+  ],
+  "plaetze": 13
+}
