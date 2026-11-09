@@ -178,7 +178,7 @@ Grundlage: [auswertung-2026-11-09.md](auswertung-2026-11-09.md). Im Dezember sin
   - Die Postkarte entsteht an der Linolstation. Ein Stempel, wenn Zeit bleibt, wird größer.
   - Das Porträt kommt zuerst auf die Platte. Die Laserzeit für das Porträt wird geschätzt, weil kein Zugang zum Mr Beam besteht. Am ersten Porträt vor Ort prüfen.
 - **Reihenfolge im Vorschlag:** Foto → Bild bearbeiten → Lasercutter/Porträt → Schneideplotter (Sticker) → KI 1 (Selbstporträt) → KI 2 (eigene Bild-App) → Rest.
-- **KI-Stationen sind Pflicht**, nicht mehr optional, weil sie sonst nicht gemacht werden. Opt-out der Eltern („ohne generative KI“) gilt weiter.
+- **KI-Stationen sind Pflicht**, nicht mehr optional, weil sie sonst nicht gemacht werden. Opt-out der Eltern („ohne generative KI“) gilt weiter. Damit die Kinder trotzdem selbst entscheiden (so steht es in `Datenschutz.md`), gibt es an beiden Stationen den Knopf „nur Beispiele ansehen“: Dann geht nichts an Claude, und die Station lässt sich beenden.
 - **Sticker ist kein Bonus mehr** und kommt früh, mit kurzer Erklärung, was ein Schneideplotter macht.
 - **Cameo darf nie durch die Matte schneiden.** Empfehlung: nur die Stickerschicht anschneiden statt durchschneiden. Das Trägerpapier bleibt ganz, der Bogen wird von Hand zerschnitten.
 - **Vibe Coding heißt „Eure eigene Bild-App“**, 2 Plätze, Hinweis nach 20 Min. Jede App bekommt „Foto wählen“, damit sie auch außerhalb von stencil.me läuft.

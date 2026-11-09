@@ -8,7 +8,7 @@ Lang und genau: `Datenschutz.md`.
 
 💻 **Pennys Laptop:** Steht hier im Raum. Er bekommt dein Porträt (für den Laser) und eure Antworten. Dein Foto bleibt auf dem iPad. Er schickt nichts ins Internet.
 
-🌍 **Internet:** Nur an zwei optionalen Stationen, an die generative KI Claude. Dorthin gehen nur Wörter aus dem Baukasten. Kein Foto, kein Name. Du musst diese Stationen nicht machen.
+🌍 **Internet:** Nur an zwei Stationen, an die generative KI Claude. Dorthin gehen nur Wörter aus dem Baukasten. Kein Foto, kein Name. Du musst nichts schicken: Tipp dort auf „nur Beispiele ansehen“.
 
 ## Drei Regeln für dich
 

@@ -30,7 +30,7 @@
 
 - [x] Ist das WLAN mit Passwort verschlüsselt? Ja, passwortgeschützt (Patricia, 25.10.). Offen: Wer ist sonst noch im selben WLAN?
 
-- [ ] Darf der Laptop im KOMEZ-WLAN ins Internet (`api.anthropic.com`, für die zwei optionalen Claude-Stationen)?
+- [ ] Darf der Laptop im KOMEZ-WLAN ins Internet (`api.anthropic.com`, für die zwei Claude-Stationen)?
 - [ ] Wer holt die Einwilligungen der Erziehungsberechtigten ein (KOMEZ, Schule oder Patricia)? `Datenschutz.md` liegt bei.
 
 ## Mr Beam
