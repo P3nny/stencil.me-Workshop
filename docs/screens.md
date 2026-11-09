@@ -279,3 +279,11 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - **Knopf „Wir wollen nichts an die KI schicken: nur Beispiele ansehen“** an beiden KI-Stationen: Die Kinder entscheiden selbst, die Station lässt sich trotzdem beenden, die Wahl bleibt nach dem Neuladen (`selbstOhneKi`). Opt-out der Eltern wie bisher
 - **Feedbackbogen** geht auf nach allen 14 Pflichtstationen oder über die Freigabe am Laptop
 - Zählung jetzt „x von 14“
+
+## Kein Wettrennen (09.11., Branch `feature/kein-wettrennen`)
+
+- **Bewertung freiwillig:** 3 Smileys (😕 Ging so, 🙂 Gut, 🤩 Super) statt 5 Pflicht-Sterne, gespeichert als `gefallen` 1–3. „Fertig“ wartet nur noch auf die KI-Frage. Auswertung zeigt ⌀ und Verteilung
+- **2 Minuten Ruhe pro Station:** „Station beendet“ frühestens 2 Minuten nach dem Check-in, mit Countdown „Kein Wettrennen: Schaut euch alles in Ruhe an.“ Foto und Feedbackbogen ohne Wartezeit (`mindestMinuten: 0`)
+- **Feedbackbogen nur über die Freigabe am Laptop** (ab ca. 12:00, `nurFreigabe`), nicht mehr nach dem Sticker oder allen Stationen
+- **„Das sollte Penny anders machen“** zum Antippen (mehrere möglich), darunter freiwillig ein eigener Satz. Auswertung zählt die Antworten
+- Sticker-Video getauscht (`X-PuUR-Sn8k`), das erste ließ sich nicht einbetten
