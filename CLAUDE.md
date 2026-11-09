@@ -53,7 +53,7 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 
 - `index.html`: Startseite der Workshop-App (Anmeldung allein/zu zweit, dann Foto-Station).
 - `app/station.html?id=<station>`: eine Seite für alle Stationen, Inhalte aus `stationen/*.json` (Format: `stationen/README.md`). Gemeinsamer Code in `app/core/`, eigene Stationsteile in `app/stationen/`. Gerätecheck: `app/geraetecheck.html`.
-- Stationen (Stand 09.11.2026): 11 Pflichtstationen (zählen für „x von 11“ und das Puzzle; „Bild bearbeiten“ macht das Lasercut-Porträt), optional: 2 Claude-Stationen (KI-Selbstporträt, Bild-App vibe coden), Stempel und Stempeldruck, 2 Bonus-Stationen (Sticker ab 8 geschafften, Feedbackbogen). Reihenfolge über `braucht` und `plaetze`, Überblick und Verlauf in `docs/screens.md`.
+- Stationen (Stand 09.11.2026): 14 Pflichtstationen (zählen für „x von 14“ und das Puzzle; „Bild bearbeiten“ macht das Lasercut-Porträt; dazu Sticker und die 2 Claude-Stationen, dort mit Knopf „nur Beispiele ansehen“), optional: Stempel und Stempeldruck, Bonus: Feedbackbogen (nach allen Pflichtstationen oder Freigabe am Laptop). Vorschlag in der Reihenfolge von `stationen/index.json` über `vorrang`: Foto → Bild bearbeiten → Lasercutter → Sticker → KI-Selbstporträt → Bild-App vibe coden → Rest. Reihenfolge über `braucht` und `plaetze`, Überblick und Verlauf in `docs/screens.md`.
 - `server/`: Workshop-Server (Python, nur Standardbibliothek; Ausnahme: Anthropic-SDK im venv für die Claude-Stationen, `server/einrichten.sh`). Laptop-Seite `/laptop` (Holzplatte, Stickerfolie mit Plotter, Nachrichten, Freigaben), `/qr`, `/auswertung`.
 - `tests/`: Playwright-Tests (`stationen-test.js` kompletter Durchlauf, `tabs-test.js`, `leistung-test.js`), laufen in WebKit und Chromium.
 - `Datenschutz.md`: kindgerechte Datenschutzinformation (dazu `docs/datenschutz-kurz.md`, `docs/canva-folie-datenschutz.md`).
@@ -61,7 +61,7 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 - `code-quiz.html`, `kunst-quiz.html`: eigenständige Quizseiten.
 - PDFs: Startpräsentation, Stationenkarten, Künstler:innen, Berufe, Abschluss, QR-Code Kunstquiz.
 - `/archiv/` ist in `.gitignore`: dort liegt lokal die `fotobox-karte` (Flask-Queue `fotobox-queue.py`, Plotter-Anbindung) als Vorbild für Foto-Übertragung und Server-Queue. **Nicht ins Repo committen.** Wenn du dort lesen musst, frag nach dem Pfad.
-- TF.js, BodyPix-Modell und Schriften liegen lokal in `vendor/` (Versionen und Lizenzen: `vendor/README.md`). Die App lädt nichts aus dem Internet. Einzige Ausnahme: das YouTube-Video am Lasercutter, erst nach Antippen von „Video laden“.
+- TF.js, BodyPix-Modell und Schriften liegen lokal in `vendor/` (Versionen und Lizenzen: `vendor/README.md`). Die App lädt nichts aus dem Internet. Einzige Ausnahme: die YouTube-Videos am Lasercutter und an der Sticker-Station, erst nach Antippen von „Video laden“.
 
 ## Repo-Struktur
 
@@ -114,7 +114,7 @@ Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen
 
 - Fotos von Jugendlichen bleiben auf dem iPad (seit 25.10.2026 kein Foto-Upload mehr). Zum lokalen Server geht nur, was für Laser, Plotter und den Ablauf im Workshop nötig ist (Stempel-, Sticker-, Porträt-SVG, Antworten).
 - **Kein Foto und kein Prompt eines Kindes geht an einen Online-Dienst**, ohne dass es in `Datenschutz.md` steht und Einwilligungen vorliegen. Das gilt auch für KI-Funktionen.
-- Der Workshop-Server ist Patricias Laptop im KOMEZ-WLAN. Er nimmt die Ergebnisse der Kinder an (Fotos, Stempel, Antworten). An einen Online-Dienst gibt er nur die Baukasten-Texte der zwei **optionalen** Claude-Stationen weiter (Anthropic), nie Fotos oder Namen.
+- Der Workshop-Server ist Patricias Laptop im KOMEZ-WLAN. Er nimmt die Ergebnisse der Kinder an (Fotos, Stempel, Antworten). An einen Online-Dienst gibt er nur die Baukasten-Texte der zwei Claude-Stationen weiter (Anthropic), nie Fotos oder Namen. Seit 09.11.2026 sind die Stationen Pflicht, das Senden an Claude bleibt freiwillig (Opt-out der Eltern, Knopf „nur Beispiele ansehen“ für die Kinder).
 - Alle Daten werden am Ende des Workshops gelöscht, auf den iPads und auf dem Laptop. Keine digitale Mappe, kein USB-Stick (entschieden 25.10.2026): Die Kinder nehmen Stempel, Postkarte und Sticker mit. Vorher sichert der Laptop ohne Namen und ohne Fotos Vibe-Coding-Apps, KI-Prompts, Auswertung und Ablauf nach `archiv/workshops/` (`server/archiv.py`).
 - `Datenschutz.md` ist ein Pflicht-Ergebnis: im Stil der Stationstexte, kindgerecht, geht vorab an Lehrkräfte und Erziehungsberechtigte, Kinder sollen es selbst lesen, verstehen und hinterfragen können. Es erklärt den Datenweg pro Station und den Unterschied Programm / KI / generative KI. **Bei jeder Änderung an Datenflüssen `Datenschutz.md` mit ändern** (und das Etikett `datenweg` der Station). `archiv/Datenschutz.md` ist der Schriftwechsel mit dem KOMEZ, nicht die Datenschutzinformation.
 - Beim Bau neuer Funktionen immer fragen: Wohin gehen die Daten? Wie lange bleiben sie? Wer kann sie sehen?
@@ -144,7 +144,7 @@ Grundsatz: **Jede Ausbaustufe muss den Workshop allein tragen**, die alte Stufe 
 Zurückgestellt (nach dem Workshop, nur bei Bedarf): eigener Router, HTTPS mit `workshop.datenhandlung.de` (`docs/https-einrichten.md`, INWX-Zugangsdaten nie ins Repo), Laser-Queue.
 
 4. Dateien an die Kinder: keine. Am Ende wird alles gelöscht, vorher anonym gesichert (entschieden 25.10., ersetzt ZIP/USB).
-5. Claude-Stationen: Claude-API mit eigenem Schlüssel und Ausgabenlimit (nicht das Pro-Abo), Modell Sonnet 5.5, nur Baukasten/Lückentext, **optional** (entschieden).
+5. Claude-Stationen: Claude-API mit eigenem Schlüssel und Ausgabenlimit (nicht das Pro-Abo), Modell Sonnet 5.5, nur Baukasten/Lückentext, **optional** (entschieden; seit 09.11. Pflichtstationen, Senden an Claude freiwillig).
 6. Canva ersetzt: „Hintergrund ändern“ lokal mit BodyPix, KI-Selbstporträt über Claude ohne Foto (entschieden).
 7. Freier Ablauf: Die App schlägt Stationen nach `braucht` und `plaetze` vor, keine Rotation (entschieden).
 

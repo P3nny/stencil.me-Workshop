@@ -1,7 +1,6 @@
 {
   "id": "vibe-coding",
-  "titel": "Optional: Bild-App vibe coden",
-  "optional": true,
+  "titel": "Bild-App vibe coden",
   "typ": "generativ",
   "datenweg": "online",
   "schritte": [
@@ -139,8 +138,5 @@
     "stencilme"
   ],
   "plaetze": 1,
-  "vorrangNach": [
-    "platte-laser",
-    "platte-fertig"
-  ]
+  "vorrang": true
 }

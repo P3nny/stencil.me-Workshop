@@ -11,7 +11,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `id` | ja | kurzer Name, gleich wie der Dateiname (`foto` → `foto.json`) |
 | `titel` | ja | Überschrift in der App |
 | `typ` | ja | `programm`, `ki`, `generativ` oder `analog` (Etikett an der Station) |
-| `datenweg` | ja | Etikett an der Station: `ipad`, `antworten` (Antworten an den Laptop), `foto-ipad` (Foto bleibt auf dem iPad, Antworten an den Laptop), `foto-ipad-video` (dazu ein YouTube-Video), `laptop` (Datei für Laser/Plotter an den Laptop) oder `online` (generative KI). Texte in `DATENWEG_TEXT` (`app/core/rahmen.js`). Fotos gehen seit 25.10.2026 nicht mehr an den Laptop |
+| `datenweg` | ja | Etikett an der Station: `ipad`, `antworten` (Antworten an den Laptop), `foto-ipad` (Foto bleibt auf dem iPad, Antworten an den Laptop), `foto-ipad-video` (dazu ein YouTube-Video), `laptop` (Datei für Laser/Plotter an den Laptop), `laptop-video` (dazu ein YouTube-Video) oder `online` (generative KI). Texte in `DATENWEG_TEXT` (`app/core/rahmen.js`). Fotos gehen seit 25.10.2026 nicht mehr an den Laptop |
 | `schritte` | ja | höchstens 5, je ein kurzer Satz |
 | `beispiele` | nein | Beispielbilder: `{ "bild": "bilder/….svg", "gut": true, "text": "…" }`, mit `"ganz": true` größer und unbeschnitten. Bilder liegen in `stationen/bilder/` |
 | `video` | nein | YouTube-Video, lädt erst nach Antippen: `{ "youtube": "<11 Zeichen aus der Adresse>", "titel": "…", "quelle": "…" }` |

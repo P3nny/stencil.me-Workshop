@@ -109,7 +109,7 @@
     <div id="platte-verlauf"></div>
   </div>
   <div class="panel bogen-panel" id="folie">
-    <h2>Sticker → A4-Stickerfolie für die Cameo (Bonus)</h2>
+    <h2>Sticker → A4-Stickerfolie für die Cameo</h2>
     <div class="count" id="folie-anzahl">–</div>
     <div class="hint">Ordner: <span class="folder" id="folie-ordner"></span></div>
     <div id="folie-fehler"></div>
@@ -514,7 +514,7 @@
   function freigabeZeigen() {
     var an = freigaben.indexOf("feedback") >= 0;
     document.getElementById("feedbackFreigabe").textContent = an ? "Feedbackbogen-Freigabe zurücknehmen" : "Feedbackbogen für alle freigeben";
-    document.getElementById("freigabeState").textContent = an ? "✓ Alle Gruppen können den Feedbackbogen ausfüllen (iPads merken es beim nächsten Öffnen einer Station)." : "Feedbackbogen nur nach Bonus 1 (Sticker).";
+    document.getElementById("freigabeState").textContent = an ? "✓ Alle Gruppen können den Feedbackbogen ausfüllen (iPads merken es beim nächsten Öffnen einer Station)." : "Feedbackbogen erst, wenn eine Gruppe alle Pflichtstationen geschafft hat.";
     var loeschen = freigaben.indexOf("loeschen") >= 0;
     document.getElementById("loeschenFreigabe").textContent = loeschen ? "Löschen-Freigabe zurücknehmen" : "Abschluss: Löschen auf den iPads freigeben";
     document.getElementById("loeschenState").textContent = loeschen

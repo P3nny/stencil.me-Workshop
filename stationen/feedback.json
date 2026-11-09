@@ -4,6 +4,7 @@
   "typ": "analog",
   "datenweg": "antworten",
   "bonus": true,
+  "mindestFertig": 14,
   "freigabe": "feedback",
   "schritte": [
     "Sagt Penny, wie der Workshop für euch war. Ehrlich ist am besten.",
@@ -46,8 +47,6 @@
   },
   "fragen": [],
   "datenschutz": "Euer Feedback geht ohne Namen an den Laptop und liegt dort getrennt von euren anderen Antworten. Penny sieht nicht, von wem es ist.",
-  "braucht": [
-    "sticker"
-  ],
+  "braucht": [],
   "plaetze": 13
 }

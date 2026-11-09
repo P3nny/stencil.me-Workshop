@@ -270,3 +270,12 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Größen in `app/core/stempel.js` (`MM`): Porträt 40, Stempel 50, Sticker 40. Der automatische Schnittrand rechnet mit der Größe der jeweiligen Art
 - **Laptop-Seite, Holzplatte:** Porträts sind vorausgewählt, Stempel nicht. Gemischt kommt eine Warnung (Porträts 1×, Stempel 2× gravieren)
 - Zählung jetzt „x von 11“
+
+## Reihenfolge und KI Pflicht (09.11., Branch `feature/reihenfolge-dezember`)
+
+- **Vorschlag in fester Reihenfolge:** Foto → Bild bearbeiten → Lasercutter → Sticker → KI-Selbstporträt → Bild-App vibe coden → Rest. Umgesetzt mit `vorrang: true` und der Reihenfolge in `stationen/index.json` (die erste freie Vorrang-Station gewinnt). Ist eine Station voll (`plaetze`), kommt die nächste
+- **Sticker** ist kein Bonus mehr, braucht nur den Lasercutter, zählt mit. Erster Schritt erklärt den Schneideplotter
+- **KI-Selbstporträt und Bild-App vibe coden** sind Pflicht (ohne „Optional:“). `vorrangNach` bei Vibe Coding entfällt
+- **Knopf „Wir wollen nichts an die KI schicken: nur Beispiele ansehen“** an beiden KI-Stationen: Die Kinder entscheiden selbst, die Station lässt sich trotzdem beenden, die Wahl bleibt nach dem Neuladen (`selbstOhneKi`). Opt-out der Eltern wie bisher
+- **Feedbackbogen** geht auf nach allen 14 Pflichtstationen oder über die Freigabe am Laptop
+- Zählung jetzt „x von 14“

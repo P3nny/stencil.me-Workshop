@@ -86,8 +86,16 @@
         erzeugenKnopf.disabled = genutzt >= ki.proGruppe || eintrag.ohneKi;
       }
 
+      // Seit 09.11.2026 Pflicht. Die Kinder entscheiden trotzdem selbst: Wer nichts an Claude
+      // schicken will, sieht Beispiele und kann die Station beenden (Datenschutz.md).
+      const verzichtKnopf = el('button', { type: 'button', klasse: 'secondary', text: 'Wir wollen nichts an die KI schicken: nur Beispiele ansehen' });
+      verzichtKnopf.addEventListener('click', () => {
+        eintrag.selbstOhneKi = true;
+        ohneKi('Ihr habt entschieden: Von euch geht nichts an die KI.');
+      });
       function ohneKi(text){
         eintrag.ohneKi = true;
+        verzichtKnopf.hidden = true;
         hinweisOffline.hidden = false;
         hinweisOffline.innerHTML = '';
         hinweisOffline.appendChild(el('p', { klasse: 'rand-warnung', text: text + ' Hier seht ihr Bilder, die vorher mit derselben KI erzeugt wurden. Vergleicht die Prompts mit den Bildern.' }));
@@ -135,6 +143,7 @@
         .then(d => {
           // Opt-out der Eltern (Liste auf dem Laptop): nur Beispiele, der Laptop fragt die KI nicht
           if(d.ohneKi) return ohneKi('Diese Station macht ihr heute mit Beispielen.');
+          if(eintrag.selbstOhneKi) return ohneKi('Ihr habt entschieden: Von euch geht nichts an die KI.');
           if(!d.eingerichtet) return ohneKi('Die KI ist auf dem Laptop nicht eingerichtet.');
           // KI ist (wieder) da: richtig erzeugen statt nur Beispiele
           if(eintrag.ohneKi){
@@ -152,7 +161,7 @@
         el('p', { klasse: 'hinweis', text: 'Wählt aus den Bausteinen. Das Bild malt eine KI (Claude), kein Mensch.' }),
         promptBox,
         baukasten,
-        erzeugenKnopf, status, rest,
+        erzeugenKnopf, status, rest, verzichtKnopf,
         hinweisOffline,
         el('h2', { text: 'Eure Bilder' }),
         galerie

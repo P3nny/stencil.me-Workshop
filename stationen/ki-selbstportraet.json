@@ -1,7 +1,6 @@
 {
   "id": "ki-selbstportraet",
-  "titel": "Optional: Selbstporträts mit KI neu erschaffen",
-  "optional": true,
+  "titel": "Selbstporträts mit KI neu erschaffen",
   "typ": "generativ",
   "datenweg": "online",
   "schritte": [
@@ -301,5 +300,6 @@
   "braucht": [
     "stencilme"
   ],
-  "plaetze": 13
+  "plaetze": 13,
+  "vorrang": true
 }
