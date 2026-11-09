@@ -241,8 +241,16 @@
         freiZeigen();
       }
 
+      // Seit 09.11.2026 Pflicht. Die Kinder entscheiden trotzdem selbst: Wer nichts an Claude
+      // schicken will, sieht Beispiele und kann die Station beenden (Datenschutz.md).
+      const verzichtKnopf = el('button', { type: 'button', klasse: 'secondary', text: 'Wir wollen nichts an die KI schicken: nur Beispiele ansehen' });
+      verzichtKnopf.addEventListener('click', () => {
+        eintrag.selbstOhneKi = true;
+        ohneKi('Ihr habt entschieden: Von euch geht nichts an die KI.');
+      });
       function ohneKi(text){
         eintrag.ohneKi = true;
+        verzichtKnopf.hidden = true;
         offline.hidden = false;
         offline.innerHTML = '';
         offline.appendChild(el('p', { klasse: 'rand-warnung', text: text + ' Hier seht ihr eine App, die vorher mit derselben KI gebaut wurde.' }));
@@ -345,6 +353,7 @@
         .then(d => {
           // Opt-out der Eltern (Liste auf dem Laptop): nur Beispiele, der Laptop fragt die KI nicht
           if(d.ohneKi) return ohneKi('Diese Station macht ihr heute mit Beispielen.');
+          if(eintrag.selbstOhneKi) return ohneKi('Ihr habt entschieden: Von euch geht nichts an die KI.');
           if(!d.eingerichtet) return ohneKi('Die KI ist auf dem Laptop nicht eingerichtet.');
           if(eintrag.ohneKi){ eintrag.ohneKi = false; appsZeigen(); api.speichern().then(() => api.pruefen()); }
           // Freier Modus nur, wenn auf dem Laptop eine PIN eingerichtet ist
@@ -357,7 +366,7 @@
       return el('div', { klasse: 'vibe-station' }, [
         el('h2', { text: 'Euer Auftrag an die KI' }),
         el('p', { klasse: 'hinweis', text: 'Wählt aus und tippt in die hellen Felder. Ihr sprecht mit einer KI (Claude), nicht mit einem Menschen.' }),
-        lueckentext, knopf, freiTeil, status, zaehler, code, offline,
+        lueckentext, knopf, verzichtKnopf, freiTeil, status, zaehler, code, offline,
         el('h2', { text: 'Eure Apps' }), apps
       ]);
     },
