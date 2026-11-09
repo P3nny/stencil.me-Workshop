@@ -299,3 +299,9 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Am 09.11. blieb Vibe Coding über eine Stunde offen, weil Gruppen die Station nicht beendet hatten. Neue Kinder kommen mit „Wir sind trotzdem dran“ an die Station, die Plätze bleiben wie sie sind
 - **iPad:** 15 Minuten nach dem Check-in erscheint oben (bleibt beim Scrollen sichtbar): „⏰ Ihr seid schon 16 Minuten an dieser Station. Seid ihr fertig? Dann unten auf ‚Station beendet‘ tippen, damit die nächste Gruppe drankommt.“ Knöpfe „Zu ‚Station beendet‘“ und „Wir brauchen noch Zeit“. Danach alle weiteren 15 Minuten wieder. Pro Station änderbar mit `erinnerungMinuten` (0 = nie)
 - **Laptop-Seite:** Spalte „Gerade an“ zeigt „seit 20 Min.“, ab 15 Minuten rot mit ⏰
+
+## Eure eigene Bild-App (09.11., Branch `feature/eigene-bild-app`)
+
+- Station „Bild-App vibe coden“ heißt jetzt **„Eure eigene Bild-App“**. „Vibe coding“ steht nur noch erklärend im ersten Schritt
+- Freier Modus: Knopf „💡 Eigene Idee mit Penny umsetzen (Penny gibt die PIN ein)“, Überschrift „Eure eigene Idee“. Plätze bleiben bei 1 (Gruppe bei Penny), gegen lange offene Stationen hilft die Erinnerung nach 15 Minuten
+- Gesicherte Apps (`archiv/workshops/…/apps/`) haben schon seit 08.11. einen Knopf „📷 Foto wählen“ und laufen auch allein im Browser (geprüft mit den 7 Apps vom 09.11.: 6 nehmen das Foto, die Untertitel-Video-App braucht keins)

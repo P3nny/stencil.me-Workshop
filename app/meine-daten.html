@@ -139,7 +139,7 @@
         const apps = d.dateien.filter(f => /\.html$/.test(f));
         box.appendChild(el('h2', { text: 'Stempel und Bilder (' + bildDateien.length + ')' }));
         box.appendChild(bildDateien.length ? bilder(bildDateien.map(url)) : el('p', { text: 'Noch keine.' }));
-        if(apps.length) box.appendChild(el('p', { text: 'Dazu ' + apps.length + (apps.length === 1 ? ' App' : ' Apps') + ' aus „Bild-App vibe coden“.' }));
+        if(apps.length) box.appendChild(el('p', { text: 'Dazu ' + apps.length + (apps.length === 1 ? ' App' : ' Apps') + ' aus „Eure eigene Bild-App“.' }));
         box.appendChild(el('h2', { text: 'Wann ihr wo wart' }));
         box.appendChild(zeitTabelle(liste, d.zeiten || {}));
         box.appendChild(el('h2', { text: 'Eure Antworten' }));

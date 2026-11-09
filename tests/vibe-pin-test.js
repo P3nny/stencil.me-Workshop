@@ -43,7 +43,7 @@ function outboxLeer(page){
   await page.goto(BASE + '/app/station.html?id=vibe-coding&schnell');
   await page.waitForSelector('text=App bauen lassen');
   await page.waitForTimeout(800);
-  pruefe(await page.locator('text=frei vibe coden freischalten').isHidden(), 'kein Knopf zum Freischalten');
+  pruefe(await page.locator('text=Eigene Idee mit Penny umsetzen').isHidden(), 'kein Knopf zum Freischalten');
   let r = await api.post('/api/ki-freigabe', { data: { gruppe: 'c1c1c1c1c1c1', pin: '' } });
   pruefe(r.status() === 409, 'Freischalten ohne PIN auf dem Laptop abgelehnt (' + r.status() + ')');
 
@@ -65,8 +65,8 @@ function outboxLeer(page){
 
   console.log('Freischalten auf dem iPad');
   await page.reload();
-  await page.waitForSelector('text=frei vibe coden freischalten');
-  await page.click('text=frei vibe coden freischalten');
+  await page.waitForSelector('text=Eigene Idee mit Penny umsetzen');
+  await page.click('text=Eigene Idee mit Penny umsetzen');
   await page.fill('.vibe-pin', '0000');
   await page.click(".vibe-pin-box button");
   await page.waitForSelector('text=Falsche PIN.');

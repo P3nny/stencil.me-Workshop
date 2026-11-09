@@ -1,4 +1,4 @@
-// ---- Station „Bild-App vibe coden“ ----
+// ---- Station „Eure eigene Bild-App“ (vibe coding, bis 09.11.2026 „Bild-App vibe coden“) ----
 // Lückentext statt freiem Auftrag: Effekt, Farben, Regler zur Auswahl, nur App-Name und
 // Knopf-Text frei (kurz, geprüft auf dem Laptop). Das iPad schickt den Lückentext an den
 // Laptop, Claude schreibt die App, der Code erscheint Stück für Stück (server/ki_app.py).
@@ -166,7 +166,7 @@
       const pinKnopf = el('button', { type: 'button', text: 'Freischalten' });
       const pinBox = el('div', { klasse: 'vibe-pin-box' }, [el('label', { text: 'PIN: ' }, [pinFeld]), pinKnopf]);
       pinBox.hidden = true;
-      const oeffnen = el('button', { type: 'button', klasse: 'secondary', text: '🔓 Erwachsene Person: frei vibe coden freischalten', onclick: () => {
+      const oeffnen = el('button', { type: 'button', klasse: 'secondary', text: '💡 Eigene Idee mit Penny umsetzen (Penny gibt die PIN ein)', onclick: () => {
         pinBox.hidden = false;
         oeffnen.hidden = true;
         pinFeld.focus();
@@ -182,8 +182,8 @@
         freiUhr, neuKnopf, aendernKnopf
       ]);
       freiOffen.hidden = true;
-      freiTeil.appendChild(el('h2', { text: 'Frei vibe coden' }));
-      freiTeil.appendChild(el('p', { klasse: 'hinweis', text: 'Mit einer erwachsenen Person dürft ihr euren Auftrag frei formulieren und eure App weiterbauen lassen, wie im echten Leben.' }));
+      freiTeil.appendChild(el('h2', { text: 'Eure eigene Idee' }));
+      freiTeil.appendChild(el('p', { klasse: 'hinweis', text: 'Ihr habt eine ganz eigene Idee für eine App? Mit Penny (oder einer anderen erwachsenen Person) beschreibt ihr sie frei und lasst eure App weiterbauen, wie im echten Leben.' }));
       [oeffnen, pinBox, pinStatus, freiOffen].forEach(k => freiTeil.appendChild(k));
 
       function freiZeigen(){
