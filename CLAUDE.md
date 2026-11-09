@@ -87,7 +87,7 @@ Jede Station ist eine Datei in `stationen/` mit festen Feldern:
 - `schritte`: maximal 5, jeweils ein Satz
 - `check`: wie die App prüft, dass die Station absolviert ist (Bestätigung, Foto-Upload, Quiz bestanden)
 - `eingaben` (optional): Textantworten, Foto-Upload (z. B. Lieblingskünstlerin, eigener Linoldruck)
-- `fragen`: Pflichtfragen „generative oder Bildbearbeitungs-KI?“ und Bewertung (1–5 Sterne)
+- `fragen`: Pflichtfrage „generative oder Bildbearbeitungs-KI?“ (`ki-typ`) und freiwillige Bewertung mit 3 Smileys (`gefallen`, seit 09.11.2026 statt 1–5 Sterne)
 - `datenschutz`: ein Satz, was mit den Daten dieser Station passiert
 
 Bestehende Stationen (aus `02_stencil.me-Stationen.pdf`) sinngemäß übernehmen: Foto, stencil.me, Kunstprojekt (Cameo), Lasercutter, Schneideplotter, Hintergrund ändern, Körpererkennung, Pixel vs. Vektor, Coding (SVG, HTML/CSS, JavaScript), KI-Selbstporträts, Mit der Hand drucken, Bild-App vibe coden, Code-Erklärung, Künstler:innen, Streetart, Berufe, Kunst- und Code-Quiz.

@@ -4,8 +4,10 @@
   "typ": "analog",
   "datenweg": "antworten",
   "bonus": true,
-  "mindestFertig": 14,
   "freigabe": "feedback",
+  "nurFreigabe": true,
+  "freigabeText": "Den Feedbackbogen gibt Penny gegen Ende des Workshops für alle frei. Bis dahin: weiter zur nächsten Station!",
+  "mindestMinuten": 0,
   "schritte": [
     "Sagt Penny, wie der Workshop für euch war. Ehrlich ist am besten.",
     "Jede Person füllt ihren eigenen Bogen aus."
@@ -25,9 +27,19 @@
     },
     {
       "id": "anders",
-      "art": "text",
-      "text": "Das sollte Penny beim nächsten Mal anders machen:",
-      "pflicht": true
+      "art": "mehrfach",
+      "text": "Das sollte Penny beim nächsten Mal anders machen (mehrere möglich):",
+      "pflicht": true,
+      "optionen": [
+        "Nichts, war gut so",
+        "Mehr Zeit zum Drucken",
+        "Mehr Zeit an Laser und Plotter",
+        "Mehr KI ausprobieren",
+        "Weniger lesen, mehr selber machen",
+        "Mehr Pausen",
+        "Mehr erklären"
+      ],
+      "zusatz": "Noch etwas? (freiwillig)"
     },
     {
       "id": "empfehlen",

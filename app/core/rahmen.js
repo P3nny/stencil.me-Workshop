@@ -30,6 +30,23 @@
   // station.html?id=foto&nochmal: Foto-Station noch einmal öffnen, obwohl sie fertig ist
   // (Link „Zurück zum Foto“ in „Bild bearbeiten“)
   const NOCHMAL = /[?&]nochmal\b/.test(location.search);
+  // Kein Wettrennen (Patricia, 09.11.2026: ein Paar hatte 12 Stationen in 25 Minuten „geschafft“):
+  // „Station beendet“ geht frühestens MINDEST_MINUTEN nach dem Check-in, pro Station änderbar
+  // mit mindestMinuten (0 = sofort). Im Testmodus (?test) und mit ?schnell ohne Wartezeit.
+  const MINDEST_MINUTEN = 2;
+  const OHNE_WARTEN = TEST || /[?&]schnell\b/.test(location.search);
+  function restSekunden(station, eintrag){
+    const minuten = station.mindestMinuten !== undefined ? station.mindestMinuten : MINDEST_MINUTEN;
+    if(OHNE_WARTEN || !minuten || !eintrag.start) return 0;
+    return Math.max(0, Math.ceil((Date.parse(eintrag.start) + minuten * 60000 - Date.now()) / 1000));
+  }
+  // Wie hat dir die Station gefallen? Freiwillig, 3 Smileys statt 5 Sterne (09.11.2026: Der Pflicht-Stern
+  // wurde oft nur angetippt, um weiterzukommen). Gespeichert als gefallen: 1–3.
+  const GEFALLEN = [
+    { wert: 1, emoji: '😕', text: 'Ging so' },
+    { wert: 2, emoji: '🙂', text: 'Gut' },
+    { wert: 3, emoji: '🤩', text: 'Super' }
+  ];
   // Testschalter an Links weitergeben, damit man beim Testen im Testmodus bleibt
   function testZusatz(){
     return (TEST ? '&test' : '') + (Stationen.FREI ? '&frei' : '');
@@ -547,11 +564,21 @@
     inhalt.innerHTML = '';
     const beendenKnopf = el('button', { type: 'button', klasse: 'gross', text: 'Station beendet', onclick: abschlussZeigen });
     const fehltHinweis = el('p', { klasse: 'hinweis' });
+    clearInterval(ctx.ruheUhr);
     ctx.pruefen = () => {
       const ok = inputErfuellt(station);
-      beendenKnopf.disabled = !ok;
-      fehltHinweis.textContent = ok ? '' : 'Erst wenn alles oben erledigt ist, geht es weiter.';
+      const rest = restSekunden(station, ctx.eintrag);
+      beendenKnopf.disabled = !ok || rest > 0;
+      fehltHinweis.textContent = !ok ? 'Erst wenn alles oben erledigt ist, geht es weiter.'
+        : rest > 0 ? 'Kein Wettrennen: Schaut euch alles in Ruhe an. In ' + Math.floor(rest / 60) + ':' + ('0' + rest % 60).slice(-2) + ' könnt ihr die Station beenden.' : '';
     };
+    if(restSekunden(station, ctx.eintrag) > 0){
+      ctx.ruheUhr = setInterval(() => {
+        if(!document.body.contains(beendenKnopf)) return clearInterval(ctx.ruheUhr);
+        ctx.pruefen();
+        if(!restSekunden(station, ctx.eintrag)) clearInterval(ctx.ruheUhr);
+      }, 1000);
+    }
     const links = (station.links || []).filter(l => l.url).map(l => el('a', { href: l.url, target: '_blank', klasse: 'knopf-link', text: l.text }));
     inhalt.appendChild(el('section', { klasse: 'panel' }, [
       el('h1', { text: station.titel }),
@@ -573,19 +600,19 @@
   function abschlussZeigen(){
     const station = ctx.station;
     const eintrag = ctx.eintrag;
-    const fragen = station.fragen || ['sterne'];
+    const fragen = station.fragen || ['gefallen'];
     const inhalt = document.getElementById('inhalt');
     inhalt.innerHTML = '';
     const fertigKnopf = el('button', { type: 'button', klasse: 'gross', text: 'Fertig', onclick: beenden });
     const aufloesung = el('div', { klasse: 'aufloesung' });
     const pruefen = () => {
-      fertigKnopf.disabled = (fragen.indexOf('ki-typ') >= 0 && !eintrag.kiTyp) || (fragen.indexOf('sterne') >= 0 && !eintrag.sterne);
+      fertigKnopf.disabled = fragen.indexOf('ki-typ') >= 0 && !eintrag.kiTyp;
       // Das Typ-Etikett erst nach der Antwort zeigen, sonst wird nur abgeschrieben
       aufloesung.innerHTML = '';
       if(eintrag.kiTyp) aufloesung.appendChild(el('p', {}, [el('span', { text: 'Auflösung: ' }), etiketten(station, true).firstChild]));
     };
     const teile = [el('h1', { text: station.titel + ': geschafft?' })];
-    // Reihenfolge (Patricia, 24.10.): erst Auflösungen, dann „Was hast du genutzt?“, dann Sterne
+    // Reihenfolge (Patricia, 24.10.): erst Auflösungen, dann „Was hast du genutzt?“, dann „Wie hat es gefallen?“
     // Auflösung zu Fragen der Station (z. B. „Was bedeuten die Farben?“), erst nach der eigenen Antwort
     (station.eingaben || []).filter(e => e.aufloesung).forEach(e => {
       teile.push(el('h2', { text: e.text }));
@@ -607,20 +634,17 @@
       teile.push(hilfe); // unter den Antworten (Patricia, 25.10.)
       teile.push(aufloesung);
     }
-    if(fragen.indexOf('sterne') >= 0){
-      teile.push(el('h2', { text: 'Wie hat dir die Station gefallen?' }));
-      const sterne = el('div', { klasse: 'sterne' });
-      const malen = () => Array.prototype.forEach.call(sterne.children, (s, i) => s.classList.toggle('an', i < (eintrag.sterne || 0)));
-      for(let n = 1; n <= 5; n++){
-        sterne.appendChild(el('button', { type: 'button', klasse: 'stern', 'aria-label': n + ' Sterne', text: '★', onclick: () => {
-          eintrag.sterne = n;
-          malen();
+    if(fragen.indexOf('gefallen') >= 0){
+      teile.push(el('h2', { text: 'Wie hat dir die Station gefallen? (freiwillig)' }));
+      teile.push(el('div', { klasse: 'auswahl gefallen' }, GEFALLEN.map(g => el('button', {
+        type: 'button', klasse: 'wahl smiley' + (eintrag.gefallen === g.wert ? ' an' : ''), 'aria-label': g.text, text: g.emoji + ' ' + g.text,
+        onclick: ev => {
+          // Nochmal antippen nimmt die Antwort zurück
+          eintrag.gefallen = eintrag.gefallen === g.wert ? 0 : g.wert;
+          Array.prototype.forEach.call(ev.currentTarget.parentNode.children, b => b.classList.toggle('an', b === ev.currentTarget && !!eintrag.gefallen));
           speichern();
-          pruefen();
-        } }));
-      }
-      malen();
-      teile.push(sterne);
+        }
+      }))));
     }
     teile.push(fertigKnopf);
     teile.push(el('button', { type: 'button', klasse: 'secondary', text: 'Zurück zur Station', onclick: stationZeigen }));
@@ -639,7 +663,7 @@
     speichern()
       // Eigene Stationsteile schicken ihre Ergebnisse erst jetzt (z. B. den fertigen Stempel)
       .then(() => art && art.beimBeenden ? art.beimBeenden(eintrag, ctx.gruppe, station).then(speichern) : null)
-      .then(() => Outbox.ereignis(ctx.gruppe.id, 'beendet', station.id, { antworten: eintrag.antworten || {}, kiTyp: eintrag.kiTyp || '', sterne: eintrag.sterne || 0 }))
+      .then(() => Outbox.ereignis(ctx.gruppe.id, 'beendet', station.id, { antworten: eintrag.antworten || {}, kiTyp: eintrag.kiTyp || '', gefallen: eintrag.gefallen || 0 }))
       .then(() => kopfleiste(ctx.gruppe, ctx.liste, ctx.f))
       .then(() => weiterZeigen(true))
       .catch(err => fehler('Speichern hat nicht geklappt. Bitte nochmal „Fertig“ antippen.', err));
@@ -838,6 +862,7 @@
             }
             return weiterZeigen(false);
           }
+          if(Stationen.wartetAufFreigabe(st)) return nochNichtDran([], st.freigabeText || 'Diese Station gibt Penny später für alle frei.');
           const fehlend = Stationen.voraussetzungen(liste, st).filter(b => !Stationen.istFertig(f, b)).map(b => liste.filter(s => s.id === b)[0]);
           const bonusFehlen = Stationen.fehlenBisBonus(liste, f, st);
           if(st.bonus && (bonusFehlen || fehlend.length)){

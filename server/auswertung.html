@@ -31,11 +31,11 @@
 
 <div class="panel">
   <h2>Stationen</h2>
-  <p class="hint">Sterne: Wie hat dir die Station gefallen? KI-Frage: Haben die Kinder richtig erkannt, ob Programm, Bildbearbeitungs-KI, generative KI oder ohne Computer?<br>
+  <p class="hint">Gefallen: Wie hat dir die Station gefallen? Freiwillig, 😕 Ging so = 1, 🙂 Gut = 2, 🤩 Super = 3. KI-Frage: Haben die Kinder richtig erkannt, ob Programm, Bildbearbeitungs-KI, generative KI oder ohne Computer?<br>
   Dauer: vom ersten Check-in (QR-Code) bis „Fertig“, Uhr des iPads. Typischer Wert (Median) und kürzeste–längste Gruppe. Über 4 Stunden zählt nicht (Station offen gelassen).</p>
   <p id="gesamt"><b>Workshop-Dauer:</b> –</p>
   <table>
-    <thead><tr><th>Station</th><th>Geschafft</th><th>Dauer (Min.)</th><th>Sterne ⌀</th><th>Verteilung 1–5 ★</th><th>KI-Frage richtig</th></tr></thead>
+    <thead><tr><th>Station</th><th>Geschafft</th><th>Dauer (Min.)</th><th>Gefallen ⌀ (1–3)</th><th>Verteilung</th><th>KI-Frage richtig</th></tr></thead>
     <tbody id="stationen"></tbody>
   </table>
 </div>
@@ -66,6 +66,7 @@
   <h2 style="font-size:1rem;margin-top:16px">So war der Workshop (ein Wort)</h2>
   <div class="woerter" id="woerter"></div>
   <h2 style="font-size:1rem;margin-top:16px">Das sollte Penny beim nächsten Mal anders machen</h2>
+  <table><tbody id="andersZahlen"></tbody></table>
   <ul class="saetze" id="anders"></ul>
   <h2 style="font-size:1rem;margin-top:16px">Anderen Schulklassen empfehlen?</h2>
   <p id="empfehlen"></p>
@@ -156,10 +157,10 @@
       td(row, s.titel);
       td(row, String(s.fertig));
       td(row, dauer(s));
-      td(row, s.sterneSchnitt === null ? "–" : balken(s.sterneSchnitt / 5, false, s.sterneSchnitt.toString().replace(".", ",") + " ★"));
+      td(row, s.gefallenSchnitt === null ? "–" : balken((s.gefallenSchnitt - 1) / 2, false, s.gefallenSchnitt.toString().replace(".", ",")));
       var v = document.createElement("span");
       v.className = "verteilung";
-      s.sterneVerteilung.forEach(function (n, i) { var x = document.createElement("span"); x.textContent = (i + 1) + "★:" + n; v.appendChild(x); });
+      s.gefallenVerteilung.forEach(function (n, i) { var x = document.createElement("span"); x.textContent = ["😕", "🙂", "🤩"][i] + " " + n; v.appendChild(x); });
       td(row, v);
       td(row, s.kiAntworten ? balken(s.kiRichtig / s.kiAntworten, true, s.kiRichtig + " von " + s.kiAntworten) : "–");
       body.appendChild(row);
@@ -180,7 +181,18 @@
     var woerter = document.getElementById("woerter");
     woerter.innerHTML = "";
     fb.forEach(function (p) { if (p.wort) { var s = document.createElement("span"); s.textContent = p.wort; woerter.appendChild(s); } });
-    liste("anders", fb.map(function (p) { return p.anders; }).filter(Boolean));
+    // Seit 09.11.: Antworten zum Antippen („; “ getrennt), dazu freiwillig ein Satz (andersText)
+    var andersZahl = {};
+    fb.forEach(function (p) { String(p.anders || "").split("; ").filter(Boolean).forEach(function (a) { andersZahl[a] = (andersZahl[a] || 0) + 1; }); });
+    var andersBody = document.getElementById("andersZahlen");
+    andersBody.innerHTML = "";
+    Object.keys(andersZahl).sort(function (a, b) { return andersZahl[b] - andersZahl[a]; }).forEach(function (a) {
+      var row = document.createElement("tr");
+      td(row, a);
+      td(row, balken(andersZahl[a] / fb.length, false, String(andersZahl[a])));
+      andersBody.appendChild(row);
+    });
+    liste("anders", fb.map(function (p) { return p.andersText; }).filter(Boolean));
     var ja = fb.filter(function (p) { return p.empfehlen === "ja"; }).length;
     var nein = fb.filter(function (p) { return p.empfehlen === "nein"; }).length;
     document.getElementById("empfehlen").textContent = (ja + nein) ? "Ja: " + ja + " · Nein: " + nein : "–";

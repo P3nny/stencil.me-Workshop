@@ -49,7 +49,7 @@ function anmelden(page, id, personen, fortschritt){
   page.on('pageerror', e => konsolenFehler.push(e.message));
   await page.goto(BASE + '/index.html');
   await anmelden(page, 'a1a1a1a1a1a1', ['Mia B.', 'Ben']);
-  await page.goto(BASE + '/app/station.html?id=foto');
+  await page.goto(BASE + '/app/station.html?id=foto&schnell');
   await page.waitForSelector('.foto-feld');
   const felder = page.locator('.foto-feld');
   pruefe(await felder.nth(0).locator('.ersatz-wahl').count() === 9, 'Mia: Auswahl mit 9 Porträts statt Kamera');
@@ -69,7 +69,7 @@ function anmelden(page, id, personen, fortschritt){
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-einwilligung-foto.png'), fullPage: true });
   await beenden.click();
   await page.locator('.wahl:has-text("Bildbearbeitungs-KI")').click();
-  await page.locator('.stern').nth(3).click();
+  await page.locator('.smiley').nth(1).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
   // Porträt fürs Puzzle und spätere Stationen
@@ -89,7 +89,7 @@ function anmelden(page, id, personen, fortschritt){
   await page2.goto(BASE + '/index.html');
   await anmelden(page2, 'b2b2b2b2b2b2', ['Lea', 'Tom'], { stationen: { foto: { status: 'fertig' }, stencilme: { status: 'fertig' } } });
   await page2.waitForFunction(() => Speicher.outboxAlle().then(o => o.length === 0), null, { timeout: 30000, polling: 500 }).catch(() => {});
-  await page2.goto(BASE + '/app/station.html?id=ki-selbstportraet');
+  await page2.goto(BASE + '/app/station.html?id=ki-selbstportraet&schnell');
   await page2.waitForSelector('text=Diese Station macht ihr heute mit Beispielen.', { timeout: 10000 });
   pruefe(true, 'Station zeigt nur Beispiele');
   pruefe(await page2.locator('button:has-text("Bild erzeugen")').isDisabled(), '„Bild erzeugen“ ist gesperrt');
@@ -111,7 +111,7 @@ function anmelden(page, id, personen, fortschritt){
   await page3.goto(BASE + '/index.html');
   await anmelden(page3, 'c3c3c3c3c3c3', ['Kim'], { stationen: { foto: { status: 'fertig' }, stencilme: { status: 'fertig' } } });
   for(const [id, knopfText] of [['ki-selbstportraet', 'Bild erzeugen'], ['vibe-coding', 'App bauen lassen']]){
-    await page3.goto(BASE + '/app/station.html?id=' + id);
+    await page3.goto(BASE + '/app/station.html?id=' + id + '&schnell');
     const verzicht = page3.locator('button:has-text("nur Beispiele ansehen")');
     await verzicht.waitFor({ timeout: 10000 });
     pruefe(await page3.locator('text=Diese Station war optional').count() === 0 && !(await page3.locator('button:has-text("' + knopfText + '")').isDisabled()), id + ': mit Einwilligung kann die Gruppe die KI nutzen');

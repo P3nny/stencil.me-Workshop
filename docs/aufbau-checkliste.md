@@ -108,7 +108,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 
 ## 5. Nach dem Workshop
 
-- [ ] Auswertung ansehen: `/auswertung` (Sterne, KI-Frage, Feedbackbögen mit „Empfehlen? Ja/Nein“, Laserzeit pro Platte)
+- [ ] Auswertung ansehen: `/auswertung` (Smileys, KI-Frage, Feedbackbögen mit „Empfehlen? Ja/Nein“, Laserzeit pro Platte)
 - [ ] Auswertung kurz durchsehen: Stehen im Feedback Namen, die der Laptop nicht kennt (Spitznamen)?
 - [ ] Laptop-Seite „Für die Workshop-Verbesserung sichern (ohne Namen)“ → Ordner `archiv/workshops/<Datum>/`
 - [ ] Am Ende des Workshops (steht so in `Datenschutz.md`): Laptop-Seite „Alle Daten löschen“

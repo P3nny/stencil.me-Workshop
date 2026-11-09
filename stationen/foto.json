@@ -105,9 +105,10 @@
   ],
   "fragen": [
     "ki-typ",
-    "sterne"
+    "gefallen"
   ],
   "datenschutz": "Dein Foto bleibt auf dem iPad und wird dort bearbeitet. Am Ende löscht ihr es selbst. Auch die KI, die dich auf dem Foto sucht, läuft auf dem iPad.",
   "braucht": [],
-  "plaetze": 13
+  "plaetze": 13,
+  "mindestMinuten": 0
 }

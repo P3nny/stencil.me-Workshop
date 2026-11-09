@@ -20,7 +20,9 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `eingaben` | nein | Textfelder: `{ "id": "…", "text": "Frage", "pflicht": true }`. Mit `"aufloesung": "…"` zeigt die App nach „Station beendet“ die richtige Antwort, mit `"ueberschrift": "KI und Ethik"` steht eine Überschrift über der Frage |
 | `ankuendigung` | nein | Kasten vor dem Input: Was passiert gleich (z. B. „BodyPix sucht dich“), mit aufklappbarer Erklärung Programm / KI / generative KI |
 | `ersatz` | nein | Nur Foto-Station: Porträts bekannter Personen für Kinder ohne Foto-Einwilligung, `{ "id", "name", "bild", "quelle", "seite" }`, Lizenzen in `bilder/ersatz/README.md` |
-| `fragen` | ja | am Ende: `ki-typ` („Programm, KI oder generative KI?“) und/oder `sterne` (1–5) |
+| `fragen` | ja | am Ende: `ki-typ` („Programm, KI oder generative KI?“, Pflicht) und/oder `gefallen` (3 Smileys, freiwillig) |
+| `mindestMinuten` | nein | „Station beendet“ frühestens so viele Minuten nach dem Check-in (Standard 2, `0` = sofort, z. B. Foto). Im Testmodus (`?test`) und mit `?schnell` ohne Wartezeit |
+| `nurFreigabe` | nein | `true`: Station geht nur über die Freigabe am Laptop auf (`freigabe`), Text für die Wartezeit in `freigabeText` (Feedbackbogen) |
 | `datenschutz` | ja | ein Satz: Was passiert mit den Daten dieser Station? |
 | `braucht` | ja | Stationen, die vorher fertig sein müssen, z. B. `["foto"]`. Gibt es eine davon (noch) nicht, zählt sie nicht |
 | `hintergruende` | nein | nur Station Hintergrund: `{ "datei": "bilder/hintergruende/….jpg", "titel": "…" }`, Lizenzen in `bilder/hintergruende/README.md` |

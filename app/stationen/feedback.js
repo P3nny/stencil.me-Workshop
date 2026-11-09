@@ -40,6 +40,35 @@
             }))));
             return;
           }
+          if(frage.art === 'mehrfach'){
+            // Antworten zum Antippen statt Pflicht-Freitext (09.11.2026: fast alle schrieben „Nichts“).
+            // Gespeichert als Text, durch „; “ getrennt, darunter freiwillig ein eigener Satz (<id>Text)
+            teile.push(titel);
+            const gewaehlt = () => String(antwort[frage.id] || '').split('; ').filter(Boolean);
+            teile.push(el('div', { klasse: 'auswahl' }, frage.optionen.map(o => el('button', {
+              type: 'button', klasse: 'wahl' + (gewaehlt().indexOf(o) >= 0 ? ' an' : ''), text: o,
+              onclick: ev => {
+                const liste = gewaehlt();
+                const i = liste.indexOf(o);
+                if(i >= 0) liste.splice(i, 1); else liste.push(o);
+                // in der Reihenfolge der Optionen speichern
+                antwort[frage.id] = frage.optionen.filter(x => liste.indexOf(x) >= 0).join('; ');
+                ev.currentTarget.classList.toggle('an', i < 0);
+                uebernehmen();
+              }
+            }))));
+            if(frage.zusatz){
+              const zusatzId = frage.id + 'Text';
+              const zusatz = el('textarea', { rows: '2', id: 'fb-' + i + '-' + zusatzId });
+              zusatz.value = antwort[zusatzId] || '';
+              zusatz.addEventListener('input', () => {
+                antwort[zusatzId] = zusatz.value;
+                uebernehmen();
+              });
+              teile.push(el('label', { klasse: 'eingabe', for: 'fb-' + i + '-' + zusatzId }, [el('p', { klasse: 'regel-titel', text: frage.zusatz }), zusatz]));
+            }
+            return;
+          }
           if(frage.art === 'janein'){
             // Ja/Nein, darunter freiwillig: „Warum?“ bzw. „Warum nicht?“ (Feld <id>Warum)
             teile.push(titel);

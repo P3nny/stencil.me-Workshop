@@ -1,5 +1,5 @@
 """„Meine Daten“ für die Kinder: alles, was auf dem Laptop über die eigene Gruppe
-liegt, auch Antworten, Sterne und Feedback (Datenschutz.md: „Du darfst jederzeit
+liegt, auch Antworten, Smileys und Feedback (Datenschutz.md: „Du darfst jederzeit
 fragen, was über dich gespeichert ist“).
 
 Eine Ergebnis-Mappe (ZIP, USB-Stick) gibt es nicht mehr: Am Ende des Workshops

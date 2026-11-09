@@ -35,7 +35,7 @@ function stempel(api, gruppe, name, art){
   for(const [g, name] of [[TEST, 'Penny'], [KIND, 'Mia']]){
     await ereignis(api, g, 'anmeldung', '', { personen: [name] });
     await ereignis(api, g, 'checkin', 'foto');
-    await ereignis(api, g, 'beendet', 'foto', { sterne: 3 });
+    await ereignis(api, g, 'beendet', 'foto', { gefallen: 3 });
     await stempel(api, g, name);
     await stempel(api, g, name, 'sticker');
     await stempel(api, g, name, 'portraet');
