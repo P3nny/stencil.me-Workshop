@@ -28,6 +28,7 @@
   .lobby { display:flex; gap:4vw; align-items:center; flex:1; }
   .qr { background:#fff; padding:2vh; border-radius:8px; }
   .qr img, .qr svg { display:block; width:38vh; height:38vh; }
+  .qr-adresse { color:#111; font-size:2.2vh; text-align:center; margin:1vh 0 0; font-family:monospace; }
   .teams { display:flex; flex-wrap:wrap; gap:1.5vh; font-size:7vh; }
   .podest { display:flex; align-items:flex-end; justify-content:center; gap:3vw; flex:1; }
   .stufe { text-align:center; width:24vw; }
@@ -180,7 +181,9 @@
       buehne.appendChild(el("h1", "", "Quiz · Teil " + d.teil));
       var lobby = el("div", "lobby");
       var code = el("div", "qr");
-      qr(code, location.protocol + "//" + location.host + "/app/quiz.html");
+      var adresse = d.adresse || (location.protocol + "//" + location.host + "/app/quiz.html");
+      qr(code, adresse);
+      code.appendChild(el("p", "qr-adresse", adresse.replace(/^http:\/\//, "")));
       lobby.appendChild(code);
       var rechts = el("div");
       rechts.appendChild(el("p", "gross", "Öffnet das Quiz auf eurem iPad: QR-Code scannen oder auf der Startseite „🏆 Quiz“ antippen. Sucht euch ein Tier aus."));

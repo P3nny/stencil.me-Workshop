@@ -587,6 +587,16 @@ def local_ips():
     return [ip for ip in ips if not ip.startswith("127.")]
 
 
+_ip_cache = [0, []]
+
+
+def wlan_ip():
+    """Erste WLAN-Adresse des Laptops, höchstens einmal pro Minute nachgesehen (Beamer fragt jede Sekunde)."""
+    if time.time() - _ip_cache[0] > 60:
+        _ip_cache[0], _ip_cache[1] = time.time(), local_ips()
+    return _ip_cache[1][0] if _ip_cache[1] else ""
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     server_version = "stencilme"
 
@@ -631,7 +641,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             fehler = self.quiz_pin_pruefen((urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("pin") or [""])[0])
             if fehler:
                 return self.send_json({"ok": False, "fehler": fehler[0]}, fehler[1])
-            return self.send_json(quiz.beamer())
+            return self.send_json(self.quiz_beamer())
         if path == "/api/belegung":
             group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
             return self.send_json({"stationen": station_occupancy(group_id)})
@@ -987,6 +997,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         quiz_pin_fehler.pop(ip, None)
         return None
 
+    def quiz_beamer(self):
+        """Stand für den Beamer. QR-Code: immer die WLAN-Adresse des Server-Laptops, nie „localhost“
+        (Beamer-Seite am Laptop selbst geöffnet: Das Handy würde sonst sich selbst fragen, 09.11.2026)."""
+        ip = wlan_ip()
+        adresse = "http://%s:%d/app/quiz.html" % (ip, self.server.server_address[1]) if ip else ""
+        return dict(quiz.beamer(), adresse=adresse)
+
     def quiz_post(self, was):
         body = self.read_body(MAX_EVENT_BYTES)
         try:
@@ -1000,7 +1017,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if fehler:
                 return self.send_json({"ok": False, "fehler": fehler[0]}, fehler[1])
             text = quiz.steuern(str(data.get("aktion", "")), data.get("teil"))
-            return self.send_json({"ok": not text, "fehler": text} if text else dict(quiz.beamer(), ok=True), 400 if text else 200)
+            return self.send_json({"ok": not text, "fehler": text} if text else dict(self.quiz_beamer(), ok=True), 400 if text else 200)
         gruppe = str(data.get("gruppe", ""))
         if not ID_RE.match(gruppe) or ist_geloescht(gruppe):
             return self.send_json({"ok": False, "fehler": "Unbekannte Gruppe. Bitte auf der Startseite anmelden."}, 400)

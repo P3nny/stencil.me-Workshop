@@ -48,7 +48,8 @@ function pruefe(ok, text){
   await beamer.goto(BASE + '/quiz');
   await beamer.click('button:has-text("Teil 1 starten")');
   await beamer.waitForSelector('.qr svg');
-  pruefe(/\/app\/quiz\.html/.test(await beamer.evaluate(() => location.origin + '/app/quiz.html')), 'Beamer zeigt QR-Code zum Quiz');
+  const qrAdresse = await beamer.locator('.qr-adresse').textContent();
+  pruefe(/^\d+\.\d+\.\d+\.\d+:\d+\/app\/quiz\.html$/.test(qrAdresse), 'QR-Code mit der WLAN-Adresse des Laptops, nicht localhost (' + qrAdresse + ')');
 
   console.log('iPads: Tier aussuchen');
   await ipadA.waitForSelector('.lq-tier');
