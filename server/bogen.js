@@ -65,8 +65,11 @@
 
     function leerBelegt() { return { x: o.rand, y: o.rand, zeile: 0, flaechen: [] }; }
 
-    function istGewaehlt(pfad) {
-      return pfad in auswahl ? auswahl[pfad] : platziert.indexOf(pfad) < 0;
+    // Von Hand an- oder abgehakt gilt. Sonst: noch nicht auf einem Bogen und (Platte) nur Porträts,
+    // Stempel hakt Penny von Hand an (eigene Platte, andere Durchgänge, o.vorauswahl)
+    function istGewaehlt(s) {
+      if (s.pfad in auswahl) return auswahl[s.pfad];
+      return platziert.indexOf(s.pfad) < 0 && (!o.vorauswahl || o.vorauswahl(s));
     }
 
     // Regal-Packen: Reihe für Reihe. Nach dem ersten Stück, das nicht mehr passt, ist Schluss,
@@ -134,7 +137,7 @@
         var label = document.createElement("label");
         var check = document.createElement("input");
         check.type = "checkbox";
-        check.checked = istGewaehlt(s.pfad);
+        check.checked = istGewaehlt(s);
         check.addEventListener("change", function () { auswahl[s.pfad] = check.checked; });
         label.appendChild(check);
         label.appendChild(document.createTextNode(o.haken));
@@ -161,7 +164,7 @@
 
     function zusammenstellen() {
       // Älteste zuerst (die Liste ist neueste zuerst)
-      var gewaehlt = liste.filter(function (s) { return istGewaehlt(s.pfad); }).reverse();
+      var gewaehlt = liste.filter(function (s) { return istGewaehlt(s); }).reverse();
       var info = el("info");
       el("layout").hidden = false;
       if (!gewaehlt.length) {
@@ -201,6 +204,8 @@
         var html = (belegt.flaechen.length ? "<p>Grau = schon benutzt, die neuen kommen auf den Rest.</p>" : "") +
           "<p><b>" + ergebnis.passt.length + " " + o.mehrzahl + "</b> auf " + o.bogen + ": " +
           ergebnis.passt.map(function (it) { return it.s.name; }).join(", ") + "</p>";
+        var warnung = o.mischWarnung ? o.mischWarnung(ergebnis.passt.map(function (it) { return it.s; })) : "";
+        if (warnung) html += '<p class="warn">' + warnung + "</p>";
         if (ergebnis.rest.length) {
           html += '<p class="warn">Passen nicht mehr: ' + ergebnis.rest.map(function (it) { return it.s.name; }).join(", ") +
             ". Die kommen auf " + o.naechster + ".</p>";

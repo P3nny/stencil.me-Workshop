@@ -101,7 +101,7 @@
       hinzufuegen({ art: 'stempel', sorte: 'sticker', gruppe: gruppe, name: name, svg: svg }),
     // Feedbackbogen einer Person, anonym (kein Feld gruppe, kein Name)
     feedback: bogen => hinzufuegen({ art: 'feedback', bogen: bogen }),
-    // Lasercut-Porträt (Bonus 2): kommt zu den Stempeln auf die Holzplatte
+    // Lasercut-Porträt (Pflicht seit 09.11.2026): kommt zu den Stempeln auf die Holzplatte
     portraet: (gruppe, name, svg) =>
       hinzufuegen({ art: 'stempel', sorte: 'portraet', gruppe: gruppe, name: name, svg: svg }),
     beobachten: fn => { beobachter.push(fn); meldeStand(); },

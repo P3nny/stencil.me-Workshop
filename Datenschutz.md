@@ -9,16 +9,16 @@ Für Lehrkräfte und Eltern stehen die genauen Angaben ganz unten.
 ## Kurz gesagt
 
 - Deine Fotos bleiben auf dem iPad. Dort werden sie auch bearbeitet. Kein Foto von dir geht an den Laptop oder ins Internet.
-- Pennys Laptop hier im Raum bekommt nur, was er für Laser und Plotter braucht (deinen Stempel, Sticker, Porträt), und eure Antworten. Er schickt nichts davon ins Internet.
+- Pennys Laptop hier im Raum bekommt nur, was er für Laser und Plotter braucht (dein Porträt, Sticker, Stempel), und eure Antworten. Er schickt nichts davon ins Internet.
 - Nur an zwei Stationen geht etwas ins Internet: an eine KI namens Claude. Dorthin gehen nur Wörter aus einem Baukasten, bei der Station "Optional: Bild-App vibe coden" kannst Du auch eine freie Idee umsetzen, wenn eine erwachsene Person den Prompt (Anfrage an die KI) mit euch eintippt. Dort wird nur Text eingegeben, kein Foto, kein Name. Diese zwei Stationen sind optional: Du musst sie nicht machen.
-- Am Ende des Workshops löscht Penny alles. Mit nach Hause nehmt ihr Stempel, Postkarte und Sticker.
+- Am Ende des Workshops löscht Penny alles. Mit nach Hause nehmt ihr Porträt, Postkarte und Sticker (und euren Stempel, wenn ihr einen gemacht habt).
 
 ## Drei Orte für deine Daten
 
 | Ort                  | Was ist das?                                                              | Wer sieht es?                       |
 | -------------------- | ------------------------------------------------------------------------- | ----------------------------------- |
 | 📱 **iPad**          | Das iPad, mit dem ihr arbeitet.                                           | Nur ihr, an diesem iPad.            |
-| 💻 **Pennys Laptop** | Steht hier im Raum. Die iPads schicken ihm Stempel und Antworten über das WLAN. | Nur Penny.                          |
+| 💻 **Pennys Laptop** | Steht hier im Raum. Die iPads schicken ihm Porträts, Stempel und Antworten über das WLAN. | Nur Penny.                          |
 | 🌍 **Online-Dienst** | Ein Computer einer Firma im Internet.                                     | Die Firma, die den Dienst betreibt. |
 
 An jeder Station steht ein Etikett. Es sagt dir, wohin deine Daten gehen.
@@ -29,7 +29,7 @@ An jeder Station fragt die App: Was hast du gerade benutzt? Hier ist der Untersc
 
 | Was?                    | So funktioniert es                                                                   | Beispiel im Workshop                             |
 | ----------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| **Computerprogramm**    | Feste Regeln. Gleiche Eingabe, immer gleiches Ergebnis.                              | Schwarz-Weiß machen (Otsu), Stempel-Datei, Laser |
+| **Computerprogramm**    | Feste Regeln. Gleiche Eingabe, immer gleiches Ergebnis.                              | Schwarz-Weiß machen (Otsu), Porträt- und Stempel-Datei, Laser |
 | **Bildbearbeitungs-KI** | Hat aus Beispielen gelernt. Erkennt oder verändert dein Bild, erfindet nichts Neues. | Die KI findet dich auf dem Foto (BodyPix)        |
 | **Generative KI**       | Erfindet neue Bilder oder Texte. Gleicher Auftrag, jedes Mal etwas anderes.          | KI-Selbstporträt, Bild-App vibe coden (Claude)   |
 
@@ -41,7 +41,7 @@ Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Fo
 | ---------------------------------- | ------------------------------------------------ | --------------------------------------------------------- | --------------------------------------------- |
 | Anmeldung                          | Eure Vornamen oder Spitznamen                    | Eure Vornamen oder Spitznamen                             | –                                             |
 | Foto machen                        | Alle Fotos, auch die verworfenen                 | –                                                         | –                                             |
-| Bild bearbeiten                    | Schwarz-Weiß-Bild, Zwischenschritte              | Dein Stempel, dein Name, deine Antwort                    | –                                             |
+| Bild bearbeiten                    | Schwarz-Weiß-Bild, Zwischenschritte              | Dein Porträt (für den Laser), dein Name, deine Antwort    | –                                             |
 | Lasercutter                        | Foto vom Laser                                   | Deine Frage, die Antwort                                  | Erst wenn du „Video laden“ antippst: YouTube  |
 | Körpererkennung testen             | Euer Video (solange die Seite offen ist), Bild der KI-Ansicht | Eure Antworten                               | –                                             |
 | Hintergrund ändern                 | Das freigestellte Foto, dein Bild mit dem neuen Hintergrund | –                                              | –                                             |
@@ -49,20 +49,20 @@ Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Fo
 | Coding: HTML, CSS und JavaScript   | –                                                | Euer Code, eure Antwort                                   | –                                             |
 | Optional: Selbstporträts mit KI    | –                                                | Euer Prompt und die Bilder                                | **Claude:** nur euer Prompt aus dem Baukasten |
 | Optional: Bild-App vibe coden      | Euer Foto (es geht nur in eure App auf dem iPad) | Euer Auftrag und eure App                                 | **Claude:** nur euer ausgefüllter Auftrag     |
+| Optional: Stempel                  | Schwarz-Weiß-Bild, Zwischenschritte              | Dein Stempel und dein Name                                | –                                             |
 | Linoldruck und Stempeldruck        | Fotos eurer Postkarten                           | –                                                         | –                                             |
 | Code-Quiz                          | –                                                | Wie viele Antworten richtig waren                         | –                                             |
 | Kunst-Quiz                         | Foto eures Lieblingswerks                        | Quiz-Ergebnis, euer Satz                                  | –                                             |
 | Berufe                             | –                                                | Euer Wunschberuf                                          | –                                             |
 | Bonus: Sticker                     | –                                                | Dein Sticker und dein Name                                | –                                             |
 | Feedback                           | –                                                | Dein Feedback, ohne Namen, getrennt von euren Daten       | –                                             |
-| Bonus 2: Lasercut-Porträt          | –                                                | Dein Porträt und dein Name                                | –                                             |
 | Nach jeder Station                 | –                                                | Deine Sterne und deine Antwort auf die KI-Frage           | –                                             |
 
 Fotografiere an den Stationen nur die Sache, um die es geht: die Maschine, die Postkarte, das Kunstwerk. Keine anderen Leute. Auch diese Fotos bleiben auf dem iPad.
 
 ## Die zwei Stationen mit Internet: Claude
 
-Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen sind optional. Sie zählen nicht zu euren Stationen, und ihr verpasst nichts für euren Stempel.
+Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen sind optional. Sie zählen nicht zu euren Stationen, und ihr verpasst nichts für euer Porträt.
 
 - **Was geht hin?** Nur der Satz aus dem Baukasten. Zum Beispiel: „Zeichne ein Selbstporträt im Stil von Frida Kahlo. Es zeigt ein 14-jähriges Mädchen mit braunen Augen und langen Haaren.“ Bei der Bild-App kommt der App-Name dazu, den ihr selbst eintippt.
 - **Frei vibe coden:** Bei der Bild-App dürft ihr eure Idee auch frei beschreiben und eure App weiterbauen lassen. Das geht nur, wenn eine erwachsene Person dabei ist: Sie schaltet euer iPad mit einer PIN frei (15 Minuten, oder bis ihr die Station beendet) und tippt eure Idee ein. Sie achtet darauf, dass nichts über euch im Auftrag (Prompt) steht.
