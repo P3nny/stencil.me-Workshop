@@ -173,7 +173,7 @@
     <div class="hint" id="kiStatus"></div>
     <div id="groupsError"></div>
     <table>
-      <thead><tr><th>Namen</th><th>Einwilligung</th><th>Gerade an</th><th>Geschafft</th><th>Dateien</th></tr></thead>
+      <thead><tr><th>Namen</th><th>Einwilligung</th><th>Gerade an</th><th>Geschafft</th><th>Dateien</th><th></th></tr></thead>
       <tbody id="groups"></tbody>
     </table>
     <div class="hint">Ordner: <span class="folder" id="groupsFolder"></span></div>
@@ -391,6 +391,7 @@
         img.alt = "";
         photos.appendChild(img);
       });
+      cell(row, "").appendChild(knopf("Löschen", function () { gruppeLoeschen(g); }));
       body.appendChild(row);
     });
     if (!data.gruppen.length) {
@@ -398,6 +399,20 @@
       cell(empty, "Noch keine Gruppe angemeldet.").colSpan = 6;
       body.appendChild(empty);
     }
+  }
+
+  // Eine Gruppe ganz vom Laptop löschen, z. B. Testgruppen vor dem Start. Das iPad behält sie,
+  // alles, was es danach noch schickt, verwirft der Server.
+  function gruppeLoeschen(g) {
+    var namen = g.personen.length ? g.personen.join(" & ") : "ohne Namen";
+    if (!confirm("Gruppe „" + namen + "“ löschen?\n\nAntworten, Fotos, Stempel, Sticker und Porträts dieser Gruppe sind dann weg. Das iPad dieser Gruppe muss sich neu anmelden.")) return;
+    fetch("/api/gruppe-loeschen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ gruppe: g.gruppe }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.ok) throw new Error(d.fehler);
+        loadGroups();
+      })
+      .catch(function () { alert("Löschen hat nicht geklappt."); });
   }
 
   // ---- Einwilligungen: Namenslisten ohneFoto / ohneKi (wie server.py: steht_auf_liste) ----
