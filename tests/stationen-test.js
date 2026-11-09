@@ -35,13 +35,14 @@ async function fertigMarkieren(page, art){
   }
 }
 
-async function abschliessen(page, sterne){
+// gefallen: 0 = keine Antwort (freiwillig), 1–3 = 😕 🙂 🤩
+async function abschliessen(page, gefallen){
   await page.click('button:has-text("Station beendet")');
   // Stationen ohne Computer (Berufe, Linoldruck) fragen nicht „Was hast du gerade genutzt?“
-  await page.waitForSelector('button.stern');
+  await page.waitForSelector('button.smiley');
   const kiFrage = page.locator('button.wahl:has-text("Bildbearbeitungs-KI")');
   if(await kiFrage.count()) await kiFrage.click();
-  await page.locator('button.stern').nth(sterne - 1).click();
+  if(gefallen) await page.locator('button.smiley').nth(Math.min(gefallen, 3) - 1).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
   await vorschlagAbwarten(page);
@@ -145,7 +146,7 @@ function vorschlagAbwarten(page){
   pruefe(await page.locator('button:has-text("Fertig")').isDisabled(), '„Fertig“ gesperrt ohne Antworten');
   await page.click('button.wahl:has-text("Computerprogramm ohne KI")');
   pruefe(await page.locator('.aufloesung .etikett').count() === 1, 'Auflösung erscheint nach der Antwort');
-  await page.locator('button.stern').nth(3).click();
+  await page.locator('button.smiley').nth(2).click();
   await page.click('.ki-hilfe summary');
   pruefe(await page.locator('.ki-hilfe p').first().isVisible(), 'Erklärung Programm / KI / generativ klappt auf');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-2-abschluss.png'), fullPage: true });
@@ -169,9 +170,8 @@ function vorschlagAbwarten(page){
 
   console.log('Freigabe Feedbackbogen vom Laptop');
   await page.goto(BASE + '/app/station.html?id=feedback&test');
-  await page.waitForSelector('text=Bonus-Station');
-  const sperreFb = await page.locator('#inhalt').textContent();
-  pruefe(sperreFb.indexOf('undefined') < 0 && /14 Stationen geschafft/.test(sperreFb), 'Feedbackbogen gesperrt bis alle 14 Pflichtstationen geschafft sind');
+  await page.waitForSelector('text=Den Feedbackbogen gibt Penny gegen Ende');
+  pruefe(true, 'Feedbackbogen gesperrt, bis Penny ihn freigibt');
   await page.request.post(BASE + '/api/einstellungen', { data: { freigaben: ['feedback'] } });
   await page.reload();
   await page.waitForSelector('.feedback-person');
@@ -214,8 +214,11 @@ function vorschlagAbwarten(page){
   await page.click('button:has-text("Station beendet")');
   pruefe(await page.locator('.aufloesung-text').count() === 1, 'Auflösung zu den Farben im Abschluss');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-7-stencilme-abschluss.png'), fullPage: true });
+  pruefe(await page.locator('button:has-text("Fertig")').isDisabled(), '„Fertig“ wartet auf die KI-Frage');
   await page.click('button.wahl:has-text("Bildbearbeitungs-KI")');
-  await page.locator('button.stern').nth(4).click();
+  pruefe(!(await page.locator('button:has-text("Fertig")').isDisabled()), '„Fertig“ geht ohne Smiley (Bewertung freiwillig)');
+  pruefe(await page.locator('button.smiley').count() === 3 && await page.locator('text=(freiwillig)').count() === 1, 'drei Smileys, als freiwillig markiert');
+  await page.locator('button.smiley').nth(2).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
@@ -406,7 +409,7 @@ function vorschlagAbwarten(page){
   await page.click('button:has-text("Station beendet")');
   pruefe(await page.locator('.aufloesung-text').count() === 1, 'Auflösung zur Regler-Frage');
   await page.click('button.wahl:has-text("Computerprogramm ohne KI")');
-  await page.locator('button.stern').nth(4).click();
+  await page.locator('button.smiley').nth(2).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
   pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 14') >= 0, 'Zähler steht auf 7 von 14');
@@ -433,7 +436,7 @@ function vorschlagAbwarten(page){
   pruefe(await page.locator('.aufloesung-text').count() === 1, 'Auflösung zur Unterschied-Frage');
   await page.click('button.wahl:has-text("Generative KI")');
   pruefe((await page.locator('.aufloesung .etikett').textContent()) === 'Generative KI', 'Auflösung: Generative KI');
-  await page.locator('button.stern').nth(4).click();
+  await page.locator('button.smiley').nth(2).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
   pruefe((await page.locator('.zaehler').textContent()).indexOf('8 von 14') >= 0, 'KI-Station ist Pflicht und zählt mit: 8 von 14');
@@ -599,9 +602,10 @@ function vorschlagAbwarten(page){
   await fertigMarkieren(page, 'Sticker');
   await abschliessen(page, 5);
   pruefe((await page.locator('.zaehler').textContent()).indexOf('14 von 14') >= 0, 'Sticker zählt mit: 14 von 14');
-  pruefe(await page.locator('text=Feedback zum Workshop').count() === 1, 'danach wird der Feedbackbogen vorgeschlagen');
+  pruefe(await page.locator('text=Feedback zum Workshop').count() === 0, 'Feedbackbogen ohne Freigabe nicht vorgeschlagen, auch nach allen Stationen');
 
-  console.log('Feedbackbogen');
+  console.log('Feedbackbogen (nach Freigabe am Laptop)');
+  await page.request.post(BASE + '/api/einstellungen', { data: { freigaben: ['feedback'] } });
   await page.goto(BASE + '/app/station.html?id=feedback&test');
   await page.waitForSelector('.feedback-person');
   pruefe(await page.locator('.feedback-person').count() === 2, 'ein Bogen pro Person');
@@ -610,6 +614,8 @@ function vorschlagAbwarten(page){
     await bogen.locator('button.wahl').first().click();
     await bogen.locator('input.feedback-wort').fill(wort);
     await bogen.locator('button.wahl >> text="Ja"').click();
+    await bogen.locator('button.wahl:has-text("Mehr Zeit zum Drucken")').click();
+    if(i) await bogen.locator('button.wahl:has-text("Mehr Pausen")').click();
     await bogen.locator('textarea').nth(1).fill('Laser ist toll');
     // Bo schreibt einen Namen ins Feedback: Beim Sichern muss er verschwinden
     await bogen.locator('textarea').first().fill(i ? 'Mit Ada mehr Zeit am Laser' : 'Mehr Zeit am Laser');
@@ -763,6 +769,7 @@ function vorschlagAbwarten(page){
   pruefe(/^\d/.test(fotoZeile), 'Auswertung: Dauer pro Station (Foto: ' + fotoZeile + ' Min.)');
   pruefe(/1 Gruppe mit allen Pflichtstationen/.test(await laptop.locator('#gesamt').textContent()), 'Auswertung: Workshop-Dauer der Gruppe');
   pruefe(/2 Bögen/.test(await laptop.locator('#fbAnzahl').textContent()), 'Auswertung: 2 Feedbackbögen');
+  pruefe(/Mehr Zeit zum Drucken\s*2/.test(await laptop.locator('#andersZahlen').textContent()) && /Mehr Pausen\s*1/.test(await laptop.locator('#andersZahlen').textContent()), 'Auswertung: „anders machen“ gezählt (Drucken 2, Pausen 1)');
   pruefe(await laptop.locator('#woerter span').count() === 2, 'Auswertung: zwei Wörter');
   const kiZusammen = await laptop.locator('#ki tr').last().textContent();
   pruefe(await laptop.locator('#ki tr').count() === 3 && /Wh/.test(kiZusammen) && /\$/.test(kiZusammen), 'Auswertung: Token, Kosten, Strom der KI-Stationen (' + kiZusammen + ')');

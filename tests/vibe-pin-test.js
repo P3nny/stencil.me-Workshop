@@ -40,7 +40,7 @@ function outboxLeer(page){
   await page.goto(BASE + '/index.html');
   await anmelden(page, 'c1c1c1c1c1c1', ['Ada', 'Bo']);
   await outboxLeer(page);
-  await page.goto(BASE + '/app/station.html?id=vibe-coding');
+  await page.goto(BASE + '/app/station.html?id=vibe-coding&schnell');
   await page.waitForSelector('text=App bauen lassen');
   await page.waitForTimeout(800);
   pruefe(await page.locator('text=frei vibe coden freischalten').isHidden(), 'kein Knopf zum Freischalten');
@@ -98,7 +98,7 @@ function outboxLeer(page){
   await page.waitForTimeout(600);
   await page.click('button:has-text("Station beendet")');
   await page.locator('.wahl:has-text("Generative KI")').click();
-  await page.locator('.stern').nth(4).click();
+  await page.locator('.smiley').nth(2).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
   await outboxLeer(page);

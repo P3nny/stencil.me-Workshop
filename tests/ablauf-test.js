@@ -81,7 +81,7 @@ function ereignis(api, gruppe, art, station, nr){
     const offen = st => Stationen.voraussetzungen(liste, st).every(b => Stationen.istFertig(f, b));
     return {
       zu: liste.filter(st => !st.bonus && st.id !== 'foto' && st.id !== 'stencilme' && !offen(st)).map(st => st.id),
-      bonusOffen: liste.filter(st => st.bonus && offen(st) && !Stationen.fehlenBisBonus(liste, f, st)).map(st => st.id),
+      bonusOffen: liste.filter(st => st.bonus && offen(st) && !Stationen.fehlenBisBonus(liste, f, st) && !Stationen.wartetAufFreigabe(st)).map(st => st.id),
       nurFotoOffen: liste.filter(st => !st.bonus && st.id !== 'foto' && st.id !== 'stencilme' && Stationen.voraussetzungen(liste, st).every(b => b === 'foto')).map(st => st.id)
     };
   }));
@@ -156,6 +156,18 @@ function ereignis(api, gruppe, art, station, nr){
   pruefe(true, '„Wir sind trotzdem dran“ öffnet die Station');
   const st = await page.evaluate(() => Stationen.fortschritt());
   pruefe(st.aktuell === 'druck-linol' && st.stationen['druck-linol'].status === 'begonnen', 'Check-in gespeichert');
+
+  console.log('Kein Wettrennen: „Station beendet“ frühestens 2 Minuten nach dem Check-in');
+  await page.locator('input[type=file]').first().setInputFiles(require('path').join(__dirname, '..', 'docs', 'test-foto.jpg'));
+  await page.waitForSelector('text=Kein Wettrennen');
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'Foto da, aber „Station beendet“ noch gesperrt');
+  pruefe(/In [12]:\d\d könnt ihr die Station beenden/.test(await page.locator('#inhalt').textContent()), 'Countdown sichtbar');
+  // Check-in liegt 2 Minuten zurück: dann geht es (ohne 2 Minuten zu warten)
+  await page.evaluate(() => Stationen.fortschritt().then(f => { f.stationen['druck-linol'].start = new Date(Date.now() - 121000).toISOString(); return Stationen.fortschrittSpeichern(f); }));
+  await page.reload();
+  await page.waitForSelector('button:has-text("Station beendet")');
+  await page.waitForFunction(() => Array.prototype.some.call(document.querySelectorAll('button'), b => b.textContent === 'Station beendet' && !b.disabled), null, { timeout: 15000 });
+  pruefe(await page.locator('text=Kein Wettrennen').count() === 0, 'nach 2 Minuten: „Station beendet“ geht');
 
   console.log('Sackgasse: Station noch gesperrt');
   await page.evaluate(() => Speicher.schreiben('fortschritt', { stationen: { foto: { status: 'fertig' } } }));
