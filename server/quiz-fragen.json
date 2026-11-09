@@ -1,0 +1,106 @@
+{
+  "_hinweis": "Fragen fürs Live-Quiz (/quiz). richtig = Nummer der richtigen Antwort, 0 = erste. Liegt im Ordner server/, damit die Lösungen nicht im WLAN abrufbar sind.",
+  "sekunden": 30,
+  "teile": {
+    "1": [
+      {
+        "frage": "Wer hat dich bei „Bild bearbeiten“ auf dem Foto gefunden?",
+        "antworten": ["Penny mit der Maus", "Eine Bildbearbeitungs-KI (BodyPix)", "Der Lasercutter", "Claude"],
+        "richtig": 1,
+        "erklaerung": "BodyPix ist eine KI, die gelernt hat, Menschen auf Fotos zu erkennen. Sie läuft direkt auf dem iPad."
+      },
+      {
+        "frage": "Otsu macht aus deinem Foto reines Schwarz und Weiß. Was ist Otsu?",
+        "antworten": ["Eine generative KI", "Eine Kamera-App", "Ein Computerprogramm mit festen Regeln", "Ein Lasercutter"],
+        "richtig": 2,
+        "erklaerung": "Otsu rechnet nach festen Regeln: Gleiches Foto, immer gleiches Ergebnis. Das ist ein Computerprogramm, keine KI."
+      },
+      {
+        "frage": "Was macht der Laser an den blauen Stellen deines Porträts?",
+        "antworten": ["Er schneidet das Holz durch", "Er graviert, das Holz wird dunkel", "Nichts, Blau bleibt hell", "Er malt mit blauer Farbe"],
+        "richtig": 1,
+        "erklaerung": "Blau heißt gravieren: Der Laser brennt die Oberfläche weg, das Holz wird dunkel. Rot heißt schneiden."
+      },
+      {
+        "frage": "Was schneidet der Schneideplotter beim Sticker?",
+        "antworten": ["Nur die Stickerschicht, das Trägerpapier bleibt ganz", "Das Holz", "Alles komplett durch, auch die Matte", "Gar nichts, er druckt nur"],
+        "richtig": 0,
+        "erklaerung": "Die Klinge schneidet nur die obere Schicht an. So kannst du den Sticker abziehen."
+      },
+      {
+        "frage": "Wo wird dein Foto bearbeitet, wenn du den Hintergrund änderst?",
+        "antworten": ["Im Internet bei einer Firma", "Auf Pennys Laptop", "Direkt auf dem iPad", "Beim Lasercutter"],
+        "richtig": 2,
+        "erklaerung": "Die KI rechnet auf dem iPad. Dein Foto verlässt das iPad dafür nicht."
+      },
+      {
+        "frage": "Ihr schickt zweimal genau denselben Prompt an Claude. Was passiert?",
+        "antworten": ["Zweimal genau dasselbe Bild", "Eine Fehlermeldung", "Jedes Mal ein anderes Bild", "Gar nichts"],
+        "richtig": 2,
+        "erklaerung": "Claude ist eine generative KI: Sie erfindet jedes Mal neu, auch beim gleichen Auftrag."
+      },
+      {
+        "frage": "Was bekommt Claude beim KI-Selbstporträt von euch?",
+        "antworten": ["Euer Foto", "Nur den Satz aus dem Baukasten", "Eure Namen", "Euer Foto und eure Namen"],
+        "richtig": 1,
+        "erklaerung": "An Claude geht nur der Text aus dem Baukasten, kein Foto und kein Name."
+      },
+      {
+        "frage": "Was heißt „vibe coding“?",
+        "antworten": ["Code mit Musik im Hintergrund schreiben", "Man sagt einer KI, was eine App können soll, und sie schreibt den Code", "Programmieren ohne Computer", "Einen Lasercutter steuern"],
+        "richtig": 1,
+        "erklaerung": "Beim vibe coding beschreibt ihr eure Idee, die KI schreibt den Code. So ist auch stencil.me entstanden."
+      }
+    ],
+    "2": [
+      {
+        "frage": "Ihr vergrößert ein Bild ganz stark. Was bleibt scharf?",
+        "antworten": ["Die Pixelgrafik", "Die Vektorgrafik", "Beide", "Keine von beiden"],
+        "richtig": 1,
+        "erklaerung": "Vektorgrafiken bestehen aus Pfaden. Die werden beim Vergrößern neu berechnet und bleiben scharf. Pixel werden zu Klötzchen."
+      },
+      {
+        "frage": "Wofür ist CSS da?",
+        "antworten": ["Für das Aussehen: Farben, Schriften, Abstände", "Für den Inhalt: Überschriften und Texte", "Damit Knöpfe etwas tun", "Um den Lasercutter zu steuern"],
+        "richtig": 0,
+        "erklaerung": "HTML ist der Inhalt, CSS das Aussehen, JavaScript macht die Seite lebendig."
+      },
+      {
+        "frage": "Was passiert bei alert('Hallo!') in JavaScript?",
+        "antworten": ["Die Seite wird gelöscht", "Ein Fenster mit „Hallo!“ geht auf", "Die Überschrift wird rot", "Nichts"],
+        "richtig": 1,
+        "erklaerung": "alert() zeigt eine kleine Nachricht in einem Fenster."
+      },
+      {
+        "frage": "Die Körpererkennung entscheidet Bild für Bild: Person oder Hintergrund? Was ist sie?",
+        "antworten": ["Ein Computerprogramm ohne KI", "Eine Bildbearbeitungs-KI", "Eine generative KI", "Ein Mensch, der zuschaut"],
+        "richtig": 1,
+        "erklaerung": "Sie hat aus vielen Beispielen gelernt, Menschen zu erkennen, erfindet aber nichts Neues: Bildbearbeitungs-KI."
+      },
+      {
+        "frage": "Wer hat in Paris als einer der Ersten Streetart mit Schablonen (Stencils) gesprüht?",
+        "antworten": ["Frida Kahlo", "Vincent van Gogh", "Blek le Rat", "Andy Warhol"],
+        "richtig": 2,
+        "erklaerung": "Blek le Rat sprühte ab 1981 Ratten mit Schablonen in Paris. Banksy nennt ihn als Vorbild."
+      },
+      {
+        "frage": "Wer bedient im Beruf Maschinen wie Lasercutter und 3D-Drucker, die ein Computer steuert?",
+        "antworten": ["Fotograf:in", "Verfahrensmechaniker:in oder Technische:r Modellbauer:in", "Fachinformatiker:in", "Bäcker:in"],
+        "richtig": 1,
+        "erklaerung": "Aus Dateien echte Bauteile machen: Das ist der Beruf wie am Lasercutter."
+      },
+      {
+        "frage": "Warum ist ein Stempel spiegelverkehrt?",
+        "antworten": ["Damit er schöner aussieht", "Weil der Laser falsch herum schneidet", "Damit der Abdruck richtig herum ist", "Damit man ihn nicht erkennt"],
+        "richtig": 2,
+        "erklaerung": "Beim Drucken dreht sich das Bild um wie im Spiegel. Darum muss es auf dem Stempel gespiegelt sein."
+      },
+      {
+        "frage": "Was passiert am Ende des Workshops mit euren Daten?",
+        "antworten": ["Sie kommen ins Internet", "Sie werden auf den iPads und auf dem Laptop gelöscht", "Penny verkauft sie", "Sie bleiben für immer auf dem iPad"],
+        "richtig": 1,
+        "erklaerung": "Alles wird gelöscht. Penny hebt nur ohne Namen auf, was hilft, den Workshop besser zu machen."
+      }
+    ]
+  }
+}
