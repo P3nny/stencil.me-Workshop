@@ -262,9 +262,10 @@
     // ---- Zusammenbauen ----
     wurzel.appendChild(el('div', { klasse: 'ce-kopf' }, [
       el('div', { klasse: 'ce-kopf-links' }, [aufgabenPunkte, aufgabeKarte]),
-      el('div', { klasse: 'ce-kopf-rechts' }, [el('p', { klasse: 'ce-label', text: 'Ergebnis' }), vorschau])
+      el('div', { klasse: 'ce-kopf-rechts' }, [el('p', { klasse: 'ce-label', text: '👀 Ausgabe: Hier verändert sich etwas' }), vorschau])
     ]));
-    wurzel.appendChild(el('div', { klasse: 'ce-code' }, [lueckentext, profiFeld, syntaxBox]));
+    // Eingabe/Ausgabe beschriften (Patricia, 09.11.2026: nicht allen war klar, wo man tippt und wo man etwas sieht)
+    wurzel.appendChild(el('div', { klasse: 'ce-code' }, [el('p', { klasse: 'ce-label ce-label-eingabe', text: '⌨️ Eingabe: Hier tippst du Code' }), lueckentext, profiFeld, syntaxBox]));
     wurzel.appendChild(el('div', { klasse: 'ce-fuss' }, [zeichenleiste, fertigKnopf]));
     wurzel.appendChild(el('div', { klasse: 'ce-modus' }, [profiKnopf]));
     if(z.profi) profiFeld.value = z.profiCode || '';
@@ -272,9 +273,21 @@
     lueckentextZeichnen();
     pruefenUndZeigen();
     if(erzwungen) setTimeout(anpassen, 0);
+
+    // ---- Groß öffnen: Editor füllt den ganzen Bildschirm (wie Quiz und Vibe-Apps), Patricia 09.11.2026 ----
+    // Der Editor bleibt dasselbe Element: Eingaben, Fokus und Vorschau bleiben erhalten.
+    const box = el('div', { klasse: 'ce-box' });
+    function vollbild(an){
+      box.classList.toggle('vollbild', an);
+      document.body.classList.toggle('vollbild-offen', an);
+      grossKnopf.hidden = an;
+    }
+    const grossKnopf = el('button', { type: 'button', klasse: 'ce-gross-knopf', text: '⛶ Code-Editor groß öffnen', onclick: () => vollbild(true) });
+    const zurueck = el('button', { type: 'button', klasse: 'vollbild-zurueck', text: '✕ Zurück zur Station', onclick: () => vollbild(false) });
+    [grossKnopf, zurueck, wurzel].forEach(k => box.appendChild(k));
     // Für Stationen, die von außen etwas melden (z. B. Klick in der Vorschau)
-    wurzel.neuPruefen = () => geaendert(true);
-    return wurzel;
+    box.neuPruefen = () => geaendert(true);
+    return box;
   }
 
   window.CodeEditor = { erstellen: erstellen, normalisieren: normalisieren };
