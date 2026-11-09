@@ -41,7 +41,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `quiz` | Quiz-Seite (`url`, z. B. `/code-quiz.html`) eingebettet, sie meldet am Ende ihr Ergebnis. Mit `foto` (wie bei `art: foto`) zusätzlich Fotos, z. B. Lieblingswerk |
 | `sticker` | wie `stempel`, aber Sticker für den Schneideplotter (nicht gespiegelt), landet auf dem Laptop im Ordner `sticker` |
 | `bestaetigung` | „Erledigt“ antippen |
-| `portraet` | Bild bearbeiten (Pflicht): Schritte pro Person, Schnittrand, Lasercut-Porträt (45 mm) an den Laptop (`app/stationen/stencilme.js`) |
+| `portraet` | Bild bearbeiten (Pflicht): Schritte pro Person, Schnittrand, Lasercut-Porträt (40 mm, auf die Person zugeschnitten) an den Laptop (`app/stationen/stencilme.js`) |
 | `stempel` | Optionale Station Stempel: wie oben, Negativ-Stempel (50 mm, gespiegelt) |
 | `koerpererkennung` | Video aufnehmen, BodyPix rechnet live auf dem Video, Regler, Aufgaben (`aufgaben`, mindestens `mindestAufgaben` abhaken), Bild der KI-Ansicht an den Laptop (`app/stationen/koerpererkennung.js`) |
 | `pixel-vektor` | Erklärung (`erklaerung`) mit Infografik, Verständnisfragen (`verstaendnis`, alle richtig), dann SVG-Übung im Code-Editor (`app/core/code-editor.js`): `uebung.vorlage` ist der Code mit Lücken `{{id}}` (Startwerte in `luecken`) und Bausteinen `[[id]]` (in `bausteine`), `aufgaben` kommen eine nach der anderen. Der Code geht beim Beenden an den Laptop (`app/stationen/pixel-vektor.js`) |

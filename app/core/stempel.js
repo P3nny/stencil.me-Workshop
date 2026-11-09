@@ -7,13 +7,14 @@
 (function(){
 const WORK_SIZE = 480; // px Arbeitsraster (quadratisch)
 // Breite des Arbeitsrasters in mm (Motiv ohne Rand), pro Art:
-// - Porträt (Pflicht ab Dezember 2026): 45 mm, Gravur 1×, geschätzt ca. 3 Min. pro Stück
-//   (Schätzung 09.11., docs/entscheidungen.md Abschnitt 11).
+// - Porträt (Pflicht ab Dezember 2026): 40 mm, Gravur 1×, geschätzt ca. 2,6 Min. pro Stück
+//   (Schätzung 09.11., docs/entscheidungen.md Abschnitt 11). 45 → 40 mm (Patricia, 09.11.):
+//   Das Positiv erkennt man auch klein, und so passen alle Porträts auf eine Platte.
 // - Stempel (optional): 50 mm. 40 mm waren am 09.11. zu klein, die Drucke wurden schlecht.
 //   Laserzeit ca. 9 Min. pro Stempel (2×), darum nur noch optional.
 // - Sticker: 40 mm wie bisher (Stickerfolie, Cameo).
 // Der Schnittrand (autoOffset) rechnet mit derselben Größe wie die Datei.
-const MM = { stempel: 50, portraet: 45, sticker: 40 };
+const MM = { stempel: 50, portraet: 40, sticker: 40 };
 const DESPECKLE_PASSES = 2;
 const ENGRAVE_COLOR = '#1e4fd6'; // Blau = Gravieren
 const CUT_COLOR = '#d6291e';     // Rot = Schneiden
@@ -93,8 +94,56 @@ function loopsToPathD(loops, scale){
   }).join(' ');
 }
 
+// Quadratischer Ausschnitt { sx, sy, side } eines Bildes ins Arbeitsraster zeichnen.
+// Der Ausschnitt darf über den Bildrand hinausgehen (Person am Rand): Dann wird nur der
+// Teil im Bild gezeichnet, der Rest bleibt in der Hintergrundfarbe. Bewusst ohne Quellrechteck
+// außerhalb des Bildes, das zeichnen ältere Safari-Versionen gar nicht.
+function ausschnittZeichnen(ctx, quelle, breite, hoehe, q, hintergrund){
+  ctx.fillStyle = hintergrund;
+  ctx.fillRect(0, 0, WORK_SIZE, WORK_SIZE);
+  const x0 = Math.max(0, q.sx), y0 = Math.max(0, q.sy);
+  const x1 = Math.min(breite, q.sx + q.side), y1 = Math.min(hoehe, q.sy + q.side);
+  if(x1 <= x0 || y1 <= y0) return;
+  const f = WORK_SIZE / q.side;
+  ctx.drawImage(quelle, x0, y0, x1 - x0, y1 - y0, (x0 - q.sx) * f, (y0 - q.sy) * f, (x1 - x0) * f, (y1 - y0) * f);
+}
+
+function mitteQuadrat(breite, hoehe){
+  const side = Math.min(breite, hoehe);
+  return { sx: (breite - side) / 2, sy: (hoehe - side) / 2, side: side };
+}
+
+// Gleich große Lasercuts, egal wie nah jemand an der Kamera stand (Patricia, 09.11.):
+// Quadrat um die Person (längere Seite der Person + Rand), statt immer die Bildmitte.
+// Ausreißer der KI (einzelne Pixel weit weg) zählen nicht: 1. bis 99. Perzentil.
+const PERSON_RAND = 0.04; // Anteil der Seitenlänge, der links/rechts bzw. oben/unten frei bleibt
+function personQuadrat(segmentation){
+  const w = segmentation.width, h = segmentation.height, d = segmentation.data;
+  const spalten = new Uint32Array(w), zeilen = new Uint32Array(h);
+  let summe = 0;
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      if(d[y * w + x]){ spalten[x]++; zeilen[y]++; summe++; }
+    }
+  }
+  if(!summe) return null;
+  function grenzen(hist){
+    const unten = summe * 0.01, oben = summe * 0.99;
+    let acc = 0, a = 0, b = hist.length - 1;
+    for(let i = 0; i < hist.length; i++){ acc += hist[i]; if(acc > unten){ a = i; break; } }
+    acc = 0;
+    for(let i = 0; i < hist.length; i++){ acc += hist[i]; if(acc >= oben){ b = i; break; } }
+    return [a, b + 1];
+  }
+  const gx = grenzen(spalten), gy = grenzen(zeilen);
+  const lang = Math.max(gx[1] - gx[0], gy[1] - gy[0]);
+  const side = lang / (1 - 2 * PERSON_RAND);
+  return { sx: (gx[0] + gx[1]) / 2 - side / 2, sy: (gy[0] + gy[1]) / 2 - side / 2, side: side, anteil: summe / (w * h) };
+}
+
 // BodyPix-Ergebnis -> quadratische Maske im Arbeitsraster (wie computePersonMaskWork in stencil.html)
-function personMaskFromSegmentation(segmentation){
+// q: Ausschnitt in Koordinaten der Segmentierung (Standard: Bildmitte)
+function personMaskFromSegmentation(segmentation, q){
   const w = segmentation.width, h = segmentation.height;
   const maskCanvas = document.createElement('canvas');
   maskCanvas.width = w; maskCanvas.height = h;
@@ -106,14 +155,11 @@ function personMaskFromSegmentation(segmentation){
   }
   mctx.putImageData(md,0,0);
 
-  // same center-crop-to-square logic as toSquareGrayscale, then scale to WORK_SIZE
-  const side = Math.min(w, h);
-  const sx = (w - side) / 2;
-  const sy = (h - side) / 2;
+  // gleicher Ausschnitt wie toSquareGrayscale, dann aufs Arbeitsraster
   const out = document.createElement('canvas');
   out.width = WORK_SIZE; out.height = WORK_SIZE;
   const octx = out.getContext('2d');
-  octx.drawImage(maskCanvas, sx, sy, side, side, 0, 0, WORK_SIZE, WORK_SIZE);
+  ausschnittZeichnen(octx, maskCanvas, w, h, q || mitteQuadrat(w, h), '#000');
   const outData = octx.getImageData(0,0,WORK_SIZE,WORK_SIZE).data;
   const result = new Uint8Array(WORK_SIZE*WORK_SIZE);
   for(let i=0, p=0; i<outData.length; i+=4, p++){
@@ -151,15 +197,12 @@ function refinePersonMask(mask, size){
   return m;
 }
 
-function toSquareGrayscale(img, contrastPct){
+// q: quadratischer Ausschnitt in Bildkoordinaten (Standard: Bildmitte). Außerhalb des Bildes weiß.
+function toSquareGrayscale(img, contrastPct, q){
   const c = document.createElement('canvas');
   c.width = WORK_SIZE; c.height = WORK_SIZE;
   const ctx = c.getContext('2d');
-  // center-crop to square
-  const side = Math.min(img.width, img.height);
-  const sx = (img.width - side) / 2;
-  const sy = (img.height - side) / 2;
-  ctx.drawImage(img, sx, sy, side, side, 0, 0, WORK_SIZE, WORK_SIZE);
+  ausschnittZeichnen(ctx, img, img.width, img.height, q || mitteQuadrat(img.width, img.height), '#fff');
   const imgData = ctx.getImageData(0,0,WORK_SIZE,WORK_SIZE);
   const d = imgData.data;
   const contrast = contrastPct/100;
@@ -646,14 +689,18 @@ const maskCanvas = mask => canvasFromPixels(p => mask[p] ? [17, 17, 17] : [255, 
 
 // Alle Schritte für ein Foto (img: Bild oder Canvas, segmentation: BodyPix-Ergebnis oder null)
 function berechnen(img, segmentation){
-  let personMask = segmentation ? personMaskFromSegmentation(segmentation) : null;
-  let personAnteil = 0;
-  if(personMask){
-    personAnteil = personMask.reduce((a, b) => a + b, 0) / personMask.length;
-    // Leere Maske würde einen leeren Stempel ergeben -> ganzes Bild verwenden (wie stencil.html)
-    if(personAnteil < MIN_PERSON_COVERAGE) personMask = null;
+  // Ausschnitt um die Person, damit alle Porträts gleich groß werden. Ohne Person (oder zu
+  // wenig: leere Maske würde einen leeren Stempel ergeben) wie bisher die Bildmitte, ganzes Bild.
+  const pq = segmentation ? personQuadrat(segmentation) : null;
+  const personAnteil = pq ? pq.anteil : 0;
+  let personMask = null, q = null;
+  if(pq && personAnteil >= MIN_PERSON_COVERAGE){
+    personMask = personMaskFromSegmentation(segmentation, pq);
+    // Segmentierung und Bild können verschieden groß sein: Ausschnitt umrechnen
+    const f = (img.naturalWidth || img.width) / segmentation.width;
+    q = { sx: pq.sx * f, sy: pq.sy * f, side: pq.side * f };
   }
-  const gray = toSquareGrayscale(img, 100);
+  const gray = toSquareGrayscale(img, 100, q);
   const schwelle = otsuThreshold(gray, personMask);
   const mask = stampMask(gray, personMask, schwelle);
   return { gray: gray, personMask: personMask, personAnteil: personAnteil, schwelle: schwelle, mask: mask, duenn: detectThinStructures(mask, WORK_SIZE) };

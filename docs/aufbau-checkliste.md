@@ -91,9 +91,9 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Die Gruppen melden sich auf der Startseite an (Vornamen) und scannen an jeder Station den QR-Code.
 - [ ] **Erste Laserplatte früh starten**, sobald etwa 4 Stempel da sind (eine Reihe). Der Laser ist der Engpass: Er soll ab dann durchlaufen.
   - Gemessen 09.11.: 35 Min. für 6 Stempel (40 mm, 2×), also knapp 6 Min. pro Stempel.
-  - Ab Dezember Porträt statt Stempel. Geschätzt: **45 mm, Gravur 1×, ca. 3 Min. pro Porträt, 18 Porträts ≈ 1 h** (Tabelle in `entscheidungen.md`, Abschnitt 11). **Erstes Porträt anschauen**: zu blass, dann Gravur 2×. Stempel nur auf einer eigenen Platte (2×).
+  - Ab Dezember Porträt statt Stempel. Geschätzt: **40 mm, Gravur 1×, ca. 2,6 Min. pro Porträt, 18 Porträts ≈ 45–50 Min., eine Platte** (Tabelle in `entscheidungen.md`, Abschnitt 11). **Erstes Porträt anschauen**: zu blass, dann Gravur 2×. Stempel nur auf einer eigenen Platte (2×).
   - Auf eine A4-Platte passen ca. 19 Stempel (17–20). 26 Kinder → 2 Platten.
-  - **Laserzeit pro Platte notieren** (für die Größenentscheidung beim nächsten Mal: 45 mm wären ca. 25 % mehr Zeit).
+  - **Laserzeit pro Platte notieren** (für die Größenentscheidung beim nächsten Mal).
   - Bonus 2 (Lasercut-Porträt) nur lasern, wenn am Ende Zeit bleibt.
 - [ ] Mr-Beam-Einstellungen: Material „Sperrholz Pappel 3 mm“. Gravur (Blau) 2 Durchgänge. **Schnitt (Rot): Geschwindigkeit 300, 2 Durchgänge** (getestet 02.11., das Preset allein schnitt nicht ganz durch).
   - **Schnitt geht trotzdem nicht durch:** der Reihe nach prüfen: Materialstärke in der Mr-Beam-Oberfläche wirklich 3 mm (bestimmt den Fokus)? Platte flach (verzogenes Sperrholz beschweren)? Linse sauber? Dann 1 Durchgang mehr. Stempel nicht herausbrechen, sondern den Schnitt wiederholen: Platte nicht bewegen, dieselbe Datei noch einmal laden und nur Rot (Schnitt) lasern, Blau in der Mr-Beam-Oberfläche weglassen. *Noch nicht ausprobiert.*

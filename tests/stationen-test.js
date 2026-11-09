@@ -192,7 +192,8 @@ function vorschlagAbwarten(page){
   pruefe(/mm/.test(randText), 'Schnittrand automatisch gewählt: ' + randText);
   pruefe(await page.locator('.rand-warnung:visible').count() === 0, 'roter Rand in einem Stück');
   pruefe(/nicht gespiegelt/.test(await page.locator('.schritt-notiz').nth(4).textContent()), 'Bild bearbeiten macht das Porträt (nicht gespiegelt)');
-  pruefe(/^4[4-9]|^5\d/.test(await page.locator('.schritt-notiz').nth(4).textContent()), 'Porträt 45 mm breit plus Rand: ' + await page.locator('.schritt-notiz').nth(4).textContent());
+  const portraetMm = Math.max.apply(null, (await page.locator('.schritt-notiz').nth(4).textContent()).match(/\d+/g).slice(0, 2).map(Number));
+  pruefe(portraetMm >= 40 && portraetMm <= 50, 'Porträt: lange Seite 40 mm plus Rand, auf die Person zugeschnitten (' + portraetMm + ' mm)');
   pruefe(await page.locator('a:has-text("Porträt gefällt dir nicht? Zurück zum Foto")').count() === 2, '„Zurück zum Foto“ für jede Person');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-6-stencilme.png'), fullPage: true });
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor die Porträts fertig sind');
@@ -474,7 +475,8 @@ function vorschlagAbwarten(page){
       await page.waitForFunction(() => document.querySelectorAll('.stempel-person .schritt-bild svg').length === 2, null, { timeout: 120000 });
       const stempelNotiz = await page.locator('.schritt-notiz').nth(4).textContent();
       pruefe(/gespiegelt/.test(stempelNotiz) && !/nicht gespiegelt/.test(stempelNotiz), 'Stempel ist gespiegelt');
-      pruefe(/^(5\d|6\d)/.test(stempelNotiz), 'Stempel 50 mm breit plus Rand: ' + stempelNotiz);
+      const stempelMm = Math.max.apply(null, stempelNotiz.match(/\d+/g).slice(0, 2).map(Number));
+      pruefe(stempelMm >= 50 && stempelMm <= 62, 'Stempel: lange Seite 50 mm plus Rand (' + stempelMm + ' mm)');
       pruefe(await page.locator('a:has-text("Zurück zum Foto")').count() === 0, 'kein „Zurück zum Foto“ im optionalen Stempel');
       await page.screenshot({ path: path.join(SHOTS, BROWSER + '-17-stempel.png'), fullPage: true });
       await fertigMarkieren(page, 'Stempel');

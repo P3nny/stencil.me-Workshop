@@ -216,7 +216,8 @@ Grundlage: [auswertung-2026-11-09.md](auswertung-2026-11-09.md). Im Dezember sin
 | 60 mm | 5,0 Min. | 89 Min. | 8,1 Min. | 146 Min. | 12,2 Min. |
 
 **Empfehlung:**
-- **Porträt 45 mm, Gravur 1 Durchgang**: ca. 1 Stunde für 18 Kinder, passt auf eine A4-Platte.
+- ~~Porträt 45 mm~~ → **Porträt 40 mm, Gravur 1 Durchgang** (Patricia, 09.11.: Das Positiv erkennt man auch klein). Ca. 45–50 Min. für 18 Kinder. Mit 45 mm wären es 54 × 59 mm große Stücke gewesen, nur 12–15 pro Platte.
+- **Gleich große Porträts:** Am 09.11. waren die Lasercuts sehr unterschiedlich groß, je nachdem, wie nah die Kinder an der Kamera standen. Seit 09.11. schneidet die App das Foto auf die Person zu (Quadrat um die Person, 4 % Rand, `personQuadrat` in `app/core/stempel.js`), statt immer die Bildmitte zu nehmen. Test mit 6 Fotos, nah, halb so groß und ein Drittel so groß: lange Seite immer 42–46 mm (vorher 11–59 mm). Weit weg aufgenommene Fotos werden dabei vergrößert und etwas unschärfer, darum an der Foto-Station weiter nah ran.
 - Ein Porträt muss nicht tief sein, es soll nur dunkel werden.
 - Optionale Stempel (50 mm, 2×) kommen auf **eine eigene Platte** bzw. einen eigenen Auftrag. Die Mr-Beam-Oberfläche stellt die Durchgänge pro Auftrag ein, nicht pro Stück.
 - Am ersten Porträt vor Ort: Wirkt es mit 1 Durchgang zu blass? Dann 2 Durchgänge und 40 mm (ca. 72 Min.).

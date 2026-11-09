@@ -164,7 +164,7 @@
           ergebnis = Stempel.berechnen(img, segmentation);
           zeigeCanvas(2, Stempel.bilder.person(ergebnis.gray, ergebnis.personMask));
           felder[2].notiz.textContent = ergebnis.personMask
-            ? 'Pink = Person (' + Math.round(ergebnis.personAnteil * 100) + ' % des Bildes)'
+            ? 'Pink = Person (' + Math.round(ergebnis.personAnteil * 100) + ' % des Bildes). Ab hier wird das Bild auf dich zugeschnitten, so werden alle ' + art.mehrzahl + ' gleich groß.'
             : 'Keine Person gefunden: Das ganze Bild wird verwendet.';
           return warten(PAUSE_MS);
         })
@@ -196,14 +196,14 @@
 
   const ARTEN = {
     stempel: {
-      name: 'Stempel', dein: 'Dein Stempel', dieser: 'Dieser Stempel', der: 'der', er: 'Er', geaendert: 'Geänderten', notiz: 'gespiegelt', puzzle: false,
+      name: 'Stempel', mehrzahl: 'Stempel', dein: 'Dein Stempel', dieser: 'Dieser Stempel', der: 'der', er: 'Er', geaendert: 'Geänderten', notiz: 'gespiegelt', puzzle: false,
       info: 'Aus deinem Foto wird ein Stempel: Der Laser trägt alles außer dem Motiv ab, das Motiv bleibt stehen und druckt.',
       legende: [['rot', 'Rot: Hier schneidet der Laser durch. Das ist der Rand deines Stempels.'], ['blau', 'Blau: Hier graviert der Laser, das Holz wird abgetragen.'], ['weiss', 'Weiß: Hier bleibt das Holz stehen und nimmt beim Drucken die Farbe auf.']],
       svg: (mask, mm) => Stempel.svg(mask, mm),
       senden: (gruppe, name, svg) => Outbox.stempel(gruppe, name, svg)
     },
     sticker: {
-      name: 'Sticker', dein: 'Dein Sticker', dieser: 'Dieser Sticker', der: 'der', er: 'Er', geaendert: 'Geänderten', notiz: 'nicht gespiegelt', puzzle: false,
+      name: 'Sticker', mehrzahl: 'Sticker', dein: 'Dein Sticker', dieser: 'Dieser Sticker', der: 'der', er: 'Er', geaendert: 'Geänderten', notiz: 'nicht gespiegelt', puzzle: false,
       legende: [['schwarz', 'Schwarz: Diese Fläche malt der Plotter mit einem Marker aus, Linie für Linie.'], ['rot', 'Rot: Hier schneidet das Messer, das ist der Rand des Stickers.']],
       svg: (mask, mm) => Stempel.stickerSvg(mask, mm),
       senden: (gruppe, name, svg) => Outbox.sticker(gruppe, name, svg)
@@ -212,7 +212,7 @@
 
   // Pflicht seit 09.11.2026 (Station „Bild bearbeiten“): Puzzle-Bild und „Zurück zum Foto“
   ARTEN.portraet = {
-    name: 'Porträt', dein: 'Dein Porträt', dieser: 'Dieses Porträt', der: 'das', er: 'Es', geaendert: 'Geändertes', notiz: 'nicht gespiegelt', puzzle: true, pflicht: true,
+    name: 'Porträt', mehrzahl: 'Porträts', dein: 'Dein Porträt', dieser: 'Dieses Porträt', der: 'das', er: 'Es', geaendert: 'Geändertes', notiz: 'nicht gespiegelt', puzzle: true, pflicht: true,
     info: 'Jetzt wird aus deinem Foto eine Datei, mit der der Lasercutter dein Porträt ins Holz graviert und ausschneidet.',
     legende: [['blau', 'Blau: Hier graviert der Laser, das Holz wird dunkel.'], ['weiss', 'Weiß: bleibt hell.'], ['rot', 'Rot: Hier schneidet der Laser das Porträt aus.']],
     svg: (mask, mm) => Stempel.portraitSvg(mask, mm),
