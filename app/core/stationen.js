@@ -97,8 +97,13 @@
     return w && meldungen.indexOf(w.meldung) < 0 ? w : null;
   }
 
+  // nurFreigabe: Station geht nur über die Freigabe am Laptop auf (Feedbackbogen ab ca. 12:00)
+  function wartetAufFreigabe(station){
+    return !!station.nurFreigabe && !FREI && !freigegeben(station);
+  }
+
   function moeglich(liste, f){
-    return liste.filter(s => !istFertig(f, s.id) && voraussetzungen(liste, s).every(b => istFertig(f, b)) && !fehlenBisBonus(liste, f, s) && !wartet(s));
+    return liste.filter(s => !istFertig(f, s.id) && voraussetzungen(liste, s).every(b => istFertig(f, b)) && !fehlenBisBonus(liste, f, s) && !wartet(s) && !wartetAufFreigabe(s));
   }
 
   // Belegung vom Laptop: { <id>: Anzahl Gruppen, eingecheckt oder unterwegs }. Ohne Laptop: null.
@@ -164,6 +169,7 @@
     meldungenLaden: meldungenLaden,
     meldungenMerken: meldungenMerken,
     wartet: wartet,
+    wartetAufFreigabe: wartetAufFreigabe,
     vorschlagen: vorschlagen
   };
 })();

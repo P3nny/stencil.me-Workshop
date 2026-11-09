@@ -426,6 +426,8 @@ def feedback_felder():
                 felder.add(f.get("id"))
                 if f.get("art") == "janein":
                     felder.add(f.get("id") + "Warum")
+                if f.get("art") == "mehrfach" and f.get("zusatz"):
+                    felder.add(f.get("id") + "Text")
     felder.discard(None)
     return felder
 
@@ -472,10 +474,10 @@ def dauer_stats(minuten):
 
 
 def evaluation():
-    """Auswertung über alle Gruppen: Sterne, KI-Frage und Dauer pro Station, Feedbackbögen."""
+    """Auswertung über alle Gruppen: Gefallen (1–3, freiwillig), KI-Frage und Dauer pro Station, Feedbackbögen."""
     stations = load_stations()
     per_station = {s["id"]: {"id": s["id"], "titel": s.get("titel", s["id"]), "typ": s.get("typ", ""),
-                             "fertig": 0, "sterne": [], "kiTyp": {}, "dauern": []} for s in stations}
+                             "fertig": 0, "gefallen": [], "kiTyp": {}, "dauern": []} for s in stations}
     pflicht = [s["id"] for s in stations if not s.get("bonus") and not s.get("optional")]
     feedback = []
     gesamt = []  # Minuten von der Anmeldung bis zur letzten Pflichtstation, nur Gruppen mit allen Pflichtstationen
@@ -498,14 +500,18 @@ def evaluation():
             if minuten > 0:
                 gesamt.append(minuten)
         for sid, daten in done.items():
-            st = per_station.setdefault(sid, {"id": sid, "titel": sid, "typ": "", "fertig": 0, "sterne": [], "kiTyp": {}, "dauern": []})
+            st = per_station.setdefault(sid, {"id": sid, "titel": sid, "typ": "", "fertig": 0, "gefallen": [], "kiTyp": {}, "dauern": []})
             if sid in checkin and sid in ende:
                 minuten = (ende[sid] - checkin[sid]).total_seconds() / 60
                 if 0 < minuten <= MAX_DAUER_MIN:
                     st["dauern"].append(minuten)
             st["fertig"] += 1
-            if daten.get("sterne"):
-                st["sterne"].append(int(daten["sterne"]))
+            try:
+                g = int(daten.get("gefallen") or 0)
+            except (TypeError, ValueError):
+                g = 0
+            if 1 <= g <= 3:
+                st["gefallen"].append(g)
             if daten.get("kiTyp"):
                 st["kiTyp"][daten["kiTyp"]] = st["kiTyp"].get(daten["kiTyp"], 0) + 1
             if sid == "feedback":
@@ -514,11 +520,11 @@ def evaluation():
     feedback.extend(read_feedback()["boegen"])
     stats = []
     for s in per_station.values():
-        n = len(s["sterne"])
+        n = len(s["gefallen"])
         richtig = s["kiTyp"].get(s["typ"], 0)
         antworten = sum(s["kiTyp"].values())
-        werte = dict(s, sterneSchnitt=round(sum(s["sterne"]) / n, 1) if n else None,
-                     sterneVerteilung=[s["sterne"].count(k) for k in range(1, 6)],
+        werte = dict(s, gefallenSchnitt=round(sum(s["gefallen"]) / n, 1) if n else None,
+                     gefallenVerteilung=[s["gefallen"].count(k) for k in range(1, 4)],
                      kiRichtig=richtig, kiAntworten=antworten)
         werte.update(dauer_stats(werte.pop("dauern")))
         stats.append(werte)

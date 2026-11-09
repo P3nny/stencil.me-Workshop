@@ -142,9 +142,9 @@
       <span class="hint" id="pupilsState"></span>
     </div>
     <div class="settings" style="margin-top:10px">
-      <button id="feedbackFreigabe" type="button">Feedbackbogen für alle freigeben</button>
+      <button id="feedbackFreigabe" type="button">Feedbackbogen für alle freigeben (ab ca. 12:00)</button>
       <span class="hint" id="freigabeState"></span>
-      <a href="/auswertung" style="margin-left:auto">Auswertung: Sterne, KI-Frage, Feedback →</a>
+      <a href="/auswertung" style="margin-left:auto">Auswertung: Smileys, KI-Frage, Feedback →</a>
     </div>
     <div class="settings" style="margin-top:10px">
       <button id="loeschenFreigabe" type="button">Abschluss: Löschen auf den iPads freigeben</button>
@@ -513,8 +513,8 @@
   var freigaben = [];
   function freigabeZeigen() {
     var an = freigaben.indexOf("feedback") >= 0;
-    document.getElementById("feedbackFreigabe").textContent = an ? "Feedbackbogen-Freigabe zurücknehmen" : "Feedbackbogen für alle freigeben";
-    document.getElementById("freigabeState").textContent = an ? "✓ Alle Gruppen können den Feedbackbogen ausfüllen (iPads merken es beim nächsten Öffnen einer Station)." : "Feedbackbogen erst, wenn eine Gruppe alle Pflichtstationen geschafft hat.";
+    document.getElementById("feedbackFreigabe").textContent = an ? "Feedbackbogen-Freigabe zurücknehmen" : "Feedbackbogen für alle freigeben (ab ca. 12:00)";
+    document.getElementById("freigabeState").textContent = an ? "✓ Alle Gruppen können den Feedbackbogen ausfüllen (iPads merken es beim nächsten Öffnen einer Station)." : "Feedbackbogen ist zu. Ab ca. 12:00 für alle freigeben (Zeitplan in der Checkliste).";
     var loeschen = freigaben.indexOf("loeschen") >= 0;
     document.getElementById("loeschenFreigabe").textContent = loeschen ? "Löschen-Freigabe zurücknehmen" : "Abschluss: Löschen auf den iPads freigeben";
     document.getElementById("loeschenState").textContent = loeschen

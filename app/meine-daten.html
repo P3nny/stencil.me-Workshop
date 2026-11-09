@@ -83,23 +83,23 @@
       const e = f.stationen[id];
       antworten += Object.keys(e.antworten || {}).filter(k => e.antworten[k]).length;
       zeitpunkte += (e.start ? 1 : 0) + (e.ende ? 1 : 0);
-      klicks += (e.kiTyp ? 1 : 0) + (e.sterne ? 1 : 0) + (e.quiz ? Object.keys(e.quiz).length : 0) + (e.aufgaben ? Object.keys(e.aufgaben).length : 0);
+      klicks += (e.kiTyp ? 1 : 0) + (e.gefallen ? 1 : 0) + (e.quiz ? Object.keys(e.quiz).length : 0) + (e.aufgaben ? Object.keys(e.aufgaben).length : 0);
     });
     return el('section', { klasse: 'panel' }, [
       el('h1', { text: '🔎 Was man aus euren Daten ablesen könnte' }),
       el('p', { text: 'In diesem Workshop habt ihr bisher ' + stationen.length + ' Stationen besucht und dabei ' + zeitpunkte + ' Zeitpunkte, ' +
-        antworten + ' Textantworten und ' + klicks + ' Auswahl-Klicks (Sterne, KI-Frage, Quiz, Aufgaben) erzeugt. Dazu kommen eure Fotos.' }),
+        antworten + ' Textantworten und ' + klicks + ' Auswahl-Klicks (Smileys, KI-Frage, Quiz, Aufgaben) erzeugt. Dazu kommen eure Fotos.' }),
       el('div', { klasse: 'auswerten' }, [
         el('p', {}, [el('strong', { text: 'Wer alle diese Daten hat, könnte zum Beispiel auswerten:' })]),
         el('ul', {}, [
           'wann ihr wo wart und wie lange ihr für jede Station gebraucht habt, auch im Vergleich zu anderen Gruppen,',
-          'welche Station euch gefallen hat und welche nicht (Sterne),',
+          'welche Station euch gefallen hat und welche nicht (Smileys),',
           'ob ihr Programm, KI und generative KI unterscheiden könnt (KI-Frage),',
           'was ihr denkt (eure Antworten, zum Beispiel zu KI und Ethik), welchen Beruf ihr euch wünscht,',
           'wie ihr ausseht: Auf euren Fotos erkennt man euch, und eine KI könnte daraus mehr schätzen, zum Beispiel Alter oder Stimmung.'
         ].map(t => el('li', { text: t })))
       ]),
-      el('p', { text: 'Darum wertet Penny nur ohne Namen aus: Sterne, KI-Frage, Zeiten und Feedback, um den Workshop zu verbessern. Am Ende wird alles gelöscht. Nur die Apps aus dem Vibe Coding hebt Penny ohne Namen auf.' })
+      el('p', { text: 'Darum wertet Penny nur ohne Namen aus: Smileys, KI-Frage, Zeiten und Feedback, um den Workshop zu verbessern. Am Ende wird alles gelöscht. Nur die Apps aus dem Vibe Coding hebt Penny ohne Namen auf.' })
     ]);
   }
 
@@ -118,7 +118,7 @@
       teile.push(el('p', {}, [el('strong', { text: (eingabe ? eingabe.text : (FELDER[key] || key)) + ' ' }), wert(liste, st, key, antworten[key])]));
     });
     if(daten.kiTyp) teile.push(el('p', { text: 'Eure Antwort auf die KI-Frage: ' + (KI_TEXT[daten.kiTyp] || daten.kiTyp) }));
-    if(daten.sterne) teile.push(el('p', { text: 'Sterne: ' + '★★★★★'.slice(0, daten.sterne) + '☆☆☆☆☆'.slice(0, 5 - daten.sterne) }));
+    if(daten.gefallen) teile.push(el('p', { text: 'Wie hat es euch gefallen: ' + ['', '😕 Ging so', '🙂 Gut', '🤩 Super'][daten.gefallen] }));
     return el('div', { klasse: 'daten-station' }, teile);
   }
 
