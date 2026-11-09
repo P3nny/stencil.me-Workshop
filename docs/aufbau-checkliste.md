@@ -58,6 +58,34 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Schnelltest aller Stationen (nur Testgerät): `…/app/station.html?id=foto&test&frei` öffnet jede Station ohne Voraussetzungen, oben rechts „Station öffnen …“. Danach „Alles zurücksetzen“ und den Tab schließen: `&frei` gehört auf kein Kinder-iPad.
 - [ ] App offen lassen, nicht neu laden
 
+## Zeitplan und Ansagen (ab Dezember 2026)
+
+| Zeit | Was |
+| --- | --- |
+| 08:45 | Ankommen |
+| 09:00 | Startpräsentation, dann Stationen: Foto, Bild bearbeiten, erste Lasercuts, erste Sticker |
+| 10:00–10:10 | Kleine Pause (vorher Hintergrund-Stationen, wichtig fürs Quiz) |
+| 10:55–11:30 | Große Pause mit Rausgehen |
+| 11:30 | Quiz Teil 1 |
+| 12:00 | Feedback für alle freigeben |
+| 12:30 | Abschlussrunde, Quiz Teil 2, Siegerehrung, Daten löschen |
+| ca. 12:45 | Ende |
+
+- [ ] **Ansagen in der Startpräsentation:**
+  - „Das ist kein Wettrennen. Wir machen das ganz in Ruhe.“
+  - „Nach der Pause gibt es ein Quiz. Die drei besten Gruppen bekommen einen Preis. Lest also gut und merkt euch, was ihr an den Stationen lernt.“
+  - „Wir machen Pausen. Außerhalb der Pausen will ich niemanden am Handy spielen sehen. Handys, die ich oder eine Lehrerin sehen, kommen bis zum Ende in diese Schüssel.“
+  - „Ihr könnt mit mir zusammen eine eigene App-Idee entwickeln und umsetzen.“ Dazu 2–3 Beispiel-Apps zeigen.
+  - „Essen nur in der Küche.“
+- [ ] Schüssel für Handys bereitstellen
+- [ ] Preise fürs Quiz: Urkunden für Platz 1–3 gedruckt (Vornamen von Hand), Süßigkeiten nach Platz gestaffelt, eine Alternative ohne Zucker
+- [ ] Mit den Lehrkräften klären: Darf die 7. Klasse in der großen Pause zum Netto?
+- [ ] Linolstation im Raum mit den Musikinstrumenten, **mit Aufsicht**
+- [ ] Pia an der Linolstation: Platten zwischendurch sauber machen
+- [ ] Bunte Druckfarben bereitlegen, nicht nur Schwarz
+- [ ] Präsentationslaptop vorne: Start-, Zwischen- und Abschlusspräsentation
+- [ ] Testgruppen vor dem Start auf der Laptop-Seite löschen
+
 ## 4. Während des Workshops
 
 - [ ] Die Gruppen melden sich auf der Startseite an (Vornamen) und scannen an jeder Station den QR-Code.

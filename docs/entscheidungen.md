@@ -167,6 +167,32 @@ Ergänzt 25.10.2026 (Patricia):
 - **Stationen frei nach „Bild bearbeiten“:** Pflicht nacheinander nur Anmeldung → Foto → Bild bearbeiten (stencil.me). Alle anderen Pflicht- und Claude-Stationen haben `braucht: ["stencilme"]`, auch Hintergrund (vorher nach Körpererkennung), Vibe Coding und Stempeldruck (vorher nach Lasercutter). Lasercutter behält den Vorrang im Vorschlag. Stempeldruck wartet weiter auf „📣 Fertig, abholen“ (`wartetAuf`), Vibe Coding wird weiter bevorzugt, sobald „Wird gelasert“ kommt. Bonus bleibt wie bisher (Sticker ab 8, dann Feedbackbogen, dann Porträt)
 - **Alle iPads ins WLAN `Gast-KOMEZ`:** Aus einem anderen KOMEZ-WLAN erreicht ein iPad den Laptop nicht
 
+## 11. Entscheidungen vom 09.11.2026 (nach dem Workshop, für Dezember)
+
+Grundlage: [auswertung-2026-11-09.md](auswertung-2026-11-09.md). Im Dezember sind es höchstens 18 Kinder, es soll mehr Zeit zum Drucken bleiben.
+
+- **Lasercut-Porträt wird Pflicht, der Stempel optional.**
+  - Grund: Die Stempel sind zu klein und die Drucke schlecht.
+  - Die Kinder wollen ihren Lasercut nicht schwarz einfärben.
+  - Der Laser braucht für Stempel zu lange: 35 Min. für 6 Stempel à 40 mm.
+  - Die Postkarte entsteht an der Linolstation. Ein Stempel, wenn Zeit bleibt, wird größer.
+  - Das Porträt kommt zuerst auf die Platte. Die Laserzeit für das Porträt wird geschätzt, weil kein Zugang zum Mr Beam besteht. Am ersten Porträt vor Ort prüfen.
+- **Reihenfolge im Vorschlag:** Foto → Bild bearbeiten → Lasercutter/Porträt → Schneideplotter (Sticker) → KI 1 (Selbstporträt) → KI 2 (eigene Bild-App) → Rest.
+- **KI-Stationen sind Pflicht**, nicht mehr optional, weil sie sonst nicht gemacht werden. Opt-out der Eltern („ohne generative KI“) gilt weiter.
+- **Sticker ist kein Bonus mehr** und kommt früh, mit kurzer Erklärung, was ein Schneideplotter macht.
+- **Cameo darf nie durch die Matte schneiden.** Empfehlung: nur die Stickerschicht anschneiden statt durchschneiden. Das Trägerpapier bleibt ganz, der Bogen wird von Hand zerschnitten.
+- **Vibe Coding heißt „Eure eigene Bild-App“**, 2 Plätze, Hinweis nach 20 Min. Jede App bekommt „Foto wählen“, damit sie auch außerhalb von stencil.me läuft.
+- **Kein Wettrennen:**
+  - Bewertung freiwillig, 3 Smileys statt 5 Sterne.
+  - Bestätigungs-Stationen frühestens nach 2 Min. fertig.
+  - Feedback gibt Patricia ab 12:00 für alle frei (hängt nicht mehr am Sticker), Auswahl statt Pflicht-Freitext.
+- **Pause-Knopf** auf der Laptop-Seite: Alle iPads zeigen „Pause“ mit Countdown.
+- **Live-Quiz mit Preis:** Teil 1 nach der großen Pause, Teil 2 in der Abschlussrunde.
+  - Patricia startet es am Präsentationslaptop (`/quiz` vom Server-Laptop, mit PIN), die Paare antworten auf dem iPad.
+  - Plätze 1–3 bekommen eine Urkunde und Süßigkeiten.
+- **Gruppe löschen** auf der Laptop-Seite, damit Testgruppen vor dem Start verschwinden.
+- **Coding:** Aufgaben groß im eigenen Fenster, Felder beschriftet mit „Eingabe“ und „Ausgabe“.
+
 ---
 
 ## Testprotokoll
@@ -183,4 +209,5 @@ Ergänzt 25.10.2026 (Patricia):
 | 02.11.2026, nachmittags | KOMEZ-iPad, Ubuntu-Laptop, Mr Beam dreamcut [x]/[S] | Safari 27.2 | `Gast-KOMEZ`, Laptop `:8000` | **Mr Beam direkt vom Ubuntu-Laptop** gelasert, 3 mm Pappelsperrholz (Preset 3 mm). 3 Stempel (50 mm, eine Reihe) **27 Min.**, fast alles Gravur 2×. **Schnitt nicht ganz durch**, Holz splitterte beim Herausbrechen. Mr Beam meldet beim Laden `clipPath` als nicht unterstützt. „📣 Wird gelasert / Fertig“ kommen auf dem iPad an. Weitere Stationen auf dem iPad angetippt (Rückmeldung folgt). IP bleibt laut Medientechniker gleich |
 | 02.11.2026, Probeplatte | KOMEZ-iPad, Mr Beam dreamcut [x]/[S] | Safari 27.2 | `Gast-KOMEZ`, Branch `fix/stempel-laserzeit` | Stempel 40 mm, glatte Schnittlinie: **keine clipPath-Warnung** mehr. Mr Beam schätzt **12:16 Min. für 2 Stempel** (ca. 6 Min. pro Stempel, vorher ca. 9). Hochgerechnet 18 Stempel ≈ 1,8 h. **Schnitt geht mit dem Preset 3 mm Pappel weiter nicht ganz durch.** Mit **Schnitt Geschwindigkeit 300, 2 Durchgänge** geht er durch (in Checkliste Abschnitt 4) |
 | 02.11.2026 | KOMEZ-iPad | Safari 27.2 | `Gast-KOMEZ`, Laptop `:8000` | **Claude-Stationen** getestet: KI-Selbstporträt und Bild-App vibe coden, je 1 Anfrage über den Laptop an Claude (Sonnet 5.5), zusammen 0,35 $. Internet aus dem Gast-WLAN klappt |
+| 09.11.2026 | 12 KOMEZ-iPads (Kinder) + 1 (Lehrerinnen), Ubuntu-Laptop, Mr Beam, Cameo 4 | Safari | `Gast-KOMEZ`, Laptop `:8000` | **Workshop** mit 24 Kindern. Alle 12 Paare haben Foto und Stempel-Datei geschafft. Laser **35 Min. für 6 Stempel** (40 mm, 2×). Cameo hat einmal durch die Matte geschnitten, danach meist nur die obere Schicht. Details: [auswertung-2026-11-09.md](auswertung-2026-11-09.md) |
 | 02.11.2026 | weitere KOMEZ-iPads | Safari | WLAN-Wechsel | iPad erreicht den Laptop **nur im selben WLAN `Gast-KOMEZ`**, aus einem anderen KOMEZ-WLAN lädt die Seite endlos. Die Anmeldeseite des Gast-WLANs erschien nicht von selbst. Entscheidung: alle iPads ins `Gast-KOMEZ` |

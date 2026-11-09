@@ -22,6 +22,13 @@ Der Maker-Teil ist **vorgegeben**, damit die Kinder weniger Entscheidungen treff
 
 Optional, nur wenn Zeit bleibt: Sticker (Cameo/Cricut), Lasercut-Porträt, Positivdruck. Nie vor dem Pflichtweg anbieten.
 
+**Ab Dezember 2026 (entschieden 09.11., Umbau läuft, siehe `docs/entscheidungen.md` Abschnitt 11):**
+- Pflicht ist das **Lasercut-Porträt** statt des Negativ-Stempels. Der Stempel wird optional und größer.
+- Die Postkarte entsteht an der Linolstation.
+- Sticker kommen früh und sind kein Bonus mehr.
+- Die beiden KI-Stationen sind Pflicht.
+- Reihenfolge: Foto → Bild bearbeiten → Lasercutter/Porträt → Schneideplotter → KI 1 → KI 2 → Rest.
+
 ## Zielgruppe und Ton
 
 - Texte für Jugendliche: kurz, klar, direkt ansprechen (Du), keine Fachwörter ohne Erklärung.
@@ -141,7 +148,23 @@ Zurückgestellt (nach dem Workshop, nur bei Bedarf): eigener Router, HTTPS mit `
 6. Canva ersetzt: „Hintergrund ändern“ lokal mit BodyPix, KI-Selbstporträt über Claude ohne Foto (entschieden).
 7. Freier Ablauf: Die App schlägt Stationen nach `braucht` und `plaetze` vor, keine Rotation (entschieden).
 
-Noch offen: Einwilligung (wer holt sie ein?), Test vor Ort am 02.11.2026, iPad-Modelle und iPadOS-Version im KOMEZ.
+Noch offen: Einwilligung (wer holt sie ein?), iPad-Modelle und iPadOS-Version im KOMEZ.
+
+**Stand 09.11.2026:**
+- Der erste Workshop hat stattgefunden, die Auswertung steht in `docs/auswertung-2026-11-09.md`.
+- Der nächste Workshop ist im Dezember mit höchstens 18 Kindern.
+- Umbau-Plan in Schritten, ein Branch pro Schritt:
+  1. Auswertung
+  2. Laserzeit schätzen
+  3. Gruppe löschen
+  4. Cameo nur anschneiden
+  5. Porträt Pflicht
+  6. Reihenfolge und KI Pflicht
+  7. Kein Wettrennen
+  8. Pause-Knopf
+  9. Eigene Bild-App
+  10. Coding groß
+  11. Live-Quiz am Präsentationslaptop
 
 ## Roadmap (Schritt für Schritt, ein Schritt pro Branch)
 
