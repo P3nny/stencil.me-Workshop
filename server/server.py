@@ -371,6 +371,7 @@ def group_state(group_id):
             state["personen"] = e.get("daten", {}).get("personen", [])
         elif art == "checkin":
             state["aktuell"] = station
+            state["aktuellSeit"] = e.get("zeit") or e.get("empfangen") or ""  # für „seit 20 Min.“ auf der Laptop-Seite
         elif art == "beendet":
             if station not in state["fertig"]:
                 state["fertig"].append(station)

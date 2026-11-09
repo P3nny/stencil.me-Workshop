@@ -85,6 +85,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Bunte Druckfarben bereitlegen, nicht nur Schwarz
 - [ ] Präsentationslaptop vorne: Start-, Zwischen- und Abschlusspräsentation
 - [ ] Testgruppen vor dem Start auf der Laptop-Seite löschen
+- [ ] Laptop-Seite, Spalte „Gerade an“: **rot mit ⏰** = Gruppe seit über 15 Minuten an einer Station. Hingehen und fragen, ob sie fertig ist (die iPads erinnern auch selbst)
 - [ ] **Pause-Knopf** auf der Laptop-Seite (☕ 10 Min., 35 Min. oder bis Uhrzeit): Alle iPads zeigen spätestens nach einer Minute „Pause bis … Uhr“ mit Countdown, nichts antippbar. Endet von selbst oder mit „Pause beenden“ (iPads geben spätestens nach 15 Sekunden frei)
 
 ## 4. Während des Workshops

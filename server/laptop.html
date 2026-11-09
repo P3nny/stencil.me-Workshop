@@ -32,6 +32,8 @@
   .error { background:var(--neon); border:2px solid var(--ink); padding:10px; margin-top:12px; font-weight:700; }
   .groups-panel { width:100%; }
   .bogen-panel { flex:1; min-width:480px; }
+  .seit { font-size:.85rem; color:#4a4a4a; }
+  .seit.lange { color:#b00020; font-weight:700; }
   .plate.folie { background:#fff; }
   .plotter { margin-top:16px; }
   .plotter-schritt { border:3px solid var(--ink); padding:12px; background:#fffbe6; }
@@ -397,7 +399,15 @@
       var row = document.createElement("tr");
       cell(row, g.personen.length ? g.personen.join(" & ") : "(noch ohne Namen)");
       einwilligungZelle(cell(row, ""), g);
-      cell(row, g.aktuell ? (stationTitles[g.aktuell] || g.aktuell) : "–", "station");
+      var aktuellZelle = cell(row, g.aktuell ? (stationTitles[g.aktuell] || g.aktuell) : "–", "station");
+      // Seit wann? Ab 15 Minuten markiert: Station vielleicht nur nicht beendet (09.11.: Vibe Coding über 1 Stunde offen)
+      var seit = g.aktuell && g.aktuellSeit ? Math.floor((Date.now() - Date.parse(g.aktuellSeit)) / 60000) : -1;
+      if (seit >= 0) {
+        var dauer = document.createElement("div");
+        dauer.className = "seit" + (seit >= 15 ? " lange" : "");
+        dauer.textContent = "seit " + seit + " Min." + (seit >= 15 ? " ⏰" : "");
+        aktuellZelle.appendChild(dauer);
+      }
       var pflicht = g.fertig.filter(function (id) { return !bonusIds[id]; }).length;
       cell(row, pflicht + (stationCount ? " von " + stationCount : "") + ": " + g.fertig.map(function (id) { return stationTitles[id] || id; }).join(", "));
       var photos = cell(row, "");

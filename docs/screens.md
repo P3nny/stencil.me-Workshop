@@ -293,3 +293,9 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Laptop-Seite, Bereich „Gruppen an den Stationen“: **☕ Pause für alle iPads**: „10 Min.“, „35 Min.“, „Bis Uhrzeit“, „Pause beenden“. Gespeichert als `pauseBis` in den Einstellungen, „Alle Daten löschen“ beendet sie
 - iPads fragen wie bei den Nachrichten einmal pro Minute nach (`pauseRest` in `/api/nachrichten`, nach der Uhr des Laptops). Dann Vollbild „☕ Pause bis 10:10 Uhr · noch 7:32 · Lasst das iPad hier liegen“ über allem. Während der Pause fragen sie alle 15 Sekunden, damit „Pause beenden“ schnell ankommt. Ohne Laptop endet die Pause von selbst, wenn die Zeit um ist
 - Keine Daten von Kindern, darum keine Änderung an `Datenschutz.md`
+
+## Erinnerung „Station noch offen“ (09.11., Branch `feature/erinnerung-offen`)
+
+- Am 09.11. blieb Vibe Coding über eine Stunde offen, weil Gruppen die Station nicht beendet hatten. Neue Kinder kommen mit „Wir sind trotzdem dran“ an die Station, die Plätze bleiben wie sie sind
+- **iPad:** 15 Minuten nach dem Check-in erscheint oben (bleibt beim Scrollen sichtbar): „⏰ Ihr seid schon 16 Minuten an dieser Station. Seid ihr fertig? Dann unten auf ‚Station beendet‘ tippen, damit die nächste Gruppe drankommt.“ Knöpfe „Zu ‚Station beendet‘“ und „Wir brauchen noch Zeit“. Danach alle weiteren 15 Minuten wieder. Pro Station änderbar mit `erinnerungMinuten` (0 = nie)
+- **Laptop-Seite:** Spalte „Gerade an“ zeigt „seit 20 Min.“, ab 15 Minuten rot mit ⏰
