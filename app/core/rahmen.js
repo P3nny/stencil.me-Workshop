@@ -40,6 +40,15 @@
     if(OHNE_WARTEN || !minuten || !eintrag.start) return 0;
     return Math.max(0, Math.ceil((Date.parse(eintrag.start) + minuten * 60000 - Date.now()) / 1000));
   }
+  // Erinnerung (Patricia, 09.11.2026: Gruppen ließen Vibe Coding über eine Stunde offen):
+  // Alle 15 Minuten nach dem Check-in fragt das iPad „Seid ihr fertig?“. Pro Station änderbar
+  // mit erinnerungMinuten (0 = nie).
+  const ERINNERUNG_MINUTEN = 15;
+  function erinnerungStufe(station, eintrag){
+    const minuten = station.erinnerungMinuten !== undefined ? station.erinnerungMinuten : ERINNERUNG_MINUTEN;
+    if(!minuten || !eintrag.start || eintrag.status !== 'begonnen') return 0;
+    return Math.floor((Date.now() - Date.parse(eintrag.start)) / (minuten * 60000));
+  }
   // Wie hat dir die Station gefallen? Freiwillig, 3 Smileys statt 5 Sterne (09.11.2026: Der Pflicht-Stern
   // wurde oft nur angetippt, um weiterzukommen). Gespeichert als gefallen: 1–3.
   const GEFALLEN = [
@@ -580,7 +589,32 @@
       }, 1000);
     }
     const links = (station.links || []).filter(l => l.url).map(l => el('a', { href: l.url, target: '_blank', klasse: 'knopf-link', text: l.text }));
+    const erinnerung = el('div', { klasse: 'erinnerung' });
+    erinnerung.hidden = true;
+    const erinnerungPruefen = () => {
+      if(!document.body.contains(beendenKnopf)) return clearInterval(ctx.erinnerUhr);
+      const stufe = erinnerungStufe(station, ctx.eintrag);
+      if(!stufe || stufe <= (ctx.eintrag.erinnert || 0) || !erinnerung.hidden) return;
+      const minuten = Math.round((Date.now() - Date.parse(ctx.eintrag.start)) / 60000);
+      erinnerung.innerHTML = '';
+      erinnerung.appendChild(el('p', { text: '⏰ Ihr seid schon ' + minuten + ' Minuten an dieser Station. Seid ihr fertig? Dann unten auf „Station beendet“ tippen, damit die nächste Gruppe drankommt.' }));
+      erinnerung.appendChild(el('button', { type: 'button', text: 'Zu „Station beendet“', onclick: () => {
+        erinnerung.hidden = true;
+        ctx.eintrag.erinnert = stufe;
+        speichern();
+        beendenKnopf.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } }));
+      erinnerung.appendChild(el('button', { type: 'button', klasse: 'secondary', text: 'Wir brauchen noch Zeit', onclick: () => {
+        erinnerung.hidden = true;
+        ctx.eintrag.erinnert = stufe;
+        speichern();
+      } }));
+      erinnerung.hidden = false;
+    };
+    clearInterval(ctx.erinnerUhr);
+    ctx.erinnerUhr = setInterval(erinnerungPruefen, 20000);
     inhalt.appendChild(el('section', { klasse: 'panel' }, [
+      erinnerung,
       el('h1', { text: station.titel }),
       etiketten(station, false),
       el('ol', { klasse: 'schritte' }, station.schritte.map(s => el('li', { text: s }))),
@@ -595,6 +629,7 @@
       fehltHinweis
     ]));
     ctx.pruefen();
+    erinnerungPruefen();
   }
 
   function abschlussZeigen(){
