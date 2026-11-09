@@ -154,7 +154,7 @@ function vorschlagAbwarten(page){
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
   pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Optional: Selbstporträts mit KI neu erschaffen', 'Linoldruck', 'Kunst-Quiz: Künstler:innen und Streetart', 'Berufe: Wer macht das in echt?', 'Optional: Bild-App vibe coden'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 12') >= 0, 'Zähler steht auf 1 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 11') >= 0, 'Zähler steht auf 1 von 11');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
 
@@ -163,7 +163,7 @@ function vorschlagAbwarten(page){
   await page.waitForSelector('text=Bonus-Station');
   const sperre = await page.locator('#inhalt').textContent();
   pruefe(/Euch fehlen noch 7\./.test(sperre), 'Bonus-Sticker gesperrt: „Euch fehlen noch 7.“');
-  pruefe(/Vorher müsst ihr noch machen: Bild bearbeiten, Lasercutter, Stempeldruck\. Stempeldruck geht auf, sobald euer Stempel fertig ist \(Nachricht „Fertig, abholen“\)\./.test(sperre), 'Sperre nennt die fehlenden Stationen');
+  pruefe(/Vorher müsst ihr noch machen: Bild bearbeiten, Lasercutter\./.test(sperre), 'Sperre nennt die fehlenden Stationen (ohne Stempeldruck, der ist optional)');
   await page.goto(BASE + '/app/station.html?id=lasercutter&test');
   await page.waitForSelector('text=noch nicht');
   pruefe(await page.locator('text=Bild bearbeiten').count() > 0, 'Lasercutter verlangt zuerst „Bild bearbeiten“');
@@ -184,28 +184,31 @@ function vorschlagAbwarten(page){
   await page.goto(BASE + '/app/station.html?id=stencilme&test');
   await page.waitForSelector('h1:has-text("Bild bearbeiten")');
   pruefe(await page.locator('.stempel-person').count() === 2, 'ein Bereich pro Person');
-  // Beide Personen nacheinander: warten, bis beide Stempel fertig gerechnet sind
+  // Beide Personen nacheinander: warten, bis beide Porträts fertig gerechnet sind
   await page.waitForFunction(() => document.querySelectorAll('.stempel-person .schritt-bild svg').length === 2, null, { timeout: 120000 });
   pruefe(await page.locator('.stempel-person').first().locator('.schritt-bild.leer').count() === 0, 'alle fünf Schritte als Bild sichtbar');
   pruefe((await page.locator('.stempel-person').first().locator('.schritt-notiz').nth(2).textContent()).indexOf('Pink = Person') === 0, 'KI hat die Person gefunden');
   const randText = await page.locator('.rand strong').first().textContent();
   pruefe(/mm/.test(randText), 'Schnittrand automatisch gewählt: ' + randText);
   pruefe(await page.locator('.rand-warnung:visible').count() === 0, 'roter Rand in einem Stück');
+  pruefe(/nicht gespiegelt/.test(await page.locator('.schritt-notiz').nth(4).textContent()), 'Bild bearbeiten macht das Porträt (nicht gespiegelt)');
+  pruefe(/^4[4-9]|^5\d/.test(await page.locator('.schritt-notiz').nth(4).textContent()), 'Porträt 45 mm breit plus Rand: ' + await page.locator('.schritt-notiz').nth(4).textContent());
+  pruefe(await page.locator('a:has-text("Porträt gefällt dir nicht? Zurück zum Foto")').count() === 2, '„Zurück zum Foto“ für jede Person');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-6-stencilme.png'), fullPage: true });
-  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor die Stempel fertig sind');
-  await page.locator('.stempel-person').first().locator('button:has-text("Stempel ist fertig")').click();
+  pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt, bevor die Porträts fertig sind');
+  await page.locator('.stempel-person').first().locator('button:has-text("Porträt ist fertig")').click();
   await page.waitForSelector('text=geht an den Laptop, wenn ihr unten auf');
-  // Regler ändern: geänderten Stempel nochmal als fertig nehmen
+  // Regler ändern: geändertes Porträt nochmal als fertig nehmen
   await page.locator('.rand input').first().fill('12');
-  await page.waitForSelector('button:has-text("Geänderten Stempel als fertig nehmen")');
-  pruefe(true, 'nach Änderung am Rand: „Geänderten Stempel als fertig nehmen“');
+  await page.waitForSelector('button:has-text("Geändertes Porträt als fertig nehmen")');
+  pruefe(true, 'nach Änderung am Rand: „Geändertes Porträt als fertig nehmen“');
   await page.locator('.rand input').first().fill(String(parseFloat(randText.replace(',', '.'))));
   await page.waitForFunction(() => document.querySelector('.stempel-person button').disabled);
-  await page.locator('.stempel-person').nth(1).locator('button:has-text("Stempel ist fertig")').click();
+  await page.locator('.stempel-person').nth(1).locator('button:has-text("Porträt ist fertig")').click();
   await page.waitForFunction(() => document.querySelectorAll('.stempel-person')[1].querySelector('button').disabled);
   await page.waitForTimeout(1500);
   const vorher = (await (await page.request.get(BASE + '/api/liste')).json()).stempel.length;
-  pruefe(vorher === 0, 'Stempel noch nicht auf dem Laptop, solange die Station läuft (' + vorher + ')');
+  pruefe(vorher === 0, 'Porträt noch nicht auf dem Laptop, solange die Station läuft (' + vorher + ')');
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne Antwort zu den Farben');
   await page.fill('#eingabe-farben', 'Rot schneidet, Blau graviert');
   await page.click('button:has-text("Station beendet")');
@@ -217,12 +220,12 @@ function vorschlagAbwarten(page){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
   const nachher = (await (await page.request.get(BASE + '/api/liste')).json()).stempel.map(x => x.name).sort().join(',');
-  pruefe(nachher === 'Ada,Bo', 'nach „Fertig“: genau ein Stempel pro Person auf dem Laptop (' + nachher + ')');
-  pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 2, 'Puzzle: zwei Teile mit Stempel-Porträt');
+  pruefe(nachher === 'Ada-Portraet,Bo-Portraet', 'nach „Fertig“: genau ein Porträt pro Person auf dem Laptop (' + nachher + ')');
+  pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 2, 'Puzzle: zwei Teile mit Porträt');
   await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
   const stempelNachher = (await (await page.request.get(BASE + '/api/liste')).json()).stempel;
   const neu = stempelNachher.slice(0, stempelNachher.length - stempelVorher).map(x => x.name).sort().join(',');
-  pruefe(neu === 'Ada,Bo', 'zwei Stempel auf dem Laptop: ' + neu);
+  pruefe(neu === 'Ada-Portraet,Bo-Portraet', 'zwei Porträts auf dem Laptop: ' + neu);
 
   console.log('Station Lasercutter');
   await page.goto(BASE + '/app/station.html?id=lasercutter&test');
@@ -235,16 +238,16 @@ function vorschlagAbwarten(page){
   await page.locator('input[type=file]').setInputFiles(FOTO);
   await page.locator('.foto-vorschau').waitFor({ state: 'visible' });
   await abschliessen(page, 3);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 12') >= 0, 'Zähler steht auf 3 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 11') >= 0, 'Zähler steht auf 3 von 11');
 
   console.log('Neu laden: Fortschritt bleibt');
   await page.reload();
   await page.waitForSelector('text=schon erledigt');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 12') >= 0, 'Fortschritt nach Neuladen erhalten');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('3 von 11') >= 0, 'Fortschritt nach Neuladen erhalten');
 
   console.log('Startseite nach drei Stationen');
   await page.goto(BASE + '/');
-  await page.waitForSelector('text=3 von 12 Stationen geschafft');
+  await page.waitForSelector('text=3 von 11 Stationen geschafft');
   pruefe(true, 'Startseite zeigt den Stand');
   await page.goto(BASE + '/app/station.html?id=lasercutter');
 
@@ -304,7 +307,7 @@ function vorschlagAbwarten(page){
   await page.locator('.hintergrund-person').nth(1).locator('button:has-text("Bild speichern")').click();
   await page.waitForFunction(() => Array.prototype.filter.call(document.querySelectorAll('button'), b => b.textContent.indexOf('Bild ist gespeichert') >= 0).length === 2);
   await abschliessen(page, 4);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 12') >= 0, 'Zähler steht auf 5 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('5 von 11') >= 0, 'Zähler steht auf 5 von 11');
 
   console.log('Station Pixel vs. Vektor');
   await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
@@ -361,7 +364,7 @@ function vorschlagAbwarten(page){
   await page.goto(BASE + '/app/station.html?id=pixel-vektor&test');
   await page.waitForSelector('.ce-vorschau img');
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 12') >= 0, 'Zähler steht auf 6 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('6 von 11') >= 0, 'Zähler steht auf 6 von 11');
 
   console.log('Station Coding: HTML, CSS und JavaScript');
   await page.goto(BASE + '/app/station.html?id=coding-web&test');
@@ -406,7 +409,7 @@ function vorschlagAbwarten(page){
   await page.locator('button.stern').nth(4).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 12') >= 0, 'Zähler steht auf 7 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 11') >= 0, 'Zähler steht auf 7 von 11');
 
   console.log('Station Selbstporträts mit KI (Server im Testmodus, ohne Claude)');
   await page.goto(BASE + '/app/station.html?id=ki-selbstportraet&test');
@@ -433,7 +436,7 @@ function vorschlagAbwarten(page){
   await page.locator('button.stern').nth(4).click();
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 12') >= 0, 'Optionale Station zählt nicht mit: weiter 7 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 11') >= 0, 'Optionale Station zählt nicht mit: weiter 7 von 11');
   pruefe(/\+ 1 extra/.test(await page.locator('.zaehler').textContent()), 'optionale Station: „+ 1 extra ⭐“ neben dem Zähler');
   pruefe(await page.locator('text=Diese Station war optional').count() === 1, 'Hinweis: optional, kein Puzzleteil');
 
@@ -458,11 +461,26 @@ function vorschlagAbwarten(page){
   pruefe(await page.locator('button:has-text("Station beendet")').isDisabled(), 'gesperrt ohne Ethik-Antwort');
   await page.fill('#eingabe-ethik', 'Schutz vor schlechten Inhalten');
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 12') >= 0, 'Optionale Station zählt nicht mit: weiter 7 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('7 von 11') >= 0, 'Optionale Station zählt nicht mit: weiter 7 von 11');
 
   for(const druck of [['druck-linol', 'Linoldruck'], ['druck-stempel', 'Stempeldruck']]){
     console.log('Station ' + druck[1]);
     if(druck[0] === 'druck-stempel'){
+      await page.goto(BASE + '/app/station.html?id=druck-stempel&test');
+      await page.waitForSelector('text=Diese Station kommt später');
+      pruefe(/Stempel zum Drucken/.test(await page.locator('#inhalt').textContent()), 'Stempeldruck braucht zuerst die Station „Stempel“');
+      console.log('Optionale Station Stempel');
+      await page.goto(BASE + '/app/station.html?id=stempel&test');
+      await page.waitForFunction(() => document.querySelectorAll('.stempel-person .schritt-bild svg').length === 2, null, { timeout: 120000 });
+      const stempelNotiz = await page.locator('.schritt-notiz').nth(4).textContent();
+      pruefe(/gespiegelt/.test(stempelNotiz) && !/nicht gespiegelt/.test(stempelNotiz), 'Stempel ist gespiegelt');
+      pruefe(/^(5\d|6\d)/.test(stempelNotiz), 'Stempel 50 mm breit plus Rand: ' + stempelNotiz);
+      pruefe(await page.locator('a:has-text("Zurück zum Foto")').count() === 0, 'kein „Zurück zum Foto“ im optionalen Stempel');
+      await page.screenshot({ path: path.join(SHOTS, BROWSER + '-17-stempel.png'), fullPage: true });
+      await fertigMarkieren(page, 'Stempel');
+      await abschliessen(page, 5);
+      const stempelListe = (await (await page.request.get(BASE + '/api/liste')).json()).stempel.map(x => x.name).sort().join(',');
+      pruefe(stempelListe === 'Ada,Ada-Portraet,Bo,Bo-Portraet', 'Stempel und Porträts auf dem Laptop: ' + stempelListe);
       // Erst wenn „Fertig, abholen“ für die Platte gekommen ist
       await page.goto(BASE + '/app/station.html?id=druck-stempel&test');
       await page.waitForSelector('text=Euer Stempel ist noch nicht fertig.');
@@ -486,7 +504,7 @@ function vorschlagAbwarten(page){
     await abschliessen(page, 5);
     pruefe(true, 'Station abgeschlossen');
   }
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('9 von 12') >= 0, 'Zähler steht auf 9 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('8 von 11') >= 0, 'Zähler steht auf 8 von 11 (Stempeldruck optional)');
 
   // Quiz in der Station durchspielen: immer die obere Antwort, dann weiter
   async function quizOeffnen(){
@@ -552,7 +570,7 @@ function vorschlagAbwarten(page){
   await lieblinge.nth(1).setInputFiles(FOTO);
   await page.waitForFunction(() => document.querySelectorAll('.foto-vorschau:not([hidden])').length === 2);
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('11 von 12') >= 0, 'Zähler steht auf 11 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('10 von 11') >= 0, 'Zähler steht auf 10 von 11');
 
   console.log('Station Berufe');
   await page.goto(BASE + '/app/station.html?id=berufe&test');
@@ -567,7 +585,7 @@ function vorschlagAbwarten(page){
   await page.fill('#eingabe-wunsch', 'Ada: Tischlerin, Bo: Informatiker');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-22-berufe.png'), fullPage: true });
   await abschliessen(page, 4);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('12 von 12') >= 0, 'Zähler steht auf 12 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('11 von 11') >= 0, 'Zähler steht auf 11 von 11');
   pruefe(await page.locator('text=Bonus: Sticker').count() === 1, 'danach wird der Bonus-Sticker vorgeschlagen');
 
   console.log('Bonus-Station Sticker');
@@ -578,7 +596,7 @@ function vorschlagAbwarten(page){
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-15-sticker.png'), fullPage: true });
   await fertigMarkieren(page, 'Sticker');
   await abschliessen(page, 5);
-  pruefe((await page.locator('.zaehler').textContent()).indexOf('12 von 12') >= 0, 'Bonus zählt nicht mit: weiter 12 von 12');
+  pruefe((await page.locator('.zaehler').textContent()).indexOf('11 von 11') >= 0, 'Bonus zählt nicht mit: weiter 11 von 11');
   pruefe(await page.locator('text=Feedback zum Workshop').count() === 1, 'danach wird der Feedbackbogen vorgeschlagen');
 
   console.log('Feedbackbogen');
@@ -598,15 +616,6 @@ function vorschlagAbwarten(page){
   await page.click('button:has-text("Fertig")');
   await page.waitForSelector('text=Super, geschafft!');
   await vorschlagAbwarten(page);
-  pruefe(await page.locator('text=Lasercut-Porträt').count() === 1, 'danach wird Bonus 2 vorgeschlagen');
-
-  console.log('Bonus 2: Lasercut-Porträt');
-  await page.goto(BASE + '/app/station.html?id=portraet&test');
-  await page.waitForFunction(() => document.querySelectorAll('.stempel-person .schritt-bild svg').length === 2, null, { timeout: 120000 });
-  pruefe(/nicht gespiegelt/.test(await page.locator('.schritt-notiz').nth(4).textContent()), 'Porträt ist nicht gespiegelt');
-  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-17-portraet.png'), fullPage: true });
-  await fertigMarkieren(page, 'Porträt');
-  await abschliessen(page, 5);
   pruefe(await page.locator('text=alle Stationen geschafft').count() === 1, '„Du hast alle Stationen geschafft!“');
   await page.waitForFunction(() => document.getElementById('sync').textContent.indexOf('Gesichert auf dem Laptop') >= 0, null, { timeout: 20000 });
   const sticker = (await (await page.request.get(BASE + '/api/sticker')).json()).stempel.map(x => x.name).sort().join(',');
@@ -619,7 +628,7 @@ function vorschlagAbwarten(page){
   const g = gruppen.gruppen.filter(x => x.personen.join() === 'Ada,Bo').pop();
   pruefe(!!g, 'Gruppe Ada & Bo auf dem Laptop');
   if(g){
-    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor,coding-web,ki-selbstportraet,vibe-coding,druck-linol,druck-stempel,code-quiz,kunst-quiz,berufe,sticker,feedback,portraet', 'fertige Stationen: ' + g.fertig.join(', '));
+    pruefe(g.fertig.join() === 'foto,stencilme,lasercutter,koerpererkennung,hintergrund,pixel-vektor,coding-web,ki-selbstportraet,vibe-coding,druck-linol,stempel,druck-stempel,code-quiz,kunst-quiz,berufe,sticker,feedback', 'fertige Stationen: ' + g.fertig.join(', '));
     const arten = g.dateien.map(d => d.split('/').pop().split('_')[0]).sort().join(',');
     pruefe(arten === 'ki-selbstportraet,ki-selbstportraet,vibe-coding', 'auf dem Laptop kein Foto, nur KI-Bilder und App (' + arten + ')');
     const fotosLaptop = fs.existsSync(path.join(__dirname, '..', 'archiv', 'testdaten', 'gruppen', g.gruppe, 'dateien')) ? fs.readdirSync(path.join(__dirname, '..', 'archiv', 'testdaten', 'gruppen', g.gruppe, 'dateien')).filter(f => /\.(jpg|png)$/.test(f)) : [];
@@ -670,15 +679,24 @@ function vorschlagAbwarten(page){
       fremd: svg.querySelectorAll('clipPath, mask, use, pattern').length };
   });
   pruefe(platte.fremd === 0, 'Platte ohne clipPath/mask/use/pattern (Mr Beam kennt sie nicht)');
-  pruefe(platte.gruppen >= 2, 'Stempel auf der Platte: ' + platte.gruppen);
-  pruefe(platte.eindeutig, 'jede ID auf der Platte nur einmal');
-  pruefe(platte.gruppen === 4, 'Platte: zwei Stempel und zwei Porträts (' + platte.gruppen + ')');
+  pruefe(platte.gruppen === 2, 'Platte: nur die zwei Porträts vorausgewählt, Stempel nicht (' + platte.gruppen + ')');
+  pruefe(await laptop.locator('#platte-info .warn').count() === 0, 'nur Porträts: keine Warnung');
+  // Stempel von Hand dazu: Warnung wegen der Durchgänge (1× / 2×)
+  for(const name of ['Ada', 'Bo']) await laptop.locator('#platte-grid .stamp').filter({ has: laptop.locator('.name', { hasText: new RegExp('^' + name + '$') }) }).locator('input').check();
+  await laptop.click('#platte-bauen');
+  await laptop.waitForFunction(() => document.querySelector('#platte-vorschau svg').children.length === 4);
+  pruefe(/Porträts und Stempel auf einer Platte/.test(await laptop.locator('#platte-info').textContent()), 'gemischt: Warnung „Porträts 1×, Stempel 2×“');
+  const platte4 = await laptop.evaluate(() => {
+    const ids = Array.prototype.map.call(document.querySelectorAll('#platte-vorschau svg [id]'), e => e.id);
+    return new Set(ids).size === ids.length;
+  });
+  pruefe(platte4, 'jede ID auf der Platte nur einmal');
   pruefe(platte.breite === '210mm', 'Platte ist A4 (210 mm breit)');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-8-platte.png'), fullPage: true });
   const [download] = await Promise.all([laptop.waitForEvent('download'), laptop.click('#platte-aktionen button:has-text("Platte herunterladen")')]);
   pruefe(/^platte-.*\.svg$/.test(download.suggestedFilename()), 'Download: ' + download.suggestedFilename());
   await laptop.waitForSelector('#platte-grid .stamp.placed');
-  pruefe(true, 'Stempel danach grau markiert');
+  pruefe(true, 'Stücke danach grau markiert');
 
   console.log('Nachricht vom Laptop an die Gruppe');
   await laptop.waitForSelector('#platte-verlauf .history-row');

@@ -85,7 +85,8 @@ function ereignis(api, gruppe, art, station, nr){
       nurFotoOffen: liste.filter(st => st.id !== 'foto' && st.id !== 'stencilme' && Stationen.voraussetzungen(liste, st).every(b => b === 'foto')).map(st => st.id)
     };
   }));
-  pruefe(!frei.zu.length, 'alle Pflicht- und Claude-Stationen offen' + (frei.zu.length ? ', gesperrt: ' + frei.zu.join(', ') : ''));
+  // Stempeldruck (optional) braucht seit 09.11. die optionale Station „Stempel“
+  pruefe(frei.zu.join() === 'druck-stempel', 'alle Pflicht- und Claude-Stationen offen, nur Stempeldruck wartet auf „Stempel“ (gesperrt: ' + frei.zu.join(', ') + ')');
   pruefe(!frei.bonusOffen.length, 'Bonus bleibt gesperrt' + (frei.bonusOffen.length ? ': ' + frei.bonusOffen.join(', ') : ''));
   pruefe(!frei.nurFotoOffen.length, 'ohne Bild bearbeiten ist nur stencil.me offen' + (frei.nurFotoOffen.length ? ', auch: ' + frei.nurFotoOffen.join(', ') : ''));
 
