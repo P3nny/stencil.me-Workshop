@@ -145,6 +145,11 @@
         box.appendChild(el('h2', { text: 'Eure Antworten' }));
         if(!Object.keys(d.antworten).length) box.appendChild(el('p', { text: 'Noch keine.' }));
         d.fertig.forEach(id => box.appendChild(stationZeigen(liste, id, d.antworten[id] || {})));
+        // Live-Quiz: Teamname (Tier), Antworten, Punkte
+        if(d.quiz){
+          box.appendChild(el('h2', { text: '🏆 Quiz: ' + d.quiz.team.emoji + ' ' + d.quiz.team.name + ' · ' + d.quiz.punkte + (d.quiz.punkte === 1 ? ' Punkt' : ' Punkte') }));
+          d.quiz.antworten.forEach(a => box.appendChild(el('p', { text: (a.richtig ? '✅ ' : '❌ ') + 'Teil ' + a.teil + ': ' + a.frage + ' → ' + a.antwort })));
+        }
       })
       .catch(err => {
         console.error(err);
