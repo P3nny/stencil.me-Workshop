@@ -6,7 +6,7 @@
 <title>stencil.me Laptop</title>
 <link href="/vendor/fonts/fonts.css" rel="stylesheet">
 <script src="/vendor/qrcode/qrcode.js"></script>
-<script src="/laptop/bogen.js?v=2026-11-09"></script>
+<script src="/laptop/bogen.js?v=2026-11-09b"></script>
 <style>
   :root { --ink:#111; --paper:#fff; --neon:#ff2d95; --kraft:#b89b74; --muted:#4a4a4a; }
   body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:'DM Sans',-apple-system,sans-serif; }
@@ -85,12 +85,12 @@
 </div>
 <div class="layout" style="margin-top:28px">
   <div class="panel bogen-panel" id="platte">
-    <h2>Stempel → A4-Holzplatte für den Mr Beam</h2>
+    <h2>Porträts und Stempel → A4-Holzplatte für den Mr Beam</h2>
     <div class="count" id="platte-anzahl">–</div>
     <div class="hint">Ordner: <span class="folder" id="platte-ordner"></span></div>
     <div id="platte-fehler"></div>
     <div class="grid" id="platte-grid"></div>
-    <div class="hint">Angehakte Stempel kommen auf die Platte: 5 mm Rand, 3 mm Abstand. Wer zuerst fertig war, kommt zuerst dran.</div>
+    <div class="hint">Angehakte Stücke kommen auf die Platte: 5 mm Rand, 3 mm Abstand. Wer zuerst fertig war, kommt zuerst dran. <b>Porträts sind automatisch angehakt, Stempel (optional) nicht</b>: Stempel auf eine eigene Platte.</div>
     <button id="platte-bauen" type="button">Platte zusammenstellen</button>
     <button id="platte-neu" type="button">Neue Platte eingelegt</button>
     <div class="hint" id="platte-belegt"></div>
@@ -100,9 +100,9 @@
         <div id="platte-info"></div>
         <div id="platte-aktionen"></div>
         <div class="hint">Angefangene Platte nicht verschieben. In der Mr-Beam-Oberfläche die Datei immer an derselben Stelle (A4-Ecke der Platte) ausrichten.</div>
-        <div class="hint">In der Mr-Beam-Oberfläche: Datei öffnen, Gravur (Blau) mit <b>2 Durchgängen</b>, dann Schnitt (Rot).</div>
+        <div class="hint">In der Mr-Beam-Oberfläche: Datei öffnen, Gravur (Blau): <b>Porträts 1 Durchgang, Stempel 2 Durchgänge</b>. Dann Schnitt (Rot).</div>
         <div class="hint">Grau = schon auf einer heruntergeladenen Platte, wird nicht mehr angehakt. Ging eine Platte schief:</div>
-        <button id="platte-zuruecksetzen" type="button">Alle Stempel wieder anhaken</button>
+        <button id="platte-zuruecksetzen" type="button">Alle Porträts wieder anhaken</button>
       </div>
     </div>
     <h2 style="margin-top:20px">Letzte Platten: Nachricht an die Kinder</h2>
@@ -232,7 +232,7 @@
     return b;
   }
 
-  // „Die Stempel von Ada und Bo“, „Das Porträt von Ada“ (Bonus 2 heißt „Name-Portraet“)
+  // „Die Stempel von Ada und Bo“, „Das Porträt von Ada“ (Porträts heißen „Name-Portraet“)
   function stuecke(namen, einzahl, mehrzahl) {
     var normal = namen.filter(function (n) { return !/-Portraet$/.test(n); });
     var portraets = namen.filter(function (n) { return /-Portraet$/.test(n); }).map(function (n) { return n.replace(/-Portraet$/, ""); });
@@ -246,9 +246,16 @@
   // ---- Holzplatte für den Mr Beam: herunterladen, in BeamOS öffnen ----
   var platte = Bogen.erstellen({
     id: "platte", schluessel: "stencilme-platte", liste: "/api/liste", dateien: "/daten/",
-    einzahl: "Stempel", mehrzahl: "Stempel", haken: "auf die Platte", bogen: "der Platte",
+    einzahl: "Stück", mehrzahl: "Stücke", haken: "auf die Platte", bogen: "der Platte",
     bogenEins: "eine Platte", bogenGross: "Die Platte", bogenNeu: "eine neue Platte", naechster: "die nächste Platte",
     rand: 5, abstand: 3,
+    // Porträts (Pflicht, Gravur 1×) sind vorausgewählt, Stempel (optional, Gravur 2×) nicht:
+    // Die Mr-Beam-Oberfläche stellt die Durchgänge pro Auftrag ein, nicht pro Stück.
+    vorauswahl: function (s) { return /-Portraet$/.test(s.name); },
+    mischWarnung: function (stuecke) {
+      var p = stuecke.filter(function (s) { return /-Portraet$/.test(s.name); }).length;
+      return p && p < stuecke.length ? "⚠ Porträts und Stempel auf einer Platte: Porträts werden 1× graviert, Stempel 2×. Besser zwei Platten (Haken bei den Stempeln weg)." : "";
+    },
     nachrichten: {
       laser: { knopf: "📣 Wird gelasert", text: function (namen) { var s = stuecke(namen, "Stempel", "Stempel"); return s.text + (s.viele ? " werden" : " wird") + " jetzt gelasert. Kommt gern zum Zuschauen!"; } },
       fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { var s = stuecke(namen, "Stempel", "Stempel"); return s.text + (s.viele ? " sind" : " ist") + " fertig! Bitte bei Penny am Lasercutter abholen."; } }

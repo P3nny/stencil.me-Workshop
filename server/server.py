@@ -1093,7 +1093,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         sorte = (query.get("art") or [""])[0]
         base = STICKER_DIR if sorte == "sticker" else DATA_DIR
         if sorte == "portraet":
-            # Bonus 2 liegt bei den Stempeln (gleiche Holzplatte), am Namen erkennbar
+            # Das Porträt liegt bei den Stempeln (gleiche Holzplatte), am Namen erkennbar
             name = (name + "-Portraet")[:30]
         existing = find_stamp(stamp_id, base)
         if existing:
