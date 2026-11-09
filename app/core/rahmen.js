@@ -14,6 +14,7 @@
     'foto-ipad': 'Foto bleibt auf dem iPad · Antworten an den Laptop',
     'foto-ipad-video': 'Foto bleibt auf dem iPad · Antworten an den Laptop · Video: YouTube',
     laptop: 'Datei für Laser/Plotter an den Laptop',
+    'laptop-video': 'Datei für Laser/Plotter an den Laptop · Video: YouTube',
     online: 'Nutzt generative KI'
   };
   const KI_ANTWORTEN = [

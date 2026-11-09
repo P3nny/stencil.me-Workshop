@@ -2,14 +2,18 @@
   "id": "sticker",
   "titel": "Sticker mit dem Schneideplotter",
   "typ": "ki",
-  "datenweg": "laptop",
+  "datenweg": "laptop-video",
   "schritte": [
-    "Ein Schneideplotter ist wie ein Drucker mit Messer: Ein Stift malt die dunklen Flächen, dann schneidet eine kleine Klinge die Form aus.",
+    "Ein Schneideplotter ist wie ein Drucker mit Messer: Ein Stift malt die dunklen Flächen, dann schneidet eine kleine Klinge die Form aus. Schaut euch dazu das kurze Video an.",
     "Die App rechnet euer Foto noch einmal, diesmal für den Schneideplotter.",
     "Prüft den roten Rand: Er muss in einem Stück um alles herumlaufen.",
     "Schickt euren Sticker an den Laptop. Der Plotter schneidet nur die Stickerschicht ein, abziehen könnt ihr ihn selbst.",
     "Vergleicht mit eurem Porträt: Wo malt der Stift, wo graviert der Laser? Warum ist beides nicht gespiegelt?"
   ],
+  "video": {
+    "youtube": "2SapoGGzTUU",
+    "titel": "Wie funktioniert ein Schneideplotter?"
+  },
   "check": {
     "art": "sticker"
   },
@@ -25,7 +29,7 @@
     "ki-typ",
     "sterne"
   ],
-  "datenschutz": "Die Bearbeitung passiert auf dem iPad. Nur der fertige Sticker und dein Name gehen an den Laptop.",
+  "datenschutz": "Die Bearbeitung passiert auf dem iPad. Nur der fertige Sticker und dein Name gehen an den Laptop. Das Video kommt von YouTube: Erst wenn du „Video laden“ antippst, sieht YouTube die Adresse des iPads.",
   "braucht": [
     "lasercutter"
   ],

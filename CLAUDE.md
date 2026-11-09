@@ -61,7 +61,7 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 - `code-quiz.html`, `kunst-quiz.html`: eigenständige Quizseiten.
 - PDFs: Startpräsentation, Stationenkarten, Künstler:innen, Berufe, Abschluss, QR-Code Kunstquiz.
 - `/archiv/` ist in `.gitignore`: dort liegt lokal die `fotobox-karte` (Flask-Queue `fotobox-queue.py`, Plotter-Anbindung) als Vorbild für Foto-Übertragung und Server-Queue. **Nicht ins Repo committen.** Wenn du dort lesen musst, frag nach dem Pfad.
-- TF.js, BodyPix-Modell und Schriften liegen lokal in `vendor/` (Versionen und Lizenzen: `vendor/README.md`). Die App lädt nichts aus dem Internet. Einzige Ausnahme: das YouTube-Video am Lasercutter, erst nach Antippen von „Video laden“.
+- TF.js, BodyPix-Modell und Schriften liegen lokal in `vendor/` (Versionen und Lizenzen: `vendor/README.md`). Die App lädt nichts aus dem Internet. Einzige Ausnahme: die YouTube-Videos am Lasercutter und an der Sticker-Station, erst nach Antippen von „Video laden“.
 
 ## Repo-Struktur
 
