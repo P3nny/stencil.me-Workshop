@@ -175,12 +175,19 @@
       <div class="settings"><button id="einwilligungSpeichern" type="button">Speichern</button><span class="hint" id="einwilligungState"></span></div>
     </div>
     <div class="settings" style="margin-top:16px">
-      <label for="vibePin">🔓 PIN für „frei vibe coden“ (nur für die erwachsene Person in der KI-Ecke, 4–6 Ziffern):</label>
+      <label for="vibePin">🔓 PIN für „Eigene Idee mit Penny“ (Bild-App, freier Auftrag, 4–6 Ziffern):</label>
       <input id="vibePin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" style="width:110px">
       <button id="vibePinSpeichern" type="button">Speichern</button>
       <span class="hint" id="vibePinState"></span>
     </div>
     <div class="hint">Leer = kein freier Modus, nur der Baukasten. Eine Freigabe gilt 15 Minuten und endet, wenn die Gruppe die Station beendet.</div>
+    <div class="settings" style="margin-top:16px">
+      <label for="quizPin">🏆 Quiz-PIN für den Präsentationslaptop (4–6 Ziffern):</label>
+      <input id="quizPin" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password" style="width:110px">
+      <button id="quizPinSpeichern" type="button">Speichern</button>
+      <span class="hint" id="quizPinState"></span>
+    </div>
+    <div class="hint">Live-Quiz: Am Präsentationslaptop <span class="folder" id="quizAdresse">http://…/quiz</span> öffnen und diese PIN eingeben. Hier am Laptop geht <a href="/quiz" target="_blank">/quiz</a> auch ohne PIN.</div>
     <div class="hint" id="kiStatus"></div>
     <div id="groupsError"></div>
     <table>
@@ -214,6 +221,7 @@
         }
         document.getElementById("neustart").hidden = !info.neustartNoetig;
         showQr(info.adressen[0]);
+        document.getElementById("quizAdresse").textContent = info.adressen[0] + "quiz";
         document.getElementById("otherUrls").textContent = info.adressen.length > 1
           ? "Falls der Code nicht geht: " + info.adressen.slice(1).join(", ")
           : "";
@@ -551,6 +559,7 @@
         einwilligung = { ohneFoto: s.ohneFoto || [], ohneKi: s.ohneKi || [] };
         einwilligungZeigen();
         document.getElementById("vibePin").value = s.vibePin || "";
+        document.getElementById("quizPin").value = s.quizPin || "";
         pauseBis = (s.pauseBis || 0) * 1000;
         pauseAnzeigen();
       });
@@ -592,6 +601,14 @@
   }
   document.getElementById("feedbackFreigabe").addEventListener("click", function () { freigabeUmschalten("feedback", "freigabeState"); });
   document.getElementById("loeschenFreigabe").addEventListener("click", function () { freigabeUmschalten("loeschen", "loeschenState"); });
+
+  document.getElementById("quizPinSpeichern").addEventListener("click", function () {
+    var state = document.getElementById("quizPinState");
+    fetch("/api/einstellungen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ quizPin: document.getElementById("quizPin").value }) })
+      .then(function (r) { return r.json(); })
+      .then(function (s) { state.textContent = s.ok === false ? "⚠ " + s.fehler : (s.quizPin ? "✓ Quiz-PIN gespeichert" : "Keine Quiz-PIN: Quiz nur hier am Laptop steuerbar"); })
+      .catch(function () { state.textContent = "Speichern hat nicht geklappt"; });
+  });
 
   document.getElementById("vibePinSpeichern").addEventListener("click", function () {
     var state = document.getElementById("vibePinState");

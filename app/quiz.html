@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Quiz · stencil.me</title>
+<link href="/vendor/fonts/fonts.css" rel="stylesheet">
+<link href="/app/core/werkstatt.css" rel="stylesheet">
+<style>
+  .lq-tiere { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin:12px 0; }
+  .lq-tier { margin:0; padding:12px 6px; font-size:1rem; text-transform:none; letter-spacing:0; }
+  .lq-tier .emoji { display:block; font-size:2.6rem; line-height:1.2; }
+  .lq-tier:disabled { opacity:.25; }
+  .lq-team { font-size:1.2rem; font-weight:700; margin:0 0 10px; }
+  .lq-frage { font-size:1.5rem; font-weight:700; margin:6px 0 14px; }
+  .lq-antworten { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .lq-antwort { margin:0; min-height:110px; font-size:1.15rem; text-transform:none; letter-spacing:0; color:#fff; border:4px solid var(--ink); text-align:left; padding:12px 14px; }
+  .lq-antwort.f0 { background:#e0245e; } .lq-antwort.f1 { background:#1d6fd6; }
+  .lq-antwort.f2 { background:#d69a00; } .lq-antwort.f3 { background:#1e9e4a; }
+  .lq-antwort .form { font-size:1.6rem; margin-right:8px; }
+  .lq-antwort, .lq-antwort:focus, .lq-antwort:active, .lq-antwort:hover { color:#fff; }
+  .lq-antwort.gewaehlt { outline:6px solid var(--ink); box-shadow:0 0 0 10px #fff inset; }
+  .lq-antwort:disabled { opacity:.35; }
+  .lq-antwort.richtig { opacity:1; outline:6px solid #1e9e4a; }
+  .lq-uhr { font-size:1.3rem; font-variant-numeric:tabular-nums; font-weight:700; }
+  .lq-ergebnis { font-size:2rem; font-weight:700; margin:10px 0; }
+  .lq-platz { font-size:3rem; font-family:var(--head); margin:10px 0; }
+  @media (orientation: portrait) { .lq-tiere { grid-template-columns:repeat(4, 1fr); } }
+</style>
+</head>
+<body>
+<!-- Live-Quiz auf dem iPad (server/quiz.py). Penny steuert am Beamer, das iPad fragt alle 2 Sekunden nach.
+     Die Antworten gehen sofort an den Laptop (live, ohne Outbox). Kein Laptop: Hinweis, nichts geht verloren,
+     weil es außer dem Quiz nichts zu speichern gibt. -->
+<main id="inhalt"><section class="panel"><p>Quiz wird geladen …</p></section></main>
+<script src="/app/core/speicher.js"></script>
+<script src="/app/core/outbox.js"></script>
+<script src="/app/core/stationen.js"></script>
+<script src="/app/core/rahmen.js"></script>
+<script>
+(function(){
+  const el = Rahmen.el;
+  const ABFRAGE_MS = 2000;
+  const FORMEN = ['▲', '◆', '●', '■'];
+  const inhalt = document.getElementById('inhalt');
+  let gruppe = null;
+  let letzter = '';     // zuletzt gezeichneter Stand (nur neu zeichnen, wenn sich etwas ändert)
+  let stand = null;
+  let restBis = 0;
+
+  // Rahmen.el setzt jedes Attribut, auch disabled: null. Darum disabled extra setzen.
+  function knopf(attrs, kinder, gesperrt){
+    const k = el('button', attrs, kinder);
+    k.disabled = !!gesperrt;
+    return k;
+  }
+
+  function senden(pfad, daten){
+    return fetch(pfad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({ gruppe: gruppe.id }, daten)) })
+      .then(r => r.json());
+  }
+
+  function panel(kinder){
+    inhalt.innerHTML = '';
+    inhalt.appendChild(el('section', { klasse: 'panel' }, [el('h1', { text: '🏆 Quiz' })].concat(kinder)));
+  }
+
+  function teamZeile(s){
+    return s.team ? el('p', { klasse: 'lq-team', text: 'Ihr seid: ' + s.team.emoji + ' ' + s.team.name + (s.punkte ? ' · ' + s.punkte + (s.punkte === 1 ? ' Punkt' : ' Punkte') : '') }) : null;
+  }
+
+  function tierWahl(s, hinweis){
+    panel([
+      el('p', { text: 'Sucht euch ein Tier als Teamnamen aus. Auf dem Beamer steht nur das Tier, keine Namen.' }),
+      el('p', { klasse: 'datenschutz', text: '🔒 Euer Tier und eure Antworten gehen an Pennys Laptop. Am Ende des Workshops wird alles gelöscht.' }),
+      hinweis ? el('p', { klasse: 'rand-warnung', text: hinweis }) : null,
+      el('div', { klasse: 'lq-tiere' }, s.tiere.map(t => knopf({
+        type: 'button', klasse: 'lq-tier secondary',
+        onclick: () => senden('/api/quiz/beitreten', { tier: t.id }).then(antwort => {
+          if(!antwort.ok) return tierWahl(s, antwort.fehler);
+          letzter = '';
+          zeigen(antwort);
+        }).catch(() => tierWahl(s, 'Der Laptop antwortet nicht. Nochmal antippen.'))
+      }, [el('span', { klasse: 'emoji', text: t.emoji }), el('span', { text: t.name })], s.vergeben.indexOf(t.id) >= 0)))
+    ]);
+  }
+
+  function frageZeigen(s){
+    const f = s.frage;
+    const aufgeloest = s.phase === 'aufloesung';
+    const uhr = el('p', { klasse: 'lq-uhr' });
+    const hinweis = el('p', { klasse: 'hinweis' });
+    const knoepfe = f.antworten.map((a, i) => knopf({
+      type: 'button',
+      klasse: 'lq-antwort f' + i + (s.meine === i ? ' gewaehlt' : '') + (aufgeloest && f.richtig === i ? ' richtig' : ''),
+      onclick: () => senden('/api/quiz/antwort', { teil: s.teil, nr: f.nr, wahl: i }).then(antwort => {
+        if(!antwort.ok){ hinweis.textContent = antwort.fehler; return; }
+        letzter = '';
+        zeigen(antwort);
+      }).catch(() => { hinweis.textContent = 'Der Laptop antwortet nicht. Nochmal antippen.'; })
+    }, [el('span', { klasse: 'form', text: FORMEN[i] }), el('span', { text: a })], aufgeloest || !s.rest));
+    const teile = [teamZeile(s), el('p', { klasse: 'hinweis', text: 'Teil ' + s.teil + ' · Frage ' + (f.nr + 1) + ' von ' + f.anzahl }),
+      el('p', { klasse: 'lq-frage', text: f.frage }), el('div', { klasse: 'lq-antworten' }, knoepfe)];
+    if(aufgeloest){
+      const richtig = s.meine === f.richtig;
+      teile.splice(1, 0, el('p', { klasse: 'lq-ergebnis', text: s.meine === null || s.meine === undefined ? '⏱ Keine Antwort' : richtig ? '✅ Richtig!' : '❌ Leider falsch' }));
+      if(f.erklaerung) teile.push(el('p', { text: f.erklaerung }));
+    }else{
+      teile.push(uhr, hinweis);
+      hinweis.textContent = s.meine === null || s.meine === undefined ? 'Tippt auf eure Antwort.' : '✓ Antwort gespeichert. Ihr könnt sie bis zum Auflösen noch ändern.';
+    }
+    panel(teile);
+    const ticken = () => {
+      const rest = Math.max(0, Math.ceil((restBis - Date.now()) / 1000));
+      uhr.textContent = rest ? '⏱ noch ' + rest + ' Sekunden' : '⏱ Zeit um. Gleich kommt die Auflösung.';
+      if(!rest) knoepfe.forEach(k => { k.disabled = true; });
+    };
+    if(!aufgeloest){ ticken(); clearInterval(frageZeigen.uhr); frageZeigen.uhr = setInterval(ticken, 500); }
+  }
+
+  function zeigen(s){
+    stand = s;
+    if(s.phase === 'frage') restBis = Date.now() + s.rest * 1000;
+    // Nur neu zeichnen, wenn sich etwas geändert hat (sonst springt nichts beim Tippen)
+    const schluessel = JSON.stringify([s.phase, s.teil, s.frage && s.frage.nr, s.meine, s.team, s.vergeben, s.punkte, s.platz]);
+    if(schluessel === letzter) return;
+    letzter = schluessel;
+    clearInterval(frageZeigen.uhr);
+    if(s.phase === 'aus') return panel([el('p', { text: 'Gerade läuft kein Quiz. Penny startet es gleich, lasst diese Seite offen.' }),
+      el('a', { klasse: 'knopf-link', href: '/', text: '← Zur Startseite' })]);
+    if(!s.team) return tierWahl(s);
+    if(s.phase === 'lobby') return panel([teamZeile(s), el('p', { klasse: 'lq-ergebnis', text: 'Ihr seid dabei! Gleich geht es los.' }),
+      el('p', { text: 'Schaut nach vorne auf den Beamer. Teil ' + s.teil + ' beginnt, sobald Penny startet.' })]);
+    if(s.phase === 'frage' || s.phase === 'aufloesung') return frageZeigen(s);
+    if(s.phase === 'ende') return panel([teamZeile(s),
+      el('p', { klasse: 'lq-platz', text: s.platz ? 'Platz ' + s.platz : '' }),
+      el('p', { klasse: 'lq-ergebnis', text: s.punkte + (s.punkte === 1 ? ' Punkt' : ' Punkte') + (s.teams ? ' · ' + s.teams + ' Teams' : '') }),
+      el('p', { text: 'Danke fürs Mitmachen! Schaut nach vorne: Gleich kommt die Siegerehrung.' })]);
+  }
+
+  function abfragen(){
+    return fetch('/api/quiz/status?gruppe=' + encodeURIComponent(gruppe.id), { cache: 'no-store' })
+      .then(r => r.json())
+      .then(zeigen)
+      .catch(() => { if(!stand) panel([el('p', { text: 'Der Laptop antwortet nicht. Ist das iPad im WLAN?' })]); });
+  }
+
+  Speicher.lesen('gruppe').then(g => {
+    if(!g || !g.id) return panel([el('p', { text: 'Bitte zuerst auf der Startseite anmelden.' }), el('a', { klasse: 'knopf-link', href: '/', text: 'Zur Startseite' })]);
+    gruppe = g;
+    abfragen();
+    setInterval(abfragen, ABFRAGE_MS);
+  });
+})();
+</script>
+</body>
+</html>

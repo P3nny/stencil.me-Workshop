@@ -86,6 +86,7 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 - [ ] Präsentationslaptop vorne: Start-, Zwischen- und Abschlusspräsentation
 - [ ] Testgruppen vor dem Start auf der Laptop-Seite löschen
 - [ ] Laptop-Seite, Spalte „Gerade an“: **rot mit ⏰** = Gruppe seit über 15 Minuten an einer Station. Hingehen und fragen, ob sie fertig ist (die iPads erinnern auch selbst)
+- [ ] **Live-Quiz:** Auf der Laptop-Seite eine **Quiz-PIN** eintragen. Am Präsentationslaptop (gleiches WLAN) `http://192.168.0.30:8000/quiz` öffnen, PIN eingeben, „Vollbild“. Teil 1 nach der großen Pause, Teil 2 in der Abschlussrunde: „Teil … starten“, die Kinder scannen den QR-Code auf dem Beamer (oder Startseite → „🏆 Quiz“) und wählen ein Tier. Weiter mit dem großen Knopf rechts unten, Pfeiltaste rechts oder Presenter. Fragen ändern: `server/quiz-fragen.json`. Vor Teil 2 nicht „Alles zurücksetzen“, sonst sind die Punkte aus Teil 1 weg
 - [ ] **Pause-Knopf** auf der Laptop-Seite (☕ 10 Min., 35 Min. oder bis Uhrzeit): Alle iPads zeigen spätestens nach einer Minute „Pause bis … Uhr“ mit Countdown, nichts antippbar. Endet von selbst oder mit „Pause beenden“ (iPads geben spätestens nach 15 Sekunden frei)
 
 ## 4. Während des Workshops

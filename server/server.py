@@ -17,6 +17,7 @@ so the children cannot see each other's data.
 import argparse
 import datetime
 import functools
+import hmac
 import http.server
 import json
 import os
@@ -36,6 +37,7 @@ import ki_app
 import ki_bild
 import mappe
 import plotter
+import quiz
 
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # STENCILME_DATEN: anderer Datenordner, z. B. für automatische Tests (echte Stempel bleiben unberührt)
@@ -50,7 +52,9 @@ KUNST_DIR = os.path.abspath(os.environ.get("STENCILME_KUNST_BILDER") or os.path.
 KUNST_RE = re.compile(r"^[a-z0-9-]{1,60}\.jpg$")
 SETTINGS_FILE = os.path.join(DATA_ROOT, "einstellungen.json")
 KI_LOG_FILE = os.path.join(DATA_ROOT, "ki-protokoll.jsonl")
-WERKSTATT_LOG = os.path.join(DATA_ROOT, "werkstatt-protokoll.jsonl")  # Platten, Folien, Laser- und Plotzeiten (ohne Namen)
+WERKSTATT_LOG = os.path.join(DATA_ROOT, "werkstatt-protokoll.jsonl")
+quiz.DATEI = os.path.join(DATA_ROOT, "quiz.json")  # Live-Quiz: Teams (Tiere) und Antworten, wird mit allem gelöscht
+quiz.FRAGEN_DATEI = os.path.join(REPO_DIR, "server", "quiz-fragen.json")  # Platten, Folien, Laser- und Plotzeiten (ohne Namen)
 werkstatt_lock = threading.Lock()
 # Vor dem Löschen am Ende: Apps, Auswertung und Ablauf ohne Namen (server/archiv.py)
 ARCHIV_DIR = os.path.abspath(os.environ.get("STENCILME_ARCHIV") or os.path.join(REPO_DIR, "archiv", "workshops"))
@@ -68,7 +72,7 @@ MAX_MESSAGE_LEN = 300
 messages_lock = threading.Lock()
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 MAX_EVENT_BYTES = 64 * 1024
-DEFAULT_SETTINGS = {"schueler": 26, "freigaben": [], "ohneFoto": [], "ohneKi": [], "vibePin": "", "pauseBis": 0}  # pauseBis: Unix-Zeit, 0 = keine Pause  # freigaben: Stationen, die der Laptop für alle öffnet
+DEFAULT_SETTINGS = {"schueler": 26, "freigaben": [], "ohneFoto": [], "ohneKi": [], "vibePin": "", "pauseBis": 0, "quizPin": ""}  # pauseBis: Unix-Zeit, 0 = keine Pause  # freigaben: Stationen, die der Laptop für alle öffnet
 FREIGABE_RE = re.compile(r"^[a-z0-9-]{1,40}$")
 # Rückmeldezettel der Eltern: Vornamen ohne Foto-Einwilligung bzw. mit Opt-out für generative KI
 EINWILLIGUNG_LISTEN = ("ohneFoto", "ohneKi")
@@ -81,10 +85,11 @@ FREI_STATION = "vibe-coding"
 FREI_SEKUNDEN = 15 * 60
 PIN_VERSUCHE = 5
 PIN_SPERRE_SEKUNDEN = 5 * 60
-NUR_LAPTOP = EINWILLIGUNG_LISTEN + ("vibePin",)  # nie an die iPads
+NUR_LAPTOP = EINWILLIGUNG_LISTEN + ("vibePin", "quizPin")  # nie an die iPads
 frei_lock = threading.Lock()
 frei_bis = {}      # gruppe -> Zeitpunkt (time.time()), bis zu dem freie Aufträge gehen
 pin_fehler = {}    # gruppe -> [Fehlversuche, gesperrt bis]
+quiz_pin_fehler = {}  # IP des Präsentationslaptops -> [Fehlversuche, gesperrt bis]
 # Unterwegs: Das iPad hat der Gruppe eine Station vorgeschlagen, sie hat dort noch nicht eingecheckt.
 # Zählt für die Belegung mit, damit zwei Gruppen nicht gleichzeitig an eine Station mit einem Platz gehen.
 # Nur im Arbeitsspeicher, ohne Namen (Patricia, 25.10.2026).
@@ -204,6 +209,7 @@ def gruppe_loeschen(group_id):
     frei_beenden(group_id)
     with unterwegs_lock:
         unterwegs.pop(group_id, None)
+    quiz.gruppe_loeschen(group_id)
     return dateien
 
 
@@ -581,6 +587,16 @@ def local_ips():
     return [ip for ip in ips if not ip.startswith("127.")]
 
 
+_ip_cache = [0, []]
+
+
+def wlan_ip():
+    """Erste WLAN-Adresse des Laptops, höchstens einmal pro Minute nachgesehen (Beamer fragt jede Sekunde)."""
+    if time.time() - _ip_cache[0] > 60:
+        _ip_cache[0], _ip_cache[1] = time.time(), local_ips()
+    return _ip_cache[1][0] if _ip_cache[1] else ""
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     server_version = "stencilme"
 
@@ -612,6 +628,20 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
         if path == "/api/status":
             return self.send_json({"ok": True})
+        if path == "/quiz":
+            # Beamer-Seite fürs Live-Quiz: auch vom Präsentationslaptop, gesteuert wird mit der Quiz-PIN
+            self.path = "/server/quiz.html"
+            return super().do_GET()
+        if path == "/api/quiz/status":
+            group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
+            if not ID_RE.match(group_id) or ist_geloescht(group_id):
+                return self.send_json({"phase": "aus"})
+            return self.send_json(quiz.status_gruppe(group_id))
+        if path == "/api/quiz/beamer":
+            fehler = self.quiz_pin_pruefen((urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("pin") or [""])[0])
+            if fehler:
+                return self.send_json({"ok": False, "fehler": fehler[0]}, fehler[1])
+            return self.send_json(self.quiz_beamer())
         if path == "/api/belegung":
             group_id = (urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query).get("gruppe") or [""])[0]
             return self.send_json({"stationen": station_occupancy(group_id)})
@@ -658,7 +688,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not ID_RE.match(group_id) or not os.path.isdir(os.path.join(GROUPS_DIR, group_id)):
                 return self.send_json({"fehler": "Gruppe nicht gefunden"}, 404)
             if path == "/api/meine-daten":
-                return self.send_json(mappe.meine_daten(group_state(group_id), GROUPS_DIR, DATA_DIR, STICKER_DIR, station_zeiten(group_id)))
+                daten = mappe.meine_daten(group_state(group_id), GROUPS_DIR, DATA_DIR, STICKER_DIR, station_zeiten(group_id))
+                daten["quiz"] = quiz.meine(group_id)
+                return self.send_json(daten)
             full = mappe.datei_pfad(group_id, (query.get("datei") or [""])[0], GROUPS_DIR, DATA_DIR, STICKER_DIR)
             return self.send_file(full) if full else self.send_error(404)
 
@@ -736,6 +768,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.ki_freigabe()
         if parsed.path == "/api/unterwegs":
             return self.unterwegs_melden()
+        if parsed.path in ("/api/quiz/beitreten", "/api/quiz/antwort", "/api/quiz/steuern"):
+            return self.quiz_post(parsed.path.rsplit("/", 1)[1])
         if (parsed.path in ("/api/alle-loeschen", "/api/gruppe-loeschen", "/api/einstellungen", "/api/nachricht", "/api/sichern", "/api/werkstatt") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
         if parsed.path == "/api/gruppe-loeschen":
@@ -780,6 +814,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             # Nächster Workshop startet wieder zu: Feedbackbogen erst nach Bonus 1, Löschen gesperrt
             settings["freigaben"] = []
             settings["pauseBis"] = 0
+            quiz.loeschen()
             os.makedirs(DATA_ROOT, exist_ok=True)
             write_atomic(SETTINGS_FILE, json.dumps(settings).encode("utf-8"))
             print("Alle Stempel, Antworten, KI-Bilder und Namenslisten gelöscht, Freigaben zurückgesetzt.")
@@ -944,6 +979,59 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             unterwegs[gruppe] = (station, time.time())
         return self.send_json({"ok": True})
 
+    def quiz_pin_pruefen(self, pin):
+        """None, wenn die Beamer-Seite steuern darf, sonst (Fehlertext, Status). Am Laptop selbst ohne PIN."""
+        if self.is_local():
+            return None
+        richtig = read_settings().get("quizPin") or ""
+        if not richtig:
+            return ("Auf der Laptop-Seite ist noch keine Quiz-PIN eingetragen.", 409)
+        ip, jetzt = self.client_address[0], time.time()
+        versuche, gesperrt = quiz_pin_fehler.get(ip, [0, 0])
+        if gesperrt > jetzt:
+            return ("Zu viele falsche PINs. Eine Minute warten.", 429)
+        if not hmac.compare_digest(str(pin), richtig):
+            versuche += 1
+            quiz_pin_fehler[ip] = [0, jetzt + 60] if versuche >= 5 else [versuche, 0]
+            return ("Falsche PIN.", 401)
+        quiz_pin_fehler.pop(ip, None)
+        return None
+
+    def quiz_beamer(self):
+        """Stand für den Beamer. QR-Code: immer die WLAN-Adresse des Server-Laptops, nie „localhost“
+        (Beamer-Seite am Laptop selbst geöffnet: Das Handy würde sonst sich selbst fragen, 09.11.2026)."""
+        ip = wlan_ip()
+        adresse = "http://%s:%d/app/quiz.html" % (ip, self.server.server_address[1]) if ip else ""
+        return dict(quiz.beamer(), adresse=adresse)
+
+    def quiz_post(self, was):
+        body = self.read_body(MAX_EVENT_BYTES)
+        try:
+            data = json.loads(body.decode("utf-8")) if body else {}
+        except ValueError:
+            data = {}
+        if not isinstance(data, dict):
+            data = {}
+        if was == "steuern":
+            fehler = self.quiz_pin_pruefen(str(data.get("pin", "")))
+            if fehler:
+                return self.send_json({"ok": False, "fehler": fehler[0]}, fehler[1])
+            text = quiz.steuern(str(data.get("aktion", "")), data.get("teil"))
+            return self.send_json({"ok": not text, "fehler": text} if text else dict(self.quiz_beamer(), ok=True), 400 if text else 200)
+        gruppe = str(data.get("gruppe", ""))
+        if not ID_RE.match(gruppe) or ist_geloescht(gruppe):
+            return self.send_json({"ok": False, "fehler": "Unbekannte Gruppe. Bitte auf der Startseite anmelden."}, 400)
+        if was == "beitreten":
+            text = quiz.beitreten(gruppe, str(data.get("tier", "")))
+        else:
+            try:
+                text = quiz.antworten(gruppe, int(data.get("teil")), int(data.get("nr")), int(data.get("wahl")))
+            except (TypeError, ValueError):
+                text = "Ungültige Antwort."
+        if text:
+            return self.send_json({"ok": False, "fehler": text}, 409)
+        return self.send_json(dict(quiz.status_gruppe(gruppe), ok=True))
+
     def ki_freigabe(self):
         """Erwachsene Person gibt die PIN ein: Gruppe darf 15 Minuten frei vibe coden."""
         body = self.read_body(MAX_EVENT_BYTES)
@@ -1075,6 +1163,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not 0 < sekunden <= 90 * 60:
                 return self.send_json({"ok": False, "fehler": "Die Uhrzeit muss in den nächsten 90 Minuten liegen"}, 400)
             settings["pauseBis"] = bis.timestamp()
+        if "quizPin" in data:
+            pin = str(data.get("quizPin") or "").strip()
+            if pin and not PIN_RE.match(pin):
+                return self.send_json({"ok": False, "fehler": "PIN: 4 bis 6 Ziffern"}, 400)
+            settings["quizPin"] = pin
         if "vibePin" in data:
             pin = str(data.get("vibePin") or "").strip()
             if pin and not PIN_RE.match(pin):
@@ -1107,6 +1200,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         except OSError as err:
             print("Sichern: %s" % err)
             return self.send_json({"ok": False, "fehler": "Sichern hat nicht geklappt: %s" % err.strerror}, 500)
+        try:
+            with open(os.path.join(ordner, "quiz.json"), "w", encoding="utf-8") as fh:
+                json.dump(quiz.zusammenfassung(), fh, ensure_ascii=False, indent=1)  # nur Zahlen pro Frage, keine Teams
+        except OSError as err:
+            print("Quiz sichern: %s" % err)
         apps = sum(len(g["apps"]) for g in gruppen)
         print("Workshop gesichert (ohne Namen): %s" % ordner)
         return self.send_json({"ok": True, "ordner": ordner, "gruppen": len(gruppen), "apps": apps})

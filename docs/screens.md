@@ -311,3 +311,11 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Gilt für Coding (HTML, CSS, JavaScript) und Pixel vs. Vektor (`app/core/code-editor.js`)
 - Knopf **„⛶ Code-Editor groß öffnen“**: Der Editor füllt den Bildschirm unter der Leiste „✕ Zurück zur Station“ (wie Quiz und Vibe-Apps). Es bleibt derselbe Editor: Eingaben, Aufgaben und Vorschau bleiben, Vorschau größer
 - Beschriftung: über dem Code **„⌨️ Eingabe: Hier tippst du Code“**, über der Vorschau **„👀 Ausgabe: Hier verändert sich etwas“** (vorher „Ergebnis“)
+
+## Live-Quiz mit Bestenliste (09.11., Branch `feature/live-quiz`)
+
+- **Beamer** (`/quiz`, `server/quiz.html`): läuft am Präsentationslaptop, steuern nur mit der **Quiz-PIN** von der Laptop-Seite (am Server-Laptop ohne PIN, 5 falsche PINs = 1 Minute Sperre). „Teil 1/2 starten“ → Lobby mit QR-Code und den Tieren, die dabei sind → Frage mit 4 farbigen Antworten (▲ ◆ ● ■), 30-Sekunden-Balken, „x von y Teams haben geantwortet“ → „Auflösen“ mit Verteilung und Erklärung → … → Siegerehrung (Podest Platz 1–3) → „Ganze Liste“. Nächster Schritt auch mit Pfeil rechts, Bild runter, Leertaste (Presenter)
+- **iPad** (`/app/quiz.html`, Link „🏆 Quiz“ auf der Startseite): Tier als Teamname wählen (16 Tiere, jedes nur einmal), große Antwortknöpfe, Antwort bis zum Auflösen änderbar, danach „Richtig!/Leider falsch“ mit Erklärung, am Ende Platz und Punkte. Fragt alle 2 Sekunden beim Laptop nach
+- **Punkte:** 1 pro richtiger Antwort, kein Bonus für Schnelligkeit, Teil 1 und 2 zusammen, gleiche Punkte = gleicher Platz. Die laufende Frage zählt erst nach dem Auflösen (sonst verrät die Punktzahl die Lösung)
+- **Fragen** in `server/quiz-fragen.json` (nicht öffentlich: Die Lösungen sind im WLAN nicht abrufbar), je 8 pro Teil
+- **Daten:** `quiz.json` im Datenordner (Tiere und Antworten pro Gruppe), weg mit „Alle Daten löschen“ und „Gruppe löschen“, in „Meine Daten“ sichtbar. Archiv: nur Zahl der richtigen Antworten pro Frage
