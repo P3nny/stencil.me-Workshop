@@ -58,6 +58,11 @@ ARCHIV_DIR = os.path.abspath(os.environ.get("STENCILME_ARCHIV") or os.path.join(
 FEEDBACK_FILE = os.path.join(DATA_ROOT, "feedback.json")
 MAX_FEEDBACK_LEN = 500
 feedback_lock = threading.Lock()
+# Auf der Laptop-Seite gelöschte Gruppen (nur zufällige IDs, z. B. Testgruppen vor dem Start).
+# Was ein iPad danach noch schickt, wird angenommen und verworfen: Die Outbox hört auf, nichts kommt zurück.
+GELOESCHT_FILE = os.path.join(DATA_ROOT, "geloeschte-gruppen.json")
+geloescht_lock = threading.Lock()
+GELOESCHT_TEXT = "Diese Gruppe wurde am Laptop gelöscht. Bitte auf der Startseite neu anmelden."
 MESSAGES_FILE = os.path.join(DATA_ROOT, "nachrichten.json")  # Laptop -> Gruppen („wird gelasert“, „fertig“)
 MAX_MESSAGE_LEN = 300
 messages_lock = threading.Lock()
@@ -138,6 +143,61 @@ def list_stamps(base=DATA_DIR):
                     "gruppe": parts[3] if len(parts) > 3 and ID_RE.match(parts[3]) else "",
                 })
     return result
+
+
+def geloeschte_gruppen():
+    try:
+        with open(GELOESCHT_FILE, encoding="utf-8") as fh:
+            data = json.load(fh)
+        return set(g for g in data if isinstance(g, str)) if isinstance(data, list) else set()
+    except (OSError, ValueError):
+        return set()
+
+
+def ist_geloescht(group_id):
+    return bool(group_id) and group_id in geloeschte_gruppen()
+
+
+def gruppe_loeschen(group_id):
+    """Eine Gruppe ganz vom Laptop löschen: Ereignisse, Dateien, Stempel, Sticker, Porträts,
+    Nachrichten, Freigaben. Im KI-Protokoll bleibt der Eintrag (Kosten), nur ohne Gruppe.
+    Fertige Platten- und Folien-Dateien und anonyme Feedbackbögen bleiben."""
+    with geloescht_lock:
+        ids = geloeschte_gruppen()
+        ids.add(group_id)
+        os.makedirs(DATA_ROOT, exist_ok=True)
+        write_atomic(GELOESCHT_FILE, json.dumps(sorted(ids)).encode("utf-8"))
+    gruppe_dir = os.path.join(GROUPS_DIR, group_id)
+    if os.path.isdir(gruppe_dir):
+        shutil.rmtree(gruppe_dir)
+    dateien = 0
+    for base in (DATA_DIR, STICKER_DIR):
+        for s in list_stamps(base):
+            if s["gruppe"] == group_id:
+                os.remove(os.path.join(base, s["pfad"]))
+                dateien += 1
+    with messages_lock:
+        data = read_messages()
+        if data.pop(group_id, None) is not None:
+            write_atomic(MESSAGES_FILE, json.dumps(data, ensure_ascii=False).encode("utf-8"))
+    if os.path.exists(KI_LOG_FILE):
+        with open(KI_LOG_FILE, encoding="utf-8") as fh:
+            zeilen = fh.read().splitlines()
+        neu = []
+        for z in zeilen:
+            try:
+                e = json.loads(z)
+            except ValueError:
+                neu.append(z)
+                continue
+            if isinstance(e, dict) and e.get("gruppe") == group_id:
+                e["gruppe"] = ""
+            neu.append(json.dumps(e, ensure_ascii=False))
+        write_atomic(KI_LOG_FILE, ("\n".join(neu) + "\n" if neu else "").encode("utf-8"))
+    frei_beenden(group_id)
+    with unterwegs_lock:
+        unterwegs.pop(group_id, None)
+    return dateien
 
 
 def read_messages():
@@ -659,8 +719,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self.ki_freigabe()
         if parsed.path == "/api/unterwegs":
             return self.unterwegs_melden()
-        if (parsed.path in ("/api/alle-loeschen", "/api/einstellungen", "/api/nachricht", "/api/sichern", "/api/werkstatt") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
+        if (parsed.path in ("/api/alle-loeschen", "/api/gruppe-loeschen", "/api/einstellungen", "/api/nachricht", "/api/sichern", "/api/werkstatt") or parsed.path.startswith("/api/plotter/")) and not self.is_local():
             return self.send_error(403, "Nur am Laptop")
+        if parsed.path == "/api/gruppe-loeschen":
+            body = self.read_body(MAX_EVENT_BYTES)
+            try:
+                gruppe = str(json.loads(body.decode("utf-8")).get("gruppe", "")) if body else ""
+            except (ValueError, AttributeError):
+                gruppe = ""
+            if not ID_RE.match(gruppe):
+                return self.send_json({"ok": False, "fehler": "ungültige Gruppe"}, 400)
+            dateien = gruppe_loeschen(gruppe)
+            print("Gruppe %s gelöscht (%d Stempel/Sticker)." % (gruppe, dateien))
+            return self.send_json({"ok": True, "dateien": dateien})
         if parsed.path == "/api/einstellungen":
             return self.save_settings()
         if parsed.path == "/api/werkstatt":
@@ -677,7 +748,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             for d in (DATA_DIR, STICKER_DIR, PLOTTER_DIR, GROUPS_DIR):
                 if os.path.isdir(d):
                     shutil.rmtree(d)
-            for f in (KI_LOG_FILE, MESSAGES_FILE, WERKSTATT_LOG, FEEDBACK_FILE):
+            for f in (KI_LOG_FILE, MESSAGES_FILE, WERKSTATT_LOG, FEEDBACK_FILE, GELOESCHT_FILE):
                 if os.path.exists(f):
                     os.remove(f)
             with frei_lock:
@@ -747,6 +818,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if event.get("art") not in EVENT_TYPES or (station and not STATION_RE.match(station)):
             return self.send_json({"ok": False, "fehler": "ungültiges Ereignis"}, 400)
 
+        if ist_geloescht(event["gruppe"]):
+            return self.send_json({"ok": True, "doppelt": False, "geloescht": True})  # annehmen und verwerfen
         events_dir = os.path.join(GROUPS_DIR, event["gruppe"], "ereignisse")
         target = os.path.join(events_dir, event["id"] + ".json")
         if os.path.exists(target):
@@ -777,6 +850,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         auswahl = anfrage.get("auswahl")
         if not ID_RE.match(gruppe) or not isinstance(auswahl, dict):
             return self.send_json({"ok": False, "fehler": "ungültige Anfrage"}, 400)
+        if ist_geloescht(gruppe):
+            return self.send_json({"ok": False, "fehler": GELOESCHT_TEXT}, 410)
         if gruppe_ohne_ki(gruppe):
             return self.send_json({"ok": False, "ohneKi": True, "fehler": OHNE_KI_TEXT}, 403)
         try:
@@ -796,6 +871,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         auswahl = anfrage.get("auswahl")
         if not ID_RE.match(gruppe) or not isinstance(auswahl, dict):
             return self.send_json({"ok": False, "fehler": "ungültige Anfrage"}, 400)
+        if ist_geloescht(gruppe):
+            return self.send_json({"ok": False, "fehler": GELOESCHT_TEXT}, 410)
         if gruppe_ohne_ki(gruppe):
             return self.send_json({"ok": False, "ohneKi": True, "fehler": OHNE_KI_TEXT}, 403)
         frei = anfrage.get("frei")
@@ -864,6 +941,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         richtig = read_settings().get("vibePin") or ""
         if not richtig:
             return self.send_json({"ok": False, "fehler": "Auf dem Laptop ist keine PIN eingerichtet."}, 409)
+        if ist_geloescht(gruppe):
+            return self.send_json({"ok": False, "fehler": GELOESCHT_TEXT}, 410)
         if gruppe_ohne_ki(gruppe):
             return self.send_json({"ok": False, "ohneKi": True, "fehler": OHNE_KI_TEXT}, 403)
         if FREI_STATION in group_state(gruppe)["fertig"]:
@@ -1001,6 +1080,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         group_id = group_id if ID_RE.match(group_id) else ""
         if not ID_RE.match(stamp_id):
             return self.send_json({"ok": False, "fehler": "ungültige ID"}, 400)
+        if ist_geloescht(group_id):
+            self.read_body(MAX_UPLOAD_BYTES)
+            return self.send_json({"ok": True, "doppelt": False, "geloescht": True})
         body = self.read_body(MAX_UPLOAD_BYTES)
         if body is None:
             return self.send_json({"ok": False, "fehler": "Datei leer oder zu groß"}, 413)
