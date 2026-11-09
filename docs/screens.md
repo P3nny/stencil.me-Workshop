@@ -305,3 +305,9 @@ Gilt für Pixel vs. Vektor und Coding (`app/core/code-editor.js`). Im KOMEZ gibt
 - Station „Bild-App vibe coden“ heißt jetzt **„Eure eigene Bild-App“**. „Vibe coding“ steht nur noch erklärend im ersten Schritt
 - Freier Modus: Knopf „💡 Eigene Idee mit Penny umsetzen (Penny gibt die PIN ein)“, Überschrift „Eure eigene Idee“. Plätze bleiben bei 1 (Gruppe bei Penny), gegen lange offene Stationen hilft die Erinnerung nach 15 Minuten
 - Gesicherte Apps (`archiv/workshops/…/apps/`) haben schon seit 08.11. einen Knopf „📷 Foto wählen“ und laufen auch allein im Browser (geprüft mit den 7 Apps vom 09.11.: 6 nehmen das Foto, die Untertitel-Video-App braucht keins)
+
+## Code-Editor groß, Eingabe/Ausgabe (09.11., Branch `feature/coding-gross`)
+
+- Gilt für Coding (HTML, CSS, JavaScript) und Pixel vs. Vektor (`app/core/code-editor.js`)
+- Knopf **„⛶ Code-Editor groß öffnen“**: Der Editor füllt den Bildschirm unter der Leiste „✕ Zurück zur Station“ (wie Quiz und Vibe-Apps). Es bleibt derselbe Editor: Eingaben, Aufgaben und Vorschau bleiben, Vorschau größer
+- Beschriftung: über dem Code **„⌨️ Eingabe: Hier tippst du Code“**, über der Vorschau **„👀 Ausgabe: Hier verändert sich etwas“** (vorher „Ergebnis“)

@@ -374,12 +374,22 @@ function vorschlagAbwarten(page){
   await page.waitForSelector('h1:has-text("Coding")');
   await page.waitForSelector('.ce-vorschau iframe');
   pruefe(await page.locator('.ce-punkt').count() === 8, 'acht Aufgaben (eine Bonus)');
+  pruefe(await page.locator('text=⌨️ Eingabe: Hier tippst du Code').count() === 1 && await page.locator('text=👀 Ausgabe: Hier verändert sich etwas').count() === 1, 'Felder beschriftet: Eingabe und Ausgabe');
+  // Groß öffnen: Editor füllt den Bildschirm, Eingaben gehen weiter
+  await page.click('button:has-text("Code-Editor groß öffnen")');
+  await page.waitForSelector('.ce-box.vollbild', { state: 'attached' });
+  const gross = await page.evaluate(() => { const r = document.querySelector('.ce-box .ce').getBoundingClientRect(); return { breite: r.width, hoehe: r.height, fenster: window.innerWidth }; });
+  pruefe(gross.breite === gross.fenster && gross.hoehe > 700, 'Editor groß: ganze Breite, fast ganze Höhe (' + Math.round(gross.breite) + ' × ' + Math.round(gross.hoehe) + ')');
   await luecke('ueberschrift').fill('Ada und Bo');
   await luecke('absatz').fill('Wir lernen HTML.');
   await page.waitForTimeout(500);
   pruefe(await punktOk(0) && await punktOk(1), 'HTML: Überschrift und Absatz geändert');
   const vorschauText = await page.frameLocator('.ce-vorschau iframe').locator('h1').textContent();
   pruefe(vorschauText === 'Ada und Bo', 'Vorschau zeigt die neue Überschrift');
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-12a-coding-gross.png') });
+  await page.click('.vollbild-zurueck:visible');
+  await page.waitForSelector('.ce-box:not(.vollbild)', { state: 'attached' });
+  pruefe(await page.locator('button:has-text("Code-Editor groß öffnen")').isVisible(), 'zurück zur Station, Eingaben bleiben');
   await page.click('.ce-aufgabe button:has-text("Baustein einfügen")');
   await page.waitForTimeout(400);
   pruefe(await punktOk(2), 'CSS: <style>-Block eingefügt');
