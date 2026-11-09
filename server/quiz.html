@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live-Quiz · stencil.me</title>
+<link href="/vendor/fonts/fonts.css" rel="stylesheet">
+<script src="/vendor/qrcode/qrcode.js"></script>
+<style>
+  :root { --ink:#111; --neon:#ff2d95; --head:'Oswald','Arial Narrow',sans-serif; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:#111; color:#fff; font-family:'DM Sans',system-ui,sans-serif; }
+  #buehne { position:absolute; top:0; left:0; right:0; bottom:64px; padding:3vh 4vw; display:flex; flex-direction:column; overflow:hidden; }
+  h1 { font-family:var(--head); text-transform:uppercase; letter-spacing:.04em; font-size:6vh; margin:0 0 2vh; color:var(--neon); }
+  .gross { font-size:5vh; font-weight:700; margin:1vh 0; }
+  .frage { font-size:5.5vh; font-weight:700; line-height:1.2; margin:1vh 0 3vh; }
+  .antworten { display:grid; grid-template-columns:1fr 1fr; gap:2vh; flex:1; }
+  .antwort { border-radius:8px; padding:2vh 2vw; font-size:4vh; font-weight:700; display:flex; align-items:center; gap:2vw; position:relative; }
+  .f0 { background:#e0245e; } .f1 { background:#1d6fd6; } .f2 { background:#d69a00; } .f3 { background:#1e9e4a; }
+  .antwort .form { font-size:5vh; }
+  .antwort .zahl { margin-left:auto; font-size:5vh; background:rgba(0,0,0,.35); border-radius:6px; padding:0 1.2vw; }
+  .aufloesung .antwort { opacity:.3; }
+  .aufloesung .antwort.richtig { opacity:1; outline:8px solid #fff; }
+  .balken { height:2vh; background:#333; margin:2vh 0 1vh; border-radius:1vh; overflow:hidden; }
+  .balken div { height:100%; background:var(--neon); transition:width 1s linear; }
+  .info { font-size:3vh; color:#ccc; margin:1vh 0; }
+  .erklaerung { font-size:3.2vh; margin:2vh 0 0; }
+  .lobby { display:flex; gap:4vw; align-items:center; flex:1; }
+  .qr { background:#fff; padding:2vh; border-radius:8px; }
+  .qr img, .qr svg { display:block; width:38vh; height:38vh; }
+  .teams { display:flex; flex-wrap:wrap; gap:1.5vh; font-size:7vh; }
+  .podest { display:flex; align-items:flex-end; justify-content:center; gap:3vw; flex:1; }
+  .stufe { text-align:center; width:24vw; }
+  .stufe .tiere { font-size:9vh; line-height:1.1; }
+  .stufe .namen { font-size:3vh; font-weight:700; }
+  .stufe .block { background:var(--neon); color:#111; font-family:var(--head); font-size:8vh; display:flex; align-items:center; justify-content:center; border-radius:8px 8px 0 0; margin-top:1vh; }
+  .p1 .block { height:34vh; } .p2 .block { height:24vh; } .p3 .block { height:16vh; }
+  .liste { columns:2; font-size:3.2vh; }
+  .liste p { margin:.6vh 0; }
+  #steuerung { position:fixed; left:0; right:0; bottom:0; height:64px; background:#000; border-top:2px solid #333; display:flex; align-items:center; gap:10px; padding:0 14px; }
+  #steuerung button { font-family:var(--head); text-transform:uppercase; letter-spacing:.04em; font-size:16px; padding:10px 16px; border:2px solid #fff; background:#111; color:#fff; cursor:pointer; }
+  #steuerung button.haupt { background:var(--neon); border-color:var(--neon); color:#111; }
+  #steuerung .rechts { margin-left:auto; display:flex; gap:10px; }
+  #steuerung .meldung { color:#ffb3d4; font-size:15px; }
+  .pin { max-width:420px; margin:20vh auto; font-size:20px; }
+  .pin input { font-size:28px; width:200px; padding:8px; }
+  .pin button { font-size:20px; padding:8px 16px; }
+</style>
+</head>
+<body>
+<!-- Beamer-Seite fürs Live-Quiz (server/quiz.py). Läuft auf dem Präsentationslaptop: http://<Server-IP>:8000/quiz.
+     Steuern nur mit der Quiz-PIN (Laptop-Seite), am Server-Laptop selbst ohne PIN.
+     Presenter/Tastatur: Pfeil rechts, Bild runter oder Leertaste = nächster Schritt. -->
+<div id="buehne"></div>
+<div id="steuerung"></div>
+<script>
+(function () {
+  var FORMEN = ["▲", "◆", "●", "■"];
+  var pin = "";
+  try { pin = sessionStorage.getItem("quizPin") || ""; } catch (e) { /* egal */ }
+  var stand = null;
+  var listeOffen = false;
+  var meldung = "";
+  var buehne = document.getElementById("buehne");
+  var steuerung = document.getElementById("steuerung");
+
+  function el(tag, klasse, text) {
+    var e = document.createElement(tag);
+    if (klasse) e.className = klasse;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+  function knopf(text, aktion, haupt) {
+    var b = el("button", haupt ? "haupt" : "", text);
+    b.type = "button";
+    b.onclick = aktion;
+    return b;
+  }
+
+  function pinFragen(fehler) {
+    buehne.innerHTML = "";
+    steuerung.innerHTML = "";
+    var box = el("div", "pin");
+    box.appendChild(el("h1", "", "Live-Quiz"));
+    box.appendChild(el("p", "", "Quiz-PIN (steht auf der Laptop-Seite):"));
+    var feld = el("input");
+    feld.type = "password"; feld.inputMode = "numeric"; feld.maxLength = 6;
+    box.appendChild(feld);
+    box.appendChild(knopf("OK", function () {
+      pin = feld.value.trim();
+      try { sessionStorage.setItem("quizPin", pin); } catch (e) { /* egal */ }
+      laden();
+    }));
+    if (fehler) box.appendChild(el("p", "", "⚠ " + fehler));
+    buehne.appendChild(box);
+    feld.focus();
+  }
+
+  function laden() {
+    return fetch("/api/quiz/beamer?pin=" + encodeURIComponent(pin), { cache: "no-store" })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (a) {
+        if (!a.ok) { stand = null; return pinFragen(a.d.fehler); }
+        zeigen(a.d);
+      })
+      .catch(function () { meldung = "Server nicht erreichbar"; steuerungZeigen(); });
+  }
+
+  function steuern(aktion, teil) {
+    fetch("/api/quiz/steuern", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pin: pin, aktion: aktion, teil: teil }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        meldung = d.ok ? "" : d.fehler;
+        listeOffen = false;
+        if (d.ok) zeigen(d); else steuerungZeigen();
+      })
+      .catch(function () { meldung = "Server nicht erreichbar"; steuerungZeigen(); });
+  }
+
+  // Der eine nächste Schritt (Knopf rechts, Presenter, Pfeiltaste)
+  function hauptAktion() {
+    if (!stand) return null;
+    var f = stand.frage;
+    if (stand.phase === "lobby") return ["Los geht's ▶", function () { steuern("weiter"); }];
+    if (stand.phase === "frage") return ["Auflösen ▶", function () { steuern("aufloesen"); }];
+    if (stand.phase === "aufloesung") return [f && f.nr + 1 < f.anzahl ? "Nächste Frage ▶" : "Ergebnis zeigen ▶", function () { steuern("weiter"); }];
+    if (stand.phase === "ende" && !listeOffen) return ["Ganze Liste ▶", function () { listeOffen = true; zeigen(stand); }];
+    return null;
+  }
+
+  function steuerungZeigen() {
+    steuerung.innerHTML = "";
+    if (!stand) return;
+    ["1", "2"].forEach(function (t) {
+      if (stand.anzahlTeile && stand.anzahlTeile[t]) steuerung.appendChild(knopf("Teil " + t + " starten", function () {
+        if (stand.phase !== "aus" && stand.phase !== "ende" && !confirm("Teil " + t + " neu starten? Der laufende Teil wird abgebrochen.")) return;
+        steuern("start", t);
+      }));
+    });
+    if (stand.phase !== "aus") steuerung.appendChild(knopf("Ausblenden", function () { steuern("aus"); }));
+    steuerung.appendChild(knopf("Alles zurücksetzen", function () {
+      if (confirm("Quiz zurücksetzen? Alle Teams und Punkte (Teil 1 und 2) sind dann weg.")) steuern("zuruecksetzen");
+    }));
+    steuerung.appendChild(knopf("Vollbild", function () {
+      if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+    }));
+    if (meldung) steuerung.appendChild(el("span", "meldung", "⚠ " + meldung));
+    var rechts = el("div", "rechts");
+    var h = hauptAktion();
+    if (h) rechts.appendChild(knopf(h[0], h[1], true));
+    steuerung.appendChild(rechts);
+  }
+
+  function qr(ziel, url) {
+    var q = qrcode(0, "M");
+    q.addData(url);
+    q.make();
+    ziel.innerHTML = q.createSvgTag(4, 0);
+  }
+
+  var letzteAnsicht = "";
+  var zeitBalken = null;
+  function zeigen(d) {
+    stand = d;
+    steuerungZeigen();
+    // Ansicht nur neu bauen, wenn sich etwas geändert hat (sonst flackert der QR-Code)
+    var schluessel = JSON.stringify([d.phase, d.teil, d.frage && d.frage.nr, d.teams.length, d.beantwortet, d.verteilung, listeOffen]);
+    if (zeitBalken && d.phase === "frage") zeitBalken.style.width = Math.round(100 * d.rest / d.sekunden) + "%";
+    if (schluessel === letzteAnsicht) return;
+    letzteAnsicht = schluessel;
+    buehne.innerHTML = "";
+    zeitBalken = null;
+    buehne.className = d.phase === "aufloesung" ? "aufloesung" : "";
+    if (d.phase === "aus") {
+      buehne.appendChild(el("h1", "", "Live-Quiz"));
+      buehne.appendChild(el("p", "gross", "Unten „Teil 1 starten“ (nach der großen Pause) oder „Teil 2 starten“ (Abschlussrunde)."));
+      return;
+    }
+    if (d.phase === "lobby") {
+      buehne.appendChild(el("h1", "", "Quiz · Teil " + d.teil));
+      var lobby = el("div", "lobby");
+      var code = el("div", "qr");
+      qr(code, location.protocol + "//" + location.host + "/app/quiz.html");
+      lobby.appendChild(code);
+      var rechts = el("div");
+      rechts.appendChild(el("p", "gross", "Öffnet das Quiz auf eurem iPad: QR-Code scannen oder auf der Startseite „🏆 Quiz“ antippen. Sucht euch ein Tier aus."));
+      rechts.appendChild(el("p", "info", d.teams.length + (d.teams.length === 1 ? " Team ist dabei:" : " Teams sind dabei:")));
+      var teams = el("div", "teams");
+      d.teams.forEach(function (t) { teams.appendChild(el("span", "", t.emoji)); });
+      rechts.appendChild(teams);
+      lobby.appendChild(rechts);
+      buehne.appendChild(lobby);
+      return;
+    }
+    if (d.phase === "frage" || d.phase === "aufloesung") {
+      var f = d.frage;
+      buehne.appendChild(el("p", "info", "Teil " + d.teil + " · Frage " + (f.nr + 1) + " von " + f.anzahl));
+      buehne.appendChild(el("p", "frage", f.frage));
+      var antworten = el("div", "antworten");
+      f.antworten.forEach(function (a, i) {
+        var box = el("div", "antwort f" + i + (d.phase === "aufloesung" && f.richtig === i ? " richtig" : ""));
+        box.appendChild(el("span", "form", FORMEN[i]));
+        box.appendChild(el("span", "", a));
+        if (d.verteilung) box.appendChild(el("span", "zahl", String(d.verteilung[i])));
+        antworten.appendChild(box);
+      });
+      buehne.appendChild(antworten);
+      if (d.phase === "frage") {
+        var balken = el("div", "balken");
+        zeitBalken = el("div");
+        zeitBalken.style.width = Math.round(100 * d.rest / d.sekunden) + "%";
+        balken.appendChild(zeitBalken);
+        buehne.appendChild(balken);
+        buehne.appendChild(el("p", "info", d.beantwortet + " von " + d.teams.length + " Teams haben geantwortet"));
+      } else if (f.erklaerung) {
+        buehne.appendChild(el("p", "erklaerung", "✅ " + f.erklaerung));
+      }
+      return;
+    }
+    if (d.phase === "ende") {
+      var r = d.rangliste || [];
+      if (listeOffen) {
+        buehne.appendChild(el("h1", "", "Alle Teams"));
+        var liste = el("div", "liste");
+        r.forEach(function (e) { liste.appendChild(el("p", "", e.platz + ". " + e.tier.emoji + " " + e.tier.name + " · " + e.punkte + (e.punkte === 1 ? " Punkt" : " Punkte"))); });
+        buehne.appendChild(liste);
+        return;
+      }
+      buehne.appendChild(el("h1", "", "Siegerehrung"));
+      var podest = el("div", "podest");
+      [2, 1, 3].forEach(function (platz) {
+        var hier = r.filter(function (e) { return e.platz === platz; });
+        if (!hier.length) return;
+        var stufe = el("div", "stufe p" + platz);
+        stufe.appendChild(el("div", "tiere", hier.map(function (e) { return e.tier.emoji; }).join(" ")));
+        stufe.appendChild(el("div", "namen", hier.map(function (e) { return e.tier.name; }).join(", ") + " · " + hier[0].punkte + (hier[0].punkte === 1 ? " Punkt" : " Punkte")));
+        stufe.appendChild(el("div", "block", String(platz)));
+        podest.appendChild(stufe);
+      });
+      buehne.appendChild(podest);
+    }
+  }
+
+  document.addEventListener("keydown", function (ev) {
+    if (ev.target && ev.target.tagName === "INPUT") return;
+    if (ev.key === "ArrowRight" || ev.key === "PageDown" || ev.key === " ") {
+      var h = hauptAktion();
+      if (h) { ev.preventDefault(); h[1](); }
+    }
+  });
+
+  laden();
+  setInterval(function () { if (stand) laden(); }, 1000);
+})();
+</script>
+</body>
+</html>
