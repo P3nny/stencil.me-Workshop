@@ -87,7 +87,7 @@ function anmelden(page, id, personen, fortschritt){
   const page2 = await browser.newPage({ viewport: { width: 1180, height: 820 } });
   page2.on('pageerror', e => konsolenFehler.push(e.message));
   await page2.goto(BASE + '/index.html');
-  await anmelden(page2, 'b2b2b2b2b2b2', ['Lea', 'Tom'], { stationen: { foto: { status: 'fertig' } } });
+  await anmelden(page2, 'b2b2b2b2b2b2', ['Lea', 'Tom'], { stationen: { foto: { status: 'fertig' }, stencilme: { status: 'fertig' } } });
   await page2.waitForFunction(() => Speicher.outboxAlle().then(o => o.length === 0), null, { timeout: 30000, polling: 500 }).catch(() => {});
   await page2.goto(BASE + '/app/station.html?id=ki-selbstportraet');
   await page2.waitForSelector('text=Diese Station macht ihr heute mit Beispielen.', { timeout: 10000 });
@@ -104,6 +104,29 @@ function anmelden(page, id, personen, fortschritt){
   pruefe(app.status() === 403, 'Laptop lehnt KI-App ab (' + app.status() + ')');
   const bereitAndere = await (await api.get('/api/ki-bereit?gruppe=a1a1a1a1a1a1')).json();
   pruefe(bereitAndere.ohneKi === false, 'andere Gruppe darf die KI nutzen');
+
+  console.log('KI-Station: Kinder entscheiden selbst („nur Beispiele ansehen“, seit 09.11. Pflichtstation)');
+  const page3 = await browser.newPage({ viewport: { width: 1180, height: 820 } });
+  page3.on('pageerror', e => konsolenFehler.push(e.message));
+  await page3.goto(BASE + '/index.html');
+  await anmelden(page3, 'c3c3c3c3c3c3', ['Kim'], { stationen: { foto: { status: 'fertig' }, stencilme: { status: 'fertig' } } });
+  for(const [id, knopfText] of [['ki-selbstportraet', 'Bild erzeugen'], ['vibe-coding', 'App bauen lassen']]){
+    await page3.goto(BASE + '/app/station.html?id=' + id);
+    const verzicht = page3.locator('button:has-text("nur Beispiele ansehen")');
+    await verzicht.waitFor({ timeout: 10000 });
+    pruefe(await page3.locator('text=Diese Station war optional').count() === 0 && !(await page3.locator('button:has-text("' + knopfText + '")').isDisabled()), id + ': mit Einwilligung kann die Gruppe die KI nutzen');
+    await verzicht.click();
+    await page3.waitForSelector('text=Ihr habt entschieden: Von euch geht nichts an die KI.');
+    pruefe(await page3.locator('button:has-text("' + knopfText + '")').isDisabled() && await verzicht.isHidden(), id + ': nach „nur Beispiele“ ist der KI-Knopf gesperrt');
+    await page3.reload();
+    await page3.waitForSelector('text=Ihr habt entschieden: Von euch geht nichts an die KI.', { timeout: 10000 });
+    pruefe(true, id + ': die Entscheidung bleibt nach dem Neuladen');
+    const felder = page3.locator('.eingabe textarea:visible, .eingabe input:visible');
+    for(let i = 0; i < await felder.count(); i++) await felder.nth(i).fill('Testantwort');
+    await page3.waitForTimeout(600);
+    pruefe(!(await page3.locator('button:has-text("Station beendet")').isDisabled()), id + ': Station lässt sich trotzdem beenden');
+  }
+  await page3.screenshot({ path: path.join(SHOTS, BROWSER + '-ki-nur-beispiele.png'), fullPage: true });
 
   console.log('Laptop-Seite: Schalter pro Person');
   const laptop = await browser.newPage({ viewport: { width: 1400, height: 1000 } });

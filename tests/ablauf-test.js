@@ -81,12 +81,12 @@ function ereignis(api, gruppe, art, station, nr){
     const offen = st => Stationen.voraussetzungen(liste, st).every(b => Stationen.istFertig(f, b));
     return {
       zu: liste.filter(st => !st.bonus && st.id !== 'foto' && st.id !== 'stencilme' && !offen(st)).map(st => st.id),
-      bonusOffen: liste.filter(st => st.bonus && offen(st)).map(st => st.id),
-      nurFotoOffen: liste.filter(st => st.id !== 'foto' && st.id !== 'stencilme' && Stationen.voraussetzungen(liste, st).every(b => b === 'foto')).map(st => st.id)
+      bonusOffen: liste.filter(st => st.bonus && offen(st) && !Stationen.fehlenBisBonus(liste, f, st)).map(st => st.id),
+      nurFotoOffen: liste.filter(st => !st.bonus && st.id !== 'foto' && st.id !== 'stencilme' && Stationen.voraussetzungen(liste, st).every(b => b === 'foto')).map(st => st.id)
     };
   }));
-  // Stempeldruck (optional) braucht seit 09.11. die optionale Station „Stempel“
-  pruefe(frei.zu.join() === 'druck-stempel', 'alle Pflicht- und Claude-Stationen offen, nur Stempeldruck wartet auf „Stempel“ (gesperrt: ' + frei.zu.join(', ') + ')');
+  // Seit 09.11.: Sticker kommt nach dem Lasercutter, Stempeldruck (optional) nach der optionalen Station „Stempel“
+  pruefe(frei.zu.join() === 'sticker,druck-stempel', 'alle anderen Stationen offen, Sticker wartet auf den Lasercutter, Stempeldruck auf „Stempel“ (gesperrt: ' + frei.zu.join(', ') + ')');
   pruefe(!frei.bonusOffen.length, 'Bonus bleibt gesperrt' + (frei.bonusOffen.length ? ': ' + frei.bonusOffen.join(', ') : ''));
   pruefe(!frei.nurFotoOffen.length, 'ohne Bild bearbeiten ist nur stencil.me offen' + (frei.nurFotoOffen.length ? ', auch: ' + frei.nurFotoOffen.join(', ') : ''));
 
@@ -122,21 +122,26 @@ function ereignis(api, gruppe, art, station, nr){
   const nachFertig = await page.evaluate(a => Stationen.laden().then(l => Stationen.vorschlagen(l, a.f, 'b2b2b2b2b2b2')).then(s => s && s.id), { f: fertig(ausser(['druck-stempel'])) });
   pruefe(nachFertig === 'druck-stempel', 'nach „Fertig, abholen“: Stempel drucken (' + nachFertig + ')');
 
-  console.log('Vibe Coding sofort nach „Wird gelasert“');
-  await ereignis(api, 'b3b3b3b3b3b3', 'anmeldung', '', '05');
-  const stand3 = { f: fertig(['foto', 'stencilme', 'lasercutter']) };
-  const vorLaser = await page.evaluate(a => Stationen.laden().then(l => {
-    const ids = {};
-    let kette = Promise.resolve();
-    for(let i = 0; i < 10; i++) kette = kette.then(() => Stationen.vorschlagen(l, a.f, 'b3b3b3b3b3b3')).then(s => { ids[s.id] = 1; });
-    return kette.then(() => Object.keys(ids));
-  }), stand3);
-  pruefe(vorLaser.indexOf('vibe-coding') < 0, 'vorher: kein Vibe Coding (optional, andere frei)');
-  await api.post('/api/nachricht', { data: { gruppen: ['b3b3b3b3b3b3'], text: 'Der Stempel von Dua wird jetzt gelasert.', art: 'platte-laser' } });
-  const nachLaser3 = await page.evaluate(a => Stationen.laden().then(l => Stationen.vorschlagen(l, a.f, 'b3b3b3b3b3b3')).then(s => s && s.id), stand3);
-  pruefe(nachLaser3 === 'vibe-coding', 'nach „Wird gelasert“: Vibe Coding (' + nachLaser3 + ')');
-  beleg = await (await api.get('/api/belegung?gruppe=b2b2b2b2b2b2')).json();
-  pruefe(beleg.stationen['vibe-coding'] === 1, 'Vibe Coding (1 iPad) ist damit besetzt');
+  console.log('Reihenfolge ab Dezember: Lasercutter → Sticker → KI 1 → KI 2 (Patricia, 09.11.2026)');
+  const reihe = await page.evaluate(() => Stationen.laden().then(liste => {
+    const f = ids => { const st = {}; ids.forEach(id => { st[id] = { status: 'fertig' }; }); return { stationen: st }; };
+    const mal = (stand, beleg) => { const ids = {}; for(let i = 0; i < 30; i++) ids[Stationen.naechste(liste, f(stand), beleg).id] = 1; return Object.keys(ids).sort().join(); };
+    const basis = ['foto', 'stencilme', 'lasercutter'];
+    return {
+      nachLaser: mal(basis, {}),
+      stickerVoll: mal(basis, { sticker: 3 }),
+      nachSticker: mal(basis.concat(['sticker']), {}),
+      nachKi1: mal(basis.concat(['sticker', 'ki-selbstportraet']), {}),
+      vibeVoll: mal(basis.concat(['sticker', 'ki-selbstportraet']), { 'vibe-coding': 1 }),
+      laserVollKi: mal(['foto', 'stencilme'], { lasercutter: 2 })
+    };
+  }));
+  pruefe(reihe.nachLaser === 'sticker', 'nach dem Lasercutter: Sticker (' + reihe.nachLaser + ')');
+  pruefe(reihe.stickerVoll === 'ki-selbstportraet', 'Sticker voll: KI-Selbstporträt (' + reihe.stickerVoll + ')');
+  pruefe(reihe.nachSticker === 'ki-selbstportraet', 'nach dem Sticker: KI-Selbstporträt (' + reihe.nachSticker + ')');
+  pruefe(reihe.nachKi1 === 'vibe-coding', 'danach: Bild-App vibe coden (' + reihe.nachKi1 + ')');
+  pruefe(reihe.vibeVoll.split(',').indexOf('vibe-coding') < 0 && reihe.vibeVoll.length > 0, 'Vibe Coding besetzt: eine andere Station (' + reihe.vibeVoll + ')');
+  pruefe(reihe.laserVollKi === 'ki-selbstportraet', 'Lasercutter voll: gleich weiter zur KI (' + reihe.laserVollKi + ')');
 
   console.log('Station gerade voll: Hinweis, aber keine Sperre');
   await ereignis(api, 'b1b1b1b1b1b1', 'checkin', 'druck-linol', '04');
