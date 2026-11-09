@@ -22,6 +22,7 @@ Eine Datei pro Station. Inhalt als Daten, nicht im Code: Texte hier ändern, die
 | `ersatz` | nein | Nur Foto-Station: Porträts bekannter Personen für Kinder ohne Foto-Einwilligung, `{ "id", "name", "bild", "quelle", "seite" }`, Lizenzen in `bilder/ersatz/README.md` |
 | `fragen` | ja | am Ende: `ki-typ` („Programm, KI oder generative KI?“, Pflicht) und/oder `gefallen` (3 Smileys, freiwillig) |
 | `mindestMinuten` | nein | „Station beendet“ frühestens so viele Minuten nach dem Check-in (Standard 2, `0` = sofort, z. B. Foto). Im Testmodus (`?test`) und mit `?schnell` ohne Wartezeit |
+| `erinnerungMinuten` | nein | Nach so vielen Minuten (und dann immer wieder) fragt das iPad „Seid ihr fertig?“ (Standard 15, `0` = nie) |
 | `nurFreigabe` | nein | `true`: Station geht nur über die Freigabe am Laptop auf (`freigabe`), Text für die Wartezeit in `freigabeText` (Feedbackbogen) |
 | `datenschutz` | ja | ein Satz: Was passiert mit den Daten dieser Station? |
 | `braucht` | ja | Stationen, die vorher fertig sein müssen, z. B. `["foto"]`. Gibt es eine davon (noch) nicht, zählt sie nicht |
