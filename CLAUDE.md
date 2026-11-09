@@ -22,8 +22,8 @@ Der Maker-Teil ist **vorgegeben**, damit die Kinder weniger Entscheidungen treff
 
 Optional, nur wenn Zeit bleibt: Sticker (Cameo/Cricut), Lasercut-Porträt, Positivdruck. Nie vor dem Pflichtweg anbieten.
 
-**Ab Dezember 2026 (entschieden 09.11., Umbau läuft, siehe `docs/entscheidungen.md` Abschnitt 11):**
-- Pflicht ist das **Lasercut-Porträt** statt des Negativ-Stempels. Der Stempel wird optional und größer.
+**Ab Dezember 2026 (entschieden 09.11., umgesetzt 09.11., siehe `docs/entscheidungen.md` Abschnitt 11):**
+- Pflicht ist das **Lasercut-Porträt** (40 mm, auf die Person zugeschnitten, 1× gravieren) statt des Negativ-Stempels. Der Stempel ist optional (50 mm, 2×, eigene Platte).
 - Die Postkarte entsteht an der Linolstation.
 - Sticker kommen früh und sind kein Bonus mehr.
 - Die beiden KI-Stationen sind Pflicht.
@@ -53,9 +53,9 @@ Drei Stufen, jede mit Beispiel aus dem Workshop:
 
 - `index.html`: Startseite der Workshop-App (Anmeldung allein/zu zweit, dann Foto-Station).
 - `app/station.html?id=<station>`: eine Seite für alle Stationen, Inhalte aus `stationen/*.json` (Format: `stationen/README.md`). Gemeinsamer Code in `app/core/`, eigene Stationsteile in `app/stationen/`. Gerätecheck: `app/geraetecheck.html`.
-- Stationen (Stand 09.11.2026): 14 Pflichtstationen (zählen für „x von 14“ und das Puzzle; „Bild bearbeiten“ macht das Lasercut-Porträt; dazu Sticker und die 2 Claude-Stationen, dort mit Knopf „nur Beispiele ansehen“), optional: Stempel und Stempeldruck, Bonus: Feedbackbogen (nach allen Pflichtstationen oder Freigabe am Laptop). Vorschlag in der Reihenfolge von `stationen/index.json` über `vorrang`: Foto → Bild bearbeiten → Lasercutter → Sticker → KI-Selbstporträt → Bild-App vibe coden → Rest. Reihenfolge über `braucht` und `plaetze`, Überblick und Verlauf in `docs/screens.md`.
-- `server/`: Workshop-Server (Python, nur Standardbibliothek; Ausnahme: Anthropic-SDK im venv für die Claude-Stationen, `server/einrichten.sh`). Laptop-Seite `/laptop` (Holzplatte, Stickerfolie mit Plotter, Nachrichten, Freigaben), `/qr`, `/auswertung`.
-- `tests/`: Playwright-Tests (`stationen-test.js` kompletter Durchlauf, `tabs-test.js`, `leistung-test.js`), laufen in WebKit und Chromium.
+- Stationen (Stand 09.11.2026): 14 Pflichtstationen (zählen für „x von 14“ und das Puzzle; „Bild bearbeiten“ macht das Lasercut-Porträt; dazu Sticker und die 2 Claude-Stationen, dort mit Knopf „nur Beispiele ansehen“), optional: Stempel und Stempeldruck, Bonus: Feedbackbogen (nach allen Pflichtstationen oder Freigabe am Laptop). Vorschlag in der Reihenfolge von `stationen/index.json` über `vorrang`: Foto → Bild bearbeiten → Lasercutter → Sticker → KI-Selbstporträt → Eure eigene Bild-App → Rest. Reihenfolge über `braucht` und `plaetze`, Überblick und Verlauf in `docs/screens.md`.
+- `server/`: Workshop-Server (Python, nur Standardbibliothek; Ausnahme: Anthropic-SDK im venv für die Claude-Stationen, `server/einrichten.sh`). Laptop-Seite `/laptop` (Holzplatte, Stickerfolie mit Plotter, Nachrichten, Freigaben, Pause, Gruppe löschen, Quiz-PIN), `/qr`, `/auswertung`, Beamer-Seite `/quiz` (Live-Quiz, auch vom Präsentationslaptop).
+- `tests/`: Playwright-Tests (`stationen-test.js` kompletter Durchlauf, dazu `ablauf`, `einwilligung`, `gruppe-loeschen`, `pause`, `live-quiz`, `tabs`, `vibe-pin`, `leistung`), laufen in WebKit und Chromium.
 - `Datenschutz.md`: kindgerechte Datenschutzinformation (dazu `docs/datenschutz-kurz.md`, `docs/canva-folie-datenschutz.md`).
 - `stencil.html` (bis 24.10.2026 `index.html`): stencil.me-Workshop-App (Foto → BodyPix → Schwarz-Weiß → SVG), eine Datei (ca. 100 KB). Startet im Pflichtweg Negativ-Stempel. `?extras` zeigt Bild (Positiv) und Sticker, `?test` den Knopf für `docs/test-foto.jpg`. Code für Schraffur, Raster, Sticker ist noch drin (Löschen in Roadmap 1).
 - `code-quiz.html`, `kunst-quiz.html`: eigenständige Quizseiten.
@@ -153,18 +153,19 @@ Noch offen: Einwilligung (wer holt sie ein?), iPad-Modelle und iPadOS-Version im
 **Stand 09.11.2026:**
 - Der erste Workshop hat stattgefunden, die Auswertung steht in `docs/auswertung-2026-11-09.md`.
 - Der nächste Workshop ist im Dezember mit höchstens 18 Kindern.
-- Umbau-Plan in Schritten, ein Branch pro Schritt:
-  1. Auswertung
-  2. Laserzeit schätzen
-  3. Gruppe löschen
-  4. Cameo nur anschneiden
-  5. Porträt Pflicht
-  6. Reihenfolge und KI Pflicht
-  7. Kein Wettrennen
-  8. Pause-Knopf
-  9. Eigene Bild-App
-  10. Coding groß
-  11. Live-Quiz am Präsentationslaptop
+- Umbau für Dezember: **alle 11 Schritte erledigt** (09.11.2026, in `main`), je ein Branch:
+  1. ✅ Auswertung (`docs/auswertung-2026-11-09.md`, Zeitplan in `docs/aufbau-checkliste.md`)
+  2. ✅ Laserzeit geschätzt (Porträt 40 mm, 1×, ca. 45–50 Min. für 18 Kinder)
+  3. ✅ Gruppe löschen auf der Laptop-Seite
+  4. ✅ Cameo nur anschneiden (26/8/3, Obergrenze), Trennlinien zum Zerschneiden
+  5. ✅ Porträt Pflicht, Stempel optional, Zuschnitt auf die Person
+  6. ✅ Reihenfolge (`vorrang`) und KI-Stationen Pflicht mit „nur Beispiele ansehen“, Sticker-Video
+  7. ✅ Kein Wettrennen: Smileys freiwillig, 2 Minuten Ruhe, Feedback nur nach Freigabe
+  8. ✅ Pause-Knopf, dazu Erinnerung nach 15 Minuten an offenen Stationen
+  9. ✅ „Eure eigene Bild-App“ (Plätze bleiben bei 1)
+  10. ✅ Code-Editor groß, Eingabe/Ausgabe beschriftet
+  11. ✅ Live-Quiz am Präsentationslaptop (`/quiz`, Quiz-PIN, `server/quiz-fragen.json`)
+- **Noch offen vor Dezember:** Test mit echten iPads im KOMEZ, Probebogen an der Cameo, erstes Porträt am Mr Beam (reicht 1× Gravieren?), Quiz am Beamer mit Presenter.
 
 ## Roadmap (Schritt für Schritt, ein Schritt pro Branch)
 
