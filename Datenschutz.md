@@ -56,6 +56,7 @@ Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Fo
 | Berufe                             | –                                                | Euer Wunschberuf                                          | –                                             |
 | Sticker                            | –                                                | Dein Sticker und dein Name                                | Erst wenn du „Video laden“ antippst: YouTube  |
 | Feedback                           | –                                                | Dein Feedback, ohne Namen, getrennt von euren Daten       | –                                             |
+| Live-Quiz (Teil 1 und 2)           | –                                                | Euer Tier als Teamname und eure Antworten. Auf dem Beamer steht nur das Tier, keine Namen | –                                             |
 | Nach jeder Station                 | –                                                | Deine Antwort auf die KI-Frage, freiwillig dein Smiley    | –                                             |
 
 Fotografiere an den Stationen nur die Sache, um die es geht: die Maschine, die Postkarte, das Kunstwerk. Keine anderen Leute. Auch diese Fotos bleiben auf dem iPad.
@@ -89,7 +90,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen ge
 ## Wie lange bleiben die Daten?
 
 - **Auf dem iPad:** bis zum Ende des Workshops. Dann seht ihr unter „Meine Daten“ noch einmal alles an und löscht es selbst mit „Jetzt alles löschen“. Die nächste Gruppe sieht nichts von euch.
-- **Auf Pennys Laptop:** bis zum Ende des Workshops. Dann löscht Penny alles auf dem Laptop. Vorher hebt sie anonymisiert - also ohne Namen und ohne Fotos - auf, was ihr hilft, den Workshop besser zu machen: die Apps aus dem Vibe Coding mit ihren Aufträgen, die Prompts der KI-Selbstporträts, die Smileys, die Antworten auf die KI-Frage, euer Feedback und wie lange ihr wo wart. Statt eurer Namen steht dort „Gruppe 1“, „Gruppe 2“ … Schreibt jemand einen Namen ins Feedback, ersetzt der Laptop ihn durch „[Name]“.
+- **Auf Pennys Laptop:** bis zum Ende des Workshops. Dann löscht Penny alles auf dem Laptop. Vorher hebt sie anonymisiert - also ohne Namen und ohne Fotos - auf, was ihr hilft, den Workshop besser zu machen: die Apps aus dem Vibe Coding mit ihren Aufträgen, die Prompts der KI-Selbstporträts, die Smileys, die Antworten auf die KI-Frage, euer Feedback, wie lange ihr wo wart und beim Quiz nur, wie viele Gruppen jede Frage richtig hatten. Statt eurer Namen steht dort „Gruppe 1“, „Gruppe 2“ … Schreibt jemand einen Namen ins Feedback, ersetzt der Laptop ihn durch „[Name]“.
 - **Bei Claude:** höchstens 30 Tage (siehe oben).
 
 ## Deine Rechte
@@ -105,7 +106,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen ge
 
 **Verantwortlich:** Patricia Ennenbach (im Workshop „Penny“), Workshop im Kommunalen Medienzentrum (KOMEZ). Kontakt: patricia.ennenbach@bildung.koeln.de
 
-**Welche Daten:** Auf dem iPad: Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung) und Fotos von Werkstücken. Diese Fotos gehen nicht an den Laptop. Auf dem Laptop: Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), die aus dem Foto erzeugten Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts, nötig für Laser und Plotter), KI-Selbstporträts (von Claude gezeichnet, kein Foto), Vibe-Coding-Apps, Textantworten, Bewertungen, Feedback, Zeitpunkte von Check-in und Abschluss jeder Station (daraus die Dauer). Die Auswertung (Laptop) zeigt Smileys (freiwillige Bewertung), KI-Frage, Dauer und Feedback ohne Namen. Für Laser und Plotter protokolliert der Laptop nur Anzahl und Dauer der Platten und Folien, ohne Namen. Damit nicht zwei Gruppen gleichzeitig an eine volle Station geschickt werden, merkt sich der Laptop, zu welcher Station eine Gruppe gerade unterwegs ist (nur Gruppen-ID und Station, nur im Arbeitsspeicher, höchstens 10 Minuten).
+**Welche Daten:** Auf dem iPad: Fotos der Kinder (Porträtfoto, freigestelltes Bild, Standbild der Körpererkennung) und Fotos von Werkstücken. Diese Fotos gehen nicht an den Laptop. Auf dem Laptop: Vor- oder Spitznamen (keine Nachnamen, keine Mailadressen), die aus dem Foto erzeugten Stempel-, Sticker- und Porträtdateien (SVG, zeigen den Umriss des Gesichts, nötig für Laser und Plotter), KI-Selbstporträts (von Claude gezeichnet, kein Foto), Vibe-Coding-Apps, Textantworten, Bewertungen, Feedback, beim Live-Quiz Teamname (Tier) und Antworten pro Gruppe, Zeitpunkte von Check-in und Abschluss jeder Station (daraus die Dauer). Die Auswertung (Laptop) zeigt Smileys (freiwillige Bewertung), KI-Frage, Dauer und Feedback ohne Namen. Für Laser und Plotter protokolliert der Laptop nur Anzahl und Dauer der Platten und Folien, ohne Namen. Damit nicht zwei Gruppen gleichzeitig an eine volle Station geschickt werden, merkt sich der Laptop, zu welcher Station eine Gruppe gerade unterwegs ist (nur Gruppen-ID und Station, nur im Arbeitsspeicher, höchstens 10 Minuten).
 
 **Wo verarbeitet:**
 
@@ -113,7 +114,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen ge
 - Speicherung auf dem iPad: Website-Daten von Safari (IndexedDB), nicht die Fotos-App.
 - Speicherung auf dem Laptop: lokaler Python-Server im KOMEZ-WLAN (HTTP, unverschlüsselt). Der Laptop nimmt keine Fotos an und gibt keine Daten weiter. Übersicht und Auswertung sind nur am Laptop selbst abrufbar. „Meine Daten“ zeigt jedem iPad nur die Daten der eigenen Gruppe (zufällige 12-stellige Gruppen-ID, nur diesem iPad bekannt).
 - Die Fotos/Ergebnisse auf den iPad und auf dem Laptop werden am Ende des Workshops gelöscht. Mitgenommen werden nur die analogen Ergebnisse (Stempel, Postkarte, Sticker).
-- Aufbewahrt zur Verbesserung des Workshops (vor dem Löschen gesichert, im Ordner `archiv/workshops/` auf dem Laptop, nicht veröffentlicht): Vibe-Coding-Apps mit Aufträgen, Baukasten-Prompts der KI-Selbstporträts, Auswertung (Smileys, KI-Frage, Dauer, Feedback), Ablauf der Stationen mit Uhrzeiten. Ohne Namen (Gruppen als Nummer, Vornamen in Freitexten automatisch ersetzt), ohne Gruppen-ID, ohne Fotos, Stempel- oder Bilddateien, ohne sonstige Textantworten.
+- Aufbewahrt zur Verbesserung des Workshops (vor dem Löschen gesichert, im Ordner `archiv/workshops/` auf dem Laptop, nicht veröffentlicht): Vibe-Coding-Apps mit Aufträgen, Baukasten-Prompts der KI-Selbstporträts, Auswertung (Smileys, KI-Frage, Dauer, Feedback), Ablauf der Stationen mit Uhrzeiten, beim Live-Quiz nur die Zahl der richtigen Antworten pro Frage (ohne Teams). Ohne Namen (Gruppen als Nummer, Vornamen in Freitexten automatisch ersetzt), ohne Gruppen-ID, ohne Fotos, Stempel- oder Bilddateien, ohne sonstige Textantworten.
 
 **Online-Dienste:**
 

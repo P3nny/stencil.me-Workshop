@@ -191,6 +191,7 @@ Grundlage: [auswertung-2026-11-09.md](auswertung-2026-11-09.md). Im Dezember sin
   - Patricia startet es am Präsentationslaptop (`/quiz` vom Server-Laptop, mit PIN), die Paare antworten auf dem iPad.
   - Plätze 1–3 bekommen eine Urkunde und Süßigkeiten.
 - **Gruppe löschen** auf der Laptop-Seite, damit Testgruppen vor dem Start verschwinden.
+- **Live-Quiz umgesetzt:** Teamnamen als Tiere (keine Vornamen auf dem Beamer), 16 Fragen (je 8), 30 Sekunden, kein Schnelligkeits-Bonus. Fragen in `server/quiz-fragen.json`.
 - **Coding:** Aufgaben groß im eigenen Fenster, Felder beschriftet mit „Eingabe“ und „Ausgabe“.
 
 ### Laserzeit Porträt: Schätzung (09.11., nicht gemessen, kein Zugang zum Mr Beam)
