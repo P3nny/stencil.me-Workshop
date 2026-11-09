@@ -193,6 +193,34 @@ Grundlage: [auswertung-2026-11-09.md](auswertung-2026-11-09.md). Im Dezember sin
 - **Gruppe löschen** auf der Laptop-Seite, damit Testgruppen vor dem Start verschwinden.
 - **Coding:** Aufgaben groß im eigenen Fenster, Felder beschriftet mit „Eingabe“ und „Ausgabe“.
 
+### Laserzeit Porträt: Schätzung (09.11., nicht gemessen, kein Zugang zum Mr Beam)
+
+**Vorgehen:**
+- 10 Testfotos (`docs/test-foto.jpg` und die 9 Promi-Porträts) mit dem App-Code (BodyPix, Otsu, `autoOffset`) im Browser zu Stempel und Porträt gerechnet.
+- Die Gravur bei 0,1 mm Zeilenabstand ausgezählt.
+- Der Laser fährt jede Zeile vom ersten bis zum letzten gravierten Punkt. Darum zählt die **Zeilenlänge**, nicht nur die Fläche.
+
+**Ergebnis:**
+- Das Porträt hat **ca. 60 % der Zeilenlänge** des Stempels (50–80 %, je nach Foto), bei etwa der Hälfte der Fläche.
+- Der Schnitt ist gleich lang (ca. 170 mm).
+
+**Eichung:**
+- 09.11.: 6 Stempel (40 mm) in 35 Min. Davon ca. 1,2 Min. Schnitt (2 Durchgänge, 300 mm/min) und ca. 4,6 Min. Gravur (2 Durchgänge).
+- Probe: Für 50-mm-Stempel sagt die Rechnung 8,7 Min. voraus, gemessen wurden am 02.11. 9 Min. (27 Min. für 3 Stück). Die Eichung passt also.
+
+| Motivbreite | Porträt, Gravur 1× | 18 Porträts | Porträt, Gravur 2× | 18 Porträts | Stempel (2×) |
+| --- | --- | --- | --- | --- | --- |
+| 40 mm | 2,6 Min. | 47 Min. | 4,0 Min. | 72 Min. | 5,8 Min. |
+| **45 mm** | **3,1 Min.** | **56 Min.** | 4,9 Min. | 88 Min. | 7,2 Min. |
+| 50 mm | 3,7 Min. | 67 Min. | 5,9 Min. | 106 Min. | 8,7 Min. |
+| 60 mm | 5,0 Min. | 89 Min. | 8,1 Min. | 146 Min. | 12,2 Min. |
+
+**Empfehlung:**
+- **Porträt 45 mm, Gravur 1 Durchgang**: ca. 1 Stunde für 18 Kinder, passt auf eine A4-Platte.
+- Ein Porträt muss nicht tief sein, es soll nur dunkel werden.
+- Optionale Stempel (50 mm, 2×) kommen auf **eine eigene Platte** bzw. einen eigenen Auftrag. Die Mr-Beam-Oberfläche stellt die Durchgänge pro Auftrag ein, nicht pro Stück.
+- Am ersten Porträt vor Ort: Wirkt es mit 1 Durchgang zu blass? Dann 2 Durchgänge und 40 mm (ca. 72 Min.).
+
 ---
 
 ## Testprotokoll

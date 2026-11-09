@@ -90,7 +90,8 @@ Zu Hause lässt sich derselbe Test im Heim-WLAN machen. Er zeigt, ob die Testsei
 
 - [ ] Die Gruppen melden sich auf der Startseite an (Vornamen) und scannen an jeder Station den QR-Code.
 - [ ] **Erste Laserplatte früh starten**, sobald etwa 4 Stempel da sind (eine Reihe). Der Laser ist der Engpass: Er soll ab dann durchlaufen.
-  - Geschätzt (nicht gemessen): ca. 5–5,5 Min. pro Stempel (40 mm, Rand ab 2 mm), 26 Stempel ≈ 2,2–2,4 h.
+  - Gemessen 09.11.: 35 Min. für 6 Stempel (40 mm, 2×), also knapp 6 Min. pro Stempel.
+  - Ab Dezember Porträt statt Stempel. Geschätzt: **45 mm, Gravur 1×, ca. 3 Min. pro Porträt, 18 Porträts ≈ 1 h** (Tabelle in `entscheidungen.md`, Abschnitt 11). **Erstes Porträt anschauen**: zu blass, dann Gravur 2×. Stempel nur auf einer eigenen Platte (2×).
   - Auf eine A4-Platte passen ca. 19 Stempel (17–20). 26 Kinder → 2 Platten.
   - **Laserzeit pro Platte notieren** (für die Größenentscheidung beim nächsten Mal: 45 mm wären ca. 25 % mehr Zeit).
   - Bonus 2 (Lasercut-Porträt) nur lasern, wenn am Ende Zeit bleibt.
