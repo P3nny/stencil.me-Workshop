@@ -36,6 +36,17 @@
     return '<g transform="translate(' + x.toFixed(3) + "," + y.toFixed(3) + ')">' + inner + "</g>";
   }
 
+  // Stickerfolie: Der Stift zeichnet um jedes Stück ein Rechteck in die Lücke (halber Abstand).
+  // Daran schneidet Penny den Bogen von Hand auseinander, die Cameo schneidet nur die
+  // Stickerschicht an (server/plotter.py) und nie durch Trägerpapier und Matte.
+  function trennlinien(stuecke, luft) {
+    return '<g id="trennlinien" fill="none" stroke="#999" stroke-width="0.3">' + stuecke.map(function (it) {
+      var x0 = it.x - luft, y0 = it.y - luft, x1 = it.x + it.w + luft, y1 = it.y + it.h + luft;
+      return '<path d="M' + [x0, y0, x1, y0, x1, y1, x0, y1].map(function (v) { return v.toFixed(2); })
+        .reduce(function (a, v, i) { return a + (i === 0 ? "" : i % 2 ? "," : "L") + v; }, "") + 'Z"/>';
+    }).join("") + "</g>";
+  }
+
   function groesse(text) {
     var root = new DOMParser().parseFromString(text, "image/svg+xml").documentElement;
     var vb = (root.getAttribute("viewBox") || "").split(/[\s,]+/).map(parseFloat);
@@ -166,7 +177,8 @@
       })).then(function (items) {
         var ergebnis = anordnen(items);
         var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + BREITE + " " + HOEHE + '" width="' + BREITE + 'mm" height="' + HOEHE + 'mm">' +
-          ergebnis.passt.map(function (it, n) { return gruppe(it.text, n, it.x, it.y); }).join("") + "</svg>";
+          ergebnis.passt.map(function (it, n) { return gruppe(it.text, n, it.x, it.y); }).join("") +
+          (o.trennlinien ? trennlinien(ergebnis.passt, o.abstand / 2) : "") + "</svg>";
         aktuell = {
           svg: svg,
           pfade: ergebnis.passt.map(function (it) { return it.s.pfad; }),

@@ -6,7 +6,7 @@
 <title>stencil.me Laptop</title>
 <link href="/vendor/fonts/fonts.css" rel="stylesheet">
 <script src="/vendor/qrcode/qrcode.js"></script>
-<script src="/laptop/bogen.js?v=2026-11-08"></script>
+<script src="/laptop/bogen.js?v=2026-11-09"></script>
 <style>
   :root { --ink:#111; --paper:#fff; --neon:#ff2d95; --kraft:#b89b74; --muted:#4a4a4a; }
   body { margin:0; padding:24px; background:var(--paper); color:var(--ink); font-family:'DM Sans',-apple-system,sans-serif; }
@@ -270,7 +270,7 @@
     id: "folie", schluessel: "stencilme-folie", liste: "/api/sticker", dateien: "/sticker/",
     einzahl: "Sticker", mehrzahl: "Sticker", haken: "auf die Folie", bogen: "der Folie",
     bogenEins: "eine Folie", bogenGross: "Die Folie", bogenNeu: "eine neue Folie", naechster: "die nächste Folie",
-    rand: 8, abstand: 4, einzelDownload: true,
+    rand: 8, abstand: 4, einzelDownload: true, trennlinien: true,
     nachrichten: {
       laser: { knopf: "📣 Wird geplottet", text: function (namen) { var s = stuecke(namen, "Sticker", "Sticker"); return s.text + (s.viele ? " werden" : " wird") + " jetzt geplottet. Kommt gern zum Zuschauen!"; } },
       fertig: { knopf: "📣 Fertig, abholen", text: function (namen) { var s = stuecke(namen, "Sticker", "Sticker"); return s.text + (s.viele ? " sind" : " ist") + " fertig! Bitte bei Penny am Schneideplotter abholen."; } }
@@ -301,7 +301,7 @@
     zeichnet: { klasse: "laeuft", text: ["Zeichnen läuft …"] },
     gezeichnet: { klasse: "", text: ["4. Marker raus, Messer rein. Matte NICHT herausnehmen, Cameo NICHT ausschalten."], knopf: ["Schneiden starten", "schneiden"] },
     schneidet: { klasse: "laeuft", text: ["Schneiden läuft …"] },
-    fertig: { klasse: "fertig", text: ["FERTIG. Matte entladen, Sticker abziehen.", "Unten bei „Letzte Folien“: „📣 Fertig, abholen“ schicken."], knopf: ["Auftrag abschließen", "verwerfen"] }
+    fertig: { klasse: "fertig", text: ["FERTIG. Matte entladen, Bogen an den grauen Linien zerschneiden (Schere oder Papierschneider).", "Unten bei „Letzte Folien“: „📣 Fertig, abholen“ schicken."], knopf: ["Auftrag abschließen", "verwerfen"] }
   };
 
   function plotterFehler(text) {

@@ -705,9 +705,11 @@ function vorschlagAbwarten(page){
   await laptop.waitForSelector('#folie-vorschau svg g');
   const folienSvg = await laptop.locator('#folie-vorschau svg').evaluate(svg => ({
     schnitt: svg.querySelectorAll('[id="schneiden-rot"]').length,
-    stift: svg.querySelectorAll('[id="zeichnen-stift"]').length
+    stift: svg.querySelectorAll('[id="zeichnen-stift"]').length,
+    trenn: svg.querySelectorAll('#trennlinien path').length
   }));
   pruefe(folienSvg.schnitt === 2 && folienSvg.stift === 2, 'Folie: 2 Sticker mit Stift- und Messer-Gruppe');
+  pruefe(folienSvg.trenn === 2, 'Folie: Trennlinien (Stift) um beide Sticker zum Zerschneiden von Hand');
   await laptop.screenshot({ path: path.join(SHOTS, BROWSER + '-16-folie.png'), fullPage: true });
   await laptop.click('#folie-aktionen button:has-text("An den Plotter schicken")');
   await laptop.waitForSelector('.plotter-schritt:has-text("Marker (0,8 mm)")');
@@ -718,6 +720,12 @@ function vorschlagAbwarten(page){
   await laptop.click('.plotter-schritt button:has-text("Schneiden starten")');
   await laptop.waitForSelector('.plotter-schritt:has-text("FERTIG")', { timeout: 20000 });
   pruefe(true, 'Plotter: fertig');
+  const plotOrdner = (await (await laptop.request.get(BASE + '/api/plotter/status')).json()).auftrag.ordner;
+  const plotLog = require('fs').readFileSync(path.join(plotOrdner, 'protokoll.log'), 'utf8');
+  pruefe(/--tool=autoblade --pressure=26 .*--multipass=3 --depth=8/.test(plotLog), 'Messer nur anschneiden: Druck 26, 3 Durchgänge, Tiefe 8');
+  const stiftSvg = require('fs').readFileSync(path.join(plotOrdner, 'stift.svg'), 'utf8');
+  // erster Sticker liegt bei Rand 8 mm, die Trennlinie 2 mm (halber Abstand) davor
+  pruefe(/d="M 6\.000 6\.000( L [\d.]+ [\d.]+){4} Z"/.test(stiftSvg), 'Stift zeichnet auch die Trennlinien');
   await laptop.click('.plotter-schritt button:has-text("Auftrag abschließen")');
   await laptop.waitForSelector('#folie-verlauf .history-row');
   await laptop.click('#folie-verlauf .history-row button:has-text("Fertig, abholen")');
