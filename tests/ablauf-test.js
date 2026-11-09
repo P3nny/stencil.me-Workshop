@@ -169,6 +169,37 @@ function ereignis(api, gruppe, art, station, nr){
   await page.waitForFunction(() => Array.prototype.some.call(document.querySelectorAll('button'), b => b.textContent === 'Station beendet' && !b.disabled), null, { timeout: 15000 });
   pruefe(await page.locator('text=Kein Wettrennen').count() === 0, 'nach 2 Minuten: „Station beendet“ geht');
 
+  console.log('Erinnerung: Station seit 15 Minuten offen');
+  const vorMinuten = m => page.evaluate(m => Stationen.fortschritt().then(f => { f.stationen['druck-linol'].start = new Date(Date.now() - m * 60000).toISOString(); return Stationen.fortschrittSpeichern(f); }), m);
+  pruefe(await page.locator('.erinnerung:visible').count() === 0, 'nach 2 Minuten noch keine Erinnerung');
+  await vorMinuten(16);
+  await page.reload();
+  await page.waitForSelector('.erinnerung:visible');
+  pruefe(/Ihr seid schon 16 Minuten an dieser Station\. Seid ihr fertig\?/.test(await page.locator('.erinnerung').textContent()), 'nach 15 Minuten: „Ihr seid schon 16 Minuten an dieser Station. Seid ihr fertig?“');
+  await page.screenshot({ path: path.join(SHOTS, BROWSER + '-erinnerung.png') });
+  await page.click('.erinnerung button:has-text("Wir brauchen noch Zeit")');
+  await page.waitForFunction(() => Stationen.fortschritt().then(f => f.stationen['druck-linol'].erinnert === 1));
+  await page.reload();
+  await page.waitForSelector('button:has-text("Station beendet")');
+  await page.waitForTimeout(500);
+  pruefe(await page.locator('.erinnerung:visible').count() === 0, '„Wir brauchen noch Zeit“: bis zur nächsten Viertelstunde Ruhe, auch nach Neuladen');
+  await vorMinuten(31);
+  await page.reload();
+  await page.waitForSelector('.erinnerung:visible');
+  pruefe(/31 Minuten/.test(await page.locator('.erinnerung').textContent()), 'nach 30 Minuten wieder');
+  await page.click('.erinnerung button:has-text("Station beendet")');
+  pruefe(await page.locator('.erinnerung:visible').count() === 0, '„Zu Station beendet“ schließt die Erinnerung');
+
+  console.log('Laptop-Seite: seit wann an der Station');
+  await api.post('/api/ereignis', { data: { id: 'f0f0f0f0f0f0', gruppe: 'b2b2b2b2b2b2', art: 'checkin', station: 'berufe', zeit: new Date(Date.now() - 20 * 60000).toISOString(), daten: {} } });
+  const laptop = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
+  await laptop.goto(BASE + '/laptop');
+  await laptop.waitForSelector('#groups .seit');
+  const seitTexte = await laptop.locator('#groups .seit').allTextContents();
+  pruefe(seitTexte.some(t => /^seit 20 Min\. ⏰$/.test(t)), 'Gruppe seit 20 Minuten an „Berufe“: rot mit ⏰ (' + seitTexte.join(' | ') + ')');
+  pruefe(await laptop.locator('#groups .seit.lange').count() >= 1, 'ab 15 Minuten markiert');
+  await laptop.close();
+
   console.log('Sackgasse: Station noch gesperrt');
   await page.evaluate(() => Speicher.schreiben('fortschritt', { stationen: { foto: { status: 'fertig' } } }));
   await page.goto(BASE + '/app/station.html?id=lasercutter');
