@@ -154,7 +154,7 @@ function vorschlagAbwarten(page){
   await page.waitForSelector('text=Super, geschafft!');
   await page.waitForSelector('text=Weiter geht es');
   const naechste = await page.locator('.gross-text strong').textContent();
-  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Selbstporträts mit KI neu erschaffen', 'Linoldruck', 'Kunst-Quiz: Künstler:innen und Streetart', 'Berufe: Wer macht das in echt?', 'Bild-App vibe coden', 'Sticker mit dem Schneideplotter', 'Lasercutter'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
+  pruefe(['Bild bearbeiten', 'Hintergrund ändern', 'Körpererkennung testen', 'Pixel vs. Vektor', 'Coding: HTML, CSS und JavaScript', 'Selbstporträts mit KI neu erschaffen', 'Linoldruck', 'Kunst-Quiz: Künstler:innen und Streetart', 'Berufe: Wer macht das in echt?', 'Eure eigene Bild-App', 'Sticker mit dem Schneideplotter', 'Lasercutter'].indexOf(naechste) >= 0, 'nächste Station vorgeschlagen: ' + naechste);
   pruefe((await page.locator('.zaehler').textContent()).indexOf('1 von 14') >= 0, 'Zähler steht auf 1 von 14');
   pruefe(await page.locator('.puzzle').first().locator('.puzzle-teil.da').count() === 1, 'ein Puzzleteil sichtbar');
   await page.screenshot({ path: path.join(SHOTS, BROWSER + '-3-weiter.png'), fullPage: true });
@@ -442,7 +442,7 @@ function vorschlagAbwarten(page){
   pruefe((await page.locator('.zaehler').textContent()).indexOf('8 von 14') >= 0, 'KI-Station ist Pflicht und zählt mit: 8 von 14');
   pruefe(await page.locator('text=Diese Station war optional').count() === 0, 'kein Hinweis „optional“ mehr');
 
-  console.log('Station Bild-App vibe coden (Server im Testmodus, ohne Claude)');
+  console.log('Station Eure eigene Bild-App (Server im Testmodus, ohne Claude)');
   await page.goto(BASE + '/app/station.html?id=vibe-coding&test');
   await page.waitForSelector('.vibe-auftrag select');
   pruefe(await page.locator('.vibe-auftrag select').count() === 3 && await page.locator('.vibe-auftrag input').count() === 0, 'Lückentext: 3 Auswahlfelder (Effekt, was man tun kann, Farben), kein Textfeld');

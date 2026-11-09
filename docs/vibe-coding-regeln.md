@@ -1,11 +1,11 @@
-# KI-Ecke: Frei vibe coden (Kärtchen für die erwachsene Person)
+# KI-Ecke: Eigene Idee umsetzen (Kärtchen für die erwachsene Person)
 
 Ausdrucken und an die Station legen. Die PIN steht **nicht** auf diesem Zettel, Penny sagt sie dir.
 
 ## So geht es
 
-1. Die Gruppe ist an der Station „Bild-App vibe coden“ und hat mindestens eine Baukasten-App gesehen (oder will gleich frei starten).
-2. Auf dem iPad: **„🔓 Erwachsene Person: frei vibe coden freischalten“** antippen, PIN eingeben.
+1. Die Gruppe ist an der Station „Eure eigene Bild-App“ und hat mindestens eine Baukasten-App gesehen (oder will gleich frei starten).
+2. Auf dem iPad: **„💡 Eigene Idee mit Penny umsetzen“** antippen, PIN eingeben.
 3. Die Kinder erzählen ihre Idee, **du tippst** sie ins Textfeld. Dann „✨ Neue App bauen“.
 4. App zusammen testen. Änderungswünsche („mach den Knopf größer“, „füge Glitzer hinzu“) ins Textfeld, dann „🔧 Letzte App ändern“.
 5. Die Freigabe gilt **15 Minuten**. Sie endet sofort, wenn die Gruppe die Station beendet. Höchstens 6 Apps pro Gruppe.

@@ -113,7 +113,7 @@
     var body = document.getElementById("ki");
     body.innerHTML = "";
     if (!ki) return;
-    [["KI-Selbstporträt", ki.arten.bild], ["Bild-App vibe coden", ki.arten.app], ["Zusammen", ki.gesamt]].forEach(function (z) {
+    [["KI-Selbstporträt", ki.arten.bild], ["Eure eigene Bild-App", ki.arten.app], ["Zusammen", ki.gesamt]].forEach(function (z) {
       var s = z[1], row = document.createElement("tr");
       td(row, z[0]);
       td(row, String(s.anfragen));

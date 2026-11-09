@@ -139,7 +139,7 @@ function ereignis(api, gruppe, art, station, nr){
   pruefe(reihe.nachLaser === 'sticker', 'nach dem Lasercutter: Sticker (' + reihe.nachLaser + ')');
   pruefe(reihe.stickerVoll === 'ki-selbstportraet', 'Sticker voll: KI-Selbstporträt (' + reihe.stickerVoll + ')');
   pruefe(reihe.nachSticker === 'ki-selbstportraet', 'nach dem Sticker: KI-Selbstporträt (' + reihe.nachSticker + ')');
-  pruefe(reihe.nachKi1 === 'vibe-coding', 'danach: Bild-App vibe coden (' + reihe.nachKi1 + ')');
+  pruefe(reihe.nachKi1 === 'vibe-coding', 'danach: Eure eigene Bild-App (' + reihe.nachKi1 + ')');
   pruefe(reihe.vibeVoll.split(',').indexOf('vibe-coding') < 0 && reihe.vibeVoll.length > 0, 'Vibe Coding besetzt: eine andere Station (' + reihe.vibeVoll + ')');
   pruefe(reihe.laserVollKi === 'ki-selbstportraet', 'Lasercutter voll: gleich weiter zur KI (' + reihe.laserVollKi + ')');
 

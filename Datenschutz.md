@@ -10,7 +10,7 @@ Für Lehrkräfte und Eltern stehen die genauen Angaben ganz unten.
 
 - Deine Fotos bleiben auf dem iPad. Dort werden sie auch bearbeitet. Kein Foto von dir geht an den Laptop oder ins Internet.
 - Pennys Laptop hier im Raum bekommt nur, was er für Laser und Plotter braucht (dein Porträt, Sticker, Stempel), und eure Antworten. Er schickt nichts davon ins Internet.
-- Nur an zwei Stationen geht etwas ins Internet: an eine KI namens Claude. Dorthin gehen nur Wörter aus einem Baukasten, bei der Station "Bild-App vibe coden" kannst Du auch eine freie Idee umsetzen, wenn eine erwachsene Person den Prompt (Anfrage an die KI) mit euch eintippt. Dort wird nur Text eingegeben, kein Foto, kein Name. Ihr müsst nichts an Claude schicken: An beiden Stationen gibt es den Knopf „nur Beispiele ansehen“. Dann geht von euch nichts ins Internet.
+- Nur an zwei Stationen geht etwas ins Internet: an eine KI namens Claude. Dorthin gehen nur Wörter aus einem Baukasten, bei der Station "Eure eigene Bild-App" kannst Du auch eine freie Idee umsetzen, wenn eine erwachsene Person den Prompt (Anfrage an die KI) mit euch eintippt. Dort wird nur Text eingegeben, kein Foto, kein Name. Ihr müsst nichts an Claude schicken: An beiden Stationen gibt es den Knopf „nur Beispiele ansehen“. Dann geht von euch nichts ins Internet.
 - Am Ende des Workshops löscht Penny alles. Mit nach Hause nehmt ihr Porträt, Postkarte und Sticker (und euren Stempel, wenn ihr einen gemacht habt).
 
 ## Drei Orte für deine Daten
@@ -31,7 +31,7 @@ An jeder Station fragt die App: Was hast du gerade benutzt? Hier ist der Untersc
 | ----------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------ |
 | **Computerprogramm**    | Feste Regeln. Gleiche Eingabe, immer gleiches Ergebnis.                              | Schwarz-Weiß machen (Otsu), Porträt- und Stempel-Datei, Laser |
 | **Bildbearbeitungs-KI** | Hat aus Beispielen gelernt. Erkennt oder verändert dein Bild, erfindet nichts Neues. | Die KI findet dich auf dem Foto (BodyPix)        |
-| **Generative KI**       | Erfindet neue Bilder oder Texte. Gleicher Auftrag, jedes Mal etwas anderes.          | KI-Selbstporträt, Bild-App vibe coden (Claude)   |
+| **Generative KI**       | Erfindet neue Bilder oder Texte. Gleicher Auftrag, jedes Mal etwas anderes.          | KI-Selbstporträt, eigene Bild-App (Claude)       |
 
 Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Foto freistellt, rechnet auf dem iPad. Dein Foto verlässt dafür das iPad nicht.
 
@@ -48,7 +48,7 @@ Wichtig: Auch eine KI kann ganz auf dem iPad laufen. Die KI, die dich auf dem Fo
 | Pixel vs. Vektor                   | –                                                | Eure Antworten, euer SVG-Code                             | –                                             |
 | Coding: HTML, CSS und JavaScript   | –                                                | Euer Code, eure Antwort                                   | –                                             |
 | Selbstporträts mit KI              | –                                                | Euer Prompt und die Bilder                                | **Claude:** nur euer Prompt aus dem Baukasten |
-| Bild-App vibe coden                | Euer Foto (es geht nur in eure App auf dem iPad) | Euer Auftrag und eure App                                 | **Claude:** nur euer ausgefüllter Auftrag     |
+| Eure eigene Bild-App               | Euer Foto (es geht nur in eure App auf dem iPad) | Euer Auftrag und eure App                                 | **Claude:** nur euer ausgefüllter Auftrag     |
 | Optional: Stempel                  | Schwarz-Weiß-Bild, Zwischenschritte              | Dein Stempel und dein Name                                | –                                             |
 | Linoldruck und Stempeldruck        | Fotos eurer Postkarten                           | –                                                         | –                                             |
 | Code-Quiz                          | –                                                | Wie viele Antworten richtig waren                         | –                                             |
@@ -65,7 +65,7 @@ Fotografiere an den Stationen nur die Sache, um die es geht: die Maschine, die P
 Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen gehören zum Workshop. Ob dabei etwas an Claude geht, entscheidet ihr: Mit dem Knopf „nur Beispiele ansehen“ schickt ihr nichts und könnt die Station trotzdem beenden. Ihr verpasst nichts für euer Porträt.
 
 - **Was geht hin?** Nur der Satz aus dem Baukasten. Zum Beispiel: „Zeichne ein Selbstporträt im Stil von Frida Kahlo. Es zeigt ein 14-jähriges Mädchen mit braunen Augen und langen Haaren.“ Bei der Bild-App kommt der App-Name dazu, den ihr selbst eintippt.
-- **Frei vibe coden:** Bei der Bild-App dürft ihr eure Idee auch frei beschreiben und eure App weiterbauen lassen. Das geht nur, wenn eine erwachsene Person dabei ist: Sie schaltet euer iPad mit einer PIN frei (15 Minuten, oder bis ihr die Station beendet) und tippt eure Idee ein. Sie achtet darauf, dass nichts über euch im Auftrag (Prompt) steht.
+- **Eigene Idee mit Penny:** Bei der Bild-App dürft ihr eure Idee auch frei beschreiben und eure App weiterbauen lassen. Das geht nur, wenn eine erwachsene Person dabei ist: Sie schaltet euer iPad mit einer PIN frei (15 Minuten, oder bis ihr die Station beendet) und tippt eure Idee ein. Sie achtet darauf, dass nichts über euch im Auftrag (Prompt) steht.
 - **Was geht nicht hin?** Kein Foto, kein Name, nichts, was zeigt, wer ihr seid. Schreibt deshalb auch in den App-Namen keinen echten Namen.
 - **Wer schickt es?** Nicht das iPad, sondern Pennys Laptop. Anthropic sieht also nicht, von welchem iPad der Auftrag kommt.
 - **Wie lange bleibt es dort?** Anthropic löscht die Aufträge normalerweise nach höchstens 30 Tagen. Anthropic benutzt sie nicht, um die KI weiter zu trainieren.
@@ -119,7 +119,7 @@ Claude ist eine generative KI der Firma Anthropic in den USA. Beide Stationen ge
 
 | Dienst                                      | Wann                                                           | Welche Daten                                                                                                                                                                                            |
 | ------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Anthropic (Claude-API), USA                 | Stationen „Selbstporträts mit KI“ und „Bild-App vibe coden“ (nur mit Einwilligung, sonst Beispiele; Kinder können selbst „nur Beispiele“ wählen) | Ausgefüllter Baukasten-Text (Stil, Alter 11–18, Geschlecht, Augen- und Haarfarbe, Brille; bzw. Effekt, Farben, App-Name). Bei „Bild-App vibe coden“ zusätzlich freier Auftrag (höchstens 1000 Zeichen) und ggf. der Code der bisherigen App, nur nach PIN-Freigabe durch eine erwachsene Person. Kein Foto, kein Name, keine Geräte-IP (Anfrage kommt vom Laptop). |
+| Anthropic (Claude-API), USA                 | Stationen „Selbstporträts mit KI“ und „Eure eigene Bild-App“ (nur mit Einwilligung, sonst Beispiele; Kinder können selbst „nur Beispiele“ wählen) | Ausgefüllter Baukasten-Text (Stil, Alter 11–18, Geschlecht, Augen- und Haarfarbe, Brille; bzw. Effekt, Farben, App-Name). Bei „Eure eigene Bild-App“ zusätzlich freier Auftrag (höchstens 1000 Zeichen) und ggf. der Code der bisherigen App, nur nach PIN-Freigabe durch eine erwachsene Person. Kein Foto, kein Name, keine Geräte-IP (Anfrage kommt vom Laptop). |
 | YouTube (Google), über youtube-nocookie.com | Nur nach Antippen von „Video laden“ an den Stationen Lasercutter und Sticker | IP-Adresse des iPads, Geräte- und Browserdaten.                                                                                                                                                         |
 | Apple (Diktierfunktion)                     | Nur, wenn ein Kind die Mikrofon-Taste nutzt                    | Sprachaufnahme, je nach Gerät auf dem iPad oder bei Apple verarbeitet.                                                                                                                                  |
 | Netlify, USA                                | Nur Plan B (WLAN zum Laptop geht nicht)                        | IP-Adresse des iPads in den Server-Protokollen. Keine Fotos, keine Antworten.                                                                                                                           |

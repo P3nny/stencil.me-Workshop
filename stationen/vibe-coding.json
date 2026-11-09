@@ -1,11 +1,11 @@
 {
   "id": "vibe-coding",
-  "titel": "Bild-App vibe coden",
+  "titel": "Eure eigene Bild-App",
   "typ": "generativ",
   "datenweg": "online",
   "schritte": [
-    "Vibe coding heißt: Ihr sagt einer KI (Claude), was eine App können soll, und sie schreibt den Code. So ist auch stencil.me entstanden.",
-    "Füllt den Auftrag aus: Was soll eure App mit dem Foto machen? Mit einer erwachsenen Person dürft ihr auch frei beschreiben, was eure App können soll.",
+    "Ihr erfindet eine eigene Bild-App für euer Foto. Den Code schreibt eine KI (Claude). Das nennt man vibe coding, so ist auch stencil.me entstanden.",
+    "Füllt den Auftrag aus: Was soll eure App mit dem Foto machen? Ihr habt eine ganz eigene Idee? Dann holt Penny und setzt sie zusammen um.",
     "Tippt auf „App bauen lassen“ und schaut zu, wie der Code entsteht (etwa eine Minute). Eure App nimmt automatisch euer Foto.",
     "Testet eure App mit eurem Foto.",
     "Vergleicht: Welche Schritte aus stencil.me findet ihr in eurer App wieder?"
